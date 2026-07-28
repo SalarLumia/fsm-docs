@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FSM | سامانهٔ مدیریت اسناد فولاد شرق ماهان</title>
+<link rel="icon" type="image/svg+xml" href="fsm-favicon.svg">
+<link rel="stylesheet" href="styles/tokens.css">
+<link rel="stylesheet" href="styles/base.css">
+<link rel="stylesheet" href="styles/components.css">
+<link rel="stylesheet" href="styles/layout.css">
+<link rel="stylesheet" href="styles/dashboard.css">
+<link rel="stylesheet" href="styles/features.css">
+<link rel="stylesheet" href="styles/project.css">
+<link rel="stylesheet" href="styles/login.css">
+</head>
+<body>
+
+<!-- ============ صفحهٔ ورود ============ -->
+<div id="loginView" class="login-wrap">
+  <div class="login-brand">
+    <img class="mark" src="fsm-mark.svg" alt="فولاد شرق ماهان">
+    <h2>فولاد شرق ماهان</h2>
+    <p class="en">FOOLAD SHARGH MAHAN</p>
+    <p class="tag">سامانهٔ مدیریت شماره و اسناد نقشه<br>دفتر فنی، تحقیق و توسعه و کنترل کیفی</p>
+  </div>
+  <div class="login-form">
+    <div class="login-card">
+      <h1>ورود به سامانه</h1>
+      <p class="sub">برای ادامه، نام کاربری و رمز عبور خود را وارد کنید.</p>
+      <label>نام کاربری</label>
+      <input id="lgUser" placeholder="نام کاربری" autocomplete="username">
+      <label>رمز عبور</label>
+      <input id="lgPass" type="password" placeholder="رمز عبور" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="btn-login" onclick="doLogin()">ورود</button>
+      <p id="lgErr" class="err"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ برنامهٔ اصلی ============ -->
+<div id="appView" class="hidden">
+
+  <!-- ===== Sidebar (سمت راست) ===== -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <img class="sb-logo" src="fsm-logotype.svg" alt="فولاد شرق ماهان">
+      <div class="sb-caption">سامانهٔ مدیریت اسناد</div>
+    </div>
+    <nav class="sb-nav" id="sidebar-nav">
+      <button class="nav-item active" data-tab="dashboard">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        داشبورد
+      </button>
+      <button class="nav-item" data-tab="archive">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        آرشیو اسناد
+      </button>
+      <div class="nav-tree">
+        <div class="nav-trow">
+          <button class="nav-item nav-tmain" data-tab="project">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            مشتریان و پروژه‌ها
+          </button>
+          <button class="nav-exp" id="navRootExp" onclick="navToggleRoot(event)" aria-label="نمایش/پنهان‌سازی مشتریان" aria-expanded="false">
+            <svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+        </div>
+        <div class="nav-collapse" id="navTreeChildren"></div>
+      </div>
+    </nav>
+    <div class="sb-dev">
+      <span class="sb-dev-name">توسعه‌ دهنده : علی شفیعی</span>
+      <a class="sb-dev-mail" href="mailto:salar_sh@live.com">salar_sh@live.com</a>
+    </div>
+    <div class="sb-bottom">
+      <button class="nav-item adminOnly" data-tab="data">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        تنظیمات
+      </button>
+      <button class="nav-item" data-tab="help">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>
+        راهنما
+      </button>
+      <button class="nav-item nav-logout" onclick="logout()">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        خروج
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== بدنهٔ اصلی ===== -->
+  <div class="app-body">
+    <header class="top-bar">
+      <div class="top-bar-right">
+        <div class="user-badge">
+          <div class="user-avatar" id="uAvatar"></div>
+          <div class="user-meta">
+            <span id="uName" class="user-name"></span>
+            <span id="uPosition" class="user-position"></span>
+          </div>
+        </div>
+      </div>
+      <div class="gs-wrap">
+        <input id="globalSearch" placeholder="جستجو در آرشیو اسناد…" oninput="onGlobalSearch(this.value)">
+        <span class="gs-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>
+      </div>
+      <div class="top-bar-left">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span id="topClock" class="top-clock" dir="rtl"></span>
+      </div>
+    </header>
+
+    <main class="app-main">
+
+    <!-- ---------- داشبورد ---------- -->
+    <section id="tab-dashboard" class="tabpane">
+      <div class="dash-hero">
+        <div class="hero-txt">
+          <h2>به سامانه مدیریت اسناد فولاد شرق ماهان خوش آمدید</h2>
+          <p>نمای کلی پروژه‌ها و وضعیت اسناد مهندسی شرکت</p>
+        </div>
+        <div class="hero-action adminOnly">
+          <button class="btn-new-doc" onclick="openNewDocModal()">
+            <svg viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/><line x1="12" y1="14" x2="12" y2="20"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+            ثبت سند جدید
+          </button>
+        </div>
+      </div>
+      <section class="dash-review reviewerOnly" id="reviewQueueSection">
+        <div class="panel-hd">
+          <h3><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>کارتابل بازبینی <span id="reviewQueueCount" class="rq-count"></span></h3>
+          <button id="reviewSeeAll" class="btn sm" onclick="openReviewAllModal()" hidden>مشاهدهٔ همه<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        </div>
+        <div id="reviewQueueList"></div>
+      </section>
+      <div class="kpi-grid rv-group">
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-figures"><div class="kpi-val" id="kpiActiveProjects">—</div><div class="kpi-label">پروژه‌های فعال</div></div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          </div>
+          <div class="kpi-foot kf-warn"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-figures"><div class="kpi-val" id="kpiDocs">—</div><div class="kpi-label">اسناد ثبت‌شده</div></div>
+            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          </div>
+          <div class="kpi-foot kf-ok"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-figures"><div class="kpi-val" id="kpiApproved">—</div><div class="kpi-label">اسناد تأییدشده</div></div>
+            <div class="kpi-icon" style="background:#dcfce7"><svg viewBox="0 0 24 24" style="stroke:var(--ok)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          </div>
+          <div class="kpi-foot kf-ok"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-top">
+            <div class="kpi-figures"><div class="kpi-val" id="kpiPending">—</div><div class="kpi-label">در انتظار بازبینی</div></div>
+            <div class="kpi-icon" style="background:#fef3c7"><svg viewBox="0 0 24 24" style="stroke:var(--warn)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          </div>
+          <div class="kpi-foot kf-warn"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+        </div>
+      </div>
+      <div class="dash-panels rv-group">
+        <div class="dash-panel">
+          <div class="panel-hd">
+            <h3><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>پیشرفت پروژه‌ها</h3>
+            <button class="btn sm" onclick="switchTab('project')">مشاهدهٔ همه<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+          </div>
+          <div id="projCardsList"></div>
+        </div>
+        <div class="dash-panel">
+          <div class="panel-hd">
+            <h3><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>فعالیت های اخیر</h3>
+            <button id="recentSeeAll" class="btn sm" onclick="openRecentAllModal()" hidden>مشاهدهٔ همه<svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+          </div>
+          <div id="recentDocsList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ثبت سند به‌صورت مودال پاپ‌آپ است (پایین صفحه، خارج از تب‌ها) -->
+
+
+    <!-- ---------- آرشیو ---------- -->
+    <section id="tab-archive" class="tabpane hidden">
+      <div class="card">
+        <div class="toolbar">
+          <div class="grow"><label class="fld">جستجو</label><input id="aSearch" placeholder="شماره سند، مشتری، نوع، عنوان خودکار…" oninput="renderArchive()"></div>
+          <div><label class="fld">مشتری</label><select id="aClient" onchange="onArchiveClientChange()"><option value="">همه</option></select></div>
+          <div><label class="fld">پروژه</label><select id="aProject" onchange="renderArchive()"><option value="">همه پروژه‌ها</option></select></div>
+          <div><label class="fld">نوع</label><select id="aType" onchange="renderArchive()"><option value="">همه</option></select></div>
+          <div><label class="fld">وضعیت</label><select id="aStatus" onchange="renderArchive()">
+            <option value="">همه</option><option value="draft">پیش‌نویس</option><option value="pending">در انتظار بازبینی</option>
+            <option value="approved">تأییدشده</option><option value="rejected">ردشده</option></select></div>
+          <div><label class="fld">ریویژن</label><select id="aLatest" onchange="renderArchive()"><option value="">همه</option><option value="1">فقط آخرین</option></select></div>
+          <div><label class="fld">&nbsp;</label><button class="btn" onclick="clearArchiveFilters()">پاک‌کردن فیلترها</button></div>
+          <div><label class="fld">&nbsp;</label><button class="btn" onclick="exportCSV()">خروجی Excel/CSV</button></div>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead id="archiveHead"></thead>
+            <tbody id="archiveBody"></tbody>
+          </table>
+        </div>
+        <p class="hint" id="archiveCount" style="margin-top:10px"></p>
+      </div>
+    </section>
+
+    <!-- ---------- مشتریان و پروژه‌ها ---------- -->
+    <section id="tab-project" class="tabpane hidden">
+      <div id="cpView" class="rv-group"></div>
+      <div id="projectDetailView" class="hidden"></div>
+    </section>
+
+    <!-- ---------- راهنما ---------- -->
+    <section id="tab-help" class="tabpane hidden">
+      <div class="card">
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>راهنمای سایت</h3>
+        <div class="help-empty">
+          <div class="help-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg></div>
+          <h4>راهنمای سامانه به‌زودی</h4>
+          <p>این بخش با تکمیلِ سامانه به راهنمای گام‌به‌گامِ کار با اسناد، پروژه‌ها و گردشِ تأیید تجهیز می‌شود.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- تنظیمات سامانه ---------- -->
+    <section id="tab-data" class="tabpane hidden">
+      <div class="card">
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات</h3>
+        <div class="toolbar">
+          <div><label class="fld">کد</label><input id="ptNo" placeholder="خودکار" style="width:90px"></div>
+          <div class="grow"><label class="fld">نام انگلیسی قطعه</label><input id="ptName" placeholder="ROLLER" style="direction:ltr;text-align:left"></div>
+          <div class="grow"><label class="fld">نام فارسی قطعه</label><input id="ptFa" placeholder="غلطک"></div>
+          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelPartBtn" onclick="resetPartForm()" style="display:none">انصراف</button><button class="btn primary" id="savePartBtn" onclick="savePart()">افزودن</button></div></div>
+        </div>
+        <div class="tablewrap" style="max-height:220px"><table><thead><tr><th>کد</th><th>نام انگلیسی قطعه</th><th>نام فارسی قطعه</th><th>عملیات</th></tr></thead><tbody id="partsBody"></tbody></table></div>
+      </div>
+
+      <div class="card">
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد</h3>
+        <div class="toolbar">
+          <div><label class="fld">کد</label><input id="dtCode" placeholder="MC" maxlength="6" style="width:90px;direction:ltr;text-align:left;text-transform:uppercase" oninput="this.value=enDigits(this.value).replace(/[^A-Za-z0-9]/g,'').toUpperCase()"></div>
+          <div class="grow"><label class="fld">نام انگلیسی سند</label><input id="dtEn" placeholder="Machining"></div>
+          <div class="grow"><label class="fld">نام فارسی سند</label><input id="dtFa" placeholder="نقشه ماشینکاری"></div>
+          <div><label class="fld">سطح</label><select id="dtScope"><option value="part">قطعه</option><option value="project">پروژه (Part 00)</option></select></div>
+          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelDocTypeBtn" onclick="resetDocTypeForm()" style="display:none">انصراف</button><button class="btn primary" id="saveDocTypeBtn" onclick="saveDocType()">افزودن</button></div></div>
+        </div>
+        <div class="tablewrap" style="max-height:240px"><table><thead><tr><th>کد</th><th>نام انگلیسی سند</th><th>نام فارسی سند</th><th>سطح</th><th>عملیات</th></tr></thead><tbody id="doctypesBody"></tbody></table></div>
+      </div>
+
+      <div class="card">
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات</h3>
+        <div class="toolbar">
+          <div class="grow"><label class="fld">نام پارامتر</label><input id="ptmName" placeholder="مثلاً وزن، جنس، سختی"></div>
+          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelPartModBtn" onclick="resetPartModForm()" style="display:none">انصراف</button><button class="btn primary" id="savePartModBtn" onclick="savePartMod()">افزودن</button></div></div>
+        </div>
+        <div class="tablewrap" style="max-height:220px"><table><thead><tr><th>نام پارامتر</th><th>عملیات</th></tr></thead><tbody id="partmodsBody"></tbody></table></div>
+      </div>
+
+      <div class="card">
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران</h3>
+        <div class="toolbar">
+          <div><label class="fld">نام کاربری (لاتین)</label><input id="usUser" placeholder="ali" style="direction:ltr;text-align:left"></div>
+          <div class="grow"><label class="fld">نام و نام خانوادگی</label><input id="usName" placeholder="علی شفیعی"></div>
+          <div><label class="fld">جنسیت</label><select id="usGender"><option value="male">آقا</option><option value="female">خانم</option></select></div>
+          <div class="grow"><label class="fld">سمت</label><input id="usPosition" placeholder="واحد تحقیق و توسعه"></div>
+          <div><label class="fld">رمز عبور (فقط کاربر جدید)</label><input id="usPass" type="password" placeholder="••••••"></div>
+          <div><label class="fld">نقش</label><select id="usRole"><option value="viewer">بیننده</option><option value="reviewer">بازبین</option><option value="admin">مدیر سیستم</option></select></div>
+          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelUserBtn" onclick="resetUserForm()" style="display:none">انصراف</button><button class="btn primary" id="saveUserBtn" onclick="saveUser()">افزودن</button></div></div>
+        </div>
+        <div style="margin:2px 0 12px">
+          <label class="fld">آواتار (در هدر نمایش داده می‌شود)</label>
+          <div class="avatar-picker" id="usAvatarPicker"></div>
+          <input type="hidden" id="usAvatar">
+        </div>
+        <div class="tablewrap" style="max-height:200px"><table><thead><tr><th>نام کاربری</th><th>نام و نام خانوادگی</th><th>سمت</th><th>نقش</th><th>عملیات</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+      </div>
+    </section>
+    </main>
+    <footer class="app-footer">
+      <span>ارائه‌دهندهٔ راهکارهای خلاق دیجیتال برای کسب‌وکارها</span>
+    </footer>
+  </div><!-- /.app-body -->
+</div><!-- /#appView -->
+
+<!-- ============ مودال ثبت سند جدید (پاپ‌آپ، بدون ترک صفحه) ============ -->
+<div id="newDocModal" class="modal hidden" onclick="if(event.target===this)closeNewDocModal()">
+  <div class="box newdoc-box">
+    <header><strong>ثبت سند / نقشهٔ جدید</strong>
+      <button class="modal-x" onclick="closeNewDocModal()" aria-label="بستن" title="بستن">✕</button></header>
+    <div class="body"><div class="newdoc-body">
+      <div class="grid g3">
+        <div><label class="fld">مشتری</label><select id="nClient" onchange="onClientChange('n')"></select></div>
+        <div><label class="fld">سفارش</label><select id="nOrder" onchange="onOrderChange('n')"></select></div>
+        <div><label class="fld">پروژه</label><select id="nProject"></select></div>
+        <div><label class="fld">نوع سند</label><select id="nType" onchange="onTypeChange()"></select></div>
+        <div><label class="fld">قطعه</label><select id="nPart"></select><div class="hint" id="partHint"></div></div>
+        <div><label class="fld">ریویژن <span class="muted" style="font-weight:400;font-size:10.5px">(خودکار)</span></label><input id="nRev" class="mono" placeholder="خودکار" style="direction:ltr;text-align:center" readonly title="ریویژن به‌صورت خودکار مدیریت می‌شود"></div>
+      </div>
+      <div id="nRevBanner" class="nrev-banner" hidden></div>
+      <div class="grid g2" style="margin-top:16px">
+        <div class="ndoc-note">
+          <label class="fld" id="nTitleLabel">یادداشت مربوط به این سند / نقشه</label>
+          <textarea id="nTitle" class="ndoc-note-ta" placeholder="یادداشت یا توضیح دربارهٔ این سند…"></textarea>
+        </div>
+        <div class="ndoc-file">
+          <label class="fld">فایل سند (PDF یا تصویر) — الزامی</label>
+          <label class="dropzone" id="nDrop" for="nFile">
+            <input id="nFile" class="dz-input" type="file" accept=".pdf,image/*" onchange="onFilePicked()">
+            <div class="dz-body">
+              <span class="dz-ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
+              <div class="dz-main">فایل را اینجا بکشید و رها کنید</div>
+              <div class="dz-sub">یا برای انتخاب کلیک کنید — PDF یا تصویر</div>
+              <div class="dz-file" id="nFileName" hidden></div>
+            </div>
+            <div class="dz-overlay"><span>اینجا رها کنید</span></div>
+          </label>
+        </div>
+      </div>
+      <div class="numbox invalid" id="nPreviewBox">
+        <span class="nb-label">شماره سند</span>
+        <span class="num" id="nPreview">منتظر تکمیل اطلاعات…</span>
+        <button type="button" class="btn sm nCopy" id="nCopyBtn" hidden onclick="copyDocNumber()" title="کپی شماره سند در کلیپ‌بورد">
+          <svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>کپی</button>
+        <span class="nb-spacer"></span>
+        <button class="btn primary" id="nSubmitBtn" onclick="submitDocument()">ثبت سند</button>
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<div id="modalHost"></div>
+<div id="toastHost"></div>
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="spinner"></div>
+  <div class="loading-msg" id="loadingMsg">در حال پردازش...</div>
+</div>
+
+<!-- ===== اسکریپت‌ها (ترتیب وابستگی؛ app.js آخر) ===== -->
+<script src="scripts/config.js"></script>
+<script src="scripts/state.js"></script>
+<script src="scripts/api.js"></script>
+<script src="scripts/auth.js"></script>
+<script src="scripts/nav.js"></script>
+<script src="scripts/selects.js"></script>
+<script src="scripts/dashboard.js"></script>
+<script src="scripts/documents.js"></script>
+<script src="scripts/archive.js"></script>
+<script src="scripts/docmodal.js"></script>
+<script src="scripts/review.js"></script>
+<script src="scripts/projects.js"></script>
+<script src="scripts/settings.js"></script>
+<script src="scripts/app.js"></script>
+</body>
+</html>

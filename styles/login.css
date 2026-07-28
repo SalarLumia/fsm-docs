@@ -1,0 +1,32 @@
+/* ===== صفحهٔ ورود — مدرن و مینیمال، دو ستونه ===== */
+.login-wrap{min-height:100vh;display:flex;background:#f4f4f3}
+.login-brand{flex:1.05;position:relative;overflow:hidden;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:14px;padding:48px 40px;color:#fff;
+  background:radial-gradient(120% 90% at 75% 10%,#33333a 0,#1d1d20 55%,#161618 100%)}
+.login-brand::before{content:"";position:absolute;left:-18%;bottom:14%;width:150%;height:54px;
+  background:#f7941f;transform:rotate(-13deg);opacity:.92}
+.login-brand::after{content:"";position:absolute;left:-18%;bottom:7%;width:150%;height:14px;
+  background:#fbcf88;transform:rotate(-13deg);opacity:.85}
+.login-brand .mark{width:132px;height:auto;position:relative;z-index:1;filter:drop-shadow(0 10px 30px #0007)}
+.login-brand h2{position:relative;z-index:1;margin:6px 0 0;font-size:25px;font-weight:700;color:#fbcf88}
+.login-brand .en{position:relative;z-index:1;margin:0;font-size:12px;letter-spacing:3px;color:#c7c7c7}
+.login-brand .tag{position:relative;z-index:1;margin:10px 0 0;max-width:300px;text-align:center;
+  line-height:2;font-size:13px;color:#b6b6b6;display:block;background:none;border:none;border-radius:0;padding:0;font-weight:400}
+.login-form{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
+.login-card{width:min(360px,92%)}
+.login-card h1{font-size:23px;margin:0 0 6px;color:#1c1c1e;font-weight:700}
+.login-card .sub{color:#6f6f6f;font-size:13px;margin:0 0 28px}
+.login-card label{display:block;font-size:12.5px;color:#1c1c1e;margin:0 0 7px;font-weight:500}
+.login-card input{width:100%;background:#fff;border:1px solid #dcdcd8;color:#1c1c1e;
+  padding:12px 13px;border-radius:11px;margin-bottom:18px;font-family:inherit;font-size:14px;transition:.15s}
+.login-card input::placeholder{color:#b3b3ad}
+.login-card input:focus{outline:none;border-color:#f7941f;box-shadow:0 0 0 3px #f7941f26}
+.btn-login{width:100%;padding:13px;border:none;border-radius:11px;cursor:pointer;font-family:inherit;
+  font-size:15px;font-weight:700;color:#231405;background:linear-gradient(135deg,#fbcf88,#f7941f);transition:.15s}
+.btn-login:hover{filter:brightness(1.05);box-shadow:0 8px 22px #f7941f44}
+.login-card .err{color:#d23b2f;font-size:12.5px;min-height:18px;margin-top:14px}
+@media(max-width:780px){
+  .login-wrap{flex-direction:column}
+  .login-brand{flex:none;min-height:34vh;padding:34px 20px}
+  .login-brand .mark{width:96px}
+}

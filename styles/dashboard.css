@@ -1,0 +1,134 @@
+/* ===== هیرو خوش‌آمد ===== */
+.dash-hero{position:relative;overflow:hidden;border-radius:var(--radius-lg);padding:26px 28px;margin-bottom:18px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;color:#fff;
+  background:radial-gradient(120% 130% at 90% 10%,#3a3a41 0,#26262a 55%,#1c1c1f 100%)}
+.dash-hero::before{content:"";position:absolute;left:-10%;bottom:-30%;width:60%;height:150%;
+  background:#f7941f;transform:rotate(-16deg);opacity:.14}
+.dash-hero::after{content:"";position:absolute;left:2%;bottom:-30%;width:60%;height:150%;
+  background:#fbcf88;transform:rotate(-16deg);opacity:.10}
+.dash-hero .hero-txt{position:relative;z-index:1}
+.dash-hero h2{margin:0;font-size:20px;font-weight:800;color:#fff;line-height:1.5}
+.dash-hero p{margin:6px 0 0;font-size:13px;color:#c7c7cc}
+.dash-hero .hero-action{position:relative;z-index:1;flex-shrink:0}
+
+.btn-new-doc{display:inline-flex;align-items:center;gap:9px;padding:12px 22px;font-size:14px;font-weight:700;
+  background:var(--brand);border:none;color:#fff;border-radius:11px;cursor:pointer;font-family:inherit;
+  box-shadow:0 4px 16px #f7941f55;transition:.15s}
+.btn-new-doc:hover{background:var(--brand2);box-shadow:0 6px 20px #f7941f66;transform:translateY(-1px)}
+.btn-new-doc svg{width:19px;height:19px;flex-shrink:0;fill:none;stroke:#fff;stroke-width:2}
+
+/* ===== کارت‌های شاخص (KPI) ===== */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+@media(max-width:1100px){.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+.kpi-card{background:#ffffff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px 14px;
+  display:flex;flex-direction:column;gap:14px;box-shadow:0 1px 4px #00000008;transition:.15s}
+.kpi-card:hover{box-shadow:0 4px 14px #0000000f;border-color:#d8d6d0}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.kpi-figures{min-width:0}
+.kpi-icon{width:46px;height:46px;border-radius:12px;background:#fff3e6;display:grid;place-items:center;flex-shrink:0;
+  transition:transform .3s cubic-bezier(0,0,.2,1)}
+/* میکرو‌هاور: با هاورِ کارت، آیکون کمی بزرگ و کج می‌شود */
+.kpi-card:hover .kpi-icon{transform:scale(1.08) rotate(-5deg)}
+.kpi-icon svg{width:22px;height:22px;stroke:var(--brand);fill:none;stroke-width:1.8}
+.kpi-val{font-size:28px;font-weight:800;color:var(--txt);line-height:1}
+.kpi-label{font-size:12px;color:var(--muted);margin-top:3px}
+.kpi-sub{font-size:11px;color:var(--ok);font-weight:600;margin-top:4px}
+.kpi-foot{display:flex;align-items:center;gap:7px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:11px;color:var(--muted);font-weight:500}
+.kpi-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--muted)}
+.kf-ok .kpi-dot{background:var(--ok)}
+.kf-warn .kpi-dot{background:var(--brand)}
+
+/* ===== ورودِ آبشاریِ عمومیِ صفحات ===== */
+/* کدِ JS (playTabReveal) هنگامِ ورود به هر تب، به بلوک‌های سطح‌بالای آن کلاسِ rv-in و
+   تأخیرِ پلکانیِ inline می‌دهد؛ عناصر از پایین بالا می‌آیند. fill-mode=both تا پیش از شروعِ
+   تأخیر پنهان بمانند و پرشِ نمایش رخ ندهد. */
+@keyframes fsmRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.rv-in{animation:fsmRise .5s cubic-bezier(0,0,.2,1) both}
+@media(prefers-reduced-motion:reduce){
+  .rv-in{animation:none}
+  .kpi-card:hover .kpi-icon{transform:none}
+}
+
+/* ===== پنل‌های داشبورد (پیشرفت پروژه راست/عریض · فعالیت اخیر چپ) ===== */
+/* stretch تا هر دو سلول هم‌ارتفاع شوند و کفشان تراز بماند */
+.dash-panels{display:grid;grid-template-columns:1.5fr 1fr;gap:16px;align-items:stretch}
+@media(max-width:960px){.dash-panels{grid-template-columns:1fr}}
+.dash-panel{background:#ffffff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:0 1px 4px #00000008;
+  display:flex;flex-direction:column}
+/* محتوای هر سلول ارتفاعِ باقی‌مانده را پر کند؛ در «فعالیت‌های اخیر» ردیف‌ها با فاصلهٔ یکسان توزیع شوند تا کف هم‌تراز شود */
+#projCardsList{flex:1;min-height:0}
+#recentDocsList{flex:1;min-height:0;display:flex;flex-direction:column}
+#recentDocsList .timeline-list{flex:1;justify-content:space-between}
+.panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.panel-hd h3{margin:0;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
+.panel-hd h3 svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
+/* دکمهٔ «مشاهدهٔ همه» حالا از سبکِ استانداردِ .btn.sm استفاده می‌کند (هم‌شکلِ بقیهٔ دکمه‌های سایت) */
+
+/* ===== کارت پروژهٔ باز‌شونده ===== */
+.proj-list{display:flex;flex-direction:column;gap:10px}
+.proj-more{display:block;width:100%;margin-top:10px;padding:9px 12px;background:none;border:1px dashed var(--line);
+  border-radius:10px;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:.12s}
+.proj-more:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
+.proj-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;transition:.15s;box-shadow:0 1px 3px #00000006}
+.proj-card:hover{border-color:#d8d6d0;box-shadow:0 3px 10px #0000000d}
+.proj-card-head{padding:13px 15px 9px;cursor:pointer;display:flex;flex-direction:column;gap:8px;transition:padding-bottom .28s cubic-bezier(0,0,.2,1)}
+/* حالتِ بسته: فاصلهٔ نوار از پایین برابرِ فاصله‌اش از چپ (۲۷px) → نوار بالاتر و متقارن */
+.proj-card:not(.open) .proj-card-head{padding-bottom:27px}
+.proj-card-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.proj-card-name{font-size:13.5px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;transition:color .12s}
+.proj-card-head:hover .proj-card-name{color:var(--brand)}
+.proj-card-meta{font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap}
+/* پیشرفت (مثلِ حلقهٔ «مستندات پروژه»): درصدِ کلیِ بزرگ بالای نوارِ دو‌لایه؛ نوار کوتاه و از سمتِ چپ */
+.proj-prog{display:flex;flex-direction:column;align-items:flex-start;gap:6px;direction:ltr;margin-top:1px;padding-inline-start:12px}
+.pp-big{font-size:22px;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums}
+/* نوار همیشه از چپ به راست پر می‌شود (مستقل از راست‌به‌چپ بودن صفحه) */
+.proj-bar-bg{position:relative;height:7px;background:#f0efeb;border-radius:4px;overflow:hidden;direction:ltr}
+.proj-prog .proj-bar-bg{width:82%;min-width:120px;max-width:420px}   /* ~۵۰٪ بلندتر، از سمتِ راست */
+.proj-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:4px;transition:width .4s}
+.proj-bar-fill.faint{background:var(--brand);opacity:.26}
+.proj-chevron{transition:.2s;color:#b9b7b1;flex-shrink:0;display:flex}
+.proj-chevron svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
+.proj-card.open .proj-chevron{transform:rotate(180deg)}
+/* باز/بسته‌شدنِ متحرک با grid-rows 0fr↔1fr (بدون پرش) */
+.proj-card-detail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(0,0,.2,1)}
+.proj-card.open .proj-card-detail{grid-template-rows:1fr}
+.pcd-inner{overflow:hidden;min-height:0}
+.pcd-body{padding:0 15px 12px}   /* بدونِ خطِ جداکننده؛ فشرده‌تر */
+@media(prefers-reduced-motion:reduce){.proj-card-detail{transition:none}.proj-bar-fill{transition:none}.proj-card-head{transition:none}}
+.detail-stats{display:flex;gap:16px;padding:4px 0 8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.detail-stats b{color:var(--txt);font-weight:700}
+/* پیام‌های وضعیت — سبز و قرمز هم‌شکل و هم‌اندازه (چیپ) */
+.detail-msgs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:1px 0 9px}
+.status-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#f7f7f5;color:var(--muted)}
+.status-chip.warn{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
+/* پیامِ خنثی/تکمیل — مثلِ یادداشتِ خاکستریِ «۳ قطعه انتخاب شده» (بدونِ کادرِ رنگی) */
+.msg-note{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:var(--muted)}
+.msg-note svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* فوترِ جزئیات: پیامِ وضعیت (راست) + دکمهٔ اکشنِ فشردهٔ «مشاهدهٔ پروژه» (چپ) */
+.pcd-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.pcd-foot .detail-msgs{flex:1;min-width:0;margin:0}
+.proj-open-btn{flex-shrink:0}
+
+/* ===== تایم‌لاین فعالیت اخیر ===== */
+.timeline-list{display:flex;flex-direction:column}
+.tl-item{display:flex;align-items:stretch;gap:8px;padding:9px 0}   /* stretch تا خط تا تهِ متن (دو خط) کشیده شود */
+.tl-marker{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px;padding-top:3px}
+.tl-dot{position:relative;width:12px;height:12px;border-radius:50%;background:var(--brand);border:2px solid #fff;flex-shrink:0}
+/* حلقهٔ نارنجیِ کم‌رنگ که مثل رادار/آلارم از مرکزِ نقطه بیرون می‌زند و تکرار می‌شود */
+.tl-dot::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:50%;
+  border:2px solid rgba(247,148,31,.55);transform:translate(-50%,-50%) scale(.4);opacity:.6;
+  pointer-events:none;animation:tlPing 1.7s cubic-bezier(0,0,.2,1) infinite}
+@keyframes tlPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}
+  58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
+@media(prefers-reduced-motion:reduce){.tl-dot::after{animation:none;opacity:0}}
+.tl-line{flex:1;width:2px;background:var(--line);border-radius:2px;min-height:18px;margin-top:4px;
+  transform:scaleY(.75);transform-origin:top}   /* هم‌اندازهٔ خطِ مودال: ۲۵٪ از پایین کوتاه‌تر، بالا ثابت */
+.tl-body{flex:1;min-width:0}
+.tl-num{font-size:12.5px;font-weight:600;direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--txt);cursor:pointer;transition:color .12s}
+.tl-num:hover{color:var(--brand)}
+.tl-meta{display:flow-root;font-size:11.5px;color:var(--muted);margin-top:2px;text-align:right;line-height:1.7}
+/* نشانِ وضعیت: همیشه در چپ‌ترین نقطهٔ آخرین خطِ متن، مستقل از طولِ متن */
+.tl-badge{float:left;margin-right:8px;margin-top:1px;transform:scale(.92);transform-origin:left center}
+.tl-date{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;margin-top:3px;text-align:left;align-self:flex-start}   /* زیرِ stretch، تاریخ بالا بماند */

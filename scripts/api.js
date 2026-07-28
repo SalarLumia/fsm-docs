@@ -1,0 +1,111 @@
+/* ================= پوشش لودینگ ================= */
+var _loadingHideTimer;
+function setLoading(on, action){
+  var el = document.getElementById("loadingOverlay");
+  if(on){
+    clearTimeout(_loadingHideTimer);
+    document.getElementById("loadingMsg").textContent = LOADING_MSGS[action] || "در حال پردازش...";
+    el.classList.remove("hidden");
+  } else {
+    _loadingHideTimer = setTimeout(function(){ el.classList.add("hidden"); }, 60);
+  }
+}
+
+/* ================= ارتباط با بک‌اند ================= */
+async function api(action, payload, opts){
+  if(!API_URL || API_URL.indexOf("PASTE_")===0){
+    toast("آدرس سرویس (API_URL) در فایل scripts/config.js تنظیم نشده است.", true);
+    return { ok:false, message:"آدرس سرویس (API_URL) تنظیم نشده است." };
+  }
+  // bootstrap با اسکلت/حالت خطای اختصاصی مدیریت می‌شود؛ overlay و توستِ عمومی لازم ندارد.
+  // opts.silent = فراخوان خودش لودینگ را داخلِ خودش نشان می‌دهد (مثلِ ویوئرِ سه‌بعدی) و اورلیِ تمام‌صفحه نمی‌خواهد.
+  var silent = (action === "ping" || action === "nextRevision" || action === "bootstrap") || !!(opts && opts.silent);
+  if(!silent) setLoading(true, action);
+  try {
+    var res = await fetch(API_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify({ action:action, token:ME.token, payload:payload||{} }),
+      redirect:"follow"
+    });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    var data = await res.json();
+    if(data && data.error==="AUTH"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
+    return data;
+  } catch(e){
+    // خطای شبکه/سرویس: پیام دوستانه (مگر برای فراخوانی‌های خاموش که خودشان مدیریت می‌کنند)
+    if(action!=="ping" && action!=="nextRevision" && action!=="bootstrap")
+      toast("خطا در ارتباط با سرویس. اتصال اینترنت یا در دسترس‌بودن سرویس را بررسی کنید.", true);
+    return { ok:false, message:"خطا در ارتباط با سرویس.", netError:true };
+  } finally {
+    if(!silent) setLoading(false);
+  }
+}
+
+/* دریافتِ فایل به‌صورتِ استریمی — برای نمایشِ پیشرفتِ بارگذاری بدونِ اورلیِ سراسری.
+   onProgress(loaded,total): اگر total>0 (سرور Content-Length داد) درصدِ دقیق ممکن است؛
+   اگر total=0 (روی Apps Script معمولاً همین‌طور است چون پاسخ gzip/chunked است) حجمِ دریافتی نشان داده می‌شود. */
+async function apiGetFileStreamed(fileId, onProgress){
+  if(!API_URL || API_URL.indexOf("PASTE_")===0) return { ok:false, message:"آدرس سرویس تنظیم نشده است." };
+  try{
+    var res=await fetch(API_URL,{ method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify({ action:"getFile", token:ME.token, payload:{ fileId:fileId } }), redirect:"follow" });
+    if(!res.ok) throw new Error("HTTP "+res.status);
+    var total=parseInt(res.headers.get("Content-Length")||"0",10)||0;
+    if(!res.body || typeof res.body.getReader!=="function") return await res.json();   // مرورگرِ بدونِ استریم: یک‌جا
+    var reader=res.body.getReader(), chunks=[], loaded=0, rd;
+    while(!(rd=await reader.read()).done){
+      chunks.push(rd.value); loaded+=rd.value.length;
+      if(onProgress) try{ onProgress(loaded, total); }catch(_){}
+    }
+    var buf=new Uint8Array(loaded), off=0, i;
+    for(i=0;i<chunks.length;i++){ buf.set(chunks[i], off); off+=chunks[i].length; }
+    var data=JSON.parse(new TextDecoder("utf-8").decode(buf));
+    if(data && data.error==="AUTH"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
+    return data;
+  }catch(e){
+    toast("خطا در دریافت فایل. اتصال اینترنت را بررسی کنید.", true);
+    return { ok:false, message:"خطا در دریافت فایل.", netError:true };
+  }
+}
+
+/* ================= توست ================= */
+function toast(msg,isErr){
+  var t=document.createElement("div"); t.className="toast "+(isErr?"err":"ok"); t.textContent=msg;
+  document.getElementById("toastHost").appendChild(t);
+  setTimeout(function(){ t.style.opacity="0"; t.style.transition=".4s"; setTimeout(function(){t.remove();},400); },3200);
+}
+
+/* ================= دیالوگ تأیید (هم‌سبک با سایت، وسط صفحه) =================
+   جایگزین confirm() مرورگر. Promise برمی‌گرداند: true=تأیید، false=انصراف.
+   روی هر مودالِ باز می‌نشیند (z بالاتر) و مودال زیرین را دست نمی‌زند. */
+function uiConfirm(message, opts){
+  opts=opts||{};
+  return new Promise(function(resolve){
+    var okLabel=opts.okLabel||"تأیید", cancelLabel=opts.cancelLabel||"انصراف";
+    var okClass=opts.danger?"btn danger":"btn primary";
+    var wrap=document.createElement("div");
+    wrap.className="modal confirm-modal";
+    wrap.innerHTML='<div class="box"><div class="body"><div class="confirm-box">'+
+      (opts.title?'<div class="confirm-title">'+esc(opts.title)+'</div>':'')+
+      '<p class="confirm-msg">'+esc(message)+'</p>'+
+      '<div class="confirm-acts">'+
+        '<button class="btn" data-v="0">'+esc(cancelLabel)+'</button>'+
+        '<button class="'+okClass+'" data-v="1">'+esc(okLabel)+'</button>'+
+      '</div></div></div></div>';
+    document.body.appendChild(wrap);
+    var onKey;
+    var settle=function(val){
+      if(onKey) document.removeEventListener("keydown",onKey,true);
+      if(wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      resolve(val);
+    };
+    var btns=wrap.querySelectorAll("[data-v]");
+    for(var i=0;i<btns.length;i++){ (function(b){ b.addEventListener("click",function(){ settle(b.getAttribute("data-v")==="1"); }); })(btns[i]); }
+    wrap.addEventListener("click",function(e){ if(e.target===wrap) settle(false); });
+    onKey=function(e){ if(e.key==="Escape"){ e.preventDefault(); e.stopPropagation(); settle(false); }
+                       else if(e.key==="Enter"){ e.preventDefault(); e.stopPropagation(); settle(true); } };
+    document.addEventListener("keydown",onKey,true);
+    var ok=wrap.querySelector('[data-v="1"]'); if(ok) try{ ok.focus(); }catch(e){}
+  });
+}

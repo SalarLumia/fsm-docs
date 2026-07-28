@@ -1,0 +1,12 @@
+# ── فایل‌های محرمانه — هرگز روی گیت‌هاب نروند ──
+SECRET-KEEP-PRIVATE.txt
+Code.gs
+
+# ── فایل/پوشه‌های توسعه‌ای و داخلی — روی سایتِ عمومی منتشر نشوند ──
+.claude/
+skills/
+Website-Template_Reference/
+design-system.html
+prototype-project-panel.html
+CLAUDE.md
+راهنمای-راه-اندازی.md

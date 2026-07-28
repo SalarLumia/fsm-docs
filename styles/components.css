@@ -1,0 +1,189 @@
+/* ===== دکمه‌ها ===== */
+.btn{border:1px solid var(--line);background:#ffffff;color:var(--txt);padding:9px 16px;border-radius:var(--radius-sm);
+  font-size:13px;transition:.15s;font-weight:500;display:inline-flex;align-items:center;gap:7px;justify-content:center}
+.btn:hover{border-color:var(--brand);background:#fff8f0;color:var(--brand)}
+.btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
+.btn.primary{background:var(--brand);border:1px solid var(--brand);color:#ffffff;font-weight:700;box-shadow:0 2px 8px #f7941f33}
+.btn.primary:hover{background:var(--brand2);border-color:var(--brand2);color:#fff;box-shadow:0 4px 14px #f7941f44}
+.btn.danger{color:var(--err);border-color:var(--err-line);background:#fff5f5}
+.btn.danger:hover{background:var(--err-bg);border-color:var(--err)}
+.btn.sm{padding:5px 11px;font-size:12px;border-radius:7px}
+.btn:active,.icon-btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-row{display:flex;gap:6px}
+/* آواتار کوچک کنار نام کاربر در جدول */
+.u-av{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:#f2f1ee;
+  font-size:14px;line-height:1;margin-inline-end:6px;vertical-align:middle}
+
+/* ===== اسکلت بارگذاری (shimmer) ===== */
+@keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.sk{background:linear-gradient(90deg,#eeede9 25%,#f6f5f2 37%,#eeede9 63%);background-size:200% 100%;
+  animation:sk-shimmer 1.4s ease-in-out infinite;border-radius:8px;display:block}
+.sk-num{height:26px;width:64%;margin-top:6px}
+.sk-card{height:104px;margin-bottom:14px}
+.sk-row{height:46px;margin-bottom:10px}
+
+/* ===== کارت‌ها ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:var(--sp-6);
+  margin-bottom:var(--sp-5);box-shadow:0 1px 6px #00000008}
+.card h2{margin:0 0 4px;font-size:17px;font-weight:700;color:var(--txt)}
+.card .sub{color:var(--muted);font-size:12.5px;margin:0 0 18px}
+
+/* ===== سرصفحهٔ صفحه (عنوان + زیرعنوان + اکشن) ===== */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-4);margin-bottom:var(--sp-5)}
+.page-header .ph-titles h2{margin:0;font-size:19px;font-weight:800;color:var(--txt)}
+.page-header .ph-titles p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+
+/* ===== شبکه و فرم‌ها ===== */
+.grid{display:grid;gap:var(--sp-4)}
+.g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:760px){.g3,.g2{grid-template-columns:1fr}}
+label.fld{display:block;font-size:12px;color:var(--txt);margin-bottom:6px;font-weight:500}
+input,select,textarea{width:100%;background:#ffffff;border:1px solid #d4d3ce;color:var(--txt);
+  padding:10px 12px;border-radius:var(--radius-sm);font-family:inherit;font-size:14px;transition:.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #f7941f1a}
+input::placeholder{color:#b0afa9}
+.hint{font-size:11px;color:var(--muted);margin-top:5px}
+
+/* جعبهٔ «شماره سند»: نتیجه/خلاصه (نه محل آپلود) → حاشیهٔ توپُر، همه‌چیز در یک خط */
+.numbox{background:#fff8f0;border:1px solid var(--brand);border-radius:12px;padding:12px 16px;display:flex;
+  align-items:center;gap:12px;margin-top:16px}
+.numbox .num{font-size:20px;font-weight:800;color:var(--brand);direction:ltr;white-space:nowrap}
+.numbox.invalid{border-color:var(--line);background:#f8f8f6} .numbox.invalid .num{color:var(--muted);font-size:14px;font-weight:600}
+.nb-label{font-size:11.5px;color:var(--muted);flex-shrink:0}
+.nb-spacer{flex:1}
+.btn.nCopy{padding:5px 12px;font-size:12px;flex-shrink:0}
+
+/* باکس یادداشت و باکس فایل هم‌اندازه (کنار هم، ارتفاع برابر) */
+.ndoc-note,.ndoc-file{display:flex;flex-direction:column}
+.ndoc-note-ta{flex:1;min-height:120px;resize:vertical;line-height:1.75;font-family:inherit}
+.ndoc-file .dropzone{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:120px}
+.btn.nCopy .ic{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-inline-end:4px;vertical-align:-2px}
+
+/* ===== ناحیهٔ درگ‌ودراپ فایل ===== */
+.dropzone{position:relative;display:block;border:2px dashed var(--line);border-radius:12px;
+  background:#faf9f7;padding:22px 18px;text-align:center;cursor:pointer;transition:.15s;overflow:hidden;-webkit-user-select:none;user-select:none}
+.dropzone:hover{border-color:var(--brand);background:#fff8f0}
+.dz-input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.dz-body{display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
+.dz-ico{color:var(--brand);opacity:.85}
+.dz-ico svg{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.dz-main{font-size:13px;font-weight:700;color:var(--txt)}
+.dz-sub{font-size:11.5px;color:var(--muted)}
+.dz-file{font-size:12px;font-weight:700;color:var(--ok);margin-top:6px;direction:ltr;word-break:break-all}
+.dropzone.has-file{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
+.dropzone.has-file .dz-ico,.dropzone.has-file .dz-sub{display:none}
+.dz-overlay{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:#f7941fee}
+.dz-overlay span{color:#fff;font-size:17px;font-weight:800;letter-spacing:.5px}
+.dropzone.drag{border-style:solid;border-color:var(--brand)}
+.dropzone.drag .dz-overlay{display:flex}
+
+/* ===== دکمهٔ بستنِ X مودال ===== */
+.modal-x{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;
+  color:var(--muted);font-size:14px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:.12s}
+.modal-x:hover{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
+
+/* ===== مودال ثبت سند ===== */
+.modal .box.newdoc-box{width:min(760px,96vw)}
+.modal .box.box-narrow{width:min(560px,96vw)}
+.modal .box.seeall-box{width:min(560px,96vw)}   /* جمع‌وجور مثلِ پنل‌های سایت تا فهرست تنک/پخش دیده نشود */
+/* پنل‌های ویرایش (مشخصاتِ پروژه / قطعات): باریک‌تر تا سلول‌ها بی‌دلیل پهن نشوند */
+.modal .box.edit-box{width:min(600px,96vw)}
+.newdoc-body{padding:20px 22px}
+.seeall-body{padding:16px 18px}
+body.modal-open{overflow:hidden}
+
+/* ===== جدول‌ها ===== */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--line)}
+th{color:var(--txt);font-weight:700;font-size:12.5px;position:sticky;top:0;background:#f4f4f2}
+th:last-child{text-align:left}
+tbody tr:hover td{background:#fff8f0}
+th.sortable{cursor:pointer;user-select:none;-webkit-user-select:none;white-space:nowrap;transition:color .12s}
+th.sortable:hover{color:var(--brand)}
+th.sortable.active{color:var(--brand)}
+.sort-ar{font-size:9px;margin-inline-start:2px}
+.file-ic{width:12px;height:12px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px;margin-inline-end:5px;opacity:.7}
+.tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;background:#fff3e6;border:1px solid #f7941f33;color:var(--brand);font-weight:500}
+.tag.proj{background:#f0f9ff;color:#0369a1;border-color:#bae6fd}
+.pill{font-size:10.5px;padding:2px 9px;border-radius:20px;font-weight:500}
+.pill.latest{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.pill.old{background:#f4f4f2;color:var(--muted);border:1px solid var(--line)}
+
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:16px}
+.toolbar .grow{flex:1;min-width:180px}
+.tablewrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+
+/* ===== نشان وضعیت (badge) — آمادهٔ گردش تأیید فاز ۴ ===== */
+.badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:20px;border:1px solid transparent;white-space:nowrap}
+.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge-approved{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-line)}
+.badge-pending{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-line)}
+.badge-review{background:var(--review-bg);color:var(--review);border-color:var(--review-line)}
+.badge-rejected{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
+.badge-archived,.badge-draft{background:var(--gray-bg);color:var(--gray);border-color:var(--gray-line)}
+
+/* ===== حالت خالی ===== */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:34px 20px;text-align:center;color:var(--muted)}
+.empty-state svg{width:38px;height:38px;stroke:#c9c7c1;fill:none;stroke-width:1.5}
+.empty-state .es-title{font-size:13.5px;font-weight:600;color:var(--txt)}
+.empty-state .es-desc{font-size:12px;color:var(--muted);max-width:280px;line-height:1.8}
+
+/* ===== اسکلت لودینگ ===== */
+.skeleton{background:linear-gradient(90deg,#eeede9 25%,#f6f5f2 37%,#eeede9 63%);
+  background-size:400% 100%;animation:sk-shine 1.3s ease infinite;border-radius:8px}
+@keyframes sk-shine{0%{background-position:100% 0}100%{background-position:-100% 0}}
+
+/* ===== توست ===== */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:90;
+  background:#ffffff;border:1px solid var(--line);border-radius:12px;padding:12px 22px;font-size:13.5px;
+  box-shadow:0 8px 32px #0000001a;max-width:90%;color:var(--txt)}
+.toast.ok{border-right:4px solid var(--ok);} .toast.err{border-right:4px solid var(--err);}
+
+/* ===== پوشش لودینگ ===== */
+.loading-overlay{position:fixed;inset:0;background:#0000005c;z-index:200;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:18px;backdrop-filter:blur(4px)}
+.loading-overlay .spinner{width:48px;height:48px;border:3px solid #e2e0db;border-top-color:var(--brand);
+  border-radius:50%;animation:ld-spin .75s linear infinite}
+.loading-overlay .loading-msg{font-size:14px;color:#ffffff;font-weight:600;letter-spacing:.3px;
+  background:#000000aa;padding:8px 20px;border-radius:20px}
+@keyframes ld-spin{to{transform:rotate(360deg)}}
+
+/* ===== مودال ===== */
+.modal{position:fixed;inset:0;background:#0000007a;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
+/* وقتی مودالِ *دیده‌شده‌ای* باز است، اسکرولِ صفحهٔ زیرین قفل می‌شود.
+   نکته: #newDocModal همیشه در DOM هست و با کلاسِ .hidden پنهان می‌شود؛ پس باید :not(.hidden) باشد
+   وگرنه اسکرولِ کلِ سایت حتی بدونِ مودالِ باز قفل می‌ماند. */
+html:has(.modal:not(.hidden)){overflow:hidden}
+/* overflow:hidden تا گوشه‌های پایینِ باکس هم مثلِ بالا گِرد بمانند (نوارِ پاورقی از گوشه بیرون نزند) */
+.modal .box{background:#ffffff;border:1px solid var(--line);border-radius:14px;width:min(960px,96vw);max-height:92vh;display:flex;flex-direction:column;box-shadow:0 20px 60px #00000033;overflow:hidden}
+.modal .box header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:14px 20px;border-bottom:1px solid var(--line);background:#f8f8f6;border-radius:14px 14px 0 0}
+.modal .box header strong{font-size:14.5px;font-weight:700;color:var(--txt);line-height:1.6;overflow-wrap:anywhere;padding-top:4px}
+.modal .box .body{padding:0;overflow:auto;flex:1;overscroll-behavior:contain}
+.modal iframe,.modal img{width:100%;height:74vh;border:0;background:#fff;display:block}
+.modal img{object-fit:contain;height:auto;max-height:74vh}
+
+/* دیالوگ تأیید (جایگزین confirm مرورگر) — وسط صفحه، هم‌سبک با سایت */
+.modal.confirm-modal{z-index:90}
+.modal.confirm-modal .box{width:min(400px,94vw)}
+.confirm-box{padding:24px 24px 20px;text-align:center}
+.confirm-title{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:8px}
+.confirm-msg{font-size:13.5px;color:var(--txt);line-height:1.85;margin:0 0 20px}
+.confirm-acts{display:flex;gap:10px;justify-content:flex-end}
+.confirm-acts .btn{min-width:104px;justify-content:center}
+
+/* ===== چک‌لیست پروژه ===== */
+.checkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.part-block{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#ffffff;box-shadow:0 1px 4px #0000000a}
+.part-block h4{margin:0 0 10px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;color:var(--txt)}
+/* نکته: استایلِ .doc-row در project.css است (خطِ توپُر). قانونِ قدیمیِ اینجا (border-top: dashed)
+   حذف شد چون با ردیف‌های سندِ صفحهٔ جزئیاتِ پروژه تداخل و خطِ نقطه‌چین ایجاد می‌کرد. */
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-left:6px;flex-shrink:0}
+.dot.has{background:var(--ok)} .dot.no{background:#d4d3ce}
+.row-actions{display:flex;gap:6px;justify-content:flex-end;align-items:center}
+/* عنوان بخش: تیتر با نوار تأکید راست (نه دکمه) */
+.section-title{font-size:14px;color:var(--txt);font-weight:800;margin:30px 0 14px;
+  padding-right:11px;border-right:3px solid var(--brand);line-height:1.25}
+.section-title:first-of-type{margin-top:6px}

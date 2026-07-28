@@ -1,0 +1,31 @@
+/* ===== فونت ایران‌سنس (فایل‌ها در پوشهٔ fonts کنار index.html) ===== */
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Light.ttf') format('truetype');font-weight:300;font-display:swap}
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Medium.ttf') format('truetype');font-weight:500;font-display:swap}
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Bold.ttf') format('truetype');font-weight:700;font-display:swap}
+
+/* ===== پایه و تایپوگرافی ===== */
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font-family:'IRANSans',system-ui,'Segoe UI',Tahoma,sans-serif;font-size:14px;line-height:1.7}
+a{color:var(--brand);text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+/* ===== دسترس‌پذیری: فوکوس کیبورد قابل‌دیدن ===== */
+:focus{outline:none}
+button:focus-visible,a:focus-visible,select:focus-visible,[tabindex]:focus-visible,
+.nav-item:focus-visible,.cp-client-item:focus-visible,.cp-order-card:focus-visible,
+.cp-proj-row:focus-visible,.icon-btn:focus-visible,.av-opt:focus-visible{
+  outline:2px solid var(--brand);outline-offset:2px;border-radius:6px}
+::selection{background:#f7941f33;color:var(--txt)}
+
+/* احترام به تنظیم «کاهش حرکت» سیستم‌عامل */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+
+/* ===== کلاس‌های کمکی ===== */
+.hidden{display:none!important}
+.mono{font-variant-numeric:tabular-nums;letter-spacing:.5px}
+.muted{color:var(--muted)}

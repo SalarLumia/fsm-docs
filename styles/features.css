@@ -1,0 +1,359 @@
+/* ===== دکمهٔ سبز (تأیید) ===== */
+.btn.ok{color:var(--ok);border-color:var(--ok-line);background:#f0fdf4}
+.btn.ok:hover{background:var(--ok-bg);border-color:var(--ok)}
+
+/* ===== صف بازبینی روی داشبورد ===== */
+.dash-review{background:#fff;border:1px solid var(--line);border-right:3px solid var(--warn);
+  border-radius:var(--radius);padding:16px 18px;margin-bottom:18px;box-shadow:0 1px 4px #00000008}
+.rq-count{font-size:11px;background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line);
+  padding:1px 9px;border-radius:20px;font-weight:700;margin-inline-start:6px}
+.rq-list{display:flex;flex-direction:column;gap:8px}
+.rq-item{display:flex;align-items:center;gap:11px;padding:10px 12px;
+  border:1px solid var(--line);border-radius:10px;background:#fafafa}
+.rq-main{flex:1;min-width:0}
+.rq-num{font-weight:700;font-size:12.5px;color:var(--txt);cursor:pointer;direction:ltr;text-align:right}
+.rq-num:hover{color:var(--brand)}
+.rq-meta{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.7}
+.rq-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
+/* بخشِ کناریِ کارتِ فعالیت (مودال): تاریخ + بَجِ وضعیت، در سمتِ چپ */
+.rq-aside{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.rq-date{font-size:11px;color:var(--muted);white-space:nowrap}
+/* کارت‌های مودال («همهٔ فعالیت‌ها» و «کارتابل بازبینی»): مارکرِ دایره+خط کنارِ متن.
+   .seeall-body مخصوصِ مودال‌هاست، پس مینی‌پنل‌های داشبورد دست‌نخورده می‌مانند.
+   ارتفاعِ کارت با کِش‌آمدن (stretch) کامل می‌شود تا خط از زیرِ دایره تا تهِ متن (دو خطِ بعدی) برسد؛
+   دایره در بالا هم‌سطرِ شمارهٔ نقشه می‌نشیند و تاریخ/بَج و دکمه‌ها عمودی وسط می‌مانند. */
+.seeall-body .rq-item{align-items:stretch}
+.seeall-body .rq-marker{display:flex;flex-direction:column;align-items:center;flex-shrink:0;padding-top:3px}
+.seeall-body .rq-line{flex:1;width:2px;background:var(--line);border-radius:2px;margin-top:4px;min-height:10px;
+  transform:scaleY(.75);transform-origin:top}   /* ۲۵٪ از پایین کوتاه‌تر؛ بالا ثابت */
+.seeall-body .rq-aside,.seeall-body .rq-actions{align-self:center}
+
+/* ===== فهرست پروژه‌ها ===== */
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.pl-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px;cursor:pointer;
+  transition:.15s;box-shadow:0 1px 3px #00000006}
+.pl-card:hover{border-color:var(--brand);box-shadow:0 4px 14px #0000000f;transform:translateY(-1px)}
+.pl-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.pl-name{font-size:14px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-meta{font-size:11.5px;color:var(--muted);margin-bottom:12px}
+
+/* ===== جزئیات پروژه ===== */
+.pd-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.pd-head h2{margin:0}
+.pd-progress{display:flex;align-items:center;gap:12px;margin:16px 0 6px}
+.pd-stats{display:flex;align-items:center;gap:18px;font-size:12.5px;color:var(--muted);flex-wrap:wrap;margin-top:8px}
+.pd-stats b{color:var(--txt)}
+
+/* ===== مودال جزئیات سند ===== */
+/* پیش‌نمایش سمت چپ، اطلاعات سمت راست (direction:ltr فقط برای چیدمان ستون‌ها) */
+.doc-modal{display:grid;grid-template-columns:1.5fr 1fr;min-height:60vh;direction:ltr}
+@media(max-width:820px){.doc-modal{grid-template-columns:1fr}}
+.doc-preview{direction:rtl;background:#f4f4f2;display:flex;flex-direction:column;min-height:320px;border-right:1px solid var(--line)}
+.dp-frame{flex:1;display:flex;align-items:center;justify-content:center;min-height:300px;overflow:auto;position:relative}
+.dp-frame iframe,.dp-frame img{width:100%;height:78vh;border:0;background:#fff;display:block}
+.dp-frame img{object-fit:contain}
+/* پیش‌نمایشِ سه‌بعدی: قاب به‌جای flex-centering به حالتِ «پُر» می‌رود تا لبهٔ مدل بریده نشود؛
+   ظرفِ .mv-toolwrap دقیقاً قاب را پر می‌کند و ویوئر + تولباکس درونش می‌نشینند (مثلِ پنلِ پروژه). */
+.dp-frame.is-3d{display:block;overflow:hidden;padding:0;min-height:60vh}
+.mv-toolwrap{position:absolute;inset:0}
+.mv-toolwrap model-viewer{position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent}
+.dm-loading{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--muted);font-size:12.5px}
+/* دکمه‌های اکشن، زیرِ پیش‌نمایش (ارسال/بارگذاری + دانلود) */
+.dp-actions{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:#fff}
+.dp-actions .btn{flex:1;justify-content:center}
+.doc-side{direction:rtl;padding:18px 18px;overflow:auto;max-height:80vh}
+/* بنر رد سند (بالای مشخصات) + مودال ثبت دلیل رد */
+.dm-reject{background:var(--err-bg);border:1px solid var(--err-line);color:var(--err);border-radius:9px;
+  padding:9px 12px;font-size:12.5px;line-height:1.7;margin-bottom:14px}
+.dm-reject b{color:var(--err)}
+.rej-box{padding:18px 20px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.rej-lead{margin:0 0 2px;font-size:13.5px;color:var(--txt)}
+.rej-ta{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;
+  font-size:13px;color:var(--txt);resize:vertical;min-height:72px;background:#fff}
+.rej-ta:focus{border-color:var(--brand);box-shadow:0 0 0 3px #f7941f1a;outline:none}
+.rej-acts{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+.dm-sec{margin-bottom:20px}
+.dm-sec-t{font-size:15.5px;font-weight:700;color:var(--txt);margin-bottom:12px;letter-spacing:-.2px}
+.dm-row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:12px;border-bottom:1px dashed var(--line)}
+.dm-k{color:var(--muted);flex-shrink:0}
+.dm-v{color:var(--txt);text-align:left;font-weight:500;min-width:0;word-break:break-word}
+
+/* ردیف‌های تاریخچهٔ نسخه‌ها */
+.ver-list{display:flex;flex-direction:column;gap:8px}
+.ver-row{border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;
+  transition:.12s;background:#fff}
+.ver-row:hover{border-color:var(--brand)}
+/* ریویژن فعلی: حاشیهٔ برندِ متقارن (هر چهار طرف یکسان) + پس‌زمینهٔ ملایم */
+.ver-row.cur{border:1.5px solid var(--brand);background:#fff8f0}
+/* ریویژنِ در حال پیش‌نمایش: حلقهٔ سایه — کانال بصری جدا از «فعلی» */
+.ver-row.sel{box-shadow:0 0 0 3px #f7941f22}
+.ver-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ver-rev{font-size:12.5px;font-weight:700;color:var(--txt)}
+.ver-latest{font-size:10px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line);
+  padding:1px 8px;border-radius:20px;font-weight:700}
+.ver-meta{font-size:11.5px;color:var(--muted)}
+.ver-acts{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+
+/* ردیف ریویژن: سرِ آکاردئونی + زیرسطرِ متادیتا/اکشن + گردش‌کارِ اکسپند‌شونده */
+.ver-chev{display:inline-flex;flex-shrink:0}
+.ver-chev svg{width:14px;height:14px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.ver-row.open .ver-chev svg{transform:rotate(180deg)}
+.ver-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:6px}
+.ver-wf{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
+.ver-row.open .ver-wf{display:block}
+.ver-note{font-size:12px;color:var(--txt);background:#faf9f7;border:1px solid var(--line);border-radius:8px;
+  padding:7px 10px;margin-bottom:10px;line-height:1.7}
+.ver-note b{color:var(--txt)}
+
+/* تایم‌لاین گردش‌کار: خط عمودیِ تیره + دایره‌های حلقه‌دار
+   (انجام‌شده = پُرِ رنگی، مرحلهٔ بعدی = پُرِ خاکستری)، مطابق رفرنس. */
+.wf-timeline{display:flex;flex-direction:column;padding:4px 2px 0}
+.wf-step{display:flex;align-items:stretch;gap:10px}
+.wf-rail{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px}
+.wf-ring{width:11px;height:11px;border-radius:50%;border:2px solid #d3d1cc;background:#ececea;
+  box-sizing:border-box;flex-shrink:0;margin-top:4px;z-index:1}
+.wf-step.done .wf-ring{background:var(--wf,var(--brand));border-color:var(--wf,var(--brand))}
+.wf-line{flex:1;width:2px;background:var(--line);min-height:20px;margin:3px 0;border-radius:1px}
+.wf-body{flex:1;min-width:0;padding-bottom:16px}
+.wf-label{font-size:13px;font-weight:700;color:var(--txt)}
+.wf-step.todo .wf-label{color:var(--muted);font-weight:600}
+.wf-meta{font-size:11.5px;color:var(--muted);margin-top:3px;word-break:break-word;line-height:1.6}
+.wf-date{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;padding-top:3px}
+
+/* پنل فشردهٔ بارگذاری ریویژن/نسخهٔ جدید */
+.rv-up{padding:18px 20px;display:flex;flex-direction:column;gap:4px;max-width:520px;margin:0 auto}
+.rv-num{font-size:13px;font-weight:700;color:var(--brand);text-align:center;background:#fff8f0;
+  border:1px solid var(--brand);border-radius:8px;padding:6px 10px}
+.rv-lead{margin:8px 0 4px;font-size:12.5px;color:var(--muted);line-height:1.75}
+
+/* بنر مدیریت ریویژن در پنل ثبت سند */
+.nrev-banner{margin:14px 0 0;padding:9px 12px;border-radius:9px;font-size:12px;line-height:1.75}
+.nrev-banner.info{background:#fff8f0;border:1px solid var(--brand);color:var(--txt)}
+.nrev-banner.info b{color:var(--brand)}
+.nrev-banner.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:#7c5300}
+
+/* ===== انتخابگر قالب پروژه (فقط انواع مدرک) ===== */
+.tpl-picker-t{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px}
+.cbx-grid{display:flex;flex-direction:column;gap:6px;max-height:210px;overflow:auto;
+  border:1px solid var(--line);border-radius:9px;padding:10px;background:#fafafa}
+.cbx-grid-wide{max-height:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:7px 16px}
+.cbx{display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer}
+.cbx input{width:auto;margin:0}
+.cbx span{color:var(--txt)}
+
+/* ===== پنل مشتریان و پروژه‌ها (Client → Order → Projects) ===== */
+.cp-grid{display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start}
+@media(max-width:900px){.cp-grid{grid-template-columns:1fr}}
+
+/* آیکون‌دکمهٔ عمومی (هم‌سبک با سایت) */
+.icon-btn{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--muted);
+  display:inline-grid;place-items:center;cursor:pointer;transition:.12s;padding:0;flex-shrink:0}
+.icon-btn:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
+.icon-btn.sm{width:26px;height:26px}
+.icon-btn.danger:hover{border-color:var(--err-line);color:var(--err);background:var(--err-bg)}
+/* تأیید (سبز) و رد (قرمز) — رنگ معنایی در حالت عادی، پررنگ‌تر در هاور */
+.icon-btn.ok{color:var(--ok)}
+.icon-btn.ok:hover{border-color:var(--ok-line);color:var(--ok);background:var(--ok-bg)}
+.icon-btn.rej{color:var(--err)}
+.icon-btn.rej:hover{border-color:var(--err-line);color:var(--err);background:var(--err-bg)}
+.icon-btn .ic{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.icon-btn.sm .ic{width:13px;height:13px}
+.btn .ic{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px;margin-inline-end:4px}
+
+/* ریل مشتریان */
+.cp-rail{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008;
+  overflow:hidden;position:sticky;top:76px}
+.cp-rail-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);
+  font-size:13px;font-weight:700;color:var(--txt)}
+.cp-client-list{display:flex;flex-direction:column;max-height:70vh;overflow:auto}
+.cp-client-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:none;border-bottom:1px solid var(--line);
+  background:none;cursor:pointer;width:100%;text-align:right;transition:.12s;border-right:3px solid transparent}
+.cp-client-item:hover{background:#fff8f0}
+.cp-client-item.sel{background:#fff3e6;border-right-color:var(--brand)}
+.cp-ci-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.cp-ci-name{font-size:13px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cp-ci-meta{font-size:11px;color:var(--muted)}
+.cp-ci-acts{display:flex;gap:4px;opacity:0;transition:.12s;flex-shrink:0}
+.cp-client-item:hover .cp-ci-acts,.cp-client-item.sel .cp-ci-acts{opacity:1}
+/* دستهٔ کشیدن برای تغییرِ ترتیبِ مشتری‌ها (سمتِ چپ = فرزندِ آخر در RTL). ۶‌نقطه‌ایِ دیزاین‌سیستم. */
+.cp-grip{flex-shrink:0;display:grid;place-items:center;width:20px;align-self:stretch;color:#c9c7c2;cursor:grab;
+  border-radius:6px;transition:.12s;user-select:none;touch-action:none}
+.cp-grip:hover{color:var(--brand);background:#fff3e6}
+.cp-grip:active{cursor:grabbing}
+.cp-grip svg{width:15px;height:15px;fill:currentColor}
+/* سلولِ در حالِ کشیده‌شدن: کم‌رنگ و بالاآمده تا مبدأ مشخص باشد */
+.cp-client-item.cli-dragging{opacity:.4;background:#fff8f0}
+
+/* لوگوی مشتری یا جایگزین حرفی */
+.cp-logo{border-radius:10px;object-fit:contain;background:#ffffff;border:1px solid var(--line);flex-shrink:0;display:block}
+/* متادیتای مشتری: ترتیب راست‌به‌چپِ قطعی (کد · سفارش · پروژه) */
+.cmeta{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+.cmeta-sep{color:var(--muted);opacity:.55}
+.cp-logo-ph{display:grid;place-items:center;font-weight:800;color:var(--brand);background:#fff3e6;border-color:#f7941f33;direction:ltr}
+
+/* هویت مشتری (تبِ اختصاصی) */
+.cp-detail{min-width:0}
+.cp-identity{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);
+  border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 4px #00000008}
+.cp-id-body{flex:1;min-width:0}
+.cp-id-name{margin:0;font-size:19px;font-weight:700;color:var(--txt)}
+.cp-id-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.cp-id-acts{display:flex;gap:8px;flex-shrink:0}
+
+/* سکشن‌ها */
+.cp-section{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;
+  margin-bottom:14px;box-shadow:0 1px 4px #00000008}
+/* تیترهای سکشن حالا از .spec-sec-t (آیکون + خطِ زیر) استفاده می‌کنند تا با کلِ سایت یکدست باشند */
+.cp-empty-hint{font-size:12.5px;color:var(--muted);padding:8px 2px}
+
+/* نوار سفارش‌ها (فشرده) */
+.cp-order-strip{display:flex;flex-wrap:wrap;gap:10px}
+.cp-order-card{position:relative;width:190px;min-height:112px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;
+  cursor:pointer;transition:.14s;background:#fafafa;display:flex;flex-direction:column}
+.cp-order-card:hover{border-color:var(--brand);background:#fff8f0}
+.cp-order-card.sel{border-color:var(--brand);background:#fff8f0;box-shadow:0 0 0 3px #f7941f1f}
+.coc-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.coc-title{font-size:13px;font-weight:700;color:var(--txt)}
+.coc-acts{display:flex;gap:3px;opacity:0;transition:.12s}
+.cp-order-card:hover .coc-acts,.cp-order-card.sel .coc-acts{opacity:1}
+.coc-desc{font-size:12px;color:var(--txt);margin-top:5px;line-height:1.55;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+/* شمارهٔ پروژه‌ها و تاریخ ایجاد همیشه به لبهٔ پایینِ کارت می‌چسبند
+   (کارت‌های یک ردیف هم‌ارتفاع‌اند، پس این خط در همه هم‌تراز می‌شود) */
+.coc-meta{font-size:11.5px;color:var(--muted);margin-top:auto;padding-top:6px}
+/* کارتِ «سفارش جدید» دقیقاً هم‌اندازهٔ کارتِ سفارشِ پُر است: همان عرض (۱۹۰)، padding و حداقل‌ارتفاعِ استاندارد (۱۱۲).
+   min-height باعث می‌شود حتی در حالتِ خالی (بدونِ سفارش، بدونِ هم‌ردیف) هم اندازهٔ استاندارد بماند؛
+   و وقتی سفارشِ پُری هست، چون هم‌ردیفِ flex‌اند (align-items:stretch) به قدِ آن‌ها کشیده می‌شود. */
+.cp-order-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:190px;min-height:112px;
+  border:1.5px dashed var(--line);border-radius:11px;background:none;cursor:pointer;color:var(--muted);
+  font-family:inherit;font-size:12px;font-weight:600;transition:.14s;padding:11px 12px}
+.cp-order-add:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
+.cp-order-add .ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+
+/* فرم درون‌خطی (افزودن/ویرایش سفارش یا پروژه) */
+.cp-inline-form{margin-top:12px;padding:12px 14px;background:#faf9f7;border:1px solid var(--line);border-radius:10px}
+.cp-inline-form .toolbar{margin:0}
+
+/* ردیف‌های پروژه (تک‌خطی) */
+/* فهرستِ تمیز: جداکنندهٔ محو (#f2f1ee) به‌جای باکسِ کاملِ هر ردیف، هاورِ برجسته، ستون‌های هم‌تراز */
+.cp-proj-rows{display:flex;flex-direction:column}
+.cp-proj-row{display:flex;align-items:center;gap:var(--sp-3);padding:11px 10px;border-bottom:1px solid #f2f1ee;
+  cursor:pointer;transition:background .12s}
+.cp-proj-row:last-child{border-bottom:none}
+.cp-proj-row:hover{background:#fff8f0}
+/* کدِ پروژه: هم‌فونتِ مقدارِ «کد پروژه» در مشخصات (.spec-val.ltr) — 11.5/500/تیره؛ چپ‌نویس.
+   margin-inline:auto فضای آزادِ بینِ نام و درصد را دوطرفه می‌بلعد، پس کد وسط‌چینِ آن فضاست
+   (نه چسبیده به نام، نه به درصد) و چون نام ثابت است، همهٔ کدها دقیقاً زیرِ هم می‌نشینند */
+.cpr-code{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;text-align:left;flex-shrink:0;margin-inline:auto}
+/* نام عرضِ ثابتِ ۳۲٪ می‌گیرد و رشد نمی‌کند؛ چون ثابت است ستونِ کد همیشه در یک xِ ثابت می‌نشیند (کدها زیرِ هم). نامِ خیلی‌بلند … می‌شود */
+.cpr-name{font-size:13px;font-weight:500;color:var(--txt);flex:0 1 32%;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* درصد (راست) + نوار (چپ)؛ عرضِ ثابت باعث می‌شود نوارِ همهٔ ردیف‌ها هم‌اندازه بماند */
+.cpr-prog{display:flex;align-items:center;gap:var(--sp-2);width:170px;flex-shrink:0}
+.cpr-prog .proj-bar-bg{flex:1;min-width:0}   /* نوار در ردیفِ پنلِ مشتری باید کش بیاید (کلاسِ مشترک با داشبورد) */
+.cpr-prog .proj-bar-bg{flex:1}
+.cpr-pct{font-size:12px;font-weight:700;color:var(--txt);min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+/* شمارشِ اسنادِ ثبت‌شده از کل (۷/۷) — از projectStats */
+.cpr-count{font-size:11.5px;color:var(--muted);direction:ltr;font-variant-numeric:tabular-nums;width:46px;text-align:center;flex-shrink:0}
+/* اکشن‌ها همیشه‌دیده و با طرحِ باکس‌دارِ استانداردِ .icon-btn (مثلِ قبل) */
+.cpr-acts{display:flex;gap:var(--sp-1);flex-shrink:0}
+@media(max-width:720px){.cpr-prog,.cpr-count{display:none}}
+
+/* مودال افزودن/ویرایش مشتری */
+.clm{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.clm-row{display:flex;flex-direction:column;gap:5px}
+/* کد (باریک، راست) کنار نام (پهن، چپ) در یک ردیف */
+.clm-grid2{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start}
+@media(max-width:520px){.clm-grid2{grid-template-columns:1fr}}
+/* دکمه‌های پایین: گروه چپ‌چین، دکمهٔ اصلی چپ‌ترین (عیناً استانداردِ .ed-foot سایت) */
+.clm-actions{display:flex;gap:8px;margin-top:4px;justify-content:flex-end}
+/* آپلود لوگو به سبک استاندارد آواتار: خودِ کادر دکمهٔ «انتخاب تصویر» است؛
+   با انتخاب، پیش‌نمایش در همان کادر می‌آید و دکمهٔ حذف (سطل استاندارد) ظاهر می‌شود. */
+.logo-up{display:flex;gap:14px;align-items:center}
+.logo-up-box{width:96px;height:96px;border:1.5px dashed var(--line);border-radius:14px;background:#faf9f7;
+  display:grid;place-items:center;cursor:pointer;overflow:hidden;transition:.15s;position:relative;flex-shrink:0}
+.logo-up-box:hover{border-color:var(--brand);background:#fff8f0}
+.logo-up-box.has{border-style:solid;border-color:var(--line);background:#ffffff}
+.logo-up-box img{width:100%;height:100%;object-fit:contain;background:#fff}
+.logo-up-empty{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted);font-size:11.5px;font-weight:600}
+.logo-up-empty .ic{width:24px;height:24px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.logo-up-box:hover .logo-up-empty{color:var(--brand)}
+.logo-up-box:hover .logo-up-empty .ic{stroke:var(--brand)}
+.logo-up-hint{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);color:#fff;font-size:10.5px;
+  text-align:center;padding:3px 0;opacity:0;transition:.15s}
+.logo-up-box.has:hover .logo-up-hint{opacity:1}
+.logo-up-side{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+
+/* ===== فهرست ماژول‌های سند (جزئیات پروژه) ===== */
+.pd-list-hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.pd-list-hd h2{margin:0}
+/* طراحی فشرده: فقط ماژول‌های فعال ردیف می‌گیرند؛ خاموش‌ها چیپ می‌شوند */
+.pd-modules{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.mod-row{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:9px;font-size:12.5px;
+  border:1px solid var(--line);background:#fff;transition:.12s}
+.mod-row.done{border-color:var(--ok-line)}
+.mod-row.on{background:#fff8f0;border-color:#f7941f44}
+.mod-state{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:inline-grid;place-items:center}
+.mod-state.done{background:var(--ok)}
+.mod-state.done .ic{width:10px;height:10px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
+.mod-state.on{background:var(--brand)}
+.mod-name{font-weight:700;color:var(--txt);white-space:nowrap}
+.mod-spacer{flex:1;min-width:8px}
+.mod-num{font-size:11px;color:var(--muted);direction:ltr;cursor:pointer;max-width:230px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mod-num:hover{color:var(--brand)}
+.mod-req{font-size:11.5px;color:var(--brand);font-weight:700}
+.mod-acts{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.mod-ico{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--muted);
+  display:inline-grid;place-items:center;cursor:pointer;transition:.12s;padding:0;flex-shrink:0}
+.mod-ico:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
+.mod-ico .ic{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* نوار چیپ‌های ماژول‌های خاموش (افزودن سریع، بدون هدررفتن فضا) */
+.mod-off-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.mod-chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--muted);
+  background:#f7f7f5;border:1px dashed var(--line);border-radius:20px;padding:4px 11px;cursor:pointer;
+  transition:.12s;font-family:inherit}
+.mod-chip:hover{border-color:var(--brand);border-style:solid;color:var(--brand);background:#fff8f0}
+.mod-chip .ic{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mod-empty{font-size:12px;color:var(--muted);padding:6px 2px}
+
+/* دو کارت کنار هم: «اسناد عمومی» (راست) + «نقشه‌های قطعات» (چپ، پهن‌تر) */
+.pd-cols{display:grid;grid-template-columns:1fr 1.5fr;gap:14px;align-items:start}
+.pd-cols .card{margin-bottom:0}
+@media(max-width:900px){.pd-cols{grid-template-columns:1fr}}
+
+/* ===== ساختار دو‌سطحی جزئیات پروژه: سطح‌پروژه + سکشن هر قطعه ===== */
+.pd-scope{margin-top:18px}
+.pd-scope:first-child{margin-top:8px}
+.pd-scope-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding-right:10px;
+  border-right:3px solid var(--brand);margin-bottom:2px}
+.pd-scope-hd h3{margin:0;font-size:14px;font-weight:800;color:var(--txt)}
+.pd-scope-sub{font-size:11.5px;color:var(--muted)}
+.pd-part{border:1px solid var(--line);border-radius:12px;background:#fcfcfb;padding:12px 14px;margin-top:10px}
+.pd-part-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}
+.pd-part-title{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;min-width:0}
+.pd-part-code{font-size:11px;font-weight:700;color:var(--brand);background:#fff3e6;border:1px solid #f7941f33;
+  border-radius:6px;padding:1px 8px;direction:ltr}
+.pd-part-name{font-size:14px;font-weight:800;color:var(--txt)}
+.pd-part-en{font-size:11.5px;color:var(--muted);direction:ltr}
+.pd-part .pd-modules{margin-top:8px}
+.pd-addpart{display:flex;align-items:center;gap:8px;margin:2px 0 14px;flex-wrap:wrap}
+.pd-addpart-sel{width:auto;min-width:220px;background:#fff;border:1px solid var(--line);border-radius:9px;
+  padding:8px 12px;font-family:inherit;font-size:13px;color:var(--txt)}
+
+/* زیرعنوان چندخطیِ جزئیات پروژه (سفارش + مشتری) */
+.pd-sub{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.75}
+.pd-sub div{white-space:normal}
+
+/* ===== انتخابگر آواتار ===== */
+.avatar-picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+.av-opt{width:42px;height:42px;border:1px solid var(--line);border-radius:11px;background:#fff;font-size:21px;
+  display:grid;place-items:center;cursor:pointer;transition:.12s;padding:0;line-height:1}
+.av-opt:hover{border-color:var(--brand);background:#fff8f0}
+.av-opt.sel{border-color:var(--brand);background:#fff3e6;box-shadow:0 0 0 3px #f7941f22}
+
+/* ===== صفحهٔ راهنما (فعلاً جای‌نگه‌دار؛ محتوای گام‌به‌گام بعداً اضافه می‌شود) ===== */
+.help-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:48px 24px}
+.help-badge{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;
+  background:#fff3e6;color:var(--brand);margin-bottom:6px}
+.help-badge svg{width:34px;height:34px;stroke:currentColor;fill:none;stroke-width:1.8}
+.help-empty h4{font-size:16px;font-weight:700;color:var(--txt)}
+.help-empty p{font-size:13px;color:var(--muted);max-width:420px;line-height:1.9;margin:0}
