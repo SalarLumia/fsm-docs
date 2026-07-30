@@ -14,6 +14,8 @@ document.addEventListener("keydown",function(e){
   }
 });
 function switchTab(name){
+  // ترکِ نمای فعلی: مدلِ سه‌بعدیِ بارگذاری‌شده (اگر بود) و URLِ بلابش آزاد می‌شود تا حافظه نشت نکند
+  if(typeof releaseBlobUrl==="function") releaseBlobUrl("mvModel");
   window._activeTab=name;   // تبِ فعالِ جاری؛ درختِ سایدبار حالتِ نارنجی را فقط برای همین تب نشان می‌دهد
   document.querySelectorAll(".nav-item[data-tab]").forEach(function(b){ b.classList.toggle("active", b.dataset.tab===name); });
   document.querySelectorAll(".tabpane").forEach(function(p){ p.classList.add("hidden"); });

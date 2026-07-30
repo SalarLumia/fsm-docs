@@ -1426,7 +1426,7 @@ async function mvLoadPart(fileId, part){
     if(myToken!==_mvLoadSeq){ est.stop(); return; }   // منسوخ شد — نتیجه را دور بریز
     if(!r||!r.ok){ est.stop(); loadBarHide(scope()); var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML='<div class="mv-empty-t">دریافتِ مدل ناموفق بود.</div>'; return; }
     var blob=b64toBlob(r.base64, r.mimeType||"model/gltf-binary");
-    var url=URL.createObjectURL(blob);
+    var url=previewBlobUrl("mvModel", blob);
     var sh=document.getElementById("mvShell"); if(!sh){ est.stop(); return; }
     // مدل را جای placeholder بگذار و تولباکس را اضافه کن؛ نوار و منو دست‌نخورده می‌مانند (تخمین ادامه دارد)
     var ph=document.getElementById("mvPh");

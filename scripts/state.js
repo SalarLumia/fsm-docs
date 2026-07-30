@@ -5,6 +5,22 @@ var ME = { token:null, role:null, name:null, username:null, gender:null, positio
 /* مجموعهٔ آواتارهای قابل‌انتخاب (خودبسنده، بدون منبع بیرونی) */
 var AVATARS = ["👤","🧑","👨‍💼","👩‍💼","👨‍🔧","👩‍🔧","👨‍🏭","👩‍🏭","👨‍🔬","👩‍🔬","👨‍💻","👩‍💻","👷","👷‍♀️","🧑‍🎓","🦺"];
 
+/* ================= مدیریتِ URLهای بلاب (پیش‌نمایش) =================
+   نشتِ حافظه در جلسه‌های طولانی از اینجا می‌آمد: هر پیش‌نمایشِ فایل یا مدلِ سه‌بعدی
+   یک URL.createObjectURL می‌ساخت که هیچ‌وقت آزاد نمی‌شد. حالا هر «کانال» فقط یک URLِ زنده
+   دارد؛ ساختِ URLِ تازه، قبلی را revoke می‌کند، و بستنِ مودال/ترکِ پنل کانالش را آزاد می‌کند. */
+var _blobUrls = {};
+function previewBlobUrl(channel, blob){
+  releaseBlobUrl(channel);
+  var url = URL.createObjectURL(blob);
+  _blobUrls[channel] = url;
+  return url;
+}
+function releaseBlobUrl(channel){
+  var u = _blobUrls[channel];
+  if(u){ try{ URL.revokeObjectURL(u); }catch(e){} delete _blobUrls[channel]; }
+}
+
 /* ================= توابع کمکی پایه ================= */
 function pad2(v){ v=String(v==null?"":v).trim(); if(v==="")return""; if(/^\d+$/.test(v)){while(v.length<2)v="0"+v;return v;} return v.toUpperCase(); }
 /* تبدیلِ ارقامِ فارسی/عربی به لاتین — تا کدهایی که با کیبوردِ فارسی تایپ می‌شوند («۳D») رد نشوند. */

@@ -122,28 +122,45 @@ function toggleProjCard(head){
 }
 
 /* یک ردیف تایم‌لاین فعالیت (مشترک بین داشبورد و پنجرهٔ «مشاهدهٔ همه») */
-function activityItemHTML(d, isLast, asCard){
-  var who=d.uploadedBy?(' · '+esc(userName(d.uploadedBy))):'';
-  var si=statusInfo(d.status);
+/* برچسب/رنگِ بج بر پایهٔ نوعِ رویداد (نه وضعیتِ لحظه‌ایِ سند) — هم‌واژهٔ تایم‌لاینِ گردش‌کار در مودال */
+function wfActionBadge(action){
+  var a=String(action||"").toLowerCase();
+  var cls = a==="approved" ? "badge-approved"
+          : a==="rejected" ? "badge-rejected"
+          : a==="submitted" ? "badge-pending"
+          : "badge-draft";
+  return { cls:cls, label:workflowActionLabel(a) };
+}
+/* یک ردیفِ فعالیت = یک رویدادِ گردش‌کار (ثبت/ارسال/تأیید/رد/بارگذاریِ نسخه) */
+function activityItemHTML(ev, isLast, asCard){
+  var d=docByNumber(ev.drawingNumber);
+  var who=ev.user?(' · '+esc(userName(ev.user))):'';
+  var b=wfActionBadge(ev.action);
+  var ctx=d?esc(docPhrase(d)):'';   // زمینه (نوع/قطعه/پروژه/مشتری)؛ اگر سند حذف شده باشد، فقط شماره
   if(asCard){
-    // نسخهٔ کارت (مودالِ «همهٔ فعالیت‌ها») — هم‌شکلِ کارتابل بازبینی؛ فقط دایرهٔ متحرک، بدونِ خطِ عمودی
+    // نسخهٔ کارت (مودالِ «همهٔ فعالیت‌ها») — هم‌شکلِ کارتابل بازبینی
     return '<div class="rq-item">'+
       '<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>'+
-      '<div class="rq-main"><div class="rq-num mono" onclick="openDocDetail(\''+esc(d.drawingNumber)+'\')">'+esc(d.drawingNumber)+'</div>'+
-        '<div class="rq-meta">'+esc(docPhrase(d))+who+'</div></div>'+
-      '<div class="rq-aside"><span class="rq-date">'+fmtDate(d.timestamp)+'</span>'+
-        '<span class="badge '+si.cls+'">'+si.label+'</span></div>'+
+      '<div class="rq-main"><div class="rq-num mono" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+
+        '<div class="rq-meta">'+ctx+who+'</div></div>'+
+      '<div class="rq-aside"><span class="rq-date">'+fmtDate(ev.timestamp)+'</span>'+
+        '<span class="badge '+b.cls+'">'+esc(b.label)+'</span></div>'+
       '</div>';
   }
   return '<div class="tl-item">'+
     '<div class="tl-marker"><div class="tl-dot"></div><div class="tl-line"></div></div>'+
-    '<div class="tl-body"><div class="tl-num" onclick="openDocDetail(\''+esc(d.drawingNumber)+'\')">'+esc(d.drawingNumber)+'</div>'+
-    '<div class="tl-meta">'+esc(docPhrase(d))+who+'<span class="badge tl-badge '+si.cls+'">'+si.label+'</span></div></div>'+
-    '<div class="tl-date">'+fmtDate(d.timestamp)+'</div>'+
+    '<div class="tl-body"><div class="tl-num" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+
+    '<div class="tl-meta">'+ctx+who+'<span class="badge tl-badge '+b.cls+'">'+esc(b.label)+'</span></div></div>'+
+    '<div class="tl-date">'+fmtDate(ev.timestamp)+'</div>'+
     '</div>';
 }
+/* رویدادهای گردش‌کار به‌ترتیبِ زمانِ نزولی — تأیید/رد/ارسال هم اینجا رویدادِ تازه می‌سازند.
+   fallback: اگر برگهٔ Workflow خالی بود (قبل از setup)، از خودِ اسناد (رویدادِ ثبت) بازسازی می‌شود. */
 function sortedActivity(){
-  return [].concat(DB.documents).sort(function(a,b){return (b.timestamp||"").localeCompare(a.timestamp||"");});
+  var wf=DB.workflow||[];
+  if(wf.length) return [].concat(wf).sort(function(a,b){ return String(b.timestamp||"").localeCompare(String(a.timestamp||"")); });
+  return [].concat(DB.documents||[]).map(function(d){ return {drawingNumber:d.drawingNumber, action:"created", user:d.uploadedBy, timestamp:d.timestamp}; })
+    .sort(function(a,b){ return String(b.timestamp||"").localeCompare(String(a.timestamp||"")); });
 }
 
 /* فعالیت اخیر — تایم‌لاین، حداکثر ۳ مورد + «مشاهدهٔ همه» */

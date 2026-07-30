@@ -121,7 +121,7 @@ async function previewFile(fileId){
   toast("در حال بازکردن…");
   var r=await api("getFile",{fileId:fileId});
   if(!r.ok){ toast(r.message||"خطا در دریافت فایل",true); return; }
-  var blob=b64toBlob(r.base64, r.mimeType); var url=URL.createObjectURL(blob);
+  var blob=b64toBlob(r.base64, r.mimeType); var url=previewBlobUrl("filePreview", blob);
   var inner = r.mimeType.indexOf("image/")===0 ? '<img src="'+url+'">' : '<iframe src="'+url+'"></iframe>';
   showModal(esc(r.name), inner);
 }
@@ -143,7 +143,11 @@ function showModal(title,innerHTML,boxClass){
     '<header><strong>'+title+'</strong><button class="modal-x" onclick="closeModal()" aria-label="بستن" title="بستن">✕</button></header>'+
     '<div class="body">'+innerHTML+'</div></div></div>';
 }
-function closeModal(){ document.getElementById("modalHost").innerHTML=""; }
+function closeModal(){
+  // آزادسازیِ URLهای بلابِ مودال (پیش‌نمایشِ سند/فایل) تا در جلسه‌های طولانی حافظه نشت نکند
+  if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
+  document.getElementById("modalHost").innerHTML="";
+}
 
 /* ================= خروجی CSV ================= */
 function exportCSV(){
