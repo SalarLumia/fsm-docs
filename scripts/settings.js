@@ -13,13 +13,18 @@ function renderDataTables(){
   if(pmBody) pmBody.innerHTML=partModsSorted().map(function(m){
     return "<tr><td>"+esc(m.nameFa)+"</td><td class='row-actions'>"+editIconBtn("editPartMod('"+esc(m.nameFa)+"')")+delIconBtn("del('deletePartMod',{nameFa:'"+esc(m.nameFa)+"'})")+"</td></tr>";
   }).join("")||emptyRow(2);
-  // users: آواتار + نام و نام خانوادگی (با نشان آقا/خانم)
+  // users: کارتِ کاربر (آواتار + نام + نامِ کاربری) · سمت · تگِ نقش · ویرایش
+  var meU=(typeof ME!=="undefined"&&ME)?String(ME.username||""):"";
   document.getElementById("usersBody").innerHTML=(DB.users||[]).map(function(u){
     var avChar = u.avatar || (String(u.name||u.username||"?").trim().charAt(0));
-    var nameCell = "<span class='u-av'>"+esc(avChar)+"</span> "+esc((honorific(u.gender)?honorific(u.gender)+" ":"")+(u.name||""));
-    return "<tr><td class='mono' style='direction:ltr;text-align:right'>"+esc(u.username)+"</td><td>"+nameCell+"</td><td>"+esc(u.position||"—")+"</td><td>"+esc(roleLabel(u.role))+"</td><td class='row-actions'>"+editIconBtn("editUser('"+esc(u.username)+"')")+delIconBtn("del('deleteUser',{username:'"+esc(u.username)+"'})")+"</td></tr>";
-  }).join("")||emptyRow(5);
-  fillAvatarPicker();
+    var you = (meU && String(u.username)===meU) ? '<span class="u-you">شما</span>' : '';
+    var nameCell = '<div class="u-cell"><span class="u-av lg">'+esc(avChar)+'</span>'+
+      '<div class="u-meta"><div class="u-name">'+esc((honorific(u.gender)?honorific(u.gender)+" ":"")+(u.name||""))+you+'</div>'+
+      '<div class="u-user mono">'+esc(u.username)+'</div></div></div>';
+    return '<tr><td>'+nameCell+'</td><td>'+esc(u.position||"—")+'</td><td>'+roleTag(u.role)+
+      '</td><td class="row-actions">'+editIconBtn("openUserModal('"+esc(u.username)+"')")+'</td></tr>';
+  }).join("")||emptyRow(4);
+  var uc=document.getElementById("usersCount"); if(uc) uc.textContent=(DB.users||[]).length;
 }
 function emptyRow(cols){ return '<tr><td colspan="'+cols+'" class="muted" style="text-align:center;padding:14px">موردی نیست.</td></tr>'; }
 
@@ -199,28 +204,90 @@ async function migratePartModRename(oldName,newName){
 
 /* ---- کاربران (نقش + جنسیت + سمت + آواتار) ---- */
 function validUsername(u){ return /^[A-Za-z][A-Za-z0-9._-]{2,19}$/.test(u); }
-function editUser(username){
-  var u=(DB.users||[]).find(function(x){return String(x.username)===String(username)});
-  if(!u){ toast("کاربر پیدا نشد",true); return; }
-  usUser.value=u.username; usName.value=u.name||""; usRole.value=u.role||"viewer"; usPass.value="";
-  document.getElementById("usGender").value=u.gender||"male";
-  document.getElementById("usPosition").value=u.position||"";
-  setAvatarSelected(u.avatar||"");
-  _editKey.user=String(u.username);
-  _disable("usUser",true); _setBtn("saveUserBtn","به‌روزرسانی"); _show("cancelUserBtn",true);
-  focusEditForm(usName,"کاربر «"+(u.name||u.username)+"» برای ویرایش بارگذاری شد");
+/* تگِ رنگیِ نقش (با آیکون) — هم‌سبک با tag سایت، رنگ‌ها غیرِبرند تا نارنجی فقط برند بماند */
+function roleTag(role){
+  var r=String(role||"viewer");
+  var cls = r==="admin"?"role-admin":(r==="reviewer"?"role-reviewer":"role-viewer");
+  var ic = r==="admin"
+    ? '<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>'
+    : (r==="reviewer"
+      ? '<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>'
+      : '<svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>');
+  return '<span class="tag '+cls+'">'+ic+esc(roleLabel(r))+'</span>';
 }
-function resetUserForm(){
-  usUser.value="";usName.value="";usPass.value="";document.getElementById("usPosition").value="";
-  document.getElementById("usGender").value="male"; usRole.value="viewer"; setAvatarSelected("");
-  _editKey.user="";
-  _disable("usUser",false); _setBtn("saveUserBtn","افزودن"); _show("cancelUserBtn",false);
+
+/* ---- کاربران: افزودن/ویرایش داخلِ مودال (به‌جای فرمِ همیشه-باز) ---- */
+var _userEdit = "";   // نامِ کاربریِ در حالِ ویرایش؛ "" = افزودنِ کاربرِ جدید
+var GENDERS_SEG=[{val:"male",label:"آقا"},{val:"female",label:"خانم"}];
+var ROLES_SEG=[{val:"viewer",label:"بیننده"},{val:"reviewer",label:"بازبین"},{val:"admin",label:"مدیر سیستم"}];
+/* کنترلِ سگمنتی (تک‌انتخابی) — مقدار در یک input مخفیِ هم‌id ذخیره می‌شود تا saveUser بدون تغییر بخواندش */
+function segControl(id, opts, cur){
+  return '<input type="hidden" id="'+id+'" value="'+esc(cur)+'">'+
+    '<div class="seg">'+opts.map(function(o){
+      return '<button type="button" class="seg-btn'+(o.val===cur?" on":"")+'" data-val="'+esc(o.val)+'" onclick="pickSeg(\''+id+'\',this)">'+esc(o.label)+'</button>';
+    }).join("")+'</div>';
+}
+function pickSeg(id, btn){
+  var h=document.getElementById(id); if(h) h.value=btn.getAttribute("data-val");
+  var wrap=btn.parentNode; if(wrap) wrap.querySelectorAll(".seg-btn").forEach(function(b){ b.classList.toggle("on", b===btn); });
+}
+function togglePass(id, btn){
+  var i=document.getElementById(id); if(!i) return;
+  var show=(i.type==="password"); i.type=show?"text":"password";
+  if(btn) btn.classList.toggle("on", show);
+}
+function openUserModal(username){
+  var u = username ? (DB.users||[]).find(function(x){return String(x.username)===String(username);}) : null;
+  _userEdit = u ? String(u.username) : "";
+  var isEdit=!!u;
+  var eye='<svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var trash='<svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+  var body='<div class="um-form">'+
+    '<div class="um-field"><label class="fld">نام و نام خانوادگی</label>'+
+      '<input id="usName" placeholder="علی شفیعی" value="'+esc(u?(u.name||""):"")+'"></div>'+
+    '<div class="um-row">'+
+      '<div class="um-field"><label class="fld">نام کاربری (لاتین)</label>'+
+        '<input id="usUser" placeholder="ali" style="direction:ltr;text-align:left" value="'+esc(u?(u.username||""):"")+'"'+(isEdit?" disabled":"")+'></div>'+
+      '<div class="um-field"><label class="fld">جنسیت</label>'+segControl("usGender",GENDERS_SEG,(u&&u.gender)||"male")+'</div>'+
+    '</div>'+
+    '<div class="um-field"><label class="fld">سمت</label>'+
+      '<input id="usPosition" placeholder="واحد تحقیق و توسعه" value="'+esc(u?(u.position||""):"")+'"></div>'+
+    '<div class="um-field"><label class="fld">رمز عبور'+(isEdit?' <span class="fld-hint">(برای بی‌تغییر ماندن خالی بگذارید)</span>':'')+'</label>'+
+      '<div class="pass-wrap"><input id="usPass" type="password" placeholder="••••••">'+
+        '<button type="button" class="pass-eye" onclick="togglePass(\'usPass\',this)" title="نمایش/مخفی">'+eye+'</button></div></div>'+
+    '<div class="um-field"><label class="fld">نقش</label>'+segControl("usRole",ROLES_SEG,(u&&u.role)||"viewer")+'</div>'+
+    '<div class="um-field"><label class="fld">آواتار (در هدر نمایش داده می‌شود)</label>'+
+      '<div class="avatar-picker" id="usAvatarPicker"></div><input type="hidden" id="usAvatar"></div>'+
+    '<div class="um-actions">'+
+      '<button class="btn primary" onclick="saveUser()">'+(isEdit?"ذخیرهٔ تغییرات":"افزودن کاربر")+'</button>'+
+      '<button class="btn" onclick="closeModal()">انصراف</button>'+
+      (isEdit?'<button class="btn danger um-del" onclick="deleteUserGuarded(\''+esc(u.username)+'\')">'+trash+'حذف کاربر</button>':'')+
+    '</div>'+
+  '</div>';
+  showModal(isEdit?"ویرایشِ کاربر":"افزودنِ کاربر", body, "user-modal");
+  fillAvatarPicker();
+  setAvatarSelected(u?(u.avatar||""):"");
+}
+async function deleteUserGuarded(username){
+  var u=(DB.users||[]).find(function(x){return String(x.username)===String(username);});
+  if(!u){ toast("کاربر پیدا نشد",true); return; }
+  var meU=(typeof ME!=="undefined"&&ME)?String(ME.username||""):"";
+  if(meU && String(username)===meU){ toast("نمی‌توانید حسابِ کاربریِ خودتان را حذف کنید.",true); return; }
+  if(u.role==="admin" && (DB.users||[]).filter(function(x){return x.role==="admin";}).length<=1){
+    toast("آخرین مدیرِ سیستم را نمی‌توان حذف کرد.",true); return;
+  }
+  if(!(await uiConfirm("حذفِ کاربر «"+(u.name||u.username)+"»؟ این کار برگشت‌ناپذیر است.",{danger:true,okLabel:"حذف"}))) return;
+  var r=await api("deleteUser",{username:username});
+  if(r.ok){
+    DB.users=(DB.users||[]).filter(function(x){return String(x.username)!==String(username);});
+    closeModal(); localRefresh(); toast("کاربر حذف شد");
+  } else toast(r.message||"حذف ناموفق",true);
 }
 async function saveUser(){
-  var wasEdit=!!_editKey.user;
+  var wasEdit=!!_userEdit;
   var uname=usUser.value.trim(), name=usName.value.trim(), role=usRole.value;
-  var gender=document.getElementById("usGender").value, position=document.getElementById("usPosition").value;
-  var avatar=document.getElementById("usAvatar").value;
+  var gender=usGender.value, position=usPosition.value.trim();
+  var avatar=usAvatar.value;
   if(!uname || !name){ toast("نام کاربری و نام و نام خانوادگی لازم است.",true); return; }
   if(!wasEdit){
     // قوانین فقط هنگام افزودن کاربر جدید (نام کاربری هنگام ویرایش قفل است)
@@ -232,9 +299,16 @@ async function saveUser(){
   if((DB.users||[]).some(function(x){return String(x.name||"").trim()===name && String(x.username)!==uname;})){
     toast("این نام و نام خانوادگی قبلاً برای کاربر دیگری ثبت شده است.",true); return;
   }
+  // محافظ: آخرین مدیرِ سیستم نباید از نقشِ مدیریت خارج شود (قفل‌شدنِ کاملِ دسترسیِ ادمین)
+  if(wasEdit && role!=="admin"){
+    var cur=(DB.users||[]).find(function(x){return String(x.username)===uname;});
+    if(cur && cur.role==="admin" && (DB.users||[]).filter(function(x){return x.role==="admin";}).length<=1){
+      toast("آخرین مدیرِ سیستم را نمی‌توان از نقشِ مدیریت خارج کرد.",true); return;
+    }
+  }
   var r=await api("saveUser",{username:uname,name:name,password:usPass.value,role:role,gender:gender,position:position,avatar:avatar});
   if(r.ok){
     localUpsert(DB.users,function(x){return x.username===uname;},{username:uname,name:name,role:role,active:true,gender:gender,position:position,avatar:avatar});
-    resetUserForm(); localRefresh(); toast("کاربر "+(wasEdit?"به‌روزرسانی شد":"افزوده شد"));
+    closeModal(); localRefresh(); toast("کاربر "+(wasEdit?"به‌روزرسانی شد":"افزوده شد"));
   } else toast(r.message,true);
 }

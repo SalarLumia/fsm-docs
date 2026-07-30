@@ -350,6 +350,54 @@
 .av-opt:hover{border-color:var(--brand);background:#fff8f0}
 .av-opt.sel{border-color:var(--brand);background:#fff3e6;box-shadow:0 0 0 3px #f7941f22}
 
+/* ===== پنلِ کاربران: سربرگ + جدولِ اعضا + تگِ نقش ===== */
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.card-head .spec-sec-t{margin:0;padding-bottom:0;border-bottom:none}
+.card-head .btn{flex-shrink:0}
+/* سلولِ کاربر: آواتار + نام + نامِ کاربری */
+.u-cell{display:flex;align-items:center;gap:11px}
+.u-av.lg{width:38px;height:38px;font-size:19px}
+.u-meta{display:flex;flex-direction:column;line-height:1.35;min-width:0}
+.u-name{font-weight:600;font-size:13px;color:var(--txt)}
+.u-user{font-size:11.5px;color:var(--muted);direction:ltr;text-align:right}
+.u-you{display:inline-block;margin-inline-start:7px;font-size:10px;font-weight:600;color:var(--brand);
+  background:#fff3e6;border:1px solid #f7941f33;border-radius:20px;padding:1px 7px;vertical-align:1px}
+.u-total{margin-top:12px;font-size:12px;text-align:left}
+.users-table td{vertical-align:middle}
+/* تگِ نقش (با آیکون) — رنگ‌های غیرِبرند تا نارنجی فقط برند بماند */
+.tag.role-admin,.tag.role-reviewer,.tag.role-viewer{display:inline-flex;align-items:center;gap:5px}
+.tag svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.tag.role-admin{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
+.tag.role-reviewer{background:#f0f9ff;color:#0369a1;border-color:#bae6fd}
+.tag.role-viewer{background:var(--gray-bg);color:var(--gray);border-color:var(--gray-line)}
+
+/* ===== مودالِ افزودن/ویرایشِ کاربر ===== */
+.modal .box.user-modal{width:min(560px,96vw)}
+.um-form{display:flex;flex-direction:column;gap:15px;padding:20px}
+.um-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.um-field{display:flex;flex-direction:column}
+.um-field .fld{margin-bottom:7px}
+.fld-hint{font-weight:400;color:var(--muted);font-size:11px}
+/* کنترلِ سگمنتی (جنسیت/نقش) */
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:#fff;width:fit-content;max-width:100%}
+.seg-btn{flex:1;white-space:nowrap;font-family:inherit;font-size:12.5px;font-weight:500;color:var(--muted);
+  background:#fff;border:none;border-inline-start:1px solid var(--line);padding:8px 15px;cursor:pointer;transition:.15s}
+.seg-btn:first-child{border-inline-start:none}
+.seg-btn:hover{background:#f6f5f3;color:var(--txt)}
+.seg-btn.on{background:var(--brand);color:#fff;font-weight:600}
+/* رمز عبور با دکمهٔ نمایش/مخفی */
+.pass-wrap{position:relative;display:flex}
+.pass-wrap input{flex:1;padding-inline-end:40px}
+.pass-eye{position:absolute;inset-inline-end:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;
+  display:grid;place-items:center;border:none;background:none;cursor:pointer;color:var(--muted);border-radius:7px;transition:.12s}
+.pass-eye svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pass-eye:hover{background:var(--panel);color:var(--txt)}
+.pass-eye.on{color:var(--brand)}
+/* اکشن‌های پایینِ مودال */
+.um-actions{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+.um-actions .btn.primary{min-width:150px;justify-content:center}
+.um-actions .um-del{margin-inline-start:auto}
+
 /* ===== صفحهٔ راهنما (فعلاً جای‌نگه‌دار؛ محتوای گام‌به‌گام بعداً اضافه می‌شود) ===== */
 .help-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:48px 24px}
 .help-badge{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;

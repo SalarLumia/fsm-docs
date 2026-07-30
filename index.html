@@ -263,22 +263,12 @@
       </div>
 
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران</h3>
-        <div class="toolbar">
-          <div><label class="fld">نام کاربری (لاتین)</label><input id="usUser" placeholder="ali" style="direction:ltr;text-align:left"></div>
-          <div class="grow"><label class="fld">نام و نام خانوادگی</label><input id="usName" placeholder="علی شفیعی"></div>
-          <div><label class="fld">جنسیت</label><select id="usGender"><option value="male">آقا</option><option value="female">خانم</option></select></div>
-          <div class="grow"><label class="fld">سمت</label><input id="usPosition" placeholder="واحد تحقیق و توسعه"></div>
-          <div><label class="fld">رمز عبور (فقط کاربر جدید)</label><input id="usPass" type="password" placeholder="••••••"></div>
-          <div><label class="fld">نقش</label><select id="usRole"><option value="viewer">بیننده</option><option value="reviewer">بازبین</option><option value="admin">مدیر سیستم</option></select></div>
-          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelUserBtn" onclick="resetUserForm()" style="display:none">انصراف</button><button class="btn primary" id="saveUserBtn" onclick="saveUser()">افزودن</button></div></div>
+        <div class="card-head">
+          <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران</h3>
+          <button class="btn primary" onclick="openUserModal()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>افزودن کاربر</button>
         </div>
-        <div style="margin:2px 0 12px">
-          <label class="fld">آواتار (در هدر نمایش داده می‌شود)</label>
-          <div class="avatar-picker" id="usAvatarPicker"></div>
-          <input type="hidden" id="usAvatar">
-        </div>
-        <div class="tablewrap" style="max-height:200px"><table><thead><tr><th>نام کاربری</th><th>نام و نام خانوادگی</th><th>سمت</th><th>نقش</th><th>عملیات</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+        <div class="tablewrap"><table class="users-table"><thead><tr><th>کاربر</th><th>سمت</th><th>نقش</th><th></th></tr></thead><tbody id="usersBody"></tbody></table></div>
+        <div class="u-total muted">مجموع کاربران: <span id="usersCount">0</span></div>
       </div>
     </section>
     </main>
