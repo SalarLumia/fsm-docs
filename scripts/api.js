@@ -84,15 +84,20 @@ function uiConfirm(message, opts){
   return new Promise(function(resolve){
     var okLabel=opts.okLabel||"تأیید", cancelLabel=opts.cancelLabel||"انصراف";
     var okClass=opts.danger?"btn danger":"btn primary";
+    var title=opts.title||(opts.danger?"تأیید حذف":"تأیید");
     var wrap=document.createElement("div");
     wrap.className="modal confirm-modal";
-    wrap.innerHTML='<div class="box"><div class="body"><div class="confirm-box">'+
-      (opts.title?'<div class="confirm-title">'+esc(opts.title)+'</div>':'')+
-      '<p class="confirm-msg">'+esc(message)+'</p>'+
-      '<div class="confirm-acts">'+
-        '<button class="btn" data-v="0">'+esc(cancelLabel)+'</button>'+
-        '<button class="'+okClass+'" data-v="1">'+esc(okLabel)+'</button>'+
-      '</div></div></div></div>';
+    // فریمِ استانداردِ مودالِ سایت (هدر + بدنه) تا با بقیهٔ پنجره‌های سایت یکپارچه باشد
+    wrap.innerHTML='<div class="box confirm-mbox">'+
+      '<header><strong>'+esc(title)+'</strong>'+
+        '<button class="modal-x" data-v="0" aria-label="بستن" title="بستن">✕</button></header>'+
+      '<div class="body"><div class="confirm-box">'+
+        '<p class="confirm-msg">'+esc(message)+'</p>'+
+        '<div class="confirm-acts">'+
+          '<button class="btn" data-v="0">'+esc(cancelLabel)+'</button>'+
+          '<button class="'+okClass+'" data-v="1">'+esc(okLabel)+'</button>'+
+        '</div>'+
+      '</div></div></div>';
     document.body.appendChild(wrap);
     var onKey;
     var settle=function(val){

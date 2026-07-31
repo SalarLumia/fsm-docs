@@ -50,8 +50,8 @@ async function openDocDetail(num){
       '</div>'+
       '<div class="doc-side">'+
         rejBanner+
-        '<div class="dm-sec"><div class="dm-sec-t">مشخصات سند</div>'+metaHTML+'</div>'+
-        '<div class="dm-sec"><div class="dm-sec-t">تاریخچهٔ سند</div>'+
+        '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>مشخصات سند</div>'+metaHTML+'</div>'+
+        '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><polyline points="12 7 12 12 15 15"/></svg>تاریخچهٔ سند</div>'+
           '<div class="ver-list">'+revHTML+'</div></div>'+
       '</div>'+
     '</div>';
@@ -78,7 +78,7 @@ function versionRowHTML(rv){
     '<div class="ver-head">'+
       '<span class="ver-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>'+
       '<span class="ver-rev mono">ریویژن '+esc(revFmt(rv.rev))+'</span>'+
-      '<span class="badge '+rsi.cls+'">'+rsi.label+'</span>'+
+      badgeHTML(rsi.cls, rsi.label)+
       (rv.fileId?'':'<span class="muted" style="font-size:11px">بدون فایل</span>')+
     '</div>'+
     '<div class="ver-sub"><span class="ver-meta">'+fmtDate(rv.timestamp)+' · '+esc(userName(rv.uploadedBy)||"")+'</span>'+

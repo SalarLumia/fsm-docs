@@ -125,11 +125,13 @@ function toggleProjCard(head){
 /* برچسب/رنگِ بج بر پایهٔ نوعِ رویداد (نه وضعیتِ لحظه‌ایِ سند) — هم‌واژهٔ تایم‌لاینِ گردش‌کار در مودال */
 function wfActionBadge(action){
   var a=String(action||"").toLowerCase();
-  var cls = a==="approved" ? "badge-approved"
-          : a==="rejected" ? "badge-rejected"
-          : a==="submitted" ? "badge-pending"
-          : "badge-draft";
-  return { cls:cls, label:workflowActionLabel(a) };
+  var map={ approved:{cls:"badge-approved",label:"تأیید"},
+            rejected:{cls:"badge-rejected",label:"رد"},
+            submitted:{cls:"badge-pending",label:"بازبینی"},
+            newversion:{cls:"badge-draft",label:"نسخهٔ جدید"},
+            created:{cls:"badge-draft",label:"ایجاد"},
+            revision:{cls:"badge-draft",label:"ایجاد"} };
+  return map[a] || { cls:"badge-draft", label:workflowActionLabel(a) };
 }
 /* یک ردیفِ فعالیت = یک رویدادِ گردش‌کار (ثبت/ارسال/تأیید/رد/بارگذاریِ نسخه) */
 function activityItemHTML(ev, isLast, asCard){
@@ -144,13 +146,13 @@ function activityItemHTML(ev, isLast, asCard){
       '<div class="rq-main"><div class="rq-num mono" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+
         '<div class="rq-meta">'+ctx+who+'</div></div>'+
       '<div class="rq-aside"><span class="rq-date">'+fmtDate(ev.timestamp)+'</span>'+
-        '<span class="badge '+b.cls+'">'+esc(b.label)+'</span></div>'+
+        badgeHTML(b.cls, b.label)+'</div>'+
       '</div>';
   }
   return '<div class="tl-item">'+
     '<div class="tl-marker"><div class="tl-dot"></div><div class="tl-line"></div></div>'+
     '<div class="tl-body"><div class="tl-num" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+
-    '<div class="tl-meta">'+ctx+who+'<span class="badge tl-badge '+b.cls+'">'+esc(b.label)+'</span></div></div>'+
+    '<div class="tl-meta">'+ctx+who+badgeHTML("tl-badge "+b.cls, b.label)+'</div></div>'+
     '<div class="tl-date">'+fmtDate(ev.timestamp)+'</div>'+
     '</div>';
 }

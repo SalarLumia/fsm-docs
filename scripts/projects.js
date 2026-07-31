@@ -120,7 +120,7 @@ function renderClientPanel(){
 
 function railHTML(clients){
   return '<aside class="cp-rail">'+
-    '<div class="cp-rail-hd"><span>مشتریان</span>'+
+    '<div class="cp-rail-hd"><span><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 21v-7h4v7"/><line x1="8" y1="7" x2="10" y2="7"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/></svg>مشتریان</span>'+
       '<button class="icon-btn" title="افزودن مشتری جدید" onclick="cpOpenClientModal(\'\')">'+ICON.plus+'</button></div>'+
     '<div class="cp-client-list" id="cpClientList" ondragover="clientDragOver(event)" ondrop="event.preventDefault()">'+
       (clients.length?clients.map(clientItemHTML).join(""):'<p class="muted" style="padding:14px;font-size:12px">مشتری‌ای ثبت نشده. با دکمهٔ + بالا اولین مشتری را بسازید.</p>')+
@@ -561,7 +561,7 @@ function showProjectDetail(c,o,pr){
       '<header class="pp-head">'+
         '<div class="pp-head-main">'+
           '<h1>پروژه تولید '+esc(s.name)+'</h1>'+
-          '<span class="mstate '+stCls+'">'+esc(s.status.label)+'</span>'+
+          '<span class="mstate '+stCls+'">'+badgeIcon(s.status.cls)+esc(s.status.label)+'</span>'+
         '</div>'+
         '<div class="pp-head-actions">'+
           '<button class="btn sm" onclick="backToClients()"><svg viewBox="0 0 24 24" class="ic"><line x1="2.5" y1="12" x2="21.5" y2="12"/><polyline points="14 4.5 21.5 12 14 19.5"/></svg>بازگشت</button>'+
@@ -640,7 +640,8 @@ function partSpecRowsHTML(p,pn,admin){
   return mods.map(function(m){
     var v=String(vals[m.label]==null?"":vals[m.label]);
     var cls=v?pdValClass(v):'spec-val ltr empty';
-    var body=v?esc(v):'Not specified';   // واحد داخلِ خودِ مقدار نوشته می‌شود (فیلدِ واحدِ جدا حذف شد)
+    var unit=(typeof partModUnitOf==="function")?partModUnitOf(m.label):"";   // واحدِ خودکارِ این پارامتر
+    var body=v?(esc(v)+(unit?' <span class="spec-unit">'+esc(unit)+'</span>':'')):'Not specified';
     var edit=admin?' data-val="'+esc(v)+'" title="کلیک برای ویرایش" onclick="partSpecEdit(this,\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\',\''+esc(m.label)+'\')"':'';
     return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(m.label)+'</span></span>'+
       '<span class="'+cls+(admin?' editable':'')+'"'+edit+'>'+body+'</span></div>';
@@ -707,10 +708,27 @@ function sectionModulesHTML(c,o,pr,types,part,proj,onSet,slotOn,admin,latest){
 
 /* ردیفِ تمیزِ سند — عیناً پروتوتایپ: آیکن + نامِ کامل (راست) · شمارهٔ سند (چپ).
    بدونِ بجِ وضعیت، بدونِ «بارگذاری نشده» و بدونِ دکمهٔ حذف — همان دو ستونِ ردیفِ مشخصات. */
-var DOC_IC_SVG='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+/* «المانِ» نوعِ سند: به‌صورتِ خودکار از روی کد ساخته می‌شود — علامتِ اصلیِ سند با «کدِ سند»
+   (MC/AS/…) در مرکزِ آن؛ برای نوعِ «3D» همان المانِ مکعبی. محتوای داخلِ کادرِ .doc-ic / .el-badge
+   را برمی‌گرداند و در جدولِ تنظیمات و پنلِ پروژه یکی است. */
+function docTypeIconInner(t){
+  var rawCode=String(t&&t.code!=null?t.code:"").toUpperCase();
+  if(rawCode==="3D") return MODEL_IC;   // مدلِ سه‌بعدی: همان المانِ مکعبی، نه نمادِ سند
+  var code=esc(rawCode);
+  var fs=code.length>=3?6:8;   // کدِ ۳ حرفی کوچک‌تر تا داخلِ نمادِ سند جا شود
+  return '<svg class="el-doc" viewBox="0 0 24 24">'+
+    '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'+
+    '<polyline points="14 2 14 8 20 8"/>'+
+    '<text x="12" y="16.5" text-anchor="middle" fill="currentColor" stroke="none" font-size="'+fs+'">'+code+'</text>'+
+    '</svg>';
+}
+/* «المانِ» قطعه: به‌صورتِ خودکار کدِ قطعه داخلِ همان کادر. */
+function partIconInner(p){
+  return '<span class="el-code">'+esc(pad2(p&&p.partNo))+'</span>';
+}
 function docRowClean(c,o,pr,part,t,doc,admin){
   var T=String(t.code).toUpperCase();
-  var ic=(T==="3D")?MODEL_IC:DOC_IC_SVG;   // مدلِ سه‌بعدی آیکنِ مکعب می‌گیرد
+  var ic=docTypeIconInner(t);   // آیکونِ سفارشی یا پیش‌فرض (مکعب برای 3D)
   if(doc){
     var num=esc(doc.drawingNumber), open="openDocDetail('"+num+"')";
     return '<div class="doc-row">'+

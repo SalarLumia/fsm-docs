@@ -99,7 +99,7 @@ function renderArchive(){
       "<td>"+esc(partName(d.partNo))+"</td>"+
       "<td>"+esc(typeName(d.typeCode))+"</td>"+
       '<td class="mono">'+esc(d.rev)+' <span class="pill '+(latest?"latest":"old")+'">'+(latest?"آخرین":"قدیمی")+"</span></td>"+
-      '<td><span class="badge '+si.cls+'">'+si.label+"</span></td>"+
+      '<td>'+badgeHTML(si.cls, si.label)+"</td>"+
       "<td>"+fmtDate(d.timestamp)+"</td>"+
       '<td class="row-actions">'+
         viewIconBtn("openDocDetail('"+esc(d.drawingNumber)+"')")+

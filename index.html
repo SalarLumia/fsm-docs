@@ -97,6 +97,7 @@
           <div class="user-avatar" id="uAvatar"></div>
           <div class="user-meta">
             <span id="uName" class="user-name"></span>
+            <span id="uRole" class="user-role"></span>
             <span id="uPosition" class="user-position"></span>
           </div>
         </div>
@@ -231,44 +232,23 @@
     <!-- ---------- تنظیمات سامانه ---------- -->
     <section id="tab-data" class="tabpane hidden">
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات</h3>
-        <div class="toolbar">
-          <div><label class="fld">کد</label><input id="ptNo" placeholder="خودکار" style="width:90px"></div>
-          <div class="grow"><label class="fld">نام انگلیسی قطعه</label><input id="ptName" placeholder="ROLLER" style="direction:ltr;text-align:left"></div>
-          <div class="grow"><label class="fld">نام فارسی قطعه</label><input id="ptFa" placeholder="غلطک"></div>
-          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelPartBtn" onclick="resetPartForm()" style="display:none">انصراف</button><button class="btn primary" id="savePartBtn" onclick="savePart()">افزودن</button></div></div>
-        </div>
-        <div class="tablewrap" style="max-height:220px"><table><thead><tr><th>کد</th><th>نام انگلیسی قطعه</th><th>نام فارسی قطعه</th><th>عملیات</th></tr></thead><tbody id="partsBody"></tbody></table></div>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات<span class="sec-act"><button class="btn sm add-btn" onclick="openPartModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>قطعه جدید</button></span></h3>
+        <div class="tablewrap"><table class="mgmt-table parts-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی قطعه</th><th>نام انگلیسی قطعه</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partsBody"></tbody></table></div>
       </div>
 
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد</h3>
-        <div class="toolbar">
-          <div><label class="fld">کد</label><input id="dtCode" placeholder="MC" maxlength="6" style="width:90px;direction:ltr;text-align:left;text-transform:uppercase" oninput="this.value=enDigits(this.value).replace(/[^A-Za-z0-9]/g,'').toUpperCase()"></div>
-          <div class="grow"><label class="fld">نام انگلیسی سند</label><input id="dtEn" placeholder="Machining"></div>
-          <div class="grow"><label class="fld">نام فارسی سند</label><input id="dtFa" placeholder="نقشه ماشینکاری"></div>
-          <div><label class="fld">سطح</label><select id="dtScope"><option value="part">قطعه</option><option value="project">پروژه (Part 00)</option></select></div>
-          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelDocTypeBtn" onclick="resetDocTypeForm()" style="display:none">انصراف</button><button class="btn primary" id="saveDocTypeBtn" onclick="saveDocType()">افزودن</button></div></div>
-        </div>
-        <div class="tablewrap" style="max-height:240px"><table><thead><tr><th>کد</th><th>نام انگلیسی سند</th><th>نام فارسی سند</th><th>سطح</th><th>عملیات</th></tr></thead><tbody id="doctypesBody"></tbody></table></div>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد<span class="sec-act"><button class="btn sm add-btn" onclick="openDocTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>سند جدید</button></span></h3>
+        <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی سند</th><th>نام انگلیسی سند</th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody"></tbody></table></div>
       </div>
 
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات</h3>
-        <div class="toolbar">
-          <div class="grow"><label class="fld">نام پارامتر</label><input id="ptmName" placeholder="مثلاً وزن، جنس، سختی"></div>
-          <div><label class="fld">&nbsp;</label><div class="btn-row"><button class="btn" id="cancelPartModBtn" onclick="resetPartModForm()" style="display:none">انصراف</button><button class="btn primary" id="savePartModBtn" onclick="savePartMod()">افزودن</button></div></div>
-        </div>
-        <div class="tablewrap" style="max-height:220px"><table><thead><tr><th>نام پارامتر</th><th>عملیات</th></tr></thead><tbody id="partmodsBody"></tbody></table></div>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات<span class="sec-act"><button class="btn sm add-btn" onclick="openPartModModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>پارامتر جدید</button></span></h3>
+        <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th>نام انگلیسی پارامتر</th><th>واحد</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody"></tbody></table></div>
       </div>
 
       <div class="card">
-        <div class="card-head">
-          <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران</h3>
-          <button class="btn primary" onclick="openUserModal()"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>افزودن کاربر</button>
-        </div>
-        <div class="tablewrap"><table class="users-table"><thead><tr><th>کاربر</th><th>سمت</th><th>نقش</th><th></th></tr></thead><tbody id="usersBody"></tbody></table></div>
-        <div class="u-total muted">مجموع کاربران: <span id="usersCount">0</span></div>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران سامانه<span class="sec-act"><button class="btn sm add-btn" onclick="openUserModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>کاربر جدید</button></span></h3>
+        <div class="tablewrap"><table class="users-table"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام و نام خانوادگی کاربر</span></th><th>نام کاربری</th><th>سمت</th><th>نقش</th><th><span class="act-h">عملیات</span></th></tr></thead><tbody id="usersBody"></tbody></table></div>
       </div>
     </section>
     </main>

@@ -162,17 +162,35 @@ function fmtClockHTML(d){
 }
 
 /* ================= نقش، جنسیت، وضعیت ================= */
-function roleLabel(r){ return r==="admin"?"مدیر سیستم":(r==="reviewer"?"بازبین":"بیننده"); }
+function roleLabel(r){ return r==="admin"?"مدیر":(r==="reviewer"?"بازبین":"بیننده"); }
 /* پیشوند احترام برای هدر/جدول: «آقای/خانم + نام». (گزینهٔ جنسیت در فرم «آقا/خانم» است.) */
 function honorific(gender){ return gender==="female"?"خانم":(gender==="male"?"آقای":""); }
 /* وضعیت تأیید سند → کلاس نشان + برچسب */
 function statusInfo(status){
   var s=String(status||"").toLowerCase();
-  if(s==="approved"||s==="active") return {cls:"badge-approved",label:"تأیید شده"};
-  if(s==="pending")  return {cls:"badge-pending", label:"در انتظار بازبینی"};
-  if(s==="rejected") return {cls:"badge-rejected",label:"نیاز به اعمال تغییرات"};
+  if(s==="approved"||s==="active") return {cls:"badge-approved",label:"تأیید"};
+  if(s==="pending")  return {cls:"badge-pending", label:"در انتظار"};
+  if(s==="rejected") return {cls:"badge-rejected",label:"رد"};
   return {cls:"badge-draft",label:"ایجادشده"};
 }
+/* آیکونِ اختصاصیِ هر بج (جایگزینِ نقطهٔ عمومی) — بر اساسِ کلاسِ بج انتخاب می‌شود */
+function badgeIcon(cls){
+  var c=String(cls||"");
+  var check='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+  var clock='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg>';
+  var eye='<svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var cross='<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+  var pencil='<svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>';
+  var ban='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="5.6" y1="5.6" x2="18.4" y2="18.4"/></svg>';
+  if(/inactive/.test(c)) return ban;
+  if(/approved|active/.test(c)) return check;
+  if(/pending/.test(c)) return clock;
+  if(/review/.test(c)) return eye;
+  if(/rejected/.test(c)) return cross;
+  return pencil;   // draft/archived و پیش‌فرض
+}
+/* رندرِ کاملِ یک بج: آیکونِ اختصاصی + برچسبِ کوتاه (همه‌جای سایت از این استفاده می‌کند) */
+function badgeHTML(cls,label){ return '<span class="badge '+cls+'">'+badgeIcon(cls)+esc(label)+'</span>'; }
 function workflowActionLabel(a){
   return { created:"ایجاد سند", revision:"ایجاد سند", submitted:"ارسال برای بازبینی",
            newversion:"بارگذاری نسخهٔ جدید", approved:"تأیید شد", rejected:"تأیید نشد" }[a] || a;

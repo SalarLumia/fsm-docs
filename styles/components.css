@@ -104,7 +104,7 @@ th.sortable:hover{color:var(--brand)}
 th.sortable.active{color:var(--brand)}
 .sort-ar{font-size:9px;margin-inline-start:2px}
 .file-ic{width:12px;height:12px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-1px;margin-inline-end:5px;opacity:.7}
-.tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;background:#fff3e6;border:1px solid #f7941f33;color:var(--brand);font-weight:500}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:3px 10px;border-radius:20px;background:#fff3e6;border:1px solid #f7941f33;color:var(--brand);font-weight:500}
 .tag.proj{background:#f0f9ff;color:#0369a1;border-color:#bae6fd}
 .pill{font-size:10.5px;padding:2px 9px;border-radius:20px;font-weight:500}
 .pill.latest{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
@@ -117,12 +117,12 @@ th.sortable.active{color:var(--brand)}
 /* ===== نشان وضعیت (badge) — آمادهٔ گردش تأیید فاز ۴ ===== */
 .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
   padding:3px 10px;border-radius:20px;border:1px solid transparent;white-space:nowrap}
-.badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.badge svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .badge-approved{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-line)}
 .badge-pending{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-line)}
 .badge-review{background:var(--review-bg);color:var(--review);border-color:var(--review-line)}
 .badge-rejected{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
-.badge-archived,.badge-draft{background:var(--gray-bg);color:var(--gray);border-color:var(--gray-line)}
+.badge-archived,.badge-draft{background:#eef2ff;color:#4f46e5;border-color:#c7d2fe}
 
 /* ===== حالت خالی ===== */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -165,12 +165,11 @@ html:has(.modal:not(.hidden)){overflow:hidden}
 .modal iframe,.modal img{width:100%;height:74vh;border:0;background:#fff;display:block}
 .modal img{object-fit:contain;height:auto;max-height:74vh}
 
-/* دیالوگ تأیید (جایگزین confirm مرورگر) — وسط صفحه، هم‌سبک با سایت */
+/* دیالوگ تأیید (جایگزین confirm مرورگر) — با فریمِ استانداردِ مودالِ سایت (هدر + بدنه) */
 .modal.confirm-modal{z-index:90}
-.modal.confirm-modal .box{width:min(400px,94vw)}
-.confirm-box{padding:24px 24px 20px;text-align:center}
-.confirm-title{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:8px}
-.confirm-msg{font-size:13.5px;color:var(--txt);line-height:1.85;margin:0 0 20px}
+.modal.confirm-modal .box{width:min(430px,94vw)}
+.confirm-box{padding:20px 22px 18px}
+.confirm-msg{font-size:13.5px;color:var(--txt);line-height:1.9;margin:0 0 18px}
 .confirm-acts{display:flex;gap:10px;justify-content:flex-end}
 .confirm-acts .btn{min-width:104px;justify-content:center}
 
@@ -183,7 +182,3 @@ html:has(.modal:not(.hidden)){overflow:hidden}
 .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-left:6px;flex-shrink:0}
 .dot.has{background:var(--ok)} .dot.no{background:#d4d3ce}
 .row-actions{display:flex;gap:6px;justify-content:flex-end;align-items:center}
-/* عنوان بخش: تیتر با نوار تأکید راست (نه دکمه) */
-.section-title{font-size:14px;color:var(--txt);font-weight:800;margin:30px 0 14px;
-  padding-right:11px;border-right:3px solid var(--brand);line-height:1.25}
-.section-title:first-of-type{margin-top:6px}

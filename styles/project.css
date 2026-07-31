@@ -26,8 +26,9 @@
 .pp-head-actions{display:flex;align-items:center;gap:var(--sp-2);flex-shrink:0}
 
 /* تگِ وضعیتِ پروژه — متریکِ .tag سایت */
-.mstate{display:inline-block;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
+.mstate{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
   line-height:1.4;white-space:nowrap;flex-shrink:0}
+.mstate svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .s-run{background:#fff3e6;color:var(--brand);border:1px solid #f7941f33}
 .s-done{background:var(--ok-bg);color:#15803d;border:1px solid var(--ok-line)}
 .s-idle{background:var(--gray-bg);color:#4b5563;border:1px solid var(--gray-line)}
@@ -121,6 +122,8 @@
   padding-inline-start:var(--val-inset)}
 .spec-val.empty{color:#b9b7b2}
 .spec-val .mono{direction:ltr}
+/* واحدِ خودکارِ پارامتر — کنارِ مقدار، کم‌رنگ‌تر و سبک‌تر تا خودِ مقدار برجسته بماند */
+.spec-unit{color:var(--muted);font-weight:400;font-size:.92em}
 .lnk-code{cursor:pointer}
 .lnk-code:hover{color:var(--brand)}
 
@@ -135,7 +138,8 @@
 /* آیکنِ ابتدای ردیف: برای سندِ موجود دکمهٔ «نمایش جزئیات» و برای اسلاتِ خالی نشانِ غیرفعال */
 .doc-ic{width:26px;height:26px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
   background:#fff;border:1px solid var(--line);border-radius:7px;padding:0;font:inherit;color:var(--txt)}
-.doc-ic svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.doc-ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.25}
+.doc-ic svg text{stroke:none;fill:currentColor;font-family:inherit;font-weight:400}   /* کدِ داخلِ نمادِ سند: هم‌فونتِ سایت، وزنِ سبک‌تر */
 button.doc-ic{cursor:pointer;transition:.15s}
 button.doc-ic:hover:not(:disabled){border-color:var(--brand);background:#fff8f0;color:var(--brand)}
 button.doc-ic:active{transform:translateY(1px)}
@@ -309,7 +313,7 @@ button.doc-ic:disabled{cursor:default}
 /* ============ پنلِ ویرایشِ قطعات (چک‌لیستِ استانداردِ سایت) ============ */
 .ed-body{padding:20px 22px;display:flex;flex-direction:column;gap:var(--sp-5)}
 .ed-card{background:#fcfcfb;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
-.ed-sec-t{margin:0 0 12px;padding-bottom:10px;font-size:13.5px;font-weight:700;color:var(--txt);
+.ed-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .ed-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .ed-count{margin-inline-start:auto;font-size:11.5px;font-weight:500;color:var(--muted)}

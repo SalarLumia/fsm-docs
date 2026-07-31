@@ -73,7 +73,9 @@
 .rej-ta:focus{border-color:var(--brand);box-shadow:0 0 0 3px #f7941f1a;outline:none}
 .rej-acts{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
 .dm-sec{margin-bottom:20px}
-.dm-sec-t{font-size:15.5px;font-weight:700;color:var(--txt);margin-bottom:12px;letter-spacing:-.2px}
+.dm-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
+  display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
+.dm-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .dm-row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:12px;border-bottom:1px dashed var(--line)}
 .dm-k{color:var(--muted);flex-shrink:0}
 .dm-v{color:var(--txt);text-align:left;font-weight:500;min-width:0;word-break:break-word}
@@ -164,7 +166,9 @@
 .cp-rail{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008;
   overflow:hidden;position:sticky;top:76px}
 .cp-rail-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);
-  font-size:13px;font-weight:700;color:var(--txt)}
+  font-size:14px;font-weight:700;color:var(--txt)}
+.cp-rail-hd>span{display:flex;align-items:center;gap:8px}
+.cp-rail-hd>span svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .cp-client-list{display:flex;flex-direction:column;max-height:70vh;overflow:auto}
 .cp-client-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:none;border-bottom:1px solid var(--line);
   background:none;cursor:pointer;width:100%;text-align:right;transition:.12s;border-right:3px solid transparent}
@@ -282,66 +286,11 @@
 .logo-up-box.has:hover .logo-up-hint{opacity:1}
 .logo-up-side{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
 
-/* ===== فهرست ماژول‌های سند (جزئیات پروژه) ===== */
-.pd-list-hd{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.pd-list-hd h2{margin:0}
-/* طراحی فشرده: فقط ماژول‌های فعال ردیف می‌گیرند؛ خاموش‌ها چیپ می‌شوند */
-.pd-modules{display:flex;flex-direction:column;gap:6px;margin-top:8px}
-.mod-row{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:9px;font-size:12.5px;
-  border:1px solid var(--line);background:#fff;transition:.12s}
-.mod-row.done{border-color:var(--ok-line)}
-.mod-row.on{background:#fff8f0;border-color:#f7941f44}
-.mod-state{width:16px;height:16px;border-radius:50%;flex-shrink:0;display:inline-grid;place-items:center}
-.mod-state.done{background:var(--ok)}
-.mod-state.done .ic{width:10px;height:10px;fill:none;stroke:#fff;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
-.mod-state.on{background:var(--brand)}
-.mod-name{font-weight:700;color:var(--txt);white-space:nowrap}
-.mod-spacer{flex:1;min-width:8px}
-.mod-num{font-size:11px;color:var(--muted);direction:ltr;cursor:pointer;max-width:230px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mod-num:hover{color:var(--brand)}
-.mod-req{font-size:11.5px;color:var(--brand);font-weight:700}
-.mod-acts{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.mod-ico{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--muted);
-  display:inline-grid;place-items:center;cursor:pointer;transition:.12s;padding:0;flex-shrink:0}
-.mod-ico:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
-.mod-ico .ic{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* نوار چیپ‌های ماژول‌های خاموش (افزودن سریع، بدون هدررفتن فضا) */
-.mod-off-strip{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.mod-chip{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;color:var(--muted);
-  background:#f7f7f5;border:1px dashed var(--line);border-radius:20px;padding:4px 11px;cursor:pointer;
-  transition:.12s;font-family:inherit}
-.mod-chip:hover{border-color:var(--brand);border-style:solid;color:var(--brand);background:#fff8f0}
-.mod-chip .ic{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* ===== پنلِ ویرایشِ قطعات: انتخابگرِ افزودنِ قطعه + حالتِ خالی ===== */
 .mod-empty{font-size:12px;color:var(--muted);padding:6px 2px}
-
-/* دو کارت کنار هم: «اسناد عمومی» (راست) + «نقشه‌های قطعات» (چپ، پهن‌تر) */
-.pd-cols{display:grid;grid-template-columns:1fr 1.5fr;gap:14px;align-items:start}
-.pd-cols .card{margin-bottom:0}
-@media(max-width:900px){.pd-cols{grid-template-columns:1fr}}
-
-/* ===== ساختار دو‌سطحی جزئیات پروژه: سطح‌پروژه + سکشن هر قطعه ===== */
-.pd-scope{margin-top:18px}
-.pd-scope:first-child{margin-top:8px}
-.pd-scope-hd{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;padding-right:10px;
-  border-right:3px solid var(--brand);margin-bottom:2px}
-.pd-scope-hd h3{margin:0;font-size:14px;font-weight:800;color:var(--txt)}
-.pd-scope-sub{font-size:11.5px;color:var(--muted)}
-.pd-part{border:1px solid var(--line);border-radius:12px;background:#fcfcfb;padding:12px 14px;margin-top:10px}
-.pd-part-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px}
-.pd-part-title{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;min-width:0}
-.pd-part-code{font-size:11px;font-weight:700;color:var(--brand);background:#fff3e6;border:1px solid #f7941f33;
-  border-radius:6px;padding:1px 8px;direction:ltr}
-.pd-part-name{font-size:14px;font-weight:800;color:var(--txt)}
-.pd-part-en{font-size:11.5px;color:var(--muted);direction:ltr}
-.pd-part .pd-modules{margin-top:8px}
 .pd-addpart{display:flex;align-items:center;gap:8px;margin:2px 0 14px;flex-wrap:wrap}
 .pd-addpart-sel{width:auto;min-width:220px;background:#fff;border:1px solid var(--line);border-radius:9px;
   padding:8px 12px;font-family:inherit;font-size:13px;color:var(--txt)}
-
-/* زیرعنوان چندخطیِ جزئیات پروژه (سفارش + مشتری) */
-.pd-sub{font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.75}
-.pd-sub div{white-space:normal}
 
 /* ===== انتخابگر آواتار ===== */
 .avatar-picker{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
@@ -350,29 +299,155 @@
 .av-opt:hover{border-color:var(--brand);background:#fff8f0}
 .av-opt.sel{border-color:var(--brand);background:#fff3e6;box-shadow:0 0 0 3px #f7941f22}
 
-/* ===== پنلِ کاربران: سربرگ + جدولِ اعضا + تگِ نقش ===== */
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
-.card-head .spec-sec-t{margin:0;padding-bottom:0;border-bottom:none}
-.card-head .btn{flex-shrink:0}
-/* سلولِ کاربر: آواتار + نام + نامِ کاربری */
+/* ===== پنلِ کاربران: جدولِ اعضا + تگِ نقش ===== */
+/* سلولِ کاربر: آواتار + نام (نامِ کاربری ستونِ جداگانه دارد) */
 .u-cell{display:flex;align-items:center;gap:11px}
-.u-av.lg{width:38px;height:38px;font-size:19px}
-.u-meta{display:flex;flex-direction:column;line-height:1.35;min-width:0}
-.u-name{font-weight:600;font-size:13px;color:var(--txt)}
-.u-user{font-size:11.5px;color:var(--muted);direction:ltr;text-align:right}
+/* آواتارِ جدولِ کاربران. ارتفاعِ سطرها با «ارتفاعِ یکدستِ سطر» (پایین‌تر) مساوی نگه داشته می‌شود،
+   پس آواتار می‌تواند اندازهٔ مناسب داشته باشد بدونِ اینکه سطرِ کاربران بلندتر شود. */
+.u-av.lg{width:30px;height:30px;font-size:15px}
+/* ارتفاعِ یکدستِ سطرهای داده در هر چهار جدولِ تنظیمات (مستقل از محتوا) + وسط‌چینِ عمودیِ محتوا */
+.mgmt-table tbody td,.users-table tbody td{height:52px;vertical-align:middle}
+.u-name{font-weight:500;font-size:13px;color:var(--txt)}
 .u-you{display:inline-block;margin-inline-start:7px;font-size:10px;font-weight:600;color:var(--brand);
   background:#fff3e6;border:1px solid #f7941f33;border-radius:20px;padding:1px 7px;vertical-align:1px}
-.u-total{margin-top:12px;font-size:12px;text-align:left}
 .users-table td{vertical-align:middle}
+/* نقش: تیتر و تگ هر دو وسط‌چین. عملیات: دکمه‌ها در گوشهٔ چپِ سلول می‌مانند و تیتر روی آن‌ها می‌آید */
+.users-table th:nth-child(4){text-align:center}
+.users-table td:nth-child(4){text-align:center}
+.users-table th:nth-child(5){text-align:left;padding-left:14px}   /* = پدینگِ سلولِ دکمه‌ها تا تیترِ عملیات دقیقاً روی گروهِ دکمه‌ها بنشیند */
+/* نام و نام خانوادگی کاربر: پدینگِ ۱۶px تا مرکزِ فلشِ .th-exp (۱۶+۱۳=۲۹) دقیقاً روی مرکزِ آواتار (۱۴+۱۵=۲۹) بنشیند */
+.users-table th:nth-child(1){padding-right:16px}
+/* گَپِ فلش↔متن در کاربران و پارامترها ۱۳px می‌شود تا متنِ تیتر روی ۵۵px بیفتد (۱۶ + ۲۶ فلش + ۱۳ = ۵۵) و با تیترِ
+   نام‌فارسیِ جدول‌های دیگر (که آن‌ها هم روی ۵۵px‌اند) دقیقاً زیرِ هم شود — بی‌آنکه مرکزِ فلش از آواتار/بَج جدا شود. */
+.users-table .th-exp,.partmods-tbl .th-exp{gap:13px}
+/* عرضِ ستون‌های کاربران در بلوکِ «هم‌ترازیِ سه جدول» (پایین‌تر) به‌صورتِ درصدی تعریف شده‌اند. */
+/* کاربرِ غیرفعال: کلِ سطر فریز/خاکستری — مثلِ ماژول‌های خاموش */
+.users-table td,.users-table .u-av,.users-table .u-name{transition:opacity .2s}
+.users-table tr.u-off td:nth-child(n+2),
+.users-table tr.u-off .u-av,.users-table tr.u-off .u-name{opacity:.5}
+/* آواتارِ کاربر = دکمهٔ toggleِ فعال/غیرفعال: حلقهٔ نارنجی دورِ آواتار = فعال؛ بی‌حلقه = غیرفعال.
+   رفتارِ hover و focus از دکمهٔ دایره‌ایِ قبلی (.ed-check) به همین‌جا منتقل شد. */
+.av-toggle{border:none;padding:0;cursor:pointer;font:inherit;-webkit-appearance:none;appearance:none;transition:box-shadow .15s,opacity .2s}
+.av-toggle.on{box-shadow:inset 0 0 0 2px var(--brand)}
+.av-toggle:hover:not(.on){box-shadow:inset 0 0 0 2px #f7941f66}
+.av-toggle:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--brand)}
+/* لرزشِ خطا (اقدامِ غیرمجاز؛ مثلِ قفلِ مدیرِ اصلی) */
+@keyframes shakeX{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-3px)}30%,60%,90%{transform:translateX(3px)}}
+.shake{animation:shakeX .4s ease}
+@media(prefers-reduced-motion:reduce){.shake{animation:none}}
 /* تگِ نقش (با آیکون) — رنگ‌های غیرِبرند تا نارنجی فقط برند بماند */
 .tag.role-admin,.tag.role-reviewer,.tag.role-viewer{display:inline-flex;align-items:center;gap:5px}
 .tag svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .tag.role-admin{background:#f5f3ff;color:#6d28d9;border-color:#ddd6fe}
 .tag.role-reviewer{background:#f0f9ff;color:#0369a1;border-color:#bae6fd}
-.tag.role-viewer{background:var(--gray-bg);color:var(--gray);border-color:var(--gray-line)}
+.tag.role-viewer{background:#f0fdfa;color:#0f766e;border-color:#99f6e4}
+
+/* ===== جدول‌های مدیریتِ اطلاعاتِ پایه (قطعات/انواعِ سند/پارامترها) — هم‌استانداردِ کاربران ===== */
+.mgmt-table td{vertical-align:middle}
+.mgmt-table th.c-mid,.mgmt-table td.c-mid{text-align:center}   /* عرض در بلوکِ هم‌ترازیِ سه جدول */
+/* ستونِ عملیات: عرضِ ثابت، تیتر وسطِ دکمه‌ها */
+.mgmt-table th.col-act,.mgmt-table td.col-act{width:96px;white-space:nowrap;text-align:left}
+/* دکمه‌های عملیاتِ همهٔ جدول‌ها چسبیده به لبهٔ چپ (flex-end در RTL) — تا در همهٔ جدول‌ها زیرِ هم و هم‌تراز شوند */
+.mgmt-table td.col-act .row-actions{justify-content:flex-end}
+/* تیترِ «عملیات»: باکسِ هم‌عرضِ گروهِ دکمه‌ها (۲×۲۶px + ۶px = ۵۸px)، وسط‌چین، چسبیده به لبهٔ چپ (پدینگِ ۱۴px هدر
+   = پدینگِ سلولِ دکمه‌ها) تا دقیقاً وسطِ فاصلهٔ آیکونِ ویرایش و حذف بنشیند و در همهٔ جدول‌ها زیرِ هم بیاید. */
+.act-h{display:inline-block;width:58px;text-align:center}
+/* ستونِ المان (اولِ سمتِ راست): کادرِ هم‌شکلِ آیکونِ سندِ پنلِ پروژه — آیکون/تصویر/کدِ قطعه داخلش
+   (مثلِ آواتارِ کاربران، اول المان بعد مشخصات). */
+/* المان راست‌چین (نه وسط‌چین) تا badge از لبهٔ راست شروع شود و دقیقاً زیرِ آواتارِ کاربران بنشیند */
+.mgmt-table th.col-el,.mgmt-table td.col-el{text-align:right}   /* عرض در بلوکِ هم‌ترازیِ سه جدول */
+.el-badge{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
+  background:#fff;border:1px solid var(--line);border-radius:8px;color:var(--txt);overflow:hidden;vertical-align:middle}
+.el-badge svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.25}
+/* نمادِ سند/۳بعدیِ جدولِ اسناد (۲۱px) خطِ نازک‌تری می‌گیرد تا رِندرش هم‌ضخامتِ خطِ المانِ پارامتر (۱۷px) شود */
+.doctypes-tbl .el-badge svg{stroke-width:1}
+/* کدِ داخلِ نماد: پُر، بدونِ خطِ دور، هم‌فونتِ متنِ لاتینِ سایت (IRANSans)، وزنِ سبک‌تر */
+.el-badge svg text{stroke:none;fill:currentColor;font-family:inherit;font-weight:400}
+/* کدِ سند/قطعه در مرکزِ المان — هم در کادرِ جدول (.el-badge) و هم در پنلِ پروژه (.doc-ic) */
+.el-code{font-size:11.5px;font-weight:700;letter-spacing:.02em;font-variant-numeric:tabular-nums;direction:ltr}
+/* نامِ فارسیِ سند/قطعه/پارامتر: دقیقاً هم‌فونت/هم‌ضخامتِ نامِ کاربر (.u-name)؛ روی td (قطعه/سند) یا span (پارامتر) */
+.mgmt-table .nm-fa{font-weight:500;font-size:13px;color:var(--txt)}
+/* سلولِ نامِ پارامتر = المانِ مرجع + نام، عیناً مثلِ سلولِ کاربر (.u-cell): بَج ۳۰px روی [۱۴،۴۴]، گپ ۱۱، نام روی ۵۵px */
+.pm-cell{display:flex;align-items:center;gap:11px}
+.pm-cell .el-badge{flex-shrink:0}
+/* آیکونِ برچسبِ پارامتر کمی کوچک‌تر از آیکونِ اسناد (کادر همان ۳۰px می‌ماند تا هم‌ترازی نخورد) */
+.pm-cell .el-badge svg{width:17px;height:17px}
+
+/* ===== هم‌ترازیِ ستونیِ سه جدول (کاربران ↔ اسناد ↔ قطعات) =====
+   عرض‌ها «درصدی» و مشترک‌اند تا در هر عرضِ صفحه دقیقاً زیرِ هم بمانند (هم در هدر هم در بدنه ست می‌شوند،
+   چون در الگوی هدرِ ثابت، thead و هر سطرِ tbody جداگانه display:table;table-layout:fixed هستند).
+   قاعده (طبقِ انتخابِ کاربر — گزینهٔ A): «نقش ≡ سطح» کاملاً هم‌عرض و زیرِ هم؛ «نام‌کاربری ≡ نام‌انگلیسیِ سند ≡
+   نام‌انگلیسیِ قطعه» از لبهٔ راست (محلِ متنِ لاتین) زیرِ هم — پس ستونِ نامِ انگلیسی کمی پهن‌تر است و اختلافِ
+   ستونِ «سمت» را در خود جذب می‌کند. رفرنسِ نام‌ها = جدولِ کاربران؛ «سمت» فقط تا حدی باریک شد که نقش/سطح
+   به راست بیایند ولی سمت تنگ نشود. مجموعِ هر ردیف = ۱۰۰٪. */
+.users-table th:nth-child(1),.users-table td:nth-child(1){width:32%}   /* نام و آواتار */
+.users-table th:nth-child(2),.users-table td:nth-child(2){width:20%}   /* نام‌کاربری */
+.users-table th:nth-child(3),.users-table td:nth-child(3){width:16%}   /* سمت (باریک‌تر) */
+.users-table th:nth-child(4),.users-table td:nth-child(4){width:13%}   /* نقش  ← هم‌ترازِ سطح */
+.users-table th:nth-child(5),.users-table td:nth-child(5){width:19%}   /* عملیات */
+.doctypes-tbl th:nth-child(1),.doctypes-tbl td:nth-child(1){width:55px}   /* المان = عرضِ ناحیهٔ آواتارِ کاربران (۱۴ پدینگ + ۳۰ بَج + ۱۱ گپ) */
+.doctypes-tbl th:nth-child(2),.doctypes-tbl td:nth-child(2){width:calc(32% - 55px);padding-right:0}   /* نام فارسی سند — شروع از ۵۵px، دقیقاً زیرِ نامِ کاربر */
+.doctypes-tbl th:nth-child(3),.doctypes-tbl td:nth-child(3){width:36%}   /* نام انگلیسی سند (پهن‌تر) */
+.doctypes-tbl th:nth-child(4),.doctypes-tbl td:nth-child(4){width:13%}   /* سطح  ← هم‌ترازِ نقش */
+.doctypes-tbl th:nth-child(5),.doctypes-tbl td:nth-child(5){width:19%}   /* عملیات */
+.parts-tbl th:nth-child(1),.parts-tbl td:nth-child(1){width:55px}   /* المان = عرضِ ناحیهٔ آواتارِ کاربران (۱۴ پدینگ + ۳۰ بَج + ۱۱ گپ) */
+.parts-tbl th:nth-child(2),.parts-tbl td:nth-child(2){width:calc(32% - 55px);padding-right:0}   /* نام فارسی قطعه — شروع از ۵۵px، دقیقاً زیرِ نامِ کاربر */
+.parts-tbl th:nth-child(3),.parts-tbl td:nth-child(3){width:36%}   /* نام انگلیسی قطعه (هم‌ترازِ نام انگلیسی سند) */
+.parts-tbl th:nth-child(4),.parts-tbl td:nth-child(4){width:32%}   /* عملیات (چون ستونِ سطح ندارد، پهن‌تر) */
+/* پارامترها (۳ ستون): نام‌فارسی ۳۲٪ (زیرِ نامِ کاربر) · نام‌انگلیسی ۳۶٪ (زیرِ نام‌انگلیسیِ قطعه/سند و نام‌کاربری) · عملیات ۳۲٪.
+   ستونِ المان ندارد؛ پس نامِ فارسی با تورفتگیِ ۵۵px (داده) و ۲۱px (هدرِ چِورون‌دار: ۲۱+۲۶+۸=۵۵) دقیقاً روی ۵۵px می‌نشیند. */
+.partmods-tbl th:nth-child(1),.partmods-tbl td:nth-child(1){width:32%}   /* نام فارسی — زیرِ نام و نام خانوادگی کاربر */
+.partmods-tbl th:nth-child(2),.partmods-tbl td:nth-child(2){width:20%}   /* نام انگلیسی — زیرِ نام کاربری (لبهٔ راست روی ۳۲٪، تا ۵۲٪) */
+.partmods-tbl th:nth-child(3),.partmods-tbl td:nth-child(3){width:16%}   /* واحد — دقیقاً زیرِ ستونِ سمت (۵۲٪ تا ۶۸٪) */
+.partmods-tbl th:nth-child(4),.partmods-tbl td:nth-child(4){width:32%}   /* عملیات */
+/* دادهٔ ستونِ اول حالا المانِ مرجع دارد (.pm-cell)، پس پدینگِ استانداردِ ۱۴px تا بَج روی [۱۴،۴۴] بنشیند (مثلِ آواتار/المانِ اسناد).
+   هدر: پدینگِ ۱۶px تا مرکزِ چِورون روی مرکزِ بَج (۲۹px) بیفتد؛ گَپِ ۱۳px (پایین‌تر) متنِ تیتر را روی ۵۵px نگه می‌دارد. */
+.partmods-tbl th:nth-child(1){padding-right:16px}
+
+/* ===== هدرِ ثابت + اسکرولِ فقط روی سطرهای داده (نه سطرِ تیترها) — همهٔ جدول‌های تنظیمات =====
+   thead و هر سطرِ tbody به‌صورتِ table با چیدمانِ ثابت رندر می‌شوند تا ستون‌ها هم‌تراز بمانند.
+   اسکرول فقط روی tbody است، پس نوارِ اسکرول کنارِ سطرها می‌آید نه کنارِ تیترها؛
+   thead به‌اندازهٔ عرضِ نوارِ اسکرول (۹px، در RTL سمتِ چپ) باریک‌تر می‌شود تا با tbody هم‌تراز بماند. */
+/* هدر تمامِ عرضِ باکس را می‌گیرد و پس‌زمینهٔ خاکستری‌اش تا انتها می‌رود؛ ۹px جای نوارِ اسکرول
+   (در RTL سمتِ چپ) با padding رزرو می‌شود تا ستون‌های هدر با بدنه هم‌تراز بمانند (box-sizing:border-box). */
+.mgmt-table thead,.users-table thead{display:table;table-layout:fixed;width:100%;padding-inline-end:9px;background:#f4f4f2}
+.mgmt-table tbody,.users-table tbody{display:block;overflow-y:scroll;overflow-x:hidden}
+.mgmt-table tbody tr,.users-table tbody tr{display:table;table-layout:fixed;width:100%}
+.mgmt-table tbody{max-height:212px}
+.users-table tbody{max-height:212px}
+.mgmt-table tbody::-webkit-scrollbar,.users-table tbody::-webkit-scrollbar{width:9px}
+.mgmt-table tbody::-webkit-scrollbar-thumb,.users-table tbody::-webkit-scrollbar-thumb{background:#d9d8d4;border-radius:6px}
+.mgmt-table tbody::-webkit-scrollbar-track,.users-table tbody::-webkit-scrollbar-track{background:transparent}
+/* خطِ جداکنندهٔ بینِ سطرهای داده = خطِ نازکِ روشنِ استانداردِ سایت (#f2f1ee)؛
+   خطِ زیرِ تیتر (th) همچنان پررنگ (var(--line)) می‌ماند. */
+.mgmt-table td,.users-table td{border-bottom-color:#f2f1ee}
+
+/* ===== فلشِ جمع/بازکردنِ جدول (در هدرِ ستونِ اول) — عیناً هم‌سبک و هم‌انیمیشنِ فلشِ درختِ سایدبار (.nav-exp) =====
+   .th-exp: کنارِ هدرهای متنی (کاربران/پارامترها) فلش را ابتدای سطر، بالای آواتار/شروعِ ردیف قرار می‌دهد. */
+.th-exp{display:flex;align-items:center;gap:8px}
+.tbl-exp{width:26px;height:26px;flex-shrink:0;display:inline-grid;place-items:center;border:none;background:none;
+  padding:0;cursor:pointer;color:var(--muted);border-radius:7px;transition:color .15s,background .15s}
+.tbl-exp:hover{color:var(--brand);background:#fff3e6}
+.tbl-exp:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
+.tbl-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
+.tbl-exp.open .chev{transform:rotate(180deg)}   /* باز = فلش رو به بالا (مثلِ سایدبار) */
+/* جمع‌شدنِ نرمِ سطرها (tbody) با انیمیشنِ max-height + محوشدگی — معادلِ گرید 0fr↔1fr سایدبار در ساختارِ table */
+.mgmt-table tbody,.users-table tbody{transition:max-height .26s cubic-bezier(0,0,.2,1),opacity .2s}
+.mgmt-table.collapsed tbody,.users-table.collapsed tbody{max-height:0;opacity:0;overflow:hidden}
+@media(prefers-reduced-motion:reduce){
+  .tbl-exp .chev{transition:none}
+  .mgmt-table tbody,.users-table tbody{transition:none}
+}
+
+/* دکمهٔ «... جدید» در سربخش‌ها: هم‌سبکِ btn sm؛ min-width مشترک (اندازهٔ بلندترین متن)
+   تا هر چهار دکمه دقیقاً هم‌عرض شوند. محتوا وسط‌چین می‌ماند. فقط علامتِ + کمی ضخیم‌تر. */
+.btn.add-btn{min-width:120px}
+.btn.add-btn svg{stroke-width:2.7}
 
 /* ===== مودالِ افزودن/ویرایشِ کاربر ===== */
 .modal .box.user-modal{width:min(560px,96vw)}
+/* مودالِ فرمِ اطلاعاتِ پایه (قطعه/نوعِ سند/پارامتر) — کمی باریک‌تر */
+.modal .box.form-modal{width:min(520px,96vw)}
 .um-form{display:flex;flex-direction:column;gap:15px;padding:20px}
 .um-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .um-field{display:flex;flex-direction:column}
@@ -394,9 +469,8 @@
 .pass-eye:hover{background:var(--panel);color:var(--txt)}
 .pass-eye.on{color:var(--brand)}
 /* اکشن‌های پایینِ مودال */
-.um-actions{display:flex;gap:10px;margin-top:4px;flex-wrap:wrap}
+.um-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:4px;flex-wrap:wrap}
 .um-actions .btn.primary{min-width:150px;justify-content:center}
-.um-actions .um-del{margin-inline-start:auto}
 
 /* ===== صفحهٔ راهنما (فعلاً جای‌نگه‌دار؛ محتوای گام‌به‌گام بعداً اضافه می‌شود) ===== */
 .help-empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:48px 24px}

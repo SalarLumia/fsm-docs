@@ -43,11 +43,12 @@ async function startApp(){
   if(typeof renderNavTree==="function") renderNavTree();
   switchTab("dashboard");
 }
-/* هدر کاربر: آواتار + (آقای/خانم + نام) + سمت — بدون تکرار نقش */
+/* هدر کاربر: آواتار + (آقای/خانم + نام) + تگِ نقش | سمت */
 function renderUserHeader(){
   var hon=honorific(ME.gender);
   var nm=ME.name||ME.username||"";
   document.getElementById("uName").textContent=(hon?hon+" ":"")+nm;
+  var rt=document.getElementById("uRole"); if(rt) rt.innerHTML=(typeof roleTag==="function")?roleTag(ME.role):"";
   var pos=document.getElementById("uPosition");
   pos.textContent=ME.position||"";
   pos.style.display=ME.position?"":"none";
