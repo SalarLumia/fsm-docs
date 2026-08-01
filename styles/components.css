@@ -151,6 +151,53 @@ th.sortable.active{color:var(--brand)}
   background:#000000aa;padding:8px 20px;border-radius:20px}
 @keyframes ld-spin{to{transform:rotate(360deg)}}
 
+/* ===== مرکز دانلود (پنلِ شناورِ صفِ دانلود) ===== */
+.dl-center{position:fixed;inset-inline-start:22px;bottom:22px;z-index:85;width:330px;
+  max-width:calc(100vw - 44px);background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:0 14px 44px #00000026;overflow:hidden;
+  color:var(--txt);display:none}
+.dl-center.show{display:block;animation:dlIn .24s ease}
+@keyframes dlIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.dl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 12px;background:var(--panel);border-bottom:1px solid var(--line);
+  cursor:pointer;user-select:none}
+.dl-center.min .dl-head{border-bottom:none}
+.dl-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
+.dl-title svg{width:16px;height:16px;fill:none;stroke:var(--brand);stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.dl-head-acts{display:flex;align-items:center;gap:2px}
+.dl-textbtn{background:none;border:none;color:var(--muted);font:inherit;font-size:11.5px;
+  cursor:pointer;padding:4px 7px;border-radius:6px}
+.dl-textbtn:hover{color:var(--txt);background:var(--panel2)}
+.dl-iconbtn{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;
+  border:none;background:none;border-radius:7px;cursor:pointer;color:var(--muted);flex-shrink:0}
+.dl-iconbtn:hover{color:var(--txt);background:var(--panel2)}
+.dl-iconbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.dl-list{max-height:320px;overflow-y:auto;padding:6px}
+.dl-center.min .dl-list{display:none}
+.dl-item{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:9px}
+.dl-item:hover{background:var(--panel)}
+.dl-fileic{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+  background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.dl-fileic svg{width:18px;height:18px;fill:none;stroke:var(--charcoal);stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round}
+.dl-item.done .dl-fileic{background:var(--ok-bg);border-color:var(--ok-line)}
+.dl-item.done .dl-fileic svg{stroke:var(--ok)}
+.dl-item.error .dl-fileic{background:var(--err-bg);border-color:var(--err-line)}
+.dl-item.error .dl-fileic svg{stroke:var(--err)}
+.dl-main{flex:1;min-width:0}
+.dl-name{font-size:12.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  direction:ltr;text-align:right}
+.dl-state{font-size:11.5px;color:var(--muted);margin-top:2px}
+.dl-state.ok{color:var(--ok)} .dl-state.err{color:var(--err)}
+.dl-bar{margin-top:6px;height:5px;background:var(--panel2);border-radius:4px;overflow:hidden;position:relative}
+.dl-fill{display:block;height:100%;background:var(--brand);border-radius:4px;transition:width .2s ease}
+.dl-bar.indet .dl-fill{position:absolute;top:0;bottom:0;width:45%;left:-45%;transition:none;
+  animation:dlSweep 1.1s ease-in-out infinite}
+@keyframes dlSweep{0%{left:-45%}100%{left:100%}}
+.dl-acts{display:flex;align-items:center;gap:1px;flex-shrink:0}
+
 /* ===== مودال ===== */
 .modal{position:fixed;inset:0;background:#0000007a;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
 /* وقتی مودالِ *دیده‌شده‌ای* باز است، اسکرولِ صفحهٔ زیرین قفل می‌شود.

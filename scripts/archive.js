@@ -103,7 +103,7 @@ function renderArchive(){
       "<td>"+fmtDate(d.timestamp)+"</td>"+
       '<td class="row-actions">'+
         viewIconBtn("openDocDetail('"+esc(d.drawingNumber)+"')")+
-        (hasFile?downloadIconBtn("downloadFile('"+d.fileId+"')"):'')+
+        (hasFile?downloadIconBtn("downloadFile('"+d.fileId+"','"+esc(d.drawingNumber)+"')"):'')+
         (admin?delIconBtn("delDocument('"+esc(d.drawingNumber)+"')"):'')+
       "</td></tr>";
   }).join("");
@@ -125,7 +125,11 @@ async function previewFile(fileId){
   var inner = r.mimeType.indexOf("image/")===0 ? '<img src="'+url+'">' : '<iframe src="'+url+'"></iframe>';
   showModal(esc(r.name), inner);
 }
-async function downloadFile(fileId){
+/* دانلود دیگر کلِ صفحه را مسدود نمی‌کند: درخواست به «مرکز دانلود» (صفِ معلق) می‌رود و فایل در
+   پس‌زمینه آماده و سپس به مرورگر سپرده می‌شود. label = شمارهٔ سند برای نمایشِ اولیهٔ کارت. */
+async function downloadFile(fileId, label){
+  if(typeof dlEnqueue==="function"){ dlEnqueue(fileId, label); return; }
+  // مسیرِ یدکی (اگر مرکزِ دانلود بارگذاری نشده بود)
   toast("در حال آماده‌سازی دانلود…");
   var r=await getFileRetry(fileId);
   if(!r||!r.ok){ toast((r&&r.message)||"خطا",true); return; }
@@ -144,6 +148,8 @@ function showModal(title,innerHTML,boxClass){
     '<div class="body">'+innerHTML+'</div></div></div>';
 }
 function closeModal(){
+  // توقفِ برآوردگرِ نوارِ پیشرفتِ پیش‌نمایش تا تایمرش پس از بسته‌شدن روی پیش‌نمایشِ بعدی ننویسد
+  if(typeof _dpStopPreview==="function") _dpStopPreview();
   // آزادسازیِ URLهای بلابِ مودال (پیش‌نمایشِ سند/فایل) تا در جلسه‌های طولانی حافظه نشت نکند
   if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
   document.getElementById("modalHost").innerHTML="";

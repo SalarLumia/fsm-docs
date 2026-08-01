@@ -2,6 +2,13 @@
 /* وضعیت ریویژن انتخاب‌شده در مودال (برای پیش‌نمایش و دانلود) */
 var _dm = { num:"", selNum:"" };
 
+/* شمارندهٔ بارگذاریِ پیش‌نمایش + برآوردگرِ نوارِ پیشرفتِ فعال.
+   بدونِ این، اگر پیش‌نمایشی پیش از تکمیل بسته و پیش‌نمایشِ تازه‌ای باز شود، تایمرِ برآوردگرِ قبلی
+   (که هنوز داخلِ await است و متوقف نشده) روی همان id=docPreviewHost می‌نویسد و عددِ درصد با نمونهٔ
+   جدید «قاطی» می‌شود. هر بارگذاریِ نو، توکن را جلو می‌برد و برآوردگرِ قبلی را متوقف می‌کند. */
+var _dpSeq = 0, _dpEst = null;
+function _dpStopPreview(){ _dpSeq++; if(_dpEst){ _dpEst.stop(); _dpEst=null; } }
+
 async function openDocDetail(num){
   var d=docByNumber(num);
   if(!d){ toast("سند یافت نشد.",true); return; }
@@ -126,6 +133,8 @@ function dmToggleRev(num){
 async function dmSelectVersion(num){
   var d=docByNumber(num); if(!d) return;
   _dm.selNum=num;
+  var myToken=++_dpSeq;                      // این بارگذاری؛ اگر بارگذاریِ تازه‌تری بیاید، این یکی باید بی‌سروصدا کنار برود
+  if(_dpEst){ _dpEst.stop(); _dpEst=null; }  // برآوردگرِ پیش‌نمایشِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
   // هایلایت ردیف انتخاب‌شده
   var list=document.querySelectorAll(".ver-row"); for(var i=0;i<list.length;i++) list[i].classList.remove("sel");
   var row=document.getElementById("ver-"+num); if(row) row.classList.add("sel");
@@ -146,11 +155,13 @@ async function dmSelectVersion(num){
     : '<div class="dm-loading"><div class="spinner" style="width:32px;height:32px;border-width:3px"></div><span>در حال بارگذاری…</span></div>';
   var getHost=function(){ return document.getElementById("docPreviewHost"); };
   var est=(typeof loadBarEstimate==="function")?loadBarEstimate(getHost, 94):null;   // پیشرفتِ نرم تا نوار روی صفر نماند
+  _dpEst=est;
   try{
-    var r=await getFileRetry(d.fileId, {onProgress: function(loaded,total){ if(est && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
+    var r=await getFileRetry(d.fileId, {onProgress: function(loaded,total){ if(est && total>0 && myToken===_dpSeq) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(est) est.stop();
-    // اگر کاربر بین‌بین ریویژن دیگری انتخاب کرده، این نتیجه را دور بریز
-    if(_dm.selNum!==num) return;
+    if(_dpEst===est) _dpEst=null;
+    // اگر کاربر بین‌بین ریویژن دیگری انتخاب کرده یا پیش‌نمایش بسته شده، این نتیجه را دور بریز
+    if(myToken!==_dpSeq) return;
     host=document.getElementById("docPreviewHost"); if(!host) return;
     if(!r||!r.ok){ host.innerHTML='<div class="empty-state"><div class="es-title">پیش‌نمایش در دسترس نیست</div></div>'; return; }
     var blob=b64toBlob(r.base64, r.mimeType); var url=previewBlobUrl("docPreview", blob);
@@ -158,7 +169,7 @@ async function dmSelectVersion(num){
     var really3D = is3D || /^model\//.test(r.mimeType||"") || /\.(glb|gltf)$/i.test(r.name||"");
     if(really3D){
       if(typeof ensureModelViewer==="function") await ensureModelViewer();
-      if(_dm.selNum!==num) return;
+      if(myToken!==_dpSeq) return;
       host=document.getElementById("docPreviewHost"); if(!host) return;
       if(window.customElements && customElements.get("model-viewer")){
         // قابِ پُر (بدونِ flex-centering که لبه را می‌بُرید) + همان تولباکسِ پنلِ پروژه
@@ -176,6 +187,8 @@ async function dmSelectVersion(num){
     }
   }catch(e){
     if(est) est.stop();
+    if(_dpEst===est) _dpEst=null;
+    if(myToken!==_dpSeq) return;
     host=document.getElementById("docPreviewHost");
     if(host) host.innerHTML='<div class="empty-state"><div class="es-title">خطا در بارگذاری پیش‌نمایش</div></div>';
   }
@@ -185,7 +198,7 @@ async function dmSelectVersion(num){
 function dmDownloadSelected(){
   var d=docByNumber(_dm.selNum);
   if(!d||!d.fileId){ toast("این ریویژن فایلی برای دانلود ندارد.",true); return; }
-  downloadFile(d.fileId);
+  downloadFile(d.fileId, d.drawingNumber);
 }
 
 /* حذف یک ریویژن؛ پس از حذف، دوباره روی ریویژن باقی‌ماندهٔ همان مبنا باز می‌شود */

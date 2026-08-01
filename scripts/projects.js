@@ -1338,6 +1338,7 @@ function has3DType(){ return docTypesSorted().some(function(t){ return String(t.
 var _mvParts=[];            // [{part,name,fileId,num}] — قطعاتِ دارای مدلِ سه‌بعدی
 var _mvPickerExpanded=false; // وضعیتِ باز/بستهٔ منوی انتخابِ قطعه
 var _mvLoadSeq=0;           // توکنِ بارگذاری — فقط جدیدترین mvLoadPart اجازهٔ تغییرِ DOM دارد (ضدِ رقابت/تکرار)
+var _mvEst=null;            // برآوردگرِ نوارِ پیشرفتِ فعالِ ویوئر — تا تایمرِ بارگذاریِ قبلی با بارگذاریِ جدید روی یک المانِ درصد ننویسد
 function projectModelParts(p){
   var docs=projectDocs(p).filter(function(d){ return String(d.typeCode).toUpperCase()==="3D" &&
     pad2(d.partNo)!=="00" && String(d.isLatest).toLowerCase()==="true"; });
@@ -1436,6 +1437,7 @@ async function mvLoadPart(fileId, part){
   if(!fileId){ toast("این قطعه مدلی ندارد.",true); return; }
   var shell=document.getElementById("mvShell"); if(!shell) return;
   var myToken=++_mvLoadSeq;   // اگر بارگذاریِ تازه‌تری شروع شود، این یکی باید بی‌سروصدا کنار برود
+  if(_mvEst){ _mvEst.stop(); _mvEst=null; }   // برآوردگرِ بارگذاریِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
   var scope=function(){ return document.getElementById("mvShell"); };
   // به‌جای اورلیِ تمام‌صفحه، نوارِ لودینگِ درون‌ویوئری تا بقیهٔ سایت هم دیده شود
   shell.innerHTML=mvPickerHTML(_mvParts, part)+
@@ -1452,6 +1454,7 @@ async function mvLoadPart(fileId, part){
     return;
   }
   var est=loadBarEstimate(scope, 92);   // پیشرفتِ نرمِ تخمینی تا نوار روی صفر نماند
+  _mvEst=est;
   try{
     var r=await getFileRetry(fileId, {onProgress: function(loaded,total){ if(myToken===_mvLoadSeq && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(myToken!==_mvLoadSeq){ est.stop(); return; }   // منسوخ شد — نتیجه را دور بریز
