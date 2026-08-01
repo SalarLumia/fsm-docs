@@ -94,6 +94,11 @@ function cpLogo(c,size){
   return '<div class="cp-logo cp-logo-ph" style="width:'+s+'px;height:'+s+'px;font-size:'+Math.round(s*0.36)+'px">'+esc(initials)+'</div>';
 }
 
+/* فقط مدیر مجاز به مدیریتِ مشتری/سفارش/پروژه است (بیننده و بازبین: فقط مشاهده).
+   بک‌اند هم این نوشتن‌ها را adminOnly می‌کند؛ این گارد برای بستنِ UI و پیامِ روشن است. */
+function cpIsAdmin(){ return (typeof ME!=="undefined" && ME && ME.role==="admin"); }
+function requireAdmin(){ if(!cpIsAdmin()){ toast("فقط مدیر مجاز به این کار است.",true); return false; } return true; }
+
 /* ---- نمای اصلی: ریل مشتریان + تبِ مشتری انتخاب‌شده ---- */
 function renderClientPanel(){
   var cpView=document.getElementById("cpView"); if(!cpView) return;
@@ -119,24 +124,27 @@ function renderClientPanel(){
 }
 
 function railHTML(clients){
+  var admin=cpIsAdmin();
+  var emptyMsg=admin?'مشتری‌ای ثبت نشده. با دکمهٔ + بالا اولین مشتری را بسازید.':'مشتری‌ای ثبت نشده.';
   return '<aside class="cp-rail">'+
     '<div class="cp-rail-hd"><span><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 21v-7h4v7"/><line x1="8" y1="7" x2="10" y2="7"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/></svg>مشتریان</span>'+
-      '<button class="icon-btn" title="افزودن مشتری جدید" onclick="cpOpenClientModal(\'\')">'+ICON.plus+'</button></div>'+
-    '<div class="cp-client-list" id="cpClientList" ondragover="clientDragOver(event)" ondrop="event.preventDefault()">'+
-      (clients.length?clients.map(clientItemHTML).join(""):'<p class="muted" style="padding:14px;font-size:12px">مشتری‌ای ثبت نشده. با دکمهٔ + بالا اولین مشتری را بسازید.</p>')+
+      (admin?'<button class="icon-btn" title="افزودن مشتری جدید" onclick="cpOpenClientModal(\'\')">'+ICON.plus+'</button>':'')+'</div>'+
+    '<div class="cp-client-list" id="cpClientList"'+(admin?' ondragover="clientDragOver(event)" ondrop="event.preventDefault()"':'')+'>'+
+      (clients.length?clients.map(clientItemHTML).join(""):'<p class="muted" style="padding:14px;font-size:12px">'+emptyMsg+'</p>')+
     '</div></aside>';
 }
 
 function clientItemHTML(c){
+  var admin=cpIsAdmin();
   var n=projectsOf(c.code).length;
-  return '<div class="cp-client-item'+(c.code===_cp.client?" sel":"")+'" data-code="'+esc(c.code)+'" draggable="true" tabindex="0" role="button"'+
-    ' ondragstart="clientDragStart(event,\''+esc(c.code)+'\')" ondragend="clientDragEnd(event)"'+
+  return '<div class="cp-client-item'+(c.code===_cp.client?" sel":"")+'" data-code="'+esc(c.code)+'"'+(admin?' draggable="true"':'')+' tabindex="0" role="button"'+
+    (admin?' ondragstart="clientDragStart(event,\''+esc(c.code)+'\')" ondragend="clientDragEnd(event)"':'')+
     ' onclick="selectClient(\''+esc(c.code)+'\')">'+
     cpLogo(c,34)+
     '<div class="cp-ci-body"><span class="cp-ci-name">'+esc(c.name)+'</span>'+
       '<span class="cp-ci-meta">'+clientMetaHTML(c.code, ordersOf(c.code).length, n)+'</span></div>'+
-    '<span class="cp-grip" title="بکشید تا ترتیب عوض شود" aria-label="جابجاییِ ترتیب" onmousedown="cliGripDown()" onclick="event.stopPropagation()">'+
-      '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>'+
+    (admin?'<span class="cp-grip" title="بکشید تا ترتیب عوض شود" aria-label="جابجاییِ ترتیب" onmousedown="cliGripDown()" onclick="event.stopPropagation()">'+
+      '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>':'')+
     '</div>';
 }
 /* ============ جابجاییِ ترتیبِ مشتری‌ها (drag & drop از روی دستهٔ ۶‌نقطه‌ای + انیمیشنِ FLIP) ============
@@ -208,42 +216,44 @@ function identityHTML(c,orders,projects){
   return '<div class="cp-identity">'+cpLogo(c,60)+
     '<div class="cp-id-body"><h2 class="cp-id-name">'+esc(c.name)+'</h2>'+
       '<div class="cp-id-meta">'+clientMetaHTML(c.code, orders.length, projects.length)+'</div></div>'+
-    '<div class="cp-id-acts">'+
+    (cpIsAdmin()?'<div class="cp-id-acts">'+
       '<button class="btn sm" onclick="cpOpenClientModal(\''+esc(c.code)+'\')">'+ICON.edit+'ویرایش</button>'+
       '<button class="btn sm danger" onclick="del(\'deleteClient\',{code:\''+esc(c.code)+'\'})">'+ICON.trash+'حذف</button>'+
-    '</div></div>';
+    '</div>':'')+'</div>';
 }
 
 /* نوار سفارش‌ها (فشرده، انتخابی) */
 function ordersSectionHTML(c,orders){
+  var admin=cpIsAdmin();
   var cards=orders.map(function(o){
     var np=projectsOf(c.code,pad2(o.orderNo)).length;
     var sel=pad2(o.orderNo)===pad2(_cp.order);
     return '<div class="cp-order-card'+(sel?" sel":"")+'" tabindex="0" role="button" onclick="selectOrder(\''+esc(pad2(o.orderNo))+'\')">'+
       '<div class="coc-top"><span class="coc-title">سفارش '+esc(pad2(o.orderNo))+'</span>'+
-        '<span class="coc-acts">'+
+        (admin?'<span class="coc-acts">'+
           '<button class="icon-btn sm" title="ویرایش سفارش" onclick="event.stopPropagation();cpToggleOrderForm(\''+esc(pad2(o.orderNo))+'\')">'+ICON.edit+'</button>'+
           '<button class="icon-btn sm danger" title="حذف سفارش" onclick="event.stopPropagation();del(\'deleteOrder\',{clientCode:\''+esc(c.code)+'\',orderNo:\''+esc(pad2(o.orderNo))+'\'})">'+ICON.trash+'</button>'+
-        '</span></div>'+
+        '</span>':'')+'</div>'+
       '<div class="coc-desc">'+esc(o.title||"بدون عنوان")+'</div>'+
       '<div class="coc-meta"><bdi>'+np+' پروژه</bdi>'+(o.date?' · <bdi>'+fmtDate(o.date)+'</bdi>':'')+'</div>'+
     '</div>';
   }).join("");
-  var addCard='<button class="cp-order-add" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'<span>سفارش جدید</span></button>';
+  var addCard=admin?'<button class="cp-order-add" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'<span>سفارش جدید</span></button>':'';
   return '<div class="cp-section"><h3 class="spec-sec-t">'+SEC_IC_ORDERS+'سفارش‌ها</h3>'+
     '<div class="cp-order-strip">'+cards+addCard+'</div></div>';
 }
 
 /* پروژه‌های سفارشِ انتخاب‌شده (ردیف‌های تک‌خطی) */
 function projectsSectionHTML(c,orders){
-  if(!orders.length) return '<div class="cp-section"><div class="cp-empty-hint">برای افزودن پروژه، ابتدا یک سفارش بسازید.</div></div>';
+  var admin=cpIsAdmin();
+  if(!orders.length) return '<div class="cp-section"><div class="cp-empty-hint">'+(admin?'برای افزودن پروژه، ابتدا یک سفارش بسازید.':'سفارشی ثبت نشده.')+'</div></div>';
   if(!_cp.order) return '';
   var projects=projectsOf(c.code,_cp.order);
   var rows=projects.length
     ? projects.map(function(p){ return projectRowHTML(c,p); }).join("")
-    : '<div class="cp-empty-hint">برای این سفارش پروژه‌ای ثبت نشده. با دکمهٔ «افزودن پروژه» شروع کنید.</div>';
+    : '<div class="cp-empty-hint">'+(admin?'برای این سفارش پروژه‌ای ثبت نشده. با دکمهٔ «افزودن پروژه» شروع کنید.':'برای این سفارش پروژه‌ای ثبت نشده.')+'</div>';
   return '<div class="cp-section" id="cpProjSection"><h3 class="spec-sec-t">'+SEC_IC_PROJ+'پروژه‌های سفارش '+esc(_cp.order)+
-      '<span class="sec-act"><button class="icon-btn" title="افزودن پروژه" onclick="cpToggleProjForm(\'\')">'+ICON.plus+'</button></span></h3>'+
+      (admin?'<span class="sec-act"><button class="icon-btn" title="افزودن پروژه" onclick="cpToggleProjForm(\'\')">'+ICON.plus+'</button></span>':'')+'</h3>'+
     '<div class="cp-proj-rows rv-group">'+rows+'</div></div>';
 }
 
@@ -258,10 +268,10 @@ function projectRowHTML(c,p){
     '<div class="cpr-prog"><span class="cpr-pct">'+s.pct+'٪</span>'+
       '<div class="proj-bar-bg"><div class="proj-bar-fill" style="width:'+s.pct+'%;background:'+s.status.bar+'"></div></div></div>'+
     '<span class="cpr-count" title="اسنادِ ثبت‌شده از کل">'+s.reg+'/'+s.total+'</span>'+
-    '<div class="cpr-acts" onclick="event.stopPropagation()">'+
+    (cpIsAdmin()?'<div class="cpr-acts" onclick="event.stopPropagation()">'+
       editIconBtn("cpToggleProjForm('"+esc(o)+"/"+esc(pr)+"')","ویرایش پروژه")+
       delIconBtn("del('deleteProject',{clientCode:'"+esc(c.code)+"',orderNo:'"+esc(o)+"',projectNo:'"+esc(pr)+"'})","حذف پروژه")+
-    '</div></div>';
+    '</div>':'')+'</div>';
 }
 
 /* ---- تعامل‌ها ---- */
@@ -275,6 +285,7 @@ function selectOrder(o){ _cp.order=pad2(o); _cp.orderFormOpen=false; _cp.editing
 /* افزودن/ویرایش سفارش — مودال کوچکِ روی‌هم (روی پنل ثبت‌سند هم می‌نشیند) */
 function cpToggleOrderForm(o){ cpOpenOrderModal(o); }
 function cpOpenOrderModal(o){
+  if(!requireAdmin()) return;
   if(!_cp.client){ toast("ابتدا مشتری را انتخاب کنید.",true); return; }
   var editing=!!o;
   _cp.editingOrder=editing?pad2(o):"";
@@ -292,6 +303,7 @@ function cpOpenOrderModal(o){
 /* افزودن/ویرایش پروژه — مودال کوچکِ روی‌هم */
 function cpToggleProjForm(op){ cpOpenProjectModal(op); }
 function cpOpenProjectModal(op){
+  if(!requireAdmin()) return;
   if(!_cp.client){ toast("ابتدا مشتری را انتخاب کنید.",true); return; }
   var editing=!!op;
   _cp.editingProject=editing?op:"";
@@ -381,6 +393,7 @@ function syncNewDocAfterProject(orderNo,projNo){
 
 /* ---- مودال افزودن/ویرایش مشتری (با لوگو) ---- */
 function cpOpenClientModal(code){
+  if(!requireAdmin()) return;
   var editing=!!code;
   var rec=editing?DB.clients.find(function(x){return x.code===code;}):null;
   _cp.logoData=undefined; // دست‌نخورده
@@ -1440,7 +1453,7 @@ async function mvLoadPart(fileId, part){
   }
   var est=loadBarEstimate(scope, 92);   // پیشرفتِ نرمِ تخمینی تا نوار روی صفر نماند
   try{
-    var r=await apiGetFileStreamed(fileId, function(loaded,total){ if(myToken===_mvLoadSeq && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); });
+    var r=await getFileRetry(fileId, {onProgress: function(loaded,total){ if(myToken===_mvLoadSeq && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(myToken!==_mvLoadSeq){ est.stop(); return; }   // منسوخ شد — نتیجه را دور بریز
     if(!r||!r.ok){ est.stop(); loadBarHide(scope()); var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML='<div class="mv-empty-t">دریافتِ مدل ناموفق بود.</div>'; return; }
     var blob=b64toBlob(r.base64, r.mimeType||"model/gltf-binary");

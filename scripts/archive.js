@@ -119,16 +119,16 @@ async function delDocument(num){
 /* ================= پیش‌نمایش / دانلود فایل ================= */
 async function previewFile(fileId){
   toast("در حال بازکردن…");
-  var r=await api("getFile",{fileId:fileId});
-  if(!r.ok){ toast(r.message||"خطا در دریافت فایل",true); return; }
+  var r=await getFileRetry(fileId);
+  if(!r||!r.ok){ toast((r&&r.message)||"خطا در دریافت فایل",true); return; }
   var blob=b64toBlob(r.base64, r.mimeType); var url=previewBlobUrl("filePreview", blob);
   var inner = r.mimeType.indexOf("image/")===0 ? '<img src="'+url+'">' : '<iframe src="'+url+'"></iframe>';
   showModal(esc(r.name), inner);
 }
 async function downloadFile(fileId){
   toast("در حال آماده‌سازی دانلود…");
-  var r=await api("getFile",{fileId:fileId});
-  if(!r.ok){ toast(r.message||"خطا",true); return; }
+  var r=await getFileRetry(fileId);
+  if(!r||!r.ok){ toast((r&&r.message)||"خطا",true); return; }
   var blob=b64toBlob(r.base64, r.mimeType); var url=URL.createObjectURL(blob);
   var a=document.createElement("a"); a.href=url; a.download=r.name; a.click(); URL.revokeObjectURL(url);
 }

@@ -147,14 +147,12 @@ async function dmSelectVersion(num){
   var getHost=function(){ return document.getElementById("docPreviewHost"); };
   var est=(typeof loadBarEstimate==="function")?loadBarEstimate(getHost, 94):null;   // پیشرفتِ نرم تا نوار روی صفر نماند
   try{
-    var r=(typeof apiGetFileStreamed==="function")
-      ? await apiGetFileStreamed(d.fileId, function(loaded,total){ if(est && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); })
-      : await api("getFile",{fileId:d.fileId},{silent:true});
+    var r=await getFileRetry(d.fileId, {onProgress: function(loaded,total){ if(est && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(est) est.stop();
     // اگر کاربر بین‌بین ریویژن دیگری انتخاب کرده، این نتیجه را دور بریز
     if(_dm.selNum!==num) return;
     host=document.getElementById("docPreviewHost"); if(!host) return;
-    if(!r.ok){ host.innerHTML='<div class="empty-state"><div class="es-title">پیش‌نمایش در دسترس نیست</div></div>'; return; }
+    if(!r||!r.ok){ host.innerHTML='<div class="empty-state"><div class="es-title">پیش‌نمایش در دسترس نیست</div></div>'; return; }
     var blob=b64toBlob(r.base64, r.mimeType); var url=previewBlobUrl("docPreview", blob);
     // فایلِ سه‌بعدی (GLB/GLTF) نباید در iframe برود (مرورگر دانلودش می‌کند)؛ با model-viewer نمایش داده می‌شود
     var really3D = is3D || /^model\//.test(r.mimeType||"") || /\.(glb|gltf)$/i.test(r.name||"");

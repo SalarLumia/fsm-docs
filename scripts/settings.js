@@ -85,6 +85,7 @@ function localRefresh(){
 }
 
 async function del(action,payload){
+  if(!(typeof ME!=="undefined" && ME && ME.role==="admin")){ toast("فقط مدیر مجاز به حذف است.",true); return; }
   if(!(await uiConfirm("حذف این مورد؟",{danger:true,okLabel:"حذف"}))) return;
   var r=await api(action,payload);
   if(r.ok){

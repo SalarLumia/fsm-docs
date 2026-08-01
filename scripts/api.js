@@ -33,8 +33,8 @@ async function api(action, payload, opts){
     if(data && data.error==="AUTH"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
     return data;
   } catch(e){
-    // خطای شبکه/سرویس: پیام دوستانه (مگر برای فراخوانی‌های خاموش که خودشان مدیریت می‌کنند)
-    if(action!=="ping" && action!=="nextRevision" && action!=="bootstrap")
+    // خطای شبکه/سرویس: پیام دوستانه (مگر برای فراخوانی‌های خاموش یا quiet که خودشان مدیریت می‌کنند)
+    if(action!=="ping" && action!=="nextRevision" && action!=="bootstrap" && !(opts&&opts.quiet))
       toast("خطا در ارتباط با سرویس. اتصال اینترنت یا در دسترس‌بودن سرویس را بررسی کنید.", true);
     return { ok:false, message:"خطا در ارتباط با سرویس.", netError:true };
   } finally {
@@ -45,7 +45,7 @@ async function api(action, payload, opts){
 /* دریافتِ فایل به‌صورتِ استریمی — برای نمایشِ پیشرفتِ بارگذاری بدونِ اورلیِ سراسری.
    onProgress(loaded,total): اگر total>0 (سرور Content-Length داد) درصدِ دقیق ممکن است؛
    اگر total=0 (روی Apps Script معمولاً همین‌طور است چون پاسخ gzip/chunked است) حجمِ دریافتی نشان داده می‌شود. */
-async function apiGetFileStreamed(fileId, onProgress){
+async function apiGetFileStreamed(fileId, onProgress, quiet){
   if(!API_URL || API_URL.indexOf("PASTE_")===0) return { ok:false, message:"آدرس سرویس تنظیم نشده است." };
   try{
     var res=await fetch(API_URL,{ method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
@@ -64,9 +64,25 @@ async function apiGetFileStreamed(fileId, onProgress){
     if(data && data.error==="AUTH"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
     return data;
   }catch(e){
-    toast("خطا در دریافت فایل. اتصال اینترنت را بررسی کنید.", true);
+    if(!quiet) toast("خطا در دریافت فایل. اتصال اینترنت را بررسی کنید.", true);
     return { ok:false, message:"خطا در دریافت فایل.", netError:true };
   }
+}
+
+/* دریافتِ فایل با «تلاشِ دوبارهٔ خودکار» — بازهٔ cold-start/وارم‌آپِ Apps Script (چند دقیقهٔ اولِ بعد از
+   هر «New version») را پنهان می‌کند: در آن بازه اولین درخواست‌ها ممکن است خطا/تایم‌اوت بدهند. اینجا تا
+   ۳ بار بی‌صدا تلاش می‌شود؛ اگر همه شکست خورد، آخرین نتیجهٔ ناموفق برمی‌گردد و خودِ فراخوان پیام می‌دهد.
+   o.onProgress(loaded,total): اگر داده شود از مسیرِ استریمی (نوارِ پیشرفت) استفاده می‌شود. */
+function fileSleep(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
+async function getFileRetry(fileId, o){
+  o=o||{}; var tries=3, r=null;
+  for(var i=0;i<tries;i++){
+    if(o.onProgress && typeof apiGetFileStreamed==="function") r=await apiGetFileStreamed(fileId, o.onProgress, true);
+    else r=await api("getFile",{fileId:fileId},{silent:true, quiet:true});
+    if(r && r.ok) return r;                     // موفق شد
+    if(i<tries-1) await fileSleep(650*(i+1));   // ۰٫۶۵s سپس ۱٫۳s پیش از تلاشِ بعدی
+  }
+  return r;
 }
 
 /* ================= توست ================= */
