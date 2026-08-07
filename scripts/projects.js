@@ -127,7 +127,7 @@ function railHTML(clients){
   var admin=cpIsAdmin();
   var emptyMsg=admin?'مشتری‌ای ثبت نشده. با دکمهٔ + بالا اولین مشتری را بسازید.':'مشتری‌ای ثبت نشده.';
   return '<aside class="cp-rail">'+
-    '<div class="cp-rail-hd"><span><svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 21v-7h4v7"/><line x1="8" y1="7" x2="10" y2="7"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/></svg>مشتریان</span>'+
+    '<div class="cp-rail-hd"><span>'+SEC_IC_CLIENT+'مشتریان</span>'+
       (admin?'<button class="icon-btn" title="افزودن مشتری جدید" onclick="cpOpenClientModal(\'\')">'+ICON.plus+'</button>':'')+'</div>'+
     '<div class="cp-client-list" id="cpClientList"'+(admin?' ondragover="clientDragOver(event)" ondrop="event.preventDefault()"':'')+'>'+
       (clients.length?clients.map(clientItemHTML).join(""):'<p class="muted" style="padding:14px;font-size:12px">'+emptyMsg+'</p>')+
@@ -364,32 +364,8 @@ async function cpSaveProject(){
   if(newDocOpen()) syncNewDocAfterProject(orderNo,pn); // اگر از پنل ثبت‌سند آمده‌ایم، خودکار انتخاب کن
 }
 
-/* ---- همگام‌سازی خودکار سلکت‌های پنل ثبت سند پس از افزودن مشتری/سفارش/پروژه ---- */
-function syncNewDocAfterClient(code){
-  var nc=document.getElementById("nClient"); if(!nc) return;
-  nc.value=code;
-  if(typeof fillOrderSelect==="function") fillOrderSelect("nOrder", code);
-  var np=document.getElementById("nProject"); if(np) np.innerHTML='<option value="">— پروژه —</option>';
-  if(typeof updatePreview==="function") updatePreview();
-}
-function syncNewDocAfterOrder(orderNo){
-  var nc=document.getElementById("nClient"); if(!nc) return;
-  if(nc.value!==_cp.client) nc.value=_cp.client;
-  if(typeof fillOrderSelect==="function") fillOrderSelect("nOrder", nc.value);
-  var no=document.getElementById("nOrder"); if(no) no.value=pad2(orderNo);
-  if(typeof fillProjectSelect==="function") fillProjectSelect("nProject", nc.value, pad2(orderNo));
-  if(typeof updatePreview==="function") updatePreview();
-}
-function syncNewDocAfterProject(orderNo,projNo){
-  var nc=document.getElementById("nClient"); if(!nc) return;
-  if(nc.value!==_cp.client) nc.value=_cp.client;
-  if(typeof fillOrderSelect==="function") fillOrderSelect("nOrder", nc.value);
-  var no=document.getElementById("nOrder"); if(no) no.value=pad2(orderNo);
-  if(typeof fillProjectSelect==="function") fillProjectSelect("nProject", nc.value, pad2(orderNo));
-  var np=document.getElementById("nProject"); if(np) np.value=pad2(projNo);
-  if(typeof fetchRevIfReady==="function") fetchRevIfReady("nProject");
-  if(typeof updatePreview==="function") updatePreview();
-}
+/* همگام‌سازیِ ویزاردِ ثبت سند پس از افزودنِ مشتری/سفارش/پروژه: توابعِ
+   syncNewDocAfterClient/Order/Project اکنون در documents.js (ویزاردِ ریلِ شماره) تعریف شده‌اند. */
 
 /* ---- مودال افزودن/ویرایش مشتری (با لوگو) ---- */
 function cpOpenClientModal(code){
@@ -551,8 +527,11 @@ var SEC_IC_DOC='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0
 var SEC_IC_PART='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
 var SEC_IC_SPEC='<svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>';
 var SEC_IC_INFO='<svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>';
-var SEC_IC_ORDERS='<svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="14" y2="15"/></svg>';
+/* آیکونِ سفارش عمداً «سبدِ خرید» شد تا با آیکونِ سندِ (SEC_IC_DOC) یکسان به‌نظر نرسد */
+var SEC_IC_ORDERS='<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
 var SEC_IC_PROJ='<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
+/* آیکونِ مشتری (ساختمان) — تک‌منبع؛ در ریلِ مشتریان و در ویزاردِ ثبت سند استفاده می‌شود */
+var SEC_IC_CLIENT='<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 21v-7h4v7"/><line x1="8" y1="7" x2="10" y2="7"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/></svg>';
 
 function showProjectDetail(c,o,pr){
   c=String(c); o=pad2(o); pr=pad2(pr);
@@ -615,8 +594,8 @@ function projectGeneralDocsHTML(p){
   var latest=projectDocs(p).filter(function(d){ return String(d.isLatest).toLowerCase()==="true"; });
   var enabled={}; projDocTypesOf(p).forEach(function(T){ enabled[T]=1; });
   latest.forEach(function(d){ if(pad2(d.partNo)==="00") enabled[String(d.typeCode).toUpperCase()]=1; });
-  // ترتیبِ ثابت (orderedProjectTypes)؛ فقط انواعِ فعال + هر نوعی که سند دارد
-  return orderedProjectTypes().filter(function(t){ return enabled[String(t.code).toUpperCase()]; }).map(function(t){
+  // ترتیبِ دلخواهِ همین پروژه (orderedProjectTypesFor)؛ فقط انواعِ فعال + هر نوعی که سند دارد
+  return orderedProjectTypesFor(p).filter(function(t){ return enabled[String(t.code).toUpperCase()]; }).map(function(t){
     var T=String(t.code).toUpperCase();
     var doc=latest.filter(function(d){ return pad2(d.partNo)==="00" && String(d.typeCode).toUpperCase()===T; })
       .sort(function(a,b){ return (parseInt(b.rev)||0)-(parseInt(a.rev)||0); })[0]||null;
@@ -663,9 +642,9 @@ function partSpecRowsHTML(p,pn,admin){
 /* ردیف‌های سندِ قطعه — انواعِ فعالِ سراسری + هر نوعی که سند دارد؛ تمیز و بدونِ چیپ. */
 function partDocRowsHTML(p,pn,partTypes,latest,admin){
   var c=p.clientCode, o=pad2(p.orderNo), pr=pad2(p.projectNo);
-  var active={}; partDocTypesForPart(p,pn).forEach(function(T){ active[T]=1; });   // انواعِ فعالِ همین قطعه (+ انواعِ دارای سند)
-  var rows=partTypes.filter(function(t){ return active[String(t.code).toUpperCase()]; }).map(function(t){
-    var T=String(t.code).toUpperCase();
+  var by={}; partTypes.forEach(function(t){ by[String(t.code).toUpperCase()]=t; });
+  // ترتیبِ نمایش = ترتیبِ دلخواهِ ذخیره‌شدهٔ همین قطعه (partDocTypesForPart از partDocsByPart می‌خواند و ترتیب را حفظ می‌کند)
+  var rows=partDocTypesForPart(p,pn).map(function(T){ T=String(T).toUpperCase(); var t=by[T]; if(!t) return "";
     var doc=latest.filter(function(d){ return pad2(d.partNo)===pn && String(d.typeCode).toUpperCase()===T; })
       .sort(function(a,b){ return (parseInt(b.rev)||0)-(parseInt(a.rev)||0); })[0]||null;
     return docRowClean(c,o,pr,pn,t,doc,admin);
@@ -726,7 +705,7 @@ function sectionModulesHTML(c,o,pr,types,part,proj,onSet,slotOn,admin,latest){
    را برمی‌گرداند و در جدولِ تنظیمات و پنلِ پروژه یکی است. */
 function docTypeIconInner(t){
   var rawCode=String(t&&t.code!=null?t.code:"").toUpperCase();
-  if(rawCode==="3D") return MODEL_IC;   // مدلِ سه‌بعدی: همان المانِ مکعبی، نه نمادِ سند
+  if(rawCode.indexOf("3D")===0) return MODEL_IC;   // هر نوعِ مدلِ سه‌بعدی (3D، 3DA، …): المانِ مکعبی، نه نمادِ سند
   var code=esc(rawCode);
   var fs=code.length>=3?6:8;   // کدِ ۳ حرفی کوچک‌تر تا داخلِ نمادِ سند جا شود
   return '<svg class="el-doc" viewBox="0 0 24 24">'+
@@ -835,27 +814,15 @@ async function removeProjectPart(c,o,pr,pn){
   if(!r||!r.ok){ toast((r&&r.message)||"حذف قطعه ناموفق بود",true); }
 }
 
-/* ثبت سند جدید با پیش‌تنظیم پروژه (و در صورت وجود، نوع سند و قطعه) */
-function goNewDocForProject(c,o,pr,typeCode,part){
-  openNewDocModal();
-  document.getElementById("nClient").value=c; onClientChange("n");
-  document.getElementById("nOrder").value=pad2(o); onOrderChange("n");
-  document.getElementById("nProject").value=pad2(pr);
-  if(typeCode){ var ty=document.getElementById("nType"); if(ty){ ty.value=String(typeCode).toUpperCase(); onTypeChange(); } }
-  if(part!==undefined && part!==null && String(part)!==""){
-    var pe=document.getElementById("nPart");
-    if(pe && !pe.disabled){ pe.value=pad2(part); }   // برای سطح‌قطعه؛ سطح‌پروژه روی 00 قفل است
-  }
-  fetchRevIfReady("nType");
-  updatePreview();
-}
+/* تابعِ goNewDocForProject (ثبت سند با پیش‌تنظیمِ پروژه/نوع/قطعه) اکنون در documents.js
+   (ویزاردِ ریلِ شماره) تعریف شده است. */
 
 /* ============ مشخصاتِ پروژه و قطعات — همه در p.specs (JSON) ذخیره می‌شوند ============
    ساختار: { project:[{label,value,on}], partMods:[{label,unit,on}],
              partVals:{"03":{"وزن":"96",...}}, partDocTypes:["MC","AC",...] }
    سازگاریِ عقب‌رو: اگر p.specs یک آرایهٔ ساده بود، همان = ماژول‌های سطحِ پروژه. بدونِ تغییرِ بک‌اند. */
 function specsRoot(p){
-  var raw=p&&p.specs, root={project:[],partMods:null,partVals:{},partDocTypes:null,projDocTypes:null,tpl:null,partModsByPart:null,partDocsByPart:null};
+  var raw=p&&p.specs, root={project:[],partMods:null,partVals:{},partDocTypes:null,projDocTypes:null,projDocOrder:null,tpl:null,partModsByPart:null,partDocsByPart:null};
   if(raw){ try{ var j=(typeof raw==="string")?JSON.parse(raw):raw;
     if(Array.isArray(j)){ root.project=j; }
     else if(j&&typeof j==="object"){
@@ -864,6 +831,7 @@ function specsRoot(p){
       if(j.partVals&&typeof j.partVals==="object") root.partVals=j.partVals;
       if(Array.isArray(j.partDocTypes)) root.partDocTypes=j.partDocTypes;
       if(Array.isArray(j.projDocTypes)) root.projDocTypes=j.projDocTypes;
+      if(Array.isArray(j.projDocOrder)) root.projDocOrder=j.projDocOrder;   // ترتیبِ دلخواهِ نمایشِ اسنادِ سطحِ پروژه (شاملِ خاموش‌ها)
       if(j.tpl&&typeof j.tpl==="object") root.tpl=j.tpl;
       if(j.partModsByPart&&typeof j.partModsByPart==="object") root.partModsByPart=j.partModsByPart;   // پارامترهای per-part: {"03":["وزن",...]}
       if(j.partDocsByPart&&typeof j.partDocsByPart==="object") root.partDocsByPart=j.partDocsByPart;   // انواعِ سندِ per-part: {"03":["MC",...]}
@@ -957,6 +925,17 @@ function orderedProjectTypes(){
   return types.map(function(t,i){ return {t:t,i:i,r:rank(t.code)}; })
     .sort(function(a,b){ return a.r!==b.r ? a.r-b.r : a.i-b.i; })
     .map(function(x){ return x.t; });
+}
+/* همان فهرست، ولی با ترتیبِ دلخواهِ همین پروژه (specs.projDocOrder) اگر تعریف شده باشد؛
+   نوع‌هایی که در ترتیبِ ذخیره‌شده نیستند (نوعِ تازه‌اضافه‌شده) پس از آن‌ها به ترتیبِ پیش‌فرض می‌آیند. */
+function orderedProjectTypesFor(p){
+  var base=orderedProjectTypes(), ord=specsRoot(p).projDocOrder;
+  if(!ord||!ord.length) return base;
+  var by={}; base.forEach(function(t){ by[String(t.code).toUpperCase()]=t; });
+  var out=[], seen={};
+  ord.forEach(function(cd){ cd=String(cd).toUpperCase(); if(by[cd]&&!seen[cd]){ out.push(by[cd]); seen[cd]=1; } });
+  base.forEach(function(t){ var cd=String(t.code).toUpperCase(); if(!seen[cd]){ out.push(t); seen[cd]=1; } });
+  return out;
 }
 /* انواعِ سندِ سطحِ پروژه که این پروژه فعال کرده؛ اگر تعریف نشده، همه فعال‌اند */
 function projDocTypesOf(p){
@@ -1063,7 +1042,7 @@ function openProjectSpecs(c,o,pr){
   var p=findProject(c,o,pr); if(!p) return;
   var on={}; projDocTypesOf(p).forEach(function(T){ on[T]=1; });
   PSED={ c:c,o:o,pr:pr, name:(p.description||""), category:projectCategory(p),
-    projDocs: orderedProjectTypes().map(function(t){ var T=String(t.code).toUpperCase(); return {code:T,label:t.nameFa||T,on:!!on[T]}; })
+    projDocs: orderedProjectTypesFor(p).map(function(t){ var T=String(t.code).toUpperCase(); return {code:T,label:t.nameFa||T,on:!!on[T]}; })
   };
   showModal("ویرایش مشخصات پروژه",
     '<div class="ed-body" id="psedBody"></div>'+
@@ -1086,9 +1065,9 @@ function drawProjectSpecsBody(c,o,pr){
   '</div>';
   /* کارتِ ۲: اسناد پروژه — فقط روشن/خاموش؛ افزودنِ نوعِ جدید فقط در تنظیمات */
   var nOn=PSED.projDocs.filter(function(x){ return x.on; }).length;
-  var docRows=PSED.projDocs.map(function(x,i){ return pedCheckRow(x.on,x.label,x.code,"psedToggleDoc("+i+")")+'</div>'; }).join("");
+  var docRows=PSED.projDocs.map(function(x,i){ return pedDragRow(x.on,x.label,x.code,"psedToggleDoc("+i+")"); }).join("");
   var docsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'اسناد پروژه<span class="ed-count">'+nOn+' سند</span></h4>'+
-    (docRows?'<div class="ed-scroll">'+docRows+'</div>':'<div class="ed-req-note">نوعِ سندِ سطحِ پروژه‌ای تعریف نشده.</div>')+
+    (docRows?'<div class="ed-scroll" data-reorder="proj" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">نوعِ سندِ سطحِ پروژه‌ای تعریف نشده.</div>')+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودنِ نوعِ جدیدِ سند، به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>برای بارگذاریِ فایلِ هر سند، در پنلِ مدیریتِ پروژه روی آیکونِ همان سند کلیک کنید.</div>'+
   '</div>';
@@ -1101,6 +1080,7 @@ async function saveProjectSpecs(){
   var root=specsRoot(p);
   root.tpl=root.tpl||{}; root.tpl.category=String(PSED.category||"").trim();
   root.projDocTypes=PSED.projDocs.filter(function(x){ return x.on; }).map(function(x){ return x.code; });
+  root.projDocOrder=PSED.projDocs.map(function(x){ return x.code; });   // ترتیبِ دلخواهِ نمایش (شاملِ خاموش‌ها)
   root.project=[];   // قالبِ ثابت جایگزینِ ماژول‌های پویا شد
   var desc=String(PSED.name||"").trim();
   p.description=desc;                       // به‌روزرسانیِ محلی تا UI فوراً نامِ تازه را نشان دهد
@@ -1122,6 +1102,9 @@ function openPartsPanel(c,o,pr){
     // وضعیتِ per-part برای همهٔ قطعاتِ سیستم؛ اگر ذخیره‌شده باشد از آن، وگرنه از fallbackِ پروژه‌ای پر می‌شود
     docsByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
       var d={}; partDocTypesForPart(p,pn).forEach(function(T){ d[String(T).toUpperCase()]=true; }); out[pn]=d; }); return out; })(),
+    // ترتیبِ دلخواهِ نمایشِ انواعِ سند برای هر قطعه؛ از ترتیبِ ذخیره‌شده (partDocsByPart) پر می‌شود
+    docOrderByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
+      out[pn]=partDocTypesForPart(p,pn).map(function(T){ return String(T).toUpperCase(); }); }); return out; })(),
     modsByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
       var m={}; partModsForPart(p,pn).forEach(function(x){ m[x.label]=x.on; }); out[pn]=m; }); return out; })(),
     vals: (function(){ var src=specsRoot(p).partVals||{}, out={};
@@ -1158,10 +1141,10 @@ function pedPartDD(which, onParts, sel){
     '<div class="ed-part-menu">'+opts+'</div></div>';
 }
 /* روشن/خاموشِ یک نوعِ سند برای قطعهٔ انتخاب‌شده (نوعی که سند دارد قفل است) */
-function pedTogglePartDoc(di){ var pn=PED.selPart, x=PED.docMaster[di]; if(!pn||!x) return;
+function pedTogglePartDoc(code){ var pn=PED.selPart; code=String(code||"").toUpperCase(); if(!pn||!code) return;
   var p=findProject(PED.c,PED.o,PED.pr);
-  if(p && partDocLockedTypes(p,pn)[x.code]){ toast("این نوع برای این قطعه سندِ ثبت‌شده دارد و نمی‌توان غیرفعالش کرد.",true); return; }
-  var d=PED.docsByPart[pn]||(PED.docsByPart[pn]={}); d[x.code]=!d[x.code]; drawPartsBody(); }
+  if(p && partDocLockedTypes(p,pn)[code]){ toast("این نوع برای این قطعه سندِ ثبت‌شده دارد و نمی‌توان غیرفعالش کرد.",true); return; }
+  var d=PED.docsByPart[pn]||(PED.docsByPart[pn]={}); d[code]=!d[code]; drawPartsBody(); }
 /* روشن/خاموشِ یک پارامتر برای قطعهٔ انتخاب‌شده */
 function pedTogglePartMod(mi){ var pn=PED.selPart, x=PED.paramMaster[mi]; if(!pn||!x) return;
   var m=PED.modsByPart[pn]||(PED.modsByPart[pn]={}); m[x.label]=!m[x.label]; drawPartsBody(); }
@@ -1177,6 +1160,95 @@ var ED_LOCK_IC='<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="1
 var ED_CHEV_IC='<svg class="ed-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>';
 /* آیکونِ توجه — برای پیامِ نارنجیِ «اول قطعه را انتخاب کنید» */
 var ED_ALERT_IC='<svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+
+/* ============ جابجاییِ ترتیبِ نمایشِ اسناد در پنل‌های ویرایش (دستهٔ ۶‌نقطه‌ای + انیمیشنِ FLIP) ============
+   دقیقاً مثلِ فهرستِ مشتری‌ها: فقط با کشیدن از روی دسته فعال می‌شود. قابِ اسکرول صفتِ data-reorder
+   دارد (proj برای اسنادِ سطحِ پروژه، part برای اسنادِ هر قطعه) تا در پایانِ کشیدن ترتیبِ جدید ثبت شود.
+   ترتیبِ سطحِ پروژه در specs.projDocOrder و ترتیبِ هر قطعه در specs.partDocsByPart ذخیره می‌شود. */
+var ED_GRIP_IC='<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';
+function edGripHTML(){ return '<span class="ed-grip" title="بکشید تا ترتیبِ نمایش عوض شود" aria-label="جابجاییِ ترتیب" onmousedown="edGripDown()" onclick="event.stopPropagation()">'+ED_GRIP_IC+'</span>'; }
+var _edGripArmed=false;
+function edGripDown(){ _edGripArmed=true; }            // فقط کشیدن از روی دسته مجاز است
+function edRowDragStart(e){
+  var item=e.currentTarget;
+  if(!_edGripArmed){ if(e&&e.preventDefault)e.preventDefault(); return; }
+  _edGripArmed=false;
+  if(e.dataTransfer){ e.dataTransfer.effectAllowed="move"; try{ e.dataTransfer.setData("text/plain",item.getAttribute("data-code")||""); }catch(_){} }
+  setTimeout(function(){ if(item&&item.classList) item.classList.add("ed-dragging"); },0);
+}
+function edRowDragOver(e){
+  if(e&&e.preventDefault)e.preventDefault();
+  var list=e.currentTarget; if(!list) return;
+  var dragging=list.querySelector(".ed-dragging"); if(!dragging) return;
+  var after=edAfterRow(list,e.clientY);
+  if(after===dragging) return;
+  if(after && dragging.nextElementSibling===after) return;
+  if(after===null && dragging===list.lastElementChild) return;
+  edFlipRows(list,function(){ if(after===null) list.appendChild(dragging); else list.insertBefore(dragging,after); });
+}
+function edAfterRow(list,y){
+  var els=[].slice.call(list.querySelectorAll(".ed-doc-row:not(.ed-dragging)"));
+  var closest=null, closestOffset=-Infinity;
+  els.forEach(function(el){ var b=el.getBoundingClientRect(); var off=y-(b.top+b.height/2);
+    if(off<0 && off>closestOffset){ closestOffset=off; closest=el; } });
+  return closest;
+}
+function edFlipRows(list,mutate){
+  var items=[].slice.call(list.querySelectorAll(".ed-doc-row"));
+  var firsts=items.map(function(el){ return el.getBoundingClientRect().top; });
+  mutate();
+  items.forEach(function(el,i){ var dy=firsts[i]-el.getBoundingClientRect().top;
+    if(dy){ el.style.transition="none"; el.style.transform="translateY("+dy+"px)"; } });
+  var play=function(){ items.forEach(function(el){ if(el.style.transform){
+    el.style.transition="transform .18s cubic-bezier(.2,0,0,1)"; el.style.transform=""; } }); };
+  if(typeof requestAnimationFrame==="function") requestAnimationFrame(play); else play();
+}
+function edRowDragEnd(e){
+  var item=e.currentTarget; if(item&&item.classList) item.classList.remove("ed-dragging");
+  var list=item.closest && item.closest(".ed-scroll[data-reorder]"); if(!list) return;
+  var codes=[].slice.call(list.querySelectorAll(".ed-doc-row")).map(function(el){ return el.getAttribute("data-code"); });
+  var kind=list.getAttribute("data-reorder");
+  if(kind==="proj") edCommitProjOrder(codes);
+  else if(kind==="part") edCommitPartOrder(codes);
+}
+if(typeof document!=="undefined" && document.addEventListener) document.addEventListener("mouseup",function(){ _edGripArmed=false; });
+/* ترتیبِ جدیدِ DOM را در آرایهٔ وضعیت بنویس، سپس رندرِ دوباره تا اندیس‌های onclick درست بمانند */
+function edCommitProjOrder(codes){
+  if(!PSED) return;
+  var by={}; PSED.projDocs.forEach(function(x){ by[x.code]=x; });
+  var next=[]; codes.forEach(function(cd){ if(by[cd]){ next.push(by[cd]); delete by[cd]; } });
+  PSED.projDocs.forEach(function(x){ if(by[x.code]) next.push(x); });   // هر ردیفِ جامانده، ته
+  PSED.projDocs=next;
+  drawProjectSpecsBody(PSED.c,PSED.o,PSED.pr);
+}
+function edCommitPartOrder(codes){
+  if(!PED||!PED.selPart) return;
+  var pn=PED.selPart, valid={}; PED.docMaster.forEach(function(x){ valid[x.code]=1; });
+  var next=[], seen={};
+  codes.forEach(function(cd){ cd=String(cd||"").toUpperCase(); if(valid[cd]&&!seen[cd]){ next.push(cd); seen[cd]=1; } });
+  pedPartDocList(pn).forEach(function(x){ if(!seen[x.code]){ next.push(x.code); seen[x.code]=1; } });
+  PED.docOrderByPart[pn]=next;
+  drawPartsBody();
+}
+/* فهرستِ انواعِ سندِ یک قطعه به ترتیبِ دلخواهِ همان قطعه؛ اگر ترتیبی نبود، ترتیبِ فهرستِ اصلی */
+function pedPartDocList(pn){
+  var ord=PED.docOrderByPart?PED.docOrderByPart[pn]:null, by={};
+  PED.docMaster.forEach(function(x){ by[x.code]=x; });
+  var out=[], seen={};
+  (ord||[]).forEach(function(cd){ cd=String(cd||"").toUpperCase(); if(by[cd]&&!seen[cd]){ out.push(by[cd]); seen[cd]=1; } });
+  PED.docMaster.forEach(function(x){ if(!seen[x.code]){ out.push(x); seen[x.code]=1; } });
+  return out;
+}
+/* ردیفِ چک‌لیستِ قابلِ کشیدن: دایرهٔ روشن/خاموش + نام + (اکسترا مثلِ قفل) + کد + دستهٔ ۶‌نقطه‌ای (سمتِ چپ) */
+function pedDragRow(on,label,code,fn,extra,dis){
+  return '<div class="ed-doc-row ed-drag'+(on?'':' off')+'" draggable="true" data-code="'+esc(code)+'" ondragstart="edRowDragStart(event)" ondragend="edRowDragEnd(event)">'+
+    '<button type="button" class="ed-check'+(on?' on':'')+'"'+(dis?' disabled':'')+' role="checkbox" aria-checked="'+(on?'true':'false')+'" aria-label="'+esc(label)+'" onclick="'+fn+'"></button>'+
+    '<span class="ed-name"><span>'+esc(label)+'</span></span>'+
+    (extra||'')+
+    '<span class="ed-doc-code">'+esc(code)+'</span>'+
+    edGripHTML()+
+  '</div>';
+}
 function drawPartsBody(){
   pedDDCloseAll();   // هر بار رندر، منوهای بازِ قبلی و لیسنرِ کلیکِ بیرون پاک می‌شوند
   var host=document.getElementById("pedBody"); if(!host) return;
@@ -1211,18 +1283,14 @@ function drawPartsBody(){
       var p2=findProject(PED.c,PED.o,PED.pr);
       var locked=(p2?partDocLockedTypes(p2,sel):{});
       var dmap=PED.docsByPart[sel]||(PED.docsByPart[sel]={});
-      var docRows=PED.docMaster.map(function(x,i){ var on=!!dmap[x.code], lock=!!locked[x.code];
-        return '<div class="ed-doc-row'+(on?'':' off')+'">'+
-          '<button type="button" class="ed-check'+(on?' on':'')+'"'+(lock?' disabled':'')+' role="checkbox" aria-checked="'+(on?'true':'false')+'" aria-label="'+esc(x.label)+'" onclick="pedTogglePartDoc('+i+')"></button>'+
-          '<span class="ed-name"><span>'+esc(x.label)+'</span></span>'+
-          (lock?'<span class="ed-lock-ic" title="سندِ ثبت‌شده دارد؛ قابلِ غیرفعال‌سازی نیست">'+ED_LOCK_IC+'</span>':'')+
-          '<span class="ed-doc-code">'+esc(x.code)+'</span>'+
-        '</div>';
+      var docRows=pedPartDocList(sel).map(function(x){ var on=!!dmap[x.code], lock=!!locked[x.code];
+        var extra=lock?'<span class="ed-lock-ic" title="سندِ ثبت‌شده دارد؛ قابلِ غیرفعال‌سازی نیست">'+ED_LOCK_IC+'</span>':'';
+        return pedDragRow(on,x.label,x.code,"pedTogglePartDoc('"+esc(x.code)+"')",extra,lock);
       }).join("");
       var hasLock=PED.docMaster.some(function(x){ return locked[x.code]; });
       var lockNote=hasLock?'<div class="ed-req-note">'+ED_LOCK_IC+'این ماژول بدلیل داشتن سند ثبت شده، امکان غیرفعال شدن ندارد.</div>':'';
       docsCard='<div class="ed-card">'+docHead+
-        (docRows?'<div class="ed-scroll">'+docRows+'</div>':'<div class="ed-req-note">سندِ سطحِ قطعه‌ای تعریف نشده.</div>')+
+        (docRows?'<div class="ed-scroll" data-reorder="part" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">سندِ سطحِ قطعه‌ای تعریف نشده.</div>')+
         lockNote+
         '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>اسنادِ بالا مخصوصِ قطعهٔ انتخاب‌شده است؛ برای افزودنِ سندِ جدید به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
         '</div>';
@@ -1295,7 +1363,7 @@ async function savePartsPanel(){
   var docsByPart={}, modsByPart={};
   parts.forEach(function(pnRaw){ var pn=pad2(pnRaw);
     var d=PED.docsByPart[pn]||{}, arrD=[];
-    PED.docMaster.forEach(function(x){ if(d[x.code]) arrD.push(x.code); });
+    pedPartDocList(pn).forEach(function(x){ if(d[x.code]) arrD.push(x.code); });   // فقط فعال‌ها، به ترتیبِ دلخواهِ همین قطعه
     var lock=partDocLockedTypes(p,pn); Object.keys(lock).forEach(function(T){ if(arrD.indexOf(T)<0) arrD.push(T); });
     docsByPart[pn]=arrD;
     var m=PED.modsByPart[pn]||{}, arrM=[];
@@ -1339,6 +1407,7 @@ var _mvParts=[];            // [{part,name,fileId,num}] — قطعاتِ دار�
 var _mvPickerExpanded=false; // وضعیتِ باز/بستهٔ منوی انتخابِ قطعه
 var _mvLoadSeq=0;           // توکنِ بارگذاری — فقط جدیدترین mvLoadPart اجازهٔ تغییرِ DOM دارد (ضدِ رقابت/تکرار)
 var _mvEst=null;            // برآوردگرِ نوارِ پیشرفتِ فعالِ ویوئر — تا تایمرِ بارگذاریِ قبلی با بارگذاریِ جدید روی یک المانِ درصد ننویسد
+var _mvCurFileId=null;      // شناسهٔ فایلِ GLBِ مدلِ درحال‌نمایش در پنلِ پروژه (برای منابعِ AR)
 function projectModelParts(p){
   var docs=projectDocs(p).filter(function(d){ return String(d.typeCode).toUpperCase()==="3D" &&
     pad2(d.partNo)!=="00" && String(d.isLatest).toLowerCase()==="true"; });
@@ -1435,6 +1504,7 @@ function loadBarHide(scope){ if(!scope) return; var el=scope.querySelector(".mv-
 
 async function mvLoadPart(fileId, part){
   if(!fileId){ toast("این قطعه مدلی ندارد.",true); return; }
+  _mvCurFileId=fileId;   // برای دکمهٔ واقعیتِ افزوده (منابعِ عمومیِ AR از روی همین شناسه)
   var shell=document.getElementById("mvShell"); if(!shell) return;
   var myToken=++_mvLoadSeq;   // اگر بارگذاریِ تازه‌تری شروع شود، این یکی باید بی‌سروصدا کنار برود
   if(_mvEst){ _mvEst.stop(); _mvEst=null; }   // برآوردگرِ بارگذاریِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
@@ -1504,15 +1574,87 @@ function mvSpin(btn){ var m=mvViewerOf(btn); if(!m) return;
   else { m.setAttribute("auto-rotate",""); if(btn) btn.classList.add("on"); } }
 function mvReset(btn){ var m=mvViewerOf(btn); if(!m) return;
   try{ m.cameraOrbit="auto auto auto"; if(m.resetTurntableRotation) m.resetTurntableRotation(); if(m.jumpCameraToGoal) m.jumpCameraToGoal(); }catch(e){} }
-/* دکمهٔ واقعیت افزوده — آگاه از دستگاه: موبایلِ سازگار → فعال‌سازیِ مستقیمِ AR · دسکتاپ → پاپ‌آپِ کدِ QR برای اسکن با موبایل */
-function mvAR(btn){ var m=mvViewerOf(btn);
-  if(m && m.canActivateAR){ try{ m.activateAR(); }catch(e){ showARQr(); } } else { showARQr(); } }
-function showARQr(){
+/* ============ واقعیتِ افزوده (AR) ============
+   دکمهٔ AR آگاه از دستگاه است: iPhone → AR Quick Look با فایلِ USDZ · Android → Scene Viewer با فایلِ GLB ·
+   دسکتاپ → کدِ QRِ واقعی که به صفحهٔ سبکِ ar.html اشاره می‌کند تا کاربر با موبایل اسکن و در AR باز کند.
+   فایل‌ها هنگامِ ثبت «عمومی (هرکس با لینک)» شده‌اند تا اپ‌های AR بتوانند واکشی‌شان کنند. */
+function driveDirectUrl(id){ return id ? "https://drive.google.com/uc?export=download&id="+id : ""; }
+function arPlatform(){
+  var ua=navigator.userAgent||"";
+  if(/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1)) return "ios";
+  if(/Android/i.test(ua)) return "android";
+  return "desktop";
+}
+/* سندِ مربوط به ویوئرِ همین دکمه: مودالِ سند → از روی ریویژنِ انتخاب‌شده؛ پنلِ پروژه → از روی شناسهٔ GLBِ درحال‌نمایش */
+function mvArDoc(btn){
+  var box=mvBoxOf(btn);
+  if(box && box.querySelector("#dmMv") && typeof _dm!=="undefined" && _dm && _dm.selNum){
+    var d=docByNumber(_dm.selNum); if(d) return d;
+  }
+  if(_mvCurFileId){
+    var m=(DB.documents||[]).filter(function(x){ return String(x.fileId)===String(_mvCurFileId); })[0];
+    if(m) return m;
+  }
+  return null;
+}
+function mvAR(btn){
+  var mv=mvViewerOf(btn), d=mvArDoc(btn);
+  if(!d || (!d.fileId && !d.usdzFileId)){
+    if(mv && mv.canActivateAR){ try{ mv.activateAR(); return; }catch(e){} }   // آخرین چاره: AR درون‌مرورگر
+    showARQr(null); return;
+  }
+  var src={ glbId:d.fileId||"", usdzId:d.usdzFileId||"", drawingNumber:d.drawingNumber||"",
+            glbUrl:driveDirectUrl(d.fileId), usdzUrl:driveDirectUrl(d.usdzFileId) };
+  // اطمینان از عمومی‌بودنِ فایل‌ها (اسنادِ جدید از قبل عمومی‌اند؛ این تضمینِ اسنادِ قدیمی است) — بدونِ انتظار تا ژستِ کلیک برای iOS حفظ شود
+  try{ var pr=api("arSources", d.drawingNumber?{drawingNumber:d.drawingNumber}:{fileId:d.fileId}); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){}
+  arLaunch(src, mv);
+}
+function arLaunch(src, mv){
+  var plat=arPlatform();
+  if(plat==="ios"){
+    if(!src.usdzUrl){ toast("برای نمایشِ AR روی iPhone به فایلِ USDZ نیاز است؛ این سند آن را ندارد.",true); return; }
+    var a=document.createElement("a"); a.setAttribute("rel","ar"); a.href=src.usdzUrl;
+    var img=document.createElement("img"); img.style.display="none"; a.appendChild(img);   // Quick Look به یک فرزندِ img نیاز دارد
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); }, 1500);
+  } else if(plat==="android"){
+    if(!src.glbUrl){ toast("برای نمایشِ AR به فایلِ GLB نیاز است.",true); return; }
+    var fb=arPageUrl(src);   // اگر ARCore نبود، به همان صفحهٔ ar.html برگردد
+    window.location.href="intent://arvr.google.com/scene-viewer/1.0?file="+encodeURIComponent(src.glbUrl)+
+      "&mode=ar_preferred&title="+encodeURIComponent(src.drawingNumber||"مدلِ سه‌بعدی")+
+      "#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;"+
+      "S.browser_fallback_url="+encodeURIComponent(fb)+";end;";
+  } else {
+    if(mv && mv.canActivateAR){ try{ mv.activateAR(); return; }catch(e){} }
+    showARQr(src);   // دسکتاپ: QR برای اسکن با موبایل
+  }
+}
+/* نشانیِ صفحهٔ سبکِ AR (کنارِ index.html، حتی در زیرمسیرِ GitHub Pages) با شناسه‌های فایل */
+function arPageBase(){ return location.href.replace(/[?#].*$/,"").replace(/[^/]*$/,""); }
+function arPageUrl(src){
+  var u=arPageBase()+"ar.html?g="+encodeURIComponent(src.glbId||"");
+  if(src.usdzId) u+="&u="+encodeURIComponent(src.usdzId);
+  if(src.drawingNumber) u+="&n="+encodeURIComponent(src.drawingNumber);
+  return u;
+}
+function showARQr(src){
+  var url=(src && (src.glbId||src.usdzId)) ? arPageUrl(src) : null;
+  var code=(url && typeof qrcode!=="undefined") ? qrSvg(url) : fakeQrSvg();
   showModal("مشاهده در واقعیت افزوده",
     '<div class="qr-body">'+
-      '<div class="qr-sub">این کد را با موبایل اسکن کنید تا قطعه به‌صورتِ واقعیت افزوده نمایش داده شود.</div>'+
-      '<div class="qr-code">'+fakeQrSvg()+'</div>'+
+      '<div class="qr-sub">این کد را با دوربینِ موبایل اسکن کنید تا مدل به‌صورتِ واقعیتِ افزوده روی گوشی باز شود.</div>'+
+      '<div class="qr-code">'+code+'</div>'+
+      (src&&src.drawingNumber?'<div class="qr-sub mono" style="direction:ltr;margin:14px 0 0">'+esc(src.drawingNumber)+'</div>':'')+
     '</div>', "box-narrow");
+}
+/* کدِ QRِ واقعی از روی کتابخانهٔ vendor/qrcode.min.js (byte mode، سطحِ M). ماژول‌ها به‌صورتِ SVG با حاشیهٔ آرام (quiet zone). */
+function qrSvg(text){
+  var q; try{ q=qrcode(0,"M").addData(text).make(); }catch(e){ return fakeQrSvg(); }
+  var n=q.getModuleCount(), quiet=4, size=n+quiet*2, rects="";
+  for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(q.isDark(r,c))
+    rects+='<rect x="'+(c+quiet)+'" y="'+(r+quiet)+'" width="1" height="1"/>';
+  return '<svg viewBox="0 0 '+size+' '+size+'" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet">'+
+    '<rect width="'+size+'" height="'+size+'" fill="#fff"/><g fill="#1c1c1e">'+rects+'</g></svg>';
 }
 /* الگوی نمونهٔ کدِ QR (تزئینی؛ در نسخهٔ عملیاتی محتوای کد = نشانیِ صفحهٔ موبایلِ همین مدل خواهد بود) */
 function fakeQrSvg(){

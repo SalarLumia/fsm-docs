@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>واقعیت افزوده — فولاد شرق ماهان</title>
+<style>
+  :root{ --brand:#f7941f; --brand2:#e07d0a; --charcoal:#4a4a4a; --ink:#2a2a2a; --muted:#848484; --line:#e7e6e2; --bg:#f4f4f2; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:Tahoma,"Segoe UI",sans-serif;
+    display:flex;align-items:center;justify-content:center;padding:24px;-webkit-text-size-adjust:100%}
+  .card{width:min(420px,100%);background:#fff;border:1px solid var(--line);border-radius:20px;
+    box-shadow:0 12px 40px #0000001a;padding:30px 26px;text-align:center}
+  .mark{width:66px;height:66px;margin:0 auto 16px;border-radius:18px;background:linear-gradient(135deg,var(--brand),var(--brand2));
+    display:flex;align-items:center;justify-content:center;box-shadow:0 8px 22px #f7941f55}
+  .mark svg{width:34px;height:34px;stroke:#fff;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  h1{font-size:18px;margin:0 0 6px;font-weight:800}
+  .num{direction:ltr;font-size:13px;color:var(--brand);font-weight:700;letter-spacing:.03em;margin:0 0 4px}
+  .sub{font-size:12.5px;color:var(--muted);line-height:1.9;margin:10px 0 22px}
+  .btn{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;text-decoration:none;
+    background:var(--brand);color:#fff;font-size:15px;font-weight:800;font-family:inherit;border:none;cursor:pointer;
+    padding:15px 18px;border-radius:14px;box-shadow:0 6px 18px #f7941f44;transition:.15s}
+  .btn:active{transform:translateY(1px)}
+  .btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .btn img{display:none}
+  .note{font-size:11.5px;color:var(--muted);line-height:1.9;margin-top:18px}
+  .hidden{display:none}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="mark">
+      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+    </div>
+    <h1>مشاهده در واقعیت افزوده</h1>
+    <div class="num" id="num"></div>
+    <div class="sub" id="sub">برای دیدنِ مدلِ سه‌بعدی در فضای واقعی، دکمهٔ زیر را بزنید.</div>
+    <div id="launch"></div>
+    <div class="note" id="note"></div>
+  </div>
+<script>
+(function(){
+  function qp(k){ var m=new RegExp("[?&]"+k+"=([^&]*)").exec(location.search); return m?decodeURIComponent(m[1]):""; }
+  var glbId=qp("g"), usdzId=qp("u"), name=qp("n");
+  function driveUrl(id){ return id ? "https://drive.google.com/uc?export=download&id="+id : ""; }
+  var glbUrl=driveUrl(glbId), usdzUrl=driveUrl(usdzId);
+  var ua=navigator.userAgent||"";
+  var isIOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+  var isAndroid=/Android/i.test(ua);
+  var arIc='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+  if(name) document.getElementById("num").textContent=name;
+  var launch=document.getElementById("launch"), note=document.getElementById("note");
+
+  if(isIOS){
+    if(usdzUrl){
+      // AR Quick Look: لینکِ rel="ar" با فرزندِ img؛ تپ روی آن، AR را باز می‌کند (ژستِ کاربر لازم است)
+      var a=document.createElement("a"); a.className="btn"; a.setAttribute("rel","ar"); a.href=usdzUrl;
+      var img=document.createElement("img"); a.appendChild(img);
+      var lbl=document.createElement("span"); lbl.textContent="مشاهده در واقعیت افزوده"; a.appendChild(lbl);
+      a.insertAdjacentHTML("afterbegin", arIc);
+      launch.appendChild(a);
+      note.textContent="نیازمندِ iOS ۱۲ به بالا و مرورگرِ Safari است.";
+    } else {
+      document.getElementById("sub").textContent="برای این سند فایلِ USDZ (مخصوصِ iPhone) موجود نیست.";
+    }
+  } else if(isAndroid){
+    if(glbUrl){
+      var intent="intent://arvr.google.com/scene-viewer/1.0?file="+encodeURIComponent(glbUrl)+
+        "&mode=ar_preferred&title="+encodeURIComponent(name||"مدلِ سه‌بعدی")+
+        "#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;"+
+        "S.browser_fallback_url="+encodeURIComponent("https://play.google.com/store/apps/details?id=com.google.ar.core")+";end;";
+      var b=document.createElement("a"); b.className="btn"; b.href=intent; b.innerHTML=arIc+"<span>مشاهده در واقعیت افزوده</span>";
+      launch.appendChild(b);
+      note.textContent="نیازمندِ «سرویس‌های Google Play برای AR» (ARCore) است.";
+    } else {
+      document.getElementById("sub").textContent="برای این سند فایلِ GLB موجود نیست.";
+    }
+  } else {
+    document.getElementById("sub").textContent="این صفحه را روی گوشیِ موبایل (Android یا iPhone) باز کنید تا مدل در واقعیتِ افزوده نمایش داده شود.";
+    if(glbUrl){ var d=document.createElement("a"); d.className="btn"; d.href=glbUrl; d.innerHTML=arIc+"<span>دانلودِ مدلِ سه‌بعدی</span>"; launch.appendChild(d); }
+  }
+})();
+</script>
+</body>
+</html>

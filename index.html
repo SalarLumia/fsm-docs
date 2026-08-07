@@ -198,11 +198,11 @@
             <option value="">همه</option><option value="draft">پیش‌نویس</option><option value="pending">در انتظار بازبینی</option>
             <option value="approved">تأییدشده</option><option value="rejected">ردشده</option></select></div>
           <div><label class="fld">ریویژن</label><select id="aLatest" onchange="renderArchive()"><option value="">همه</option><option value="1">فقط آخرین</option></select></div>
-          <div><label class="fld">&nbsp;</label><button class="btn" onclick="clearArchiveFilters()">پاک‌کردن فیلترها</button></div>
-          <div><label class="fld">&nbsp;</label><button class="btn" onclick="exportCSV()">خروجی Excel/CSV</button></div>
+          <div><label class="fld">&nbsp;</label><button class="btn" onclick="clearArchiveFilters()"><svg viewBox="0 0 24 24" class="ic"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>پاک‌کردن فیلترها</button></div>
+          <div><label class="fld">&nbsp;</label><button class="btn primary" onclick="exportCSV()"><svg viewBox="0 0 24 24" class="ic"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>خروجی Excel</button></div>
         </div>
         <div class="tablewrap">
-          <table>
+          <table class="arch-table">
             <thead id="archiveHead"></thead>
             <tbody id="archiveBody"></tbody>
           </table>
@@ -233,22 +233,22 @@
     <section id="tab-data" class="tabpane hidden">
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات<span class="sec-act"><button class="btn sm add-btn" onclick="openPartModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>قطعه جدید</button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table parts-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی قطعه</th><th>نام انگلیسی قطعه</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partsBody"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table parts-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی قطعه</th><th class="c-mid"><span class="en-shift">نام انگلیسی قطعه</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partsBody"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد<span class="sec-act"><button class="btn sm add-btn" onclick="openDocTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>سند جدید</button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی سند</th><th>نام انگلیسی سند</th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی سند</th><th class="c-mid"><span class="en-shift">نام انگلیسی سند</span></th><th class="c-mid"><span class="unit-shift">کد سند</span></th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات<span class="sec-act"><button class="btn sm add-btn" onclick="openPartModModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>پارامتر جدید</button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th>نام انگلیسی پارامتر</th><th>واحد</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی پارامتر</span></th><th class="c-mid"><span class="unit-shift">واحد</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران سامانه<span class="sec-act"><button class="btn sm add-btn" onclick="openUserModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>کاربر جدید</button></span></h3>
-        <div class="tablewrap"><table class="users-table"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام و نام خانوادگی کاربر</span></th><th>نام کاربری</th><th>سمت</th><th>نقش</th><th><span class="act-h">عملیات</span></th></tr></thead><tbody id="usersBody"></tbody></table></div>
+        <div class="tablewrap"><table class="users-table"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام و نام خانوادگی کاربر</span></th><th class="c-mid"><span class="en-shift">نام کاربری</span></th><th>سمت</th><th>نقش</th><th><span class="act-h">عملیات</span></th></tr></thead><tbody id="usersBody"></tbody></table></div>
       </div>
     </section>
     </main>
@@ -261,45 +261,23 @@
 <!-- ============ مودال ثبت سند جدید (پاپ‌آپ، بدون ترک صفحه) ============ -->
 <div id="newDocModal" class="modal hidden" onclick="if(event.target===this)closeNewDocModal()">
   <div class="box newdoc-box">
-    <header><strong>ثبت سند / نقشهٔ جدید</strong>
+    <header><strong>ثبت سند / فایل جدید</strong>
       <button class="modal-x" onclick="closeNewDocModal()" aria-label="بستن" title="بستن">✕</button></header>
     <div class="body"><div class="newdoc-body">
-      <div class="grid g3">
-        <div><label class="fld">مشتری</label><select id="nClient" onchange="onClientChange('n')"></select></div>
-        <div><label class="fld">سفارش</label><select id="nOrder" onchange="onOrderChange('n')"></select></div>
-        <div><label class="fld">پروژه</label><select id="nProject"></select></div>
-        <div><label class="fld">نوع سند</label><select id="nType" onchange="onTypeChange()"></select></div>
-        <div><label class="fld">قطعه</label><select id="nPart"></select><div class="hint" id="partHint"></div></div>
-        <div><label class="fld">ریویژن <span class="muted" style="font-weight:400;font-size:10.5px">(خودکار)</span></label><input id="nRev" class="mono" placeholder="خودکار" style="direction:ltr;text-align:center" readonly title="ریویژن به‌صورت خودکار مدیریت می‌شود"></div>
+      <!-- ریلِ افقیِ شماره: بالای بدنه، ثابت (خارج از ناحیهٔ اسکرول) -->
+      <div class="nd-rail" id="ndRail"></div>
+      <!-- ناحیهٔ اسکرول: فقط سکشن‌ها + بخشِ نهایی (نوارِ اسکرول همیشه اینجاست، نه کنارِ ریل) -->
+      <div class="nd-scroll" id="ndScroll">
+        <!-- ایستگاهِ فعال (منوی سفارشیِ همان قدم) -->
+        <div class="nd-stage" id="ndStage"></div>
+        <!-- بخشِ نهایی: فایل + یادداشت + ثبت (پس از کاملِ‌شدنِ شماره) -->
+        <div class="nd-final" id="ndFinal" hidden></div>
+        <!-- فضای خالیِ پایین: تضمینِ جای کافی برای اسکرول تا سکشنِ فعال همیشه به بالا بیاید (ارتفاعش با JS = بلندیِ ناحیهٔ اسکرول) -->
+        <div class="nd-spacer" id="ndSpacer" aria-hidden="true"></div>
       </div>
-      <div id="nRevBanner" class="nrev-banner" hidden></div>
-      <div class="grid g2" style="margin-top:16px">
-        <div class="ndoc-note">
-          <label class="fld" id="nTitleLabel">یادداشت مربوط به این سند / نقشه</label>
-          <textarea id="nTitle" class="ndoc-note-ta" placeholder="یادداشت یا توضیح دربارهٔ این سند…"></textarea>
-        </div>
-        <div class="ndoc-file">
-          <label class="fld">فایل سند (PDF یا تصویر) — الزامی</label>
-          <label class="dropzone" id="nDrop" for="nFile">
-            <input id="nFile" class="dz-input" type="file" accept=".pdf,image/*" onchange="onFilePicked()">
-            <div class="dz-body">
-              <span class="dz-ico"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg></span>
-              <div class="dz-main">فایل را اینجا بکشید و رها کنید</div>
-              <div class="dz-sub">یا برای انتخاب کلیک کنید — PDF یا تصویر</div>
-              <div class="dz-file" id="nFileName" hidden></div>
-            </div>
-            <div class="dz-overlay"><span>اینجا رها کنید</span></div>
-          </label>
-        </div>
-      </div>
-      <div class="numbox invalid" id="nPreviewBox">
-        <span class="nb-label">شماره سند</span>
-        <span class="num" id="nPreview">منتظر تکمیل اطلاعات…</span>
-        <button type="button" class="btn sm nCopy" id="nCopyBtn" hidden onclick="copyDocNumber()" title="کپی شماره سند در کلیپ‌بورد">
-          <svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>کپی</button>
-        <span class="nb-spacer"></span>
-        <button class="btn primary" id="nSubmitBtn" onclick="submitDocument()">ثبت سند</button>
-      </div>
+      <!-- ورودی‌های مخفیِ مقدار: کدِ موجود nClient.value و… را همچنان می‌خوانَد -->
+      <input type="hidden" id="nClient"><input type="hidden" id="nOrder"><input type="hidden" id="nProject">
+      <input type="hidden" id="nPart"><input type="hidden" id="nType"><input type="hidden" id="nRev">
     </div></div>
   </div>
 </div>
@@ -312,6 +290,7 @@
 </div>
 
 <!-- ===== اسکریپت‌ها (ترتیب وابستگی؛ app.js آخر) ===== -->
+<script src="vendor/qrcode.min.js"></script>
 <script src="scripts/config.js"></script>
 <script src="scripts/state.js"></script>
 <script src="scripts/api.js"></script>

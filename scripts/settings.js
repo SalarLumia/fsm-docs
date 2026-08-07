@@ -2,16 +2,16 @@
 function renderDataTables(){
   // parts (مرتب بر اساس شماره، صعودی)
   document.getElementById("partsBody").innerHTML=partsSorted().map(function(p){
-    return "<tr><td class='col-el'><span class='el-badge'>"+partIconInner(p)+"</span></td><td class='nm-fa'>"+esc(p.nameFa||"—")+"</td><td style='direction:ltr;text-align:right'>"+esc(p.name)+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModal('"+esc(pad2(p.partNo))+"')")+delIconBtn("del('deletePart',{partNo:'"+esc(pad2(p.partNo))+"'})")+"</div></td></tr>";
+    return "<tr><td class='col-el'><span class='el-badge'>"+partIconInner(p)+"</span></td><td class='nm-fa'>"+esc(p.nameFa||"—")+"</td><td class='spec-en c-mid'><span class='en-shift'>"+esc(p.name)+"</span></td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModal('"+esc(pad2(p.partNo))+"')")+delIconBtn("del('deletePart',{partNo:'"+esc(pad2(p.partNo))+"'})")+"</div></td></tr>";
   }).join("")||emptyRow(4);
   // doctypes (مرتب بر اساس کد)
   document.getElementById("doctypesBody").innerHTML=docTypesSorted().map(function(t){
-    return "<tr><td class='col-el'><span class='el-badge'>"+docTypeIconInner(t)+"</span></td><td class='nm-fa'>"+esc(t.nameFa)+"</td><td style='direction:ltr;text-align:right'>"+esc(t.nameEn)+"</td><td class='c-mid'>"+(t.scope==="project"?'<span class="tag proj"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>پروژه</span>':'<span class="tag"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>قطعه</span>')+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openDocTypeModal('"+esc(t.code)+"')")+delIconBtn("del('deleteDocType',{code:'"+esc(t.code)+"'})")+"</div></td></tr>";
-  }).join("")||emptyRow(5);
+    return "<tr><td class='col-el'><span class='el-badge'>"+docTypeIconInner(t)+"</span></td><td class='nm-fa'>"+esc(t.nameFa)+"</td><td class='spec-en c-mid'><span class='en-shift'>"+esc(t.nameEn)+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(t.code)+"</span></td><td class='c-mid'>"+(t.scope==="project"?'<span class="tag proj"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>پروژه</span>':'<span class="tag"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>قطعه</span>')+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openDocTypeModal('"+esc(t.code)+"')")+delIconBtn("del('deleteDocType',{code:'"+esc(t.code)+"'})")+"</div></td></tr>";
+  }).join("")||emptyRow(6);
   // part info modules (پارامتر‌های اطلاعاتِ قطعه) — فهرستِ اصلیِ سراسری
   var pmBody=document.getElementById("partmodsBody");
   if(pmBody) pmBody.innerHTML=partModsSorted().map(function(m){
-    return "<tr><td><div class='pm-cell'><span class='el-badge'>"+PARTMOD_EL_SVG+"</span><span class='nm-fa'>"+esc(m.nameFa)+"</span></div></td><td style='direction:ltr;text-align:right'>"+esc(partModEn(m)||"—")+"</td><td style='direction:ltr;text-align:right'>"+esc(partModUnit(m)||"—")+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModModal('"+esc(m.nameFa)+"')")+delIconBtn("del('deletePartMod',{nameFa:'"+esc(m.nameFa)+"'})")+"</div></td></tr>";
+    return "<tr><td><div class='pm-cell'><span class='el-badge'>"+PARTMOD_EL_SVG+"</span><span class='nm-fa'>"+esc(m.nameFa)+"</span></div></td><td class='spec-en c-mid'><span class='en-shift'>"+esc(partModEn(m)||"—")+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(partModUnit(m)||"—")+"</span></td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModModal('"+esc(m.nameFa)+"')")+delIconBtn("del('deletePartMod',{nameFa:'"+esc(m.nameFa)+"'})")+"</div></td></tr>";
   }).join("")||emptyRow(4);
   // users: کارتِ کاربر (آواتار + نام + نامِ کاربری) · سمت · تگِ نقش · ویرایش
   var meU=(typeof ME!=="undefined"&&ME)?String(ME.username||""):"";
@@ -32,8 +32,8 @@ function renderDataTables(){
     var acts = '<div class="row-actions">'+editIconBtn("openUserModal('"+esc(u.username)+"')")+
       delIconBtn("deleteUserGuarded(event,'"+esc(u.username)+"')")+'</div>';
     return '<tr'+(uActive?'':' class="u-off"')+'><td>'+nameCell+'</td>'+
-      '<td class="mono" style="direction:ltr;text-align:right">'+esc(u.username)+'</td>'+
-      '<td>'+esc(u.position||"—")+'</td>'+
+      '<td class="spec-en c-mid"><span class="en-shift">'+esc(u.username)+'</span></td>'+
+      '<td class="meta-txt">'+esc(u.position||"—")+'</td>'+
       '<td>'+roleTag(u.role)+'</td>'+
       '<td>'+acts+'</td></tr>';
   }).join("")||emptyRow(5);
@@ -139,7 +139,7 @@ async function savePart(){
 
 /* ---- انواعِ سند: افزودن/ویرایش داخلِ مودال ---- */
 var _docTypeEdit="";   // کدِ نوعِ سندِ در حالِ ویرایش؛ "" = افزودنِ نوعِ جدید
-var SCOPE_SEG=[{val:"part",label:"قطعه"},{val:"project",label:"پروژه (Part 00)"}];
+var SCOPE_SEG=[{val:"part",label:"قطعه"},{val:"project",label:"پروژه"}];
 function openDocTypeModal(code){
   var t = code ? DB.docTypes.find(function(x){return String(x.code)===String(code);}) : null;
   _docTypeEdit = t ? String(t.code) : "";
@@ -151,9 +151,11 @@ function openDocTypeModal(code){
       '<div class="um-field"><label class="fld">نام انگلیسی سند</label>'+
         '<input id="dsEn" style="direction:ltr;text-align:left" placeholder="Machining" value="'+esc(t?(t.nameEn||""):"")+'"></div>'+
     '</div>'+
-    '<div class="um-field"><label class="fld">نام فارسی سند</label>'+
-      '<input id="dsFa" placeholder="نقشه ماشینکاری" value="'+esc(t?(t.nameFa||""):"")+'"></div>'+
-    '<div class="um-field"><label class="fld">سطح</label>'+segControl("dsScope",SCOPE_SEG,(t&&t.scope==="project")?"project":"part")+'</div>'+
+    '<div class="um-row">'+
+      '<div class="um-field"><label class="fld">نام فارسی سند</label>'+
+        '<input id="dsFa" placeholder="نقشه ماشینکاری" value="'+esc(t?(t.nameFa||""):"")+'"></div>'+
+      '<div class="um-field"><label class="fld">سطح</label>'+segControl("dsScope",SCOPE_SEG,(t&&t.scope==="project")?"project":"part")+'</div>'+
+    '</div>'+
     '<div class="um-actions">'+
       '<button class="btn" onclick="closeModal()">انصراف</button>'+
       '<button class="btn primary" onclick="saveDocType()">'+(isEdit?"ذخیرهٔ تغییرات":"افزودن نوع سند")+'</button>'+
@@ -230,7 +232,9 @@ async function savePartMod(){
   var dup=(DB.partMods||[]).some(function(x){ return String(x.nameFa).trim()===name && String(x.nameFa)!==oldName; });
   if(dup){ toast("این نامِ پارامتر قبلاً وجود دارد.",true); return; }
   var payload={nameFa:name,nameEn:nameEn,unit:unit};
-  if(wasEdit && oldName && oldName!==name) payload.oldName=oldName;
+  // در هر ویرایش oldName فرستاده می‌شود (نه فقط هنگامِ تغییرِ نام) تا بک‌اند ویرایشِ درجا را
+  // «افزودنِ نامِ تکراری» تشخیص ندهد؛ اگر oldName === nameFa بک‌اند فقط ردیف را به‌روزرسانی می‌کند.
+  if(wasEdit && oldName) payload.oldName=oldName;
   var r=await api("savePartMod",payload);
   if(!r||!r.ok){ toast((r&&r.message)||"ذخیره ناموفق بود",true); return; }
   if(wasEdit && oldName && oldName!==name){

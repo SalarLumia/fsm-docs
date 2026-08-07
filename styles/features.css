@@ -128,11 +128,157 @@
   border:1px solid var(--brand);border-radius:8px;padding:6px 10px}
 .rv-lead{margin:8px 0 4px;font-size:12.5px;color:var(--muted);line-height:1.75}
 
-/* بنر مدیریت ریویژن در پنل ثبت سند */
-.nrev-banner{margin:14px 0 0;padding:9px 12px;border-radius:9px;font-size:12px;line-height:1.75}
-.nrev-banner.info{background:#fff8f0;border:1px solid var(--brand);color:var(--txt)}
-.nrev-banner.info b{color:var(--brand)}
-.nrev-banner.warn{background:var(--warn-bg);border:1px solid var(--warn-line);color:#7c5300}
+/* ================= ویزاردِ «ثبت سند / فایل جدید» — ریلِ افقیِ باکس‌های شماره + فهرستِ ایستگاهِ فعال ================= */
+/* --- ریل: هر قطعهٔ شماره یک باکسِ جدا؛ باکسِ فعال بزرگ‌تر و دورش نوارِ نارنجیِ چرخان --- */
+/* ریل ثابتِ بالای بدنه — خارج از ناحیهٔ اسکرول (نوارِ اسکرول شاملِ این بخش نمی‌شود) */
+.nd-rail{flex:0 0 auto;position:relative;z-index:5;background:#f4f4f2;padding:18px 24px 12px;
+  box-shadow:0 8px 14px -10px #0000002e}
+/* ناحیهٔ اسکرولِ سکشن‌ها — نوارِ اسکرول همیشه حاضر (scroll، نه auto) و فقط اینجا.
+   scrollbar-gutter: both-edges فضای نوار را در هر دو لبه رزرو می‌کند تا سکشن‌ها دقیقاً وسط بمانند */
+.nd-scroll{flex:1 1 auto;overflow-y:scroll;overflow-x:hidden;scrollbar-gutter:stable both-edges;
+  padding:16px 13px 4px;overscroll-behavior:contain}
+.nd-scroll::-webkit-scrollbar{width:11px}
+.nd-scroll::-webkit-scrollbar-thumb{background:#d4d3cf;border-radius:7px;border:3px solid #f4f4f2}
+.nd-scroll::-webkit-scrollbar-thumb:hover{background:#c1bfba}
+.nd-scroll::-webkit-scrollbar-track{background:transparent}
+.nd-spacer{flex:none;width:100%}   /* ارتفاعش با JS تنظیم می‌شود؛ فقط جای اسکرولِ اضافه ایجاد می‌کند */
+/* ارتفاعِ ثابت = بلندترین حالت (سلولِ فعال)؛ با تغییرِ سایزِ سلول‌ها، ارتفاعِ ریل ثابت می‌ماند و سکشن‌های پایین تکان نمی‌خورند */
+.nd-rail-in{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:0;direction:ltr;min-height:64px}
+.nd-chip{display:flex;flex-direction:column;align-items:center;gap:3px;flex:0 0 auto;width:78px;padding:9px 8px;
+  border:1px solid var(--line);border-radius:12px;background:#fff;font-family:inherit;
+  transition:width .35s cubic-bezier(.2,0,0,1),padding .35s cubic-bezier(.2,0,0,1),background .25s,border-color .25s,box-shadow .3s}
+button.nd-chip{cursor:pointer}
+.nd-chip-val{font-size:14px;font-weight:800;color:var(--txt);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.02em;line-height:1.15;min-height:18px;display:flex;align-items:center}
+.nd-chip-val svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
+.nd-chip-cap{font-size:9px;font-weight:800;color:var(--muted);direction:ltr;letter-spacing:.09em;line-height:1;text-transform:uppercase}
+/* خطِ اتصال: وسط‌چینِ عمودی (align-items:center)، ضخامتِ ۱px مثلِ کادرِ سلول‌ها، چسبیده به دو طرف (gap صفر).
+   بینِ دو سلولِ تکمیل‌شده نارنجی می‌شود (کلاسِ on)، دقیقاً هم‌رنگِ کادرِ سلول‌ها. */
+.nd-cx{flex:0 0 auto;width:16px;height:1px;background:var(--line);transition:background .3s}
+.nd-cx.on{background:var(--brand)}
+/* باکس‌های تکمیل‌شده (پرشده): تمِ نارنجیِ پُر — کادر + پس‌زمینهٔ روشن + متنِ نارنجی */
+.nd-chip.fixed,.nd-chip.done{border-color:var(--brand);background:#fff8f0}
+.nd-chip.fixed .nd-chip-val,.nd-chip.done .nd-chip-val{color:var(--txt)}
+.nd-chip.fixed .nd-chip-cap,.nd-chip.done .nd-chip-cap{color:var(--muted)}
+/* باکسِ آنلاک‌شده اما هنوز خالی: فقط کادرِ نارنجی روی زمینهٔ سفید (نه پُر) تا «تکمیل‌شده» به‌نظر نرسد */
+.nd-chip.next{border-color:var(--brand);background:#fff}
+.nd-chip.next .nd-chip-val{color:#c9c7c2}
+.nd-chip.next .nd-chip-cap{color:var(--brand)}
+/* باکس‌های قفل: مثلِ ماژولِ ریویژن (پس‌زمینهٔ خنثی + متنِ کم‌رنگ) اما با کادرِ یک‌دست (نه خط‌چین) */
+.nd-chip.locked{background:var(--panel)}
+.nd-chip.locked .nd-chip-val{color:#c9c7c2}
+button.nd-chip:hover{border-color:var(--charcoal)}
+.nd-chip.done:hover,.nd-chip.next:hover{border-color:var(--brand)}
+/* باکسِ درحالِ‌تکمیل: مرکز سفید، کادرِ طوسی، و رینگِ نارنجیِ تک‌رنگِ چرخان دورش */
+.nd-chip.active{position:relative;width:94px;padding:12px 10px;gap:4px;border:1px solid #c9c7c2;background:#fff;box-shadow:0 6px 16px rgba(0,0,0,.08);z-index:3}
+.nd-chip.active .nd-chip-val{font-size:16px;color:var(--txt)}
+.nd-chip.active .nd-chip-cap{color:var(--muted)}
+/* باکسِ تأییدشده که موقتاً بزرگ نگه داشته می‌شود (تا بعد از پالس کوچک شود) */
+.nd-chip.held{width:94px;padding:12px 10px}
+/* رینگِ چرخانِ نارنجیِ سلولِ فعال — اورلیِ پایا که بینِ سلول‌ها سُر می‌خورد */
+.nd-ring{position:absolute;left:0;top:0;width:0;height:0;border-radius:12px;padding:1.5px;pointer-events:none;z-index:4;opacity:0;
+  background:conic-gradient(from var(--nd-ang,0deg),#f7941f 0deg 80deg,transparent 80deg 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;
+  mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;
+  animation:nd-ring 1.4s linear infinite;
+  transition:left .42s cubic-bezier(.4,0,.2,1),top .42s cubic-bezier(.4,0,.2,1),width .42s cubic-bezier(.4,0,.2,1),height .42s cubic-bezier(.4,0,.2,1),opacity .2s}
+.nd-ring.show{opacity:1}
+/* پالسِ تأییدِ سلول: دو حلقهٔ شعاعی که پخش و محو می‌شوند (نشانهٔ ست‌شدنِ پارامتر) */
+.nd-pulse{position:absolute;left:0;top:0;width:0;height:0;pointer-events:none;z-index:3}
+.nd-pulse::before,.nd-pulse::after{content:"";position:absolute;inset:0;border:2px solid var(--brand);border-radius:12px;opacity:0}
+.nd-pulse.go::before{animation:nd-pulse .6s ease-out}
+.nd-pulse.go::after{animation:nd-pulse .6s ease-out .16s}
+/* حلقه‌های شعاعی که دیده شوند اما قبل از بزرگ‌شدنِ زیاد محو گردند (روشن‌تر از قبل، دامنهٔ کوچک) */
+@keyframes nd-pulse{0%{opacity:.55;transform:scale(1)}65%{opacity:.14}100%{opacity:0;transform:scale(1.16)}}
+@property --nd-ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes nd-ring{to{--nd-ang:360deg}}
+@media(prefers-reduced-motion:reduce){.nd-ring{animation:none}.nd-pulse.go::before,.nd-pulse.go::after{animation:none}.nd-ring{transition:none}}
+/* --- آکاردئونِ ایستگاه‌ها (زیرِ ریل): همه حاضر و کولپس جز ایستگاهِ فعال؛ هر باکس به سبکِ کارتابلِ بازبینی --- */
+.nd-stage{margin-top:0}
+.nd-acc{display:flex;flex-direction:column;gap:12px}
+/* باکسِ هر ایستگاه — پس‌زمینهٔ سفید روی صفحهٔ خاکستری؛ ایستگاهِ فعال با نوارِ کهربایی */
+.nd-sec{border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 1px 3px #00000008;
+  transition:border-color .25s,box-shadow .25s,background .25s}
+.nd-sec.active{border-right:3px solid var(--warn);box-shadow:0 3px 12px #0000000f}
+.nd-sec.locked{opacity:.6}
+/* هدرِ باکس = تیتر + المانِ پارامتر + نامِ کامل + دکمهٔ افزودن + فلش */
+.nd-sec-hd{display:flex;align-items:center;gap:9px;width:100%;padding:13px 15px;background:none;border:none;
+  font-family:inherit;cursor:pointer;text-align:right}
+.nd-sec.locked .nd-sec-hd{cursor:default}
+.nd-sec-t{font-size:13.5px;font-weight:700;color:var(--txt);flex-shrink:0}
+.nd-sec.locked .nd-sec-t{color:var(--muted)}
+.nd-sec.active .nd-sec-t{color:var(--txt)}     /* تیترِ ایستگاهِ فعال مشکی می‌ماند، نه نارنجی */
+/* المانِ همان پارامتر (آیکونِ سکشن) — قبل از تیتر، نارنجی، هم‌سبکِ بقیهٔ سایت */
+.nd-sec-ic{display:inline-flex;align-items:center;flex-shrink:0;color:var(--brand)}
+.nd-sec-ic:empty{display:none}
+.nd-sec-ic svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.nd-sec-add-slot{margin-inline-start:auto;display:inline-flex;align-items:center}   /* فلش و دکمهٔ افزودن به سمتِ چپ رانده می‌شوند */
+.nd-sec-chev{display:inline-flex;flex-shrink:0;color:#b9b7b1;transition:transform .3s,color .25s}   /* هم‌رنگِ فلش‌های بقیهٔ سایت */
+.nd-sec-chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+.nd-sec.active .nd-sec-chev{transform:rotate(180deg);color:#b9b7b1}   /* فلشِ سلولِ فعال هم طوسی، نه نارنجی */
+.nd-sec.done .nd-sec-chev,.nd-sec.locked .nd-sec-chev{opacity:.45}
+/* بدنهٔ کولپس‌شونده — انیمیشنِ نرمِ ارتفاع با grid (0fr→1fr) تا دقیقاً به‌اندازهٔ محتوا باز شود */
+.nd-sec-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s cubic-bezier(.2,0,0,1)}   /* کند، تا کلِ انیمیشنِ بالا (پالس→ریسایز→رینگ) هم‌زمان داخلش جا شود */
+.nd-sec.active .nd-sec-body,.nd-sec.done .nd-sec-body{grid-template-rows:1fr}   /* فعال: همهٔ سلول‌ها؛ تنظیم‌شده: فقط سلولِ انتخاب‌شده باقی می‌ماند */
+.nd-sec-inner{min-height:0;overflow:hidden}
+.nd-sec-div{height:1px;background:var(--line);margin:0 15px}                 /* خطِ جداکنندهٔ نازک زیرِ تیتر */
+.nd-sec-rows{padding:12px 14px 14px}
+/* رکوردها: هر گزینه یک سلولِ جدا، هم‌سبکِ ردیف‌های کارتابلِ بازبینی (.rq-item) */
+.nd-list{max-height:250px;overflow-y:auto;overflow-x:hidden;display:flex;flex-direction:column;gap:7px;padding:2px}
+.nd-list::-webkit-scrollbar{width:9px}
+.nd-list::-webkit-scrollbar-thumb{background:#d9d8d4;border-radius:6px}
+.nd-list::-webkit-scrollbar-thumb:hover{background:#c4c2bd}
+.nd-list::-webkit-scrollbar-track{background:transparent}
+.nd-opt{display:flex;align-items:center;gap:11px;width:100%;text-align:right;font-family:inherit;
+  background:#f4f4f2;border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer;transition:.14s}
+.nd-opt:hover{background:#fff8f0;border-color:var(--brand)}
+.nd-opt.on{background:#fff8f0;border-color:var(--brand)}
+.nd-opt-ic{flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px}
+.nd-opt-ic .cp-logo{border-radius:8px}
+.nd-opt-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.nd-opt-lab{font-size:13px;font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nd-opt-sub{font-size:11px;font-weight:500;color:var(--muted);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nd-opt-ck{flex-shrink:0;display:inline-flex;color:var(--brand)}
+.nd-opt-ck svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4}
+.nd-opt.special .nd-opt-lab{color:var(--brand)}
+.nd-menu-empty{padding:14px 12px;font-size:12px;color:var(--muted);text-align:center}
+.nd-step-hint{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.6}
+.nd-step-hint svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* --- بخشِ نهایی: انیمیشنِ باز‌شدن هم‌سبکِ سکشن‌ها (grid 0fr→1fr) --- */
+.nd-final{margin-top:12px;display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s cubic-bezier(.2,0,0,1)}
+.nd-final.show{grid-template-rows:1fr}
+.nd-fin-wrap{min-height:0;overflow:hidden}
+/* قابِ «بارگذاری سند/فایل» — هم‌سبکِ سکشن‌های بالا (سفید، کادر، شعاع، سایه، تیتر+آیکون+خطِ جداکننده) */
+.nd-finalbox{border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 1px 3px #00000008}
+.nd-final-hd{display:flex;align-items:center;gap:9px;padding:13px 15px}
+.nd-final-inner{padding:12px 14px 14px}
+/* پیامِ ریویژن: یک خطِ زیرِ جداکننده با نقطهٔ نارنجی، هم‌فونتِ بقیهٔ سایت (نه کادرِ جدا) */
+/* هم‌فونتِ کپشنِ کارت‌های داشبورد (.kpi-foot): ۱۱px، وزنِ ۵۰۰، رنگِ --muted */
+.nd-revnote{display:flex;align-items:flex-start;gap:7px;margin-bottom:13px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.9}
+.nd-revnote::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:6px}
+.nd-revnote b{font-weight:700;color:var(--brand);unicode-bidi:isolate}
+.nd-revnote.warn{color:var(--err)}
+.nd-revnote.warn::before{background:var(--err)}
+.nd-revnote.warn b{color:var(--err)}
+.nd-final-num{font-size:15px;font-weight:800;color:var(--brand);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* چیدمانِ عمودی: یادداشتِ افقی بالا، سپس ردیفِ باکس‌های آپلود */
+.nd-fstack{display:flex;flex-direction:column;gap:14px}
+/* باکس‌های آپلود هم‌سایز: تک‌باکس (عادی) یا سه‌باکس (سه‌بعدی: GLB/USDZ/STP) */
+.nd-up-grid{display:grid;gap:12px}
+.nd-up-1{grid-template-columns:1fr}
+.nd-up-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:620px){.nd-up-3{grid-template-columns:1fr}}
+.nd-up-grid .dropzone{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+/* نوارِ پاییِن باکس: «نام سند» + نامِ کلیک‌پذیر (سمتِ راست) و دکمهٔ ثبت (سمتِ چپ) */
+.nd-actions{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.nd-actions .btn.primary{margin-inline-start:auto;min-width:120px;justify-content:center}   /* ثبت به انتهای چپ رانده می‌شود */
+/* نامِ سندِ تولیدشده: تیتر «نام سند» + کدِ کلیک‌پذیر برای کپی + نوتِ راهنما */
+.nd-namewrap{display:flex;flex-direction:column;gap:7px;min-width:0}
+.nd-nameline{display:inline-flex;align-items:center;gap:9px;background:none;border:none;font-family:inherit;cursor:pointer;padding:0;min-width:0}
+.nd-name-t{font-size:13px;font-weight:700;color:var(--txt);flex-shrink:0}
+.nd-nameline:hover .nd-final-num{text-decoration:underline;text-underline-offset:3px}
+.nd-copy-hint{margin-top:0;cursor:pointer}
+.nd-copy-hint.ok{color:var(--ok)}
+.nd-copy-hint.ok svg{stroke:var(--ok)}
 
 /* ===== انتخابگر قالب پروژه (فقط انواع مدرک) ===== */
 .tpl-picker-t{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:8px}
@@ -344,7 +490,7 @@
 
 /* ===== جدول‌های مدیریتِ اطلاعاتِ پایه (قطعات/انواعِ سند/پارامترها) — هم‌استانداردِ کاربران ===== */
 .mgmt-table td{vertical-align:middle}
-.mgmt-table th.c-mid,.mgmt-table td.c-mid{text-align:center}   /* عرض در بلوکِ هم‌ترازیِ سه جدول */
+.mgmt-table th.c-mid,.mgmt-table td.c-mid,.users-table th.c-mid,.users-table td.c-mid{text-align:center}   /* عرض در بلوکِ هم‌ترازیِ سه جدول */
 /* ستونِ عملیات: عرضِ ثابت، تیتر وسطِ دکمه‌ها */
 .mgmt-table th.col-act,.mgmt-table td.col-act{width:96px;white-space:nowrap;text-align:left}
 /* دکمه‌های عملیاتِ همهٔ جدول‌ها چسبیده به لبهٔ چپ (flex-end در RTL) — تا در همهٔ جدول‌ها زیرِ هم و هم‌تراز شوند */
@@ -372,6 +518,16 @@
 .pm-cell .el-badge{flex-shrink:0}
 /* آیکونِ برچسبِ پارامتر کمی کوچک‌تر از آیکونِ اسناد (کادر همان ۳۰px می‌ماند تا هم‌ترازی نخورد) */
 .pm-cell .el-badge svg{width:17px;height:17px}
+/* ستونِ دومِ از راست (دادهٔ لاتین: نام انگلیسیِ قطعه/سند/پارامتر + نام کاربری) در هر چهار جدول:
+   محتوا وسط‌چین و با translateX به راست جابه‌جا می‌شود (روی محتوا، نه سلول؛ عرضِ ستون و خطِ ردیف دست‌نخورده).
+   مقدارِ ۱۰۰px مشترک است تا هر چهار ستون به یک اندازه جابه‌جا و در کلِ صفحه هم‌تراز بمانند. */
+.mgmt-table .en-shift,.users-table .en-shift{display:inline-block;transform:translateX(100px)}
+/* ستونِ ۳۶٪ (نام انگلیسیِ قطعه) را با padding به قابِ ۲۰٪ِ سمتِ راست جمع می‌کنیم تا مرکزش
+   دقیقاً مثلِ ستون‌های ۲۰٪ (نام کاربری/نام انگلیسیِ سند/پارامتر) روی ۵۸٪ بیفتد و هم‌تراز شود (border-box). */
+.parts-tbl th:nth-child(3),.parts-tbl td:nth-child(3){padding-left:calc(16% + 14px)}
+/* ستونِ «واحد» (جدولِ پارامترها) و «کد سند» (جدولِ اسناد) — هر دو در همان جای افقی (زیرِ هم) با یک شیفتِ
+   مشترک. عدد را دستی تنظیم کن — مثبت = راست، منفی = چپ؛ صفر = دقیقاً وسطِ ستون. */
+.partmods-tbl .unit-shift,.doctypes-tbl .unit-shift{display:inline-block;transform:translateX(70px)}
 
 /* ===== هم‌ترازیِ ستونیِ سه جدول (کاربران ↔ اسناد ↔ قطعات) =====
    عرض‌ها «درصدی» و مشترک‌اند تا در هر عرضِ صفحه دقیقاً زیرِ هم بمانند (هم در هدر هم در بدنه ست می‌شوند،
@@ -387,9 +543,10 @@
 .users-table th:nth-child(5),.users-table td:nth-child(5){width:19%}   /* عملیات */
 .doctypes-tbl th:nth-child(1),.doctypes-tbl td:nth-child(1){width:55px}   /* المان = عرضِ ناحیهٔ آواتارِ کاربران (۱۴ پدینگ + ۳۰ بَج + ۱۱ گپ) */
 .doctypes-tbl th:nth-child(2),.doctypes-tbl td:nth-child(2){width:calc(32% - 55px);padding-right:0}   /* نام فارسی سند — شروع از ۵۵px، دقیقاً زیرِ نامِ کاربر */
-.doctypes-tbl th:nth-child(3),.doctypes-tbl td:nth-child(3){width:36%}   /* نام انگلیسی سند (پهن‌تر) */
-.doctypes-tbl th:nth-child(4),.doctypes-tbl td:nth-child(4){width:13%}   /* سطح  ← هم‌ترازِ نقش */
-.doctypes-tbl th:nth-child(5),.doctypes-tbl td:nth-child(5){width:19%}   /* عملیات */
+.doctypes-tbl th:nth-child(3),.doctypes-tbl td:nth-child(3){width:20%}   /* نام انگلیسی سند — حالا ۲۰٪ (مثلِ نام‌انگلیسیِ پارامتر) تا «کد سند» در چپش جا شود */
+.doctypes-tbl th:nth-child(4),.doctypes-tbl td:nth-child(4){width:16%}   /* کد سند — دقیقاً زیرِ ستونِ «واحد»ِ جدولِ پارامترها (۳۲٪ تا ۴۸٪) */
+.doctypes-tbl th:nth-child(5),.doctypes-tbl td:nth-child(5){width:13%}   /* سطح  ← هم‌ترازِ نقش */
+.doctypes-tbl th:nth-child(6),.doctypes-tbl td:nth-child(6){width:19%}   /* عملیات */
 .parts-tbl th:nth-child(1),.parts-tbl td:nth-child(1){width:55px}   /* المان = عرضِ ناحیهٔ آواتارِ کاربران (۱۴ پدینگ + ۳۰ بَج + ۱۱ گپ) */
 .parts-tbl th:nth-child(2),.parts-tbl td:nth-child(2){width:calc(32% - 55px);padding-right:0}   /* نام فارسی قطعه — شروع از ۵۵px، دقیقاً زیرِ نامِ کاربر */
 .parts-tbl th:nth-child(3),.parts-tbl td:nth-child(3){width:36%}   /* نام انگلیسی قطعه (هم‌ترازِ نام انگلیسی سند) */
@@ -421,6 +578,40 @@
 /* خطِ جداکنندهٔ بینِ سطرهای داده = خطِ نازکِ روشنِ استانداردِ سایت (#f2f1ee)؛
    خطِ زیرِ تیتر (th) همچنان پررنگ (var(--line)) می‌ماند. */
 .mgmt-table td,.users-table td{border-bottom-color:#f2f1ee}
+
+/* ===== آرشیو: هم‌ترازیِ «چرمِ جدول» با استانداردِ جدول‌های تنظیمات =====
+   خطِ جداکنندهٔ ردیف‌ها همان روشنِ #f2f1ee (خطِ زیرِ تیتر پررنگ می‌ماند) + نوارِ اسکرولِ باریک (افقی و عمودی). */
+.arch-table td{border-bottom-color:#f2f1ee}
+#tab-archive .tablewrap::-webkit-scrollbar{width:9px;height:9px}
+#tab-archive .tablewrap::-webkit-scrollbar-thumb{background:#d9d8d4;border-radius:6px}
+#tab-archive .tablewrap::-webkit-scrollbar-track{background:transparent}
+/* همهٔ ستون‌ها وسط‌چین (تیتر + داده) */
+.arch-table th,.arch-table td{text-align:center;vertical-align:middle}
+/* المانِ نوعِ سند در راست‌ترین ستون — خطِ نازک‌تر، مثلِ جدولِ «انواع سند» */
+.arch-table .el-badge svg{stroke-width:1}
+/* شماره سند — عیناً سبکِ شمارهٔ سندِ پنلِ پروژه (.doc-num): ۱۱٫۵px/۵۰۰/ltr، هاور برند، کلیک‌پذیر */
+.arch-num{display:inline-block;font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;
+  font-variant-numeric:tabular-nums;letter-spacing:.5px;cursor:pointer;transition:color .12s}
+.arch-num:hover{color:var(--brand)}
+/* کد مشتری — کلیک‌پذیر (به پنلِ مشتری) با هاورِ برند؛ نامِ کامل در تولتیپ */
+.arch-client{display:inline-block;font-weight:500;direction:ltr;cursor:pointer;transition:color .12s}
+.arch-client:hover{color:var(--brand)}
+/* تاریخ — متنِ فرعیِ خاکستریِ وزن‌عادی */
+.arch-date{font-size:11.5px;color:var(--muted)}
+/* دکمهٔ سه‌نقطه‌ای عملیات */
+.kebab-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
+  border:none;background:none;border-radius:8px;cursor:pointer;color:var(--muted);transition:.12s}
+.kebab-btn:hover{background:var(--panel2);color:var(--txt)}
+.kebab-btn svg{width:18px;height:18px}
+/* منوی شناورِ سه‌نقطه‌ای — به body چسبیده و position:fixed تا overflowِ جدول آن را نبُرد */
+.kebab-pop{position:fixed;z-index:100;min-width:132px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;box-shadow:0 10px 30px #00000022;padding:5px;display:flex;flex-direction:column;gap:2px}
+.kebab-item{display:flex;align-items:center;gap:9px;width:100%;padding:8px 10px;border:none;background:none;
+  border-radius:7px;font:inherit;font-size:12.5px;color:var(--txt);cursor:pointer;text-align:right}
+.kebab-item:hover{background:var(--panel)}
+.kebab-item.danger{color:var(--err)}
+.kebab-item.danger:hover{background:var(--err-bg)}
+.kebab-item svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;flex-shrink:0}
 
 /* ===== فلشِ جمع/بازکردنِ جدول (در هدرِ ستونِ اول) — عیناً هم‌سبک و هم‌انیمیشنِ فلشِ درختِ سایدبار (.nav-exp) =====
    .th-exp: کنارِ هدرهای متنی (کاربران/پارامترها) فلش را ابتدای سطر، بالای آواتار/شروعِ ردیف قرار می‌دهد. */

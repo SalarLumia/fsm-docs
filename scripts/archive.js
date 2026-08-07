@@ -1,11 +1,12 @@
 /* ================= آرشیو ================= */
 var _arch = { sortKey:"date", sortDir:-1 };
+/* ستون‌های آرشیو (راست→چپ): «نوع» به‌صورتِ المانِ سند در راست‌ترین ستون؛ ریویژن حذف شد. */
 var ARCH_COLS = [
-  {k:"number",label:"شماره سند"},{k:"client",label:"مشتری"},{k:"order",label:"سفارش"},
-  {k:"project",label:"پروژه"},{k:"part",label:"قطعه"},{k:"type",label:"نوع"},
-  {k:"rev",label:"ریویژن"},{k:"status",label:"وضعیت"},{k:"date",label:"تاریخ"}
+  {k:"type",label:"نوع"},{k:"number",label:"شماره سند"},{k:"client",label:"مشتری"},
+  {k:"order",label:"سفارش"},{k:"project",label:"پروژه"},{k:"part",label:"قطعه"},
+  {k:"status",label:"وضعیت"},{k:"date",label:"تاریخ"}
 ];
-var ARCH_CLIP = '<svg class="file-ic" viewBox="0 0 24 24" title="دارای فایل"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>';
+var KEBAB_IC = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>';
 
 function filteredDocs(){
   var q=(document.getElementById("aSearch").value||"").trim().toLowerCase();
@@ -89,26 +90,61 @@ function renderArchive(){
   var rows=filteredDocs().slice().sort(archCompare);
   var admin=ME.role==="admin";
   var html=rows.map(function(d){
-    var latest=String(d.isLatest).toLowerCase()==="true";
-    var hasFile=!!d.fileId;
     var si=statusInfo(d.status);
+    var num=esc(d.drawingNumber), open="openDocDetail('"+num+"')";
     return "<tr>"+
-      '<td class="mono" style="direction:ltr;text-align:left">'+(hasFile?ARCH_CLIP:'')+'<a href="#" onclick="openDocDetail(\''+esc(d.drawingNumber)+'\');return false">'+esc(d.drawingNumber)+"</a></td>"+
-      "<td>"+esc(clientName(d.clientCode))+"</td>"+
-      "<td>"+esc(pad2(d.orderNo))+"</td><td>"+esc(pad2(d.projectNo))+"</td>"+
-      "<td>"+esc(partName(d.partNo))+"</td>"+
-      "<td>"+esc(typeName(d.typeCode))+"</td>"+
-      '<td class="mono">'+esc(d.rev)+' <span class="pill '+(latest?"latest":"old")+'">'+(latest?"آخرین":"قدیمی")+"</span></td>"+
-      '<td>'+badgeHTML(si.cls, si.label)+"</td>"+
-      "<td>"+fmtDate(d.timestamp)+"</td>"+
-      '<td class="row-actions">'+
-        viewIconBtn("openDocDetail('"+esc(d.drawingNumber)+"')")+
-        (hasFile?downloadIconBtn("downloadFile('"+d.fileId+"','"+esc(d.drawingNumber)+"')"):'')+
-        (admin?delIconBtn("delDocument('"+esc(d.drawingNumber)+"')"):'')+
-      "</td></tr>";
+      // نوع → المانِ سند (راست‌ترین ستون؛ ستونِ نوعِ متنی حذف شد)
+      '<td><span class="el-badge" title="'+esc(typeName(d.typeCode))+'">'+docTypeIconInner({code:d.typeCode})+'</span></td>'+
+      // شماره سند — سبکِ پنلِ پروژه، کلیک‌پذیر (جایگزینِ دکمهٔ نمایش)
+      '<td><span class="arch-num" title="نمایش جزئیات سند" onclick="'+open+'">'+num+'</span></td>'+
+      // مشتری → کد + تولتیپِ نامِ کامل + کلیک به پنلِ همان مشتری
+      '<td><span class="arch-client" title="'+esc(clientName(d.clientCode))+'" onclick="navGoClient(\''+esc(d.clientCode)+'\')">'+esc(d.clientCode)+'</span></td>'+
+      '<td>'+esc(pad2(d.orderNo))+'</td>'+
+      '<td>'+esc(pad2(d.projectNo))+'</td>'+
+      '<td>'+esc(partName(d.partNo))+'</td>'+
+      '<td>'+badgeHTML(si.cls, si.label)+'</td>'+
+      '<td class="arch-date">'+fmtDate(d.timestamp)+'</td>'+
+      // عملیات → منوی سه‌نقطه‌ای (فقط مدیر: ویرایش + حذف)
+      '<td class="arch-act">'+(admin?'<button class="kebab-btn" title="عملیات" aria-label="عملیات" onclick="archKebab(event,\''+num+'\')">'+KEBAB_IC+'</button>':'')+'</td>'+
+    "</tr>";
   }).join("");
-  document.getElementById("archiveBody").innerHTML = html || '<tr><td colspan="10" class="muted" style="text-align:center;padding:24px">موردی با این فیلترها یافت نشد.</td></tr>';
+  document.getElementById("archiveBody").innerHTML = html || '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">موردی با این فیلترها یافت نشد.</td></tr>';
   document.getElementById("archiveCount").textContent = rows.length+" سند";
+}
+
+/* ================= منوی سه‌نقطه‌ایِ عملیاتِ آرشیو =================
+   منو به body چسبانده و با position:fixed جای می‌گیرد تا overflowِ .tablewrap آن را نبُرد.
+   کلیکِ بیرون/اسکرول/تغییرِ اندازه ⟵ بسته می‌شود؛ کلیکِ دوباره روی همان دکمه = toggle. */
+var _archMenu=null;
+function archCloseKebab(){
+  if(!_archMenu) return;
+  _archMenu.remove(); _archMenu=null;
+  document.removeEventListener("click",_archDocClick,false);
+  document.removeEventListener("scroll",archCloseKebab,true);
+  window.removeEventListener("resize",archCloseKebab);
+}
+function _archDocClick(e){ if(_archMenu && _archMenu.contains(e.target)) return; archCloseKebab(); }
+function archKebab(ev, num){
+  ev.stopPropagation();
+  var wasFor=_archMenu && _archMenu._num===num;
+  archCloseKebab();
+  if(wasFor) return;                                   // toggle: کلیکِ دوباره ⟵ بستن
+  var r=ev.currentTarget.getBoundingClientRect();
+  var m=document.createElement("div"); m.className="kebab-pop"; m._num=num;
+  m.innerHTML=
+    '<button class="kebab-item" onclick="archCloseKebab();openDocDetail(\''+esc(num)+'\')">'+ICON.edit+'ویرایش</button>'+
+    '<button class="kebab-item danger" onclick="archCloseKebab();delDocument(\''+esc(num)+'\')">'+ICON.trash+'حذف</button>';
+  document.body.appendChild(m);
+  var mw=m.offsetWidth, mh=m.offsetHeight;
+  var top=r.bottom+5; if(top+mh>window.innerHeight-8) top=r.top-mh-5;   // اگر پایین جا نبود، بالا باز شود
+  var left=r.right-mw; if(left<8) left=8;                              // در RTL راست‌ترازِ دکمه
+  m.style.top=Math.max(8,top)+"px"; m.style.left=left+"px";
+  _archMenu=m;
+  setTimeout(function(){
+    document.addEventListener("click",_archDocClick,false);
+    document.addEventListener("scroll",archCloseKebab,true);
+    window.addEventListener("resize",archCloseKebab);
+  },0);
 }
 async function delDocument(num){
   if(!(await uiConfirm("حذف سند «"+num+"»؟ سند از فهرست حذف و فایلش به سطلِ زبالهٔ گوگل‌درایو منتقل می‌شود (تا حدود یک ماه قابلِ بازیابی).",{danger:true,okLabel:"حذف"}))) return;
