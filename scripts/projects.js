@@ -37,6 +37,15 @@ function navToggleClient(e,code){
 }
 function navGoClient(code){ _nav.open=true; switchTab("project"); selectClient(code); }
 function navGoProject(c,o,pr){ _nav.open=true; _nav.clients[c]=true; openProject(c,o,pr); }
+/* ناوبری به «پنلِ قطعه»: به جزئیاتِ پروژه می‌رود و به سکشنِ همان قطعه اسکرول + یک فلاشِ کوتاه می‌زند.
+   برای اسنادِ سطحِ پروژه (قطعهٔ ۰۰) سکشنی نیست، پس فقط روی خودِ پروژه می‌ماند. */
+function navGoPart(c,o,pr,pn){
+  navGoProject(c,o,pr);
+  var el=document.getElementById("pdpart-"+c+"-"+pad2(o)+"-"+pad2(pr)+"-"+pad2(pn));
+  if(!el) return;
+  try{ el.scrollIntoView({behavior:"smooth",block:"center"}); }catch(e){ el.scrollIntoView(); }
+  el.classList.add("pd-flash"); setTimeout(function(){ el.classList.remove("pd-flash"); },1600);
+}
 function navClientLogo(c){
   if(c&&c.logo) return '<img class="nav-ci-logo" src="'+esc(c.logo)+'" alt="">';
   return '<span class="nav-ci-ph">'+esc((c&&c.code?String(c.code):"?").slice(0,2).toUpperCase())+'</span>';
@@ -610,9 +619,10 @@ function projectPartsDocsHTML(p){
   var partTypes=docTypesSorted().filter(function(t){ return t.scope==="part"; });
   var parts=projectPartsList(p);
   if(!parts.length) return '<div class="cp-empty-hint">هنوز قطعه‌ای به این پروژه اضافه نشده. با دکمهٔ ویرایشِ کنارِ عنوان، قطعه اضافه کنید.</div>';
+  var pc=p.clientCode, po=pad2(p.orderNo), ppr=pad2(p.projectNo);
   var groups=parts.map(function(pn){
     var rec=partRec(pn);
-    return '<div class="spec-group">'+
+    return '<div class="spec-group" id="pdpart-'+esc(pc)+'-'+esc(po)+'-'+esc(ppr)+'-'+esc(pad2(pn))+'">'+
       '<div class="spec-hd">'+
         '<span class="spec-name">'+esc(partNameFa(pn))+'</span>'+
         (rec&&rec.name&&rec.name!==partNameFa(pn)?'<span class="spec-en">'+esc(rec.name)+'</span>':'')+
@@ -1492,8 +1502,10 @@ function loadBarProgress(scope, loaded, total){ if(!scope) return; var el=scope.
    و شمارشِ بایت روی صفر می‌ماند، یک تخمینِ نمایی نشان می‌دهیم تا کاربر حرکت ببیند؛ با real() سیگنالِ واقعی
    (اگر بود) جایش را می‌گیرد و با done() به ۱۰۰ می‌رسد. */
 function loadBarEstimate(getScope, cap){
-  cap=cap||92; var p=0, useReal=false, timer=setInterval(tick,170);
-  function tick(){ if(useReal) return; p += Math.max(0.6,(cap-p)*0.05); if(p>cap)p=cap;
+  // پیشرفتِ تخمینی آرام‌تر و واقع‌گرایانه‌تر: دیرتر به سقف می‌رسد و نزدیکِ سقف کند می‌خزد
+  // تا کاربر تا پایانِ دانلودِ واقعیِ مدل حسِ «گیرکردن روی ۹۲» نگیرد.
+  cap=cap||92; var p=0, useReal=false, timer=setInterval(tick,220);
+  function tick(){ if(useReal) return; p += Math.max(0.3,(cap-p)*0.02); if(p>cap)p=cap;
     var s=getScope&&getScope(); if(s) loadBarPct(s, Math.round(p)); }
   function stop(){ if(timer){ clearInterval(timer); timer=null; } }
   return { real:function(v){ useReal=true; var s=getScope&&getScope(); if(s) loadBarPct(s, v); },
@@ -1528,7 +1540,7 @@ async function mvLoadPart(fileId, part){
   try{
     var r=await getFileRetry(fileId, {onProgress: function(loaded,total){ if(myToken===_mvLoadSeq && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(myToken!==_mvLoadSeq){ est.stop(); return; }   // منسوخ شد — نتیجه را دور بریز
-    if(!r||!r.ok){ est.stop(); loadBarHide(scope()); var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML='<div class="mv-empty-t">دریافتِ مدل ناموفق بود.</div>'; return; }
+    if(!r||!r.ok){ est.stop(); loadBarHide(scope()); var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML='<div class="mv-empty-t">دریافتِ مدل ناموفق بود.</div>'+mvRetryBtn(fileId,part); return; }
     var blob=b64toBlob(r.base64, r.mimeType||"model/gltf-binary");
     var url=previewBlobUrl("mvModel", blob);
     var sh=document.getElementById("mvShell"); if(!sh){ est.stop(); return; }
@@ -1543,7 +1555,12 @@ async function mvLoadPart(fileId, part){
     var mv=document.getElementById("mvEl");
     if(mv){ mv.addEventListener("load", function(){ if(myToken===_mvLoadSeq){ est.done(); loadBarHide(scope()); } }); }
     else { est.done(); loadBarHide(scope()); }
-  }catch(e){ est.stop(); loadBarHide(scope()); var ph2=document.getElementById("mvPh"); if(ph2) ph2.innerHTML='<div class="mv-empty-t">خطا در بارگذاری مدل.</div>'; }
+  }catch(e){ est.stop(); loadBarHide(scope()); var ph2=document.getElementById("mvPh"); if(ph2) ph2.innerHTML='<div class="mv-empty-t">خطا در بارگذاری مدل.</div>'+mvRetryBtn(fileId,part); }
+}
+/* دکمهٔ «تلاش مجدد» بارگذاریِ مدلِ سه‌بعدی از ابتدا (روی خطا/عدمِ دریافت) */
+function mvRetryBtn(fileId, part){
+  return '<button class="btn sm mv-retry" onclick="mvLoadPart(\''+esc(String(fileId))+'\',\''+esc(String(part))+'\')">'+
+    '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>تلاش مجدد</button>';
 }
 /* منوی ابزارِ ویوئر — همبرگر + واقعیت افزوده + تمام‌صفحه + چرخش + نمای اولیه.
    ویوئر-مستقل است: هم در پنلِ پروژه (#mvEl داخلِ .mv-shell) و هم در مودالِ سند (#dmMv داخلِ .mv-toolwrap)

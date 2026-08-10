@@ -23,15 +23,8 @@ function switchTab(name){
   pane.classList.remove("hidden");
   if(name==="dashboard") renderDashboard(true);   // آرگومان true → شمارشِ عددیِ کارت‌های شاخص
   if(name==="project") renderProjectTab();
+  if(name==="trash" && typeof renderTrash==="function") renderTrash();
   // درختِ «مشتریان و پروژه‌ها» را تازه کن تا با ترکِ تبِ پروژه، نارنجیِ مشتری/پروژه پاک شود
   if(name!=="project" && typeof renderNavTree==="function") renderNavTree();
   if(typeof playTabReveal==="function") playTabReveal(pane);   // ورودِ آبشاریِ بلوک‌های همان تب
-}
-
-/* ================= جستجوی سریع ================= */
-function onGlobalSearch(q){
-  if(!q||!q.trim()){ return; }
-  switchTab("archive");
-  document.getElementById("aSearch").value=q;
-  renderArchive();
 }

@@ -25,7 +25,7 @@ async function openDocDetail(num){
     ["ثبت‌کننده", esc(userName(d.uploadedBy)||"—")],
     ["تاریخ ثبت", fmtTimeDate(d.timestamp)]
   ];
-  if(d.reviewedBy) meta.push(["بازبین", esc(userName(d.reviewedBy))+(d.reviewedAt?(" · "+fmtDateTime(d.reviewedAt)):"")]);
+  // سطرِ «بازبین» حذف شد؛ اطلاعاتِ کاملِ بازبینی در سکشنِ گردش‌کار (تاریخچهٔ سند) نمایش داده می‌شود.
   var metaHTML=meta.map(function(m){return '<div class="dm-row"><span class="dm-k">'+m[0]+'</span><span class="dm-v">'+m[1]+'</span></div>';}).join("");
 
   /* بنر پررنگِ رد: در بخش استاندارد (بالای مشخصات) تا مدیرِ ثبت‌کننده دلیل رد را ببیند */
@@ -62,7 +62,7 @@ async function openDocDetail(num){
           '<div class="ver-list">'+revHTML+'</div></div>'+
       '</div>'+
     '</div>';
-  showModal(esc(docPhrase(d)), body);
+  showModal(esc(docPhrase(d)), body, "doc-box");
 
   /* ریویژن جاری را به‌صورت پیش‌فرض در پیش‌نمایش بارگذاری کن (بدون باز کردن گردش‌کار) */
   dmSelectVersion(num);
@@ -81,19 +81,23 @@ function versionRowHTML(rv){
   }
   if(admin) acts.push(delIconBtn("event.stopPropagation();dmDeleteVersion('"+esc(rv.drawingNumber)+"')"));
 
+  // سرِ فشرده: شماره + وضعیت در راست؛ اکشن‌ها (تأیید/رد/حذف) + فلشِ اکسپند در چپ، همه در یک خط.
+  // تاریخ/نام دیگر زیرِ نام نمی‌آید (در گردش‌کارِ اکسپند‌شونده هست) تا سلول جمع‌وجور بماند.
   return '<div class="ver-row'+(isCur?" cur":"")+'" id="ver-'+esc(rv.drawingNumber)+'" onclick="dmToggleRev(\''+esc(rv.drawingNumber)+'\')">'+
     '<div class="ver-head">'+
-      '<span class="ver-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>'+
-      '<span class="ver-rev mono">ریویژن '+esc(revFmt(rv.rev))+'</span>'+
+      '<span class="ver-rev mono">ریویژن '+esc(pad2(revFmt(rv.rev)))+'</span>'+   // شمارهٔ دو‌رقمی (۰۰/۰۱/…)
       badgeHTML(rsi.cls, rsi.label)+
       (rv.fileId?'':'<span class="muted" style="font-size:11px">بدون فایل</span>')+
+      '<div class="ver-head-end">'+
+        (acts.length?'<div class="ver-acts">'+acts.join("")+'</div>':'')+
+        '<span class="ver-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>'+
+      '</div>'+
     '</div>'+
-    '<div class="ver-sub"><span class="ver-meta">'+fmtDate(rv.timestamp)+' · '+esc(userName(rv.uploadedBy)||"")+'</span>'+
-      (acts.length?'<div class="ver-acts">'+acts.join("")+'</div>':'')+'</div>'+
-    '<div class="ver-wf">'+
+    '<div class="ver-wf"><div class="ver-wf-in">'+                                  // wrapper برای انیمیشنِ باز/بسته‌شدن (grid 0fr→1fr)
+      '<div class="ver-wf-sep"></div>'+                                            // خطِ جداکنندهٔ پیوسته زیرِ سرِ ریویژن
       (rv.title?'<div class="ver-note"><b>یادداشت:</b> '+esc(rv.title)+'</div>':'')+
       workflowStepsHTML(rv.drawingNumber)+
-    '</div>'+
+    '</div></div>'+
   '</div>';
 }
 
@@ -107,9 +111,11 @@ function workflowStepsHTML(num){
   });
   wfFutureSteps(status).forEach(function(a){ steps.push({label:wfFutureLabel(a), done:false, meta:"", date:""}); });
   if(!steps.length) return '<p class="muted" style="padding:6px 2px">رویدادی ثبت نشده.</p>';
+  // آخرین مرحلهٔ انجام‌شده = «مرحلهٔ فعلی» → حلقهٔ شعاعیِ متحرک (مثلِ رکوردهای فعالیتِ اخیرِ داشبورد)
+  var lastDone=-1; steps.forEach(function(s,i){ if(s.done) lastDone=i; }); if(lastDone>=0) steps[lastDone].active=true;
   return '<div class="wf-timeline">'+steps.map(function(s,i){
     var last=(i===steps.length-1);
-    return '<div class="wf-step '+(s.done?"done":"todo")+'">'+
+    return '<div class="wf-step '+(s.done?"done":"todo")+(s.active?" active":"")+'">'+
       '<div class="wf-rail"><span class="wf-ring"'+((s.done&&s.color)?(' style="--wf:'+s.color+'"'):'')+'></span>'+(last?'':'<span class="wf-line"></span>')+'</div>'+
       '<div class="wf-body"><div class="wf-label">'+esc(s.label)+'</div>'+
         (s.meta?'<div class="wf-meta">'+esc(s.meta)+'</div>':'')+'</div>'+
@@ -163,7 +169,7 @@ async function dmSelectVersion(num){
     // اگر کاربر بین‌بین ریویژن دیگری انتخاب کرده یا پیش‌نمایش بسته شده، این نتیجه را دور بریز
     if(myToken!==_dpSeq) return;
     host=document.getElementById("docPreviewHost"); if(!host) return;
-    if(!r||!r.ok){ host.innerHTML='<div class="empty-state"><div class="es-title">پیش‌نمایش در دسترس نیست</div></div>'; return; }
+    if(!r||!r.ok){ host.innerHTML='<div class="empty-state"><div class="es-title">پیش‌نمایش در دسترس نیست</div>'+dmRetryBtn(num)+'</div>'; return; }
     var blob=b64toBlob(r.base64, r.mimeType); var url=previewBlobUrl("docPreview", blob);
     // فایلِ سه‌بعدی (GLB/GLTF) نباید در iframe برود (مرورگر دانلودش می‌کند)؛ با model-viewer نمایش داده می‌شود
     var really3D = is3D || /^model\//.test(r.mimeType||"") || /\.(glb|gltf)$/i.test(r.name||"");
@@ -177,6 +183,7 @@ async function dmSelectVersion(num){
         host.innerHTML='<div class="mv-toolwrap">'+
           '<model-viewer id="dmMv" src="'+url+'" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="0.95" '+
             'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" alt="مدلِ سه‌بعدی" style="background:#f4f4f2"><button slot="ar-button" class="mv-ar"></button></model-viewer>'+
+          mvPartBadgeHTML(partName(d.partNo))+                                    // برچسبِ نامِ انگلیسیِ قطعه + آیکونِ سه‌بعدی
           (typeof mvToolbarHTML==="function"?mvToolbarHTML():'')+
         '</div>';
       } else {
@@ -190,8 +197,19 @@ async function dmSelectVersion(num){
     if(_dpEst===est) _dpEst=null;
     if(myToken!==_dpSeq) return;
     host=document.getElementById("docPreviewHost");
-    if(host) host.innerHTML='<div class="empty-state"><div class="es-title">خطا در بارگذاری پیش‌نمایش</div></div>';
+    if(host) host.innerHTML='<div class="empty-state"><div class="es-title">خطا در بارگذاری پیش‌نمایش</div>'+dmRetryBtn(num)+'</div>';
   }
+}
+/* دکمهٔ «تلاش مجدد» برای بارگذاریِ دوبارهٔ پیش‌نمایش/مدل از ابتدا */
+function dmRetryBtn(num){
+  return '<button class="btn sm es-retry" onclick="dmSelectVersion(\''+esc(num)+'\')">'+
+    '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'+
+    'تلاش مجدد</button>';
+}
+/* برچسبِ نامِ انگلیسیِ قطعه (گوشهٔ ویوئرِ سه‌بعدی) — عیناً المانِ منوی انتخابِ قطعه: آیکونِ لایه‌ها + رنگِ متن (نه نارنجی) */
+function mvPartBadgeHTML(name){
+  if(!name) return '';
+  return '<div class="mv-partbadge">'+MV_LAYERS_IC+'<span class="mv-pb-t">'+esc(name)+'</span></div>';
 }
 
 /* دانلود ریویژن در حال نمایش */
@@ -243,7 +261,7 @@ function openRevisionUploadModal(baseNum, mode){
   var rs=revState(d.clientCode,d.orderNo,d.projectNo,d.partNo,d.typeCode);
   var lead=isVer
     ? 'نسخهٔ اصلاح‌شدهٔ همین ریویژن (بدون تغییر شماره) را بارگذاری کنید؛ نسخهٔ قبلی جایگزین می‌شود.'
-    : 'ریویژن بعدی این سند («<b>ریویژن '+esc(rs.nextRev)+'</b>») ثبت می‌شود.';
+    : 'ریویژن بعدی این سند («<b>ریویژن '+esc(pad2(rs.nextRev))+'</b>») ثبت می‌شود.';
   var noteLabel=isVer?"توضیحات این نسخه":"توضیحات این ریویژن";
   var upIco='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
   var body='<div class="rv-up">'+
@@ -298,28 +316,31 @@ async function submitRevisionUpload(){
   var ta=document.getElementById("rvNote"); var note=ta?String(ta.value).trim():"";
   var base=docByNumber(_rv.baseNum); if(!base){ toast("سند یافت نشد.",true); return; }
   var b64=await fileToBase64(f);
-  toast("در حال بارگذاری…");
-  var targetNum, r;
+  // انتخابِ اندپوینت/پیلود بر اساسِ حالت (ریویژنِ جدیدِ همان مبنا یا سندِ جدید)
+  var action, payload, label;
   if(_rv.mode==="version"){
-    r=await api("uploadNewVersion",{drawingNumber:_rv.baseNum, note:note, fileBase64:b64, fileName:f.name, mimeType:f.type});
-    if(!r.ok){ toast(r.message||"بارگذاری ناموفق",true); return; }
-    targetNum=_rv.baseNum;
+    action="uploadNewVersion";
+    payload={drawingNumber:_rv.baseNum, note:note, fileBase64:b64, fileName:f.name, mimeType:f.type};
+    label=_rv.baseNum;
   } else {
     var rs=revState(base.clientCode,base.orderNo,base.projectNo,base.partNo,base.typeCode);
-    r=await api("createDocument",{clientCode:base.clientCode, orderNo:base.orderNo, projectNo:base.projectNo,
+    action="createDocument";
+    payload={clientCode:base.clientCode, orderNo:base.orderNo, projectNo:base.projectNo,
         partNo:base.partNo, typeCode:base.typeCode, rev:rs.nextRev, title:note,
-        fileBase64:b64, fileName:f.name, mimeType:f.type});
-    if(!r.ok){ toast(r.message||"بارگذاری ناموفق",true); return; }
-    targetNum=r.drawingNumber;
+        fileBase64:b64, fileName:f.name, mimeType:f.type};
+    label=base.drawingNumber;
   }
-  toast("بارگذاری شد");
-  await refreshDocuments();
+  // آپلود به «مرکز انتقال» می‌رود؛ مودال بلافاصله بسته می‌شود و ارسال برای بازبینی خودکار انجام می‌شود.
   closeModal();
-  // پاپ‌آپ: ارسال برای بازبینی؟ (طبق انتخاب کاربر)
-  if(await uiConfirm("این سند برای بازبینی ارسال شود؟",{okLabel:"ارسال"})){
-    var sr=await api("submitForReview",{drawingNumber:targetNum});
-    if(sr.ok){ toast("برای بازبینی ارسال شد"); await refreshDocuments(); }
-    else toast(sr.message||"ارسال ناموفق",true);
-  }
-  openDocDetail(targetNum);
+  dlEnqueueUpload({
+    label: label, action: action, payload: payload,
+    onSuccess: async function(r){
+      if(!r || !r.ok){ toast((r&&r.message)||"بارگذاری ناموفق",true); return; }
+      var targetNum = r.drawingNumber || _rv.baseNum;
+      toast("بارگذاری شد");
+      var sr=await api("submitForReview",{drawingNumber:targetNum},{silent:true, quiet:true});
+      if(sr && sr.ok) toast("برای بازبینی ارسال شد");
+      await refreshDocuments();
+    }
+  });
 }

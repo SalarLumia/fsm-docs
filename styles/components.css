@@ -16,7 +16,8 @@
   font-size:14px;line-height:1;margin-inline-end:6px;vertical-align:middle}
 
 /* ===== اسکلت بارگذاری (shimmer) ===== */
-@keyframes sk-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+/* جاروبِ اسکلت راست‌به‌چپ (هماهنگ با سایتِ فارسی/RTL) */
+@keyframes sk-shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 .sk{background:linear-gradient(90deg,#eeede9 25%,#f6f5f2 37%,#eeede9 63%);background-size:200% 100%;
   animation:sk-shimmer 1.4s ease-in-out infinite;border-radius:8px;display:block}
 .sk-num{height:26px;width:64%;margin-top:6px}
@@ -140,7 +141,7 @@ th.sortable.active{color:var(--brand)}
 /* ===== اسکلت لودینگ ===== */
 .skeleton{background:linear-gradient(90deg,#eeede9 25%,#f6f5f2 37%,#eeede9 63%);
   background-size:400% 100%;animation:sk-shine 1.3s ease infinite;border-radius:8px}
-@keyframes sk-shine{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@keyframes sk-shine{0%{background-position:-100% 0}100%{background-position:100% 0}}
 
 /* ===== توست ===== */
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:90;
@@ -157,17 +158,20 @@ th.sortable.active{color:var(--brand)}
   background:#000000aa;padding:8px 20px;border-radius:20px}
 @keyframes ld-spin{to{transform:rotate(360deg)}}
 
-/* ===== مرکز دانلود (پنلِ شناورِ صفِ دانلود) ===== */
-.dl-center{position:fixed;inset-inline-start:22px;bottom:22px;z-index:85;width:330px;
-  max-width:calc(100vw - 44px);background:var(--card);border:1px solid var(--line);
-  border-radius:var(--radius);box-shadow:0 14px 44px #00000026;overflow:hidden;
-  color:var(--txt);display:none}
-.dl-center.show{display:block;animation:dlIn .24s ease}
-@keyframes dlIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+/* ===== مرکز انتقال (دراپ‌داونِ زیرِ دکمهٔ هدر، سبکِ مرورگر) ===== */
+.dl-center{position:absolute;top:calc(100% + 10px);left:0;z-index:88;width:330px;
+  max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:0 14px 44px #00000026;overflow:hidden;color:var(--txt);
+  transform-origin:top left;opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none;
+  transition:opacity .18s ease,transform .2s cubic-bezier(.2,0,0,1)}
+.dl-center.open{opacity:1;transform:none;pointer-events:auto}
+@media(max-width:520px){.dl-center{position:fixed;top:58px;left:16px;right:16px;width:auto}}
 .dl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;
-  padding:10px 12px;background:var(--panel);border-bottom:1px solid var(--line);
-  cursor:pointer;user-select:none}
-.dl-center.min .dl-head{border-bottom:none}
+  padding:10px 12px;background:var(--panel);border-bottom:1px solid var(--line);user-select:none}
+.dl-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px 16px;
+  color:var(--muted);font-size:12.5px}
+.dl-empty svg{width:26px;height:26px;fill:none;stroke:var(--muted);stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;opacity:.7}
 .dl-title{display:flex;align-items:center;gap:8px;font-weight:600;font-size:13px}
 .dl-title svg{width:16px;height:16px;fill:none;stroke:var(--brand);stroke-width:2;
   stroke-linecap:round;stroke-linejoin:round}
@@ -181,7 +185,6 @@ th.sortable.active{color:var(--brand)}
 .dl-iconbtn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;
   stroke-linecap:round;stroke-linejoin:round}
 .dl-list{max-height:320px;overflow-y:auto;padding:6px}
-.dl-center.min .dl-list{display:none}
 .dl-item{display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:9px}
 .dl-item:hover{background:var(--panel)}
 .dl-fileic{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
@@ -198,11 +201,55 @@ th.sortable.active{color:var(--brand)}
 .dl-state{font-size:11.5px;color:var(--muted);margin-top:2px}
 .dl-state.ok{color:var(--ok)} .dl-state.err{color:var(--err)}
 .dl-bar{margin-top:6px;height:5px;background:var(--panel2);border-radius:4px;overflow:hidden;position:relative}
-.dl-fill{display:block;height:100%;background:var(--brand);border-radius:4px;transition:width .2s ease}
-.dl-bar.indet .dl-fill{position:absolute;top:0;bottom:0;width:45%;left:-45%;transition:none;
+/* نوارِ پیشرفت راست‌به‌چپ (هماهنگ با کلِ سایتِ RTL): پُرشدنِ معیّن از سمتِ راست، و
+   جاروبِ نامعیّن هم از راست به چپ حرکت می‌کند. */
+.dl-fill{position:absolute;top:0;bottom:0;right:0;height:100%;background:var(--brand);border-radius:4px;transition:width .2s ease}
+.dl-bar.indet .dl-fill{width:45%;right:-45%;left:auto;transition:none;
   animation:dlSweep 1.1s ease-in-out infinite}
-@keyframes dlSweep{0%{left:-45%}100%{left:100%}}
+@keyframes dlSweep{0%{right:-45%}100%{right:100%}}
 .dl-acts{display:flex;align-items:center;gap:1px;flex-shrink:0}
+/* کارتِ آپلود: آیکونِ نارنجیِ برند حینِ فعالیت (سبکِ کنوا) */
+.dl-item.up .dl-fileic.up{background:#fff3e6;border-color:#fbcf88}
+.dl-item.up .dl-fileic.up svg{stroke:var(--brand)}
+.dl-item.up.done .dl-fileic{background:var(--ok-bg);border-color:var(--ok-line)}
+.dl-item.up.done .dl-fileic svg{stroke:var(--ok)}
+/* ورودِ آبشاریِ هر کارت + پرشِ کوچکِ آیکون هنگامِ کامل‌شدن (انیمیشن‌های کنوا) */
+.dl-item{animation:dlItemIn .22s cubic-bezier(.2,0,0,1)}
+@keyframes dlItemIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.dl-item.done .dl-fileic{animation:dlPop .34s cubic-bezier(.2,1.4,.4,1)}
+@keyframes dlPop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+/* ===== نشانگرِ «مرکز انتقال» در هدر (سمتِ چپ) ===== */
+.xfer-wrap{position:relative;display:inline-flex}
+.xfer-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
+  border:1px solid var(--line);background:var(--card);border-radius:9px;cursor:pointer;color:var(--muted);
+  padding:0;transition:border-color .15s,color .15s,background .15s}
+.xfer-btn:hover,.xfer-btn.open{border-color:var(--brand);color:var(--brand);background:#fff8f0}
+.xfer-btn.busy{border-color:var(--brand);color:var(--brand)}
+.xfer-btn.alldone{border-color:var(--ok-line);color:var(--ok);background:var(--ok-bg)}
+.xfer-btn.err{border-color:var(--err-line);color:var(--err);background:var(--err-bg)}
+.xfer-ic{position:relative;width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center}
+/* آیکونِ ثابتِ «انتقال» (فلشِ بالا+پایین) — شکل هرگز عوض نمی‌شود؛ فقط رنگِ دکمه بسته به وضعیت
+   تغییر می‌کند: پیش‌فرض خاکستری، در حال انجام نارنجی (.busy)، موفقِ ندیده سبز (.alldone)، خطای ندیده قرمز (.err). */
+.xfer-btn .xfer-glyph{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+/* حلقهٔ چرخانِ دورِ آیکون هنگامِ فعالیت */
+.xfer-ring{position:absolute;inset:-4px;border-radius:50%;border:2px solid transparent;pointer-events:none;opacity:0}
+.xfer-btn.busy .xfer-ring{opacity:1;border-top-color:var(--brand);border-right-color:var(--brand);
+  animation:xferSpin .8s linear infinite}
+@keyframes xferSpin{to{transform:rotate(360deg)}}
+/* شمارندهٔ گوشه */
+.xfer-badge{position:absolute;top:-6px;inset-inline-end:-6px;min-width:16px;height:16px;padding:0 4px;
+  box-sizing:border-box;display:none;align-items:center;justify-content:center;border-radius:9px;
+  background:var(--brand);color:#fff;font-size:10px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;
+  box-shadow:0 0 0 2px var(--card)}
+.xfer-btn.busy .xfer-badge,.xfer-btn.err .xfer-badge{display:inline-flex}
+.xfer-btn.err .xfer-badge{background:var(--err)}
+@media(prefers-reduced-motion:reduce){
+  .dl-item,.dl-item.done .dl-fileic{animation:none}
+  .dl-center{transition:opacity .1s}
+  .xfer-btn.busy .xfer-ring{animation-duration:1.6s}
+}
 
 /* ===== مودال ===== */
 .modal{position:fixed;inset:0;background:#0000007a;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}

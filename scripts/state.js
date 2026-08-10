@@ -156,9 +156,8 @@ function fmtClockHTML(d){
   var day = d.toLocaleDateString("fa-IR",{day:"numeric"});
   var mon = d.toLocaleDateString("fa-IR",{month:"long"});
   var yr  = d.toLocaleDateString("fa-IR",{year:"numeric"});
-  var time= d.toLocaleTimeString("fa-IR",{hour:"2-digit",minute:"2-digit"});
   var date= wd+" "+day+" "+mon+" "+yr;
-  return '<bdi>'+esc(date)+'</bdi><span class="clk-sep">—</span><bdi>'+esc(time)+'</bdi>';
+  return '<bdi>'+esc(date)+'</bdi>';   // فقط تاریخ (ساعت حذف شد)
 }
 
 /* ================= نقش، جنسیت، وضعیت ================= */
@@ -169,8 +168,8 @@ function honorific(gender){ return gender==="female"?"خانم":(gender==="male"
 function statusInfo(status){
   var s=String(status||"").toLowerCase();
   if(s==="approved"||s==="active") return {cls:"badge-approved",label:"تأیید"};
-  if(s==="pending")  return {cls:"badge-pending", label:"در انتظار"};
-  if(s==="rejected") return {cls:"badge-rejected",label:"رد"};
+  if(s==="pending")  return {cls:"badge-pending", label:"بازبینی"};   /* یکی‌شده با تگِ رویدادِ «بازبینی» (هم‌مفهوم) */
+  if(s==="rejected") return {cls:"badge-rejected",label:"عدم تایید"};
   return {cls:"badge-draft",label:"ایجادشده"};
 }
 /* آیکونِ اختصاصیِ هر بج (جایگزینِ نقطهٔ عمومی) — بر اساسِ کلاسِ بج انتخاب می‌شود */

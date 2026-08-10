@@ -126,33 +126,39 @@ function toggleProjCard(head){
 function wfActionBadge(action){
   var a=String(action||"").toLowerCase();
   var map={ approved:{cls:"badge-approved",label:"تأیید"},
-            rejected:{cls:"badge-rejected",label:"رد"},
+            rejected:{cls:"badge-rejected",label:"عدم تایید"},
             submitted:{cls:"badge-pending",label:"بازبینی"},
             newversion:{cls:"badge-draft",label:"نسخهٔ جدید"},
             created:{cls:"badge-draft",label:"ایجاد"},
-            revision:{cls:"badge-draft",label:"ایجاد"} };
+            revision:{cls:"badge-draft",label:"ایجاد"},
+            deleted:{cls:"badge-rejected",label:"حذف"},          // حذفِ نرم (به سطلِ زباله، قابلِ بازیابی)
+            restored:{cls:"badge-approved",label:"بازیابی"},      // بازگردانده‌شده از سطلِ زباله
+            purged:{cls:"badge-rejected",label:"حذف دائمی"} };    // حذفِ همیشگی (معمولاً توسطِ «سامانه»)
   return map[a] || { cls:"badge-draft", label:workflowActionLabel(a) };
 }
 /* یک ردیفِ فعالیت = یک رویدادِ گردش‌کار (ثبت/ارسال/تأیید/رد/بارگذاریِ نسخه) */
 function activityItemHTML(ev, isLast, asCard){
   var d=docByNumber(ev.drawingNumber);
-  var who=ev.user?(' · '+esc(userName(ev.user))):'';
+  var meName=ev.user?esc(userName(ev.user)):'';
   var b=wfActionBadge(ev.action);
   var ctx=d?esc(docPhrase(d)):'';   // زمینه (نوع/قطعه/پروژه/مشتری)؛ اگر سند حذف شده باشد، فقط شماره
+  // قانون: نامِ انجام‌دهنده همیشه در خطِ دومِ توضیحات بیاید — توضیح در خطِ اول (یک‌خطی)، نام زیرِ آن.
+  var meta = (ctx?'<span class="act-desc" title="'+ctx+'">'+ctx+'</span>':'')+
+             (meName?'<span class="act-who">'+meName+'</span>':'');
   if(asCard){
     // نسخهٔ کارت (مودالِ «همهٔ فعالیت‌ها») — هم‌شکلِ کارتابل بازبینی
     return '<div class="rq-item">'+
       '<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>'+
       '<div class="rq-main"><div class="rq-num mono" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+
-        '<div class="rq-meta">'+ctx+who+'</div></div>'+
+        '<div class="rq-meta">'+meta+'</div></div>'+
       '<div class="rq-aside"><span class="rq-date">'+fmtDate(ev.timestamp)+'</span>'+
-        badgeHTML(b.cls, b.label)+'</div>'+
+        badgeHTML("wf-badge "+b.cls, b.label)+'</div>'+
       '</div>';
   }
   return '<div class="tl-item">'+
     '<div class="tl-marker"><div class="tl-dot"></div><div class="tl-line"></div></div>'+
     '<div class="tl-body"><div class="tl-num" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+
-    '<div class="tl-meta">'+ctx+who+badgeHTML("tl-badge "+b.cls, b.label)+'</div></div>'+
+    '<div class="tl-meta">'+meta+badgeHTML("tl-badge wf-badge "+b.cls, b.label)+'</div></div>'+
     '<div class="tl-date">'+fmtDate(ev.timestamp)+'</div>'+
     '</div>';
 }

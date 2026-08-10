@@ -453,7 +453,7 @@ function updateRevMode(){
   if(!(c&&o&&pr&&pt&&ty)){ if(note){ note.hidden=true; note.innerHTML=""; } if(submitBtn) submitBtn.disabled=false; _newDocBlocked=false; return; }
   var rs=revState(c,o,pr,pt,ty), msg="", cls="nd-revnote";
   if(rs.mode==="new"){          // هیچ نسخهٔ قبلی نیست → این نسخه Rev 00
-    msg='هیچ نسخهٔ قبلی‌ای از این سند در آرشیوِ اسناد موجود نیست؛ این نسخه <b>Rev 00</b> از این سند محسوب می‌شود.';
+    msg='هیچ نسخهٔ قبلی‌ از این سند در آرشیوِ اسناد موجود نیست؛ این نسخه <b>Rev 00</b> از این سند محسوب می‌شود.';
     if(submitBtn) submitBtn.disabled=false; _newDocBlocked=false;
   } else if(rs.mode==="revision"){   // یک نسخهٔ قبلی (تأییدشده) هست → ارجاع به همان یک نسخهٔ قبلی
     msg='در آرشیوِ اسناد، نسخهٔ <b>Rev '+esc(pad2(revFmt(rs.maxRev)))+'</b> این سند قبلاً بارگذاری شده است؛ پس این نسخهٔ جدید <b>Rev '+esc(pad2(rs.nextRev))+'</b> نام‌گذاری خواهد شد.';
@@ -531,17 +531,22 @@ async function submitDocument(){
     if(usdzF){ if(usdzF.size>25*1024*1024){ toast("حجم فایل USDZ بیش از ۲۵ مگابایت است.",true); return; }
       payload.usdzBase64=await fileToBase64(usdzF); payload.usdzName=usdzF.name; payload.usdzMime=usdzF.type; }
   }
-  toast("در حال ثبت…");
-  var r=await api("createDocument",payload);
-  if(!r.ok){ toast(r.message||"ثبت ناموفق بود.",true); return; }
-  toast("ثبت شد: "+r.drawingNumber);
-  await refreshDocuments();
+  // آپلود به «مرکز انتقال» می‌رود (غیرمسدودکننده)؛ مودال بلافاصله بسته می‌شود و سایت آزاد می‌ماند.
+  // ارسال برای بازبینی به‌صورتِ پیش‌فرض و خودکار پس از ثبت انجام می‌شود (بدونِ پرسش).
   ndReset(); closeNewDocModal();
-  if(await uiConfirm("این سند برای بازبینی ارسال شود؟",{okLabel:"ارسال"})){
-    var sr=await api("submitForReview",{drawingNumber:r.drawingNumber});
-    if(sr.ok){ toast("برای بازبینی ارسال شد"); await refreshDocuments(); }
-    else toast(sr.message||"ارسال ناموفق",true);
-  }
+  dlEnqueueUpload({
+    label: n,                       // شمارهٔ سند به‌عنوانِ برچسبِ کارت
+    action: "createDocument",
+    payload: payload,
+    onSuccess: async function(r){
+      if(!r || !r.ok){ toast((r&&r.message)||"ثبت ناموفق بود.",true); return; }
+      toast("ثبت شد: "+r.drawingNumber);
+      // ارسالِ خودکار برای بازبینی (پیش‌فرضِ فعال)
+      var sr=await api("submitForReview",{drawingNumber:r.drawingNumber},{silent:true, quiet:true});
+      if(sr && sr.ok) toast("برای بازبینی ارسال شد");
+      await refreshDocuments();
+    }
+  });
 }
 
 /* ================= مودالِ ثبت سند ================= */

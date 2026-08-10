@@ -98,6 +98,10 @@
 @media(max-width:900px){.spec-groups{grid-template-columns:1fr}}
 .spec-group{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fcfcfb;
   display:flex;flex-direction:column}
+/* فلاشِ کوتاه هنگام ناوبری به یک قطعهٔ خاص از آرشیو (navGoPart) */
+.spec-group.pd-flash{animation:pdFlash 1.6s ease}
+@keyframes pdFlash{0%,100%{box-shadow:0 0 0 0 rgba(247,148,31,0)}18%{box-shadow:0 0 0 3px rgba(247,148,31,.38)}}
+@media(prefers-reduced-motion:reduce){.spec-group.pd-flash{animation:none}}
 .spec-hd{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3)}
 .spec-name{font-size:13px;font-weight:700;color:var(--txt);flex:1;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -145,8 +149,8 @@ button.doc-ic:hover:not(:disabled){border-color:var(--brand);background:#fff8f0;
 button.doc-ic:active{transform:translateY(1px)}
 button.doc-ic:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 button.doc-ic:disabled{cursor:default}
-/* نامِ سند «جواب» است نه پارامتر، پس رنگِ مشکیِ .spec-val را می‌گیرد */
-.doc-name{font-size:11.5px;color:var(--txt);font-weight:500;min-width:0;
+/* نامِ سند در ستونِ راست (جایگاهِ پارامتر) است، پس عیناً کلاسِ فارسیِ استانداردِ این بخش (.spec-label) — خاکستریِ کم‌رنگ */
+.doc-name{font-size:11.5px;color:var(--muted);font-weight:500;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .doc-row.empty .doc-name{color:var(--muted)}
 .doc-acts{flex:1;min-width:0;display:flex;align-items:center;gap:var(--sp-2)}
@@ -236,6 +240,13 @@ button.doc-ic:disabled{cursor:default}
 .mv-pick:hover{background:#fff2e2;color:var(--brand2)}
 .mv-pick.on{color:var(--brand2);background:#fff2e2}
 .mv-pick-hd{align-self:stretch;border-bottom:1px solid var(--line);border-radius:0}
+/* برچسبِ نامِ انگلیسیِ قطعه در مودالِ سند (گوشهٔ بالا-چپ) — هم‌سبکِ منوی شیشه‌ایِ ابزار/انتخاب */
+.mv-partbadge{position:absolute;top:12px;left:12px;z-index:5;direction:ltr;display:flex;align-items:center;gap:7px;
+  padding:6px 11px 6px 9px;background:#ffffffe8;backdrop-filter:blur(6px);border:1px solid var(--line);
+  border-radius:11px;box-shadow:0 3px 14px #0000001f}
+.mv-partbadge svg{width:16px;height:16px;stroke:var(--txt);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin:0 1px}
+.mv-pb-t{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.5px;white-space:nowrap}
+.mv-retry{margin-top:14px}   /* دکمهٔ «تلاش مجدد» بارگذاریِ مدل روی خطا */
 /* دکمهٔ پیش‌فرضِ AR سرکوب می‌شود؛ فعال‌سازی از طریقِ دکمهٔ «واقعیت افزوده» در تولباکس انجام می‌شود */
 .mv-ar{display:none}
 /* پاپ‌آپِ کدِ QRِ واقعیت افزوده (درونِ مودالِ استانداردِ سایت) */

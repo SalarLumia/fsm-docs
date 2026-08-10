@@ -62,6 +62,15 @@
 .dp-actions{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:#fff}
 .dp-actions .btn{flex:1;justify-content:center}
 .doc-side{direction:rtl;padding:18px 18px;overflow:auto;max-height:80vh}
+/* پنجرهٔ جزئیاتِ سند: ارتفاعِ ثابت تا با باز/بسته‌شدنِ یک ریویژن یا زیادشدنِ رکوردها اندازهٔ پنجره تغییر نکند؛
+   فقط ستونِ سمت‌راست (اطلاعات) داخلِ خودش اسکرول می‌شود. روی موبایل، چیدمانِ یک‌ستونه و اسکرولِ کلی می‌ماند. */
+@media(min-width:821px){
+  .modal .box.doc-box{height:min(88vh,820px)}
+  .doc-box .body{overflow:hidden}
+  .doc-box .doc-modal{height:100%;min-height:0}
+  .doc-box .doc-preview{min-height:0}
+  .doc-box .doc-side{max-height:none;min-height:0;height:100%}
+}
 /* بنر رد سند (بالای مشخصات) + مودال ثبت دلیل رد */
 .dm-reject{background:var(--err-bg);border:1px solid var(--err-line);color:var(--err);border-radius:9px;
   padding:9px 12px;font-size:12.5px;line-height:1.7;margin-bottom:14px}
@@ -72,23 +81,29 @@
   font-size:13px;color:var(--txt);resize:vertical;min-height:72px;background:#fff}
 .rej-ta:focus{border-color:var(--brand);box-shadow:0 0 0 3px #f7941f1a;outline:none}
 .rej-acts{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
-.dm-sec{margin-bottom:20px}
-.dm-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
+/* هر بخش (مشخصات/تاریخچه) در باکسِ کارتیِ خودش، هم‌سبکِ بقیهٔ سکشن‌های سایت */
+.dm-sec{margin-bottom:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px 13px;box-shadow:0 1px 3px #00000008}
+.dm-sec:last-child{margin-bottom:0}
+.dm-sec-t{margin:0 0 12px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .dm-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
-.dm-row{display:flex;justify-content:space-between;gap:12px;padding:5px 0;font-size:12px;border-bottom:1px dashed var(--line)}
-.dm-k{color:var(--muted);flex-shrink:0}
+/* فاصله‌گذاری/فونت/جداکننده دقیقاً مثلِ ردیفِ مشخصاتِ پروژه‌ها (.spec-row): پدینگِ ۸px، گپِ ۳۲px، خطِ محوِ #f2f1ee، فونتِ ۱۱٫۵px وزنِ ۵۰۰ */
+.dm-row{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--val-gap);padding:var(--sp-2) 0;font-size:11.5px;border-bottom:1px solid #f2f1ee}
+.dm-sec .dm-row:last-child{border-bottom:none}
+.dm-k{color:var(--muted);flex-shrink:0;font-weight:500}
 .dm-v{color:var(--txt);text-align:left;font-weight:500;min-width:0;word-break:break-word}
+.es-retry{margin-top:14px}   /* دکمهٔ «تلاش مجدد» زیرِ پیامِ خطای پیش‌نمایش */
 
 /* ردیف‌های تاریخچهٔ نسخه‌ها */
 .ver-list{display:flex;flex-direction:column;gap:8px}
-.ver-row{border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;
-  transition:.12s;background:#fff}
-.ver-row:hover{border-color:var(--brand)}
-/* ریویژن فعلی: حاشیهٔ برندِ متقارن (هر چهار طرف یکسان) + پس‌زمینهٔ ملایم */
-.ver-row.cur{border:1.5px solid var(--brand);background:#fff8f0}
-/* ریویژنِ در حال پیش‌نمایش: حلقهٔ سایه — کانال بصری جدا از «فعلی» */
-.ver-row.sel{box-shadow:0 0 0 3px #f7941f22}
+/* ردیفِ ریویژن دقیقاً مثلِ سلولِ پارامترِ پنلِ ثبتِ سند رفتار می‌کند:
+   حالتِ پیش‌فرض (انتخاب‌نشده) = سفید با کادرِ ۱px طوسی؛ هاور = کادرِ ذغالی (مثلِ .nd-chip). */
+.ver-row{border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;
+  transition:border-color .25s,background .25s;background:#fff}
+.ver-row:hover{border-color:var(--charcoal)}
+/* ریویژنِ در حال پیش‌نمایش = سلولِ «تنظیم‌شده»: کادرِ ۱px نارنجی + پس‌زمینهٔ نارنجیِ کم‌رنگ (#fff8f0)، هاورِ نارنجی */
+.ver-row.sel{border-color:var(--brand);background:#fff8f0}
+.ver-row.sel:hover{border-color:var(--brand)}
 .ver-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .ver-rev{font-size:12.5px;font-weight:700;color:var(--txt)}
 .ver-latest{font-size:10px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line);
@@ -97,12 +112,16 @@
 .ver-acts{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 
 /* ردیف ریویژن: سرِ آکاردئونی + زیرسطرِ متادیتا/اکشن + گردش‌کارِ اکسپند‌شونده */
+/* گروهِ انتهایِ سر (اکشن‌ها + فلش) به سمتِ چپ رانده می‌شود؛ حذف/تأیید/رد و فلش در یک خط با شماره */
+.ver-head-end{display:flex;align-items:center;gap:8px;margin-inline-start:auto;flex-shrink:0}
 .ver-chev{display:inline-flex;flex-shrink:0}
 .ver-chev svg{width:14px;height:14px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
 .ver-row.open .ver-chev svg{transform:rotate(180deg)}
-.ver-sub{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:6px}
-.ver-wf{display:none;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)}
-.ver-row.open .ver-wf{display:block}
+/* گردش‌کار: باز/بسته‌شدنِ روان (grid 0fr→1fr) هم‌سبکِ آکاردئون‌های سایت */
+.ver-wf{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.2,0,0,1)}
+.ver-row.open .ver-wf{grid-template-rows:1fr}
+.ver-wf-in{min-height:0;overflow:hidden}
+.ver-wf-sep{height:1px;background:var(--line);margin:12px 0}   /* خطِ جداکنندهٔ پیوسته (نه خط‌چین) هم‌سبکِ زیرِ تیتر */
 .ver-note{font-size:12px;color:var(--txt);background:#faf9f7;border:1px solid var(--line);border-radius:8px;
   padding:7px 10px;margin-bottom:10px;line-height:1.7}
 .ver-note b{color:var(--txt)}
@@ -112,10 +131,17 @@
 .wf-timeline{display:flex;flex-direction:column;padding:4px 2px 0}
 .wf-step{display:flex;align-items:stretch;gap:10px}
 .wf-rail{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px}
-.wf-ring{width:11px;height:11px;border-radius:50%;border:2px solid #d3d1cc;background:#ececea;
+.wf-ring{position:relative;width:11px;height:11px;border-radius:50%;border:2px solid #d3d1cc;background:#ececea;
   box-sizing:border-box;flex-shrink:0;margin-top:4px;z-index:1}
 .wf-step.done .wf-ring{background:var(--wf,var(--brand));border-color:var(--wf,var(--brand))}
-.wf-line{flex:1;width:2px;background:var(--line);min-height:20px;margin:3px 0;border-radius:1px}
+/* مرحلهٔ فعلی: حلقهٔ شعاعیِ متحرک، دقیقاً مثلِ نقطهٔ فعالیتِ اخیرِ داشبورد (.tl-dot) */
+.wf-step.active .wf-ring::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--wf,var(--brand));transform:translate(-50%,-50%) scale(.4);opacity:.6;pointer-events:none;
+  animation:wfPing 1.7s cubic-bezier(0,0,.2,1) infinite}
+@keyframes wfPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
+@media(prefers-reduced-motion:reduce){.wf-step.active .wf-ring::after{animation:none;opacity:0}}
+/* فاصلهٔ برابرِ خطِ عمودی بین دو نقطهٔ متوالی: بالای خط ۶px، پایینِ خط ۲px + ۴px margin-topِ نقطهٔ بعدی = ۶px */
+.wf-line{flex:1;width:2px;background:var(--line);min-height:20px;margin:6px 0 2px;border-radius:1px}
 .wf-body{flex:1;min-width:0;padding-bottom:16px}
 .wf-label{font-size:13px;font-weight:700;color:var(--txt)}
 .wf-step.todo .wf-label{color:var(--muted);font-weight:600}
@@ -581,23 +607,299 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 
 /* ===== آرشیو: هم‌ترازیِ «چرمِ جدول» با استانداردِ جدول‌های تنظیمات =====
    خطِ جداکنندهٔ ردیف‌ها همان روشنِ #f2f1ee (خطِ زیرِ تیتر پررنگ می‌ماند) + نوارِ اسکرولِ باریک (افقی و عمودی). */
+.arch-table{border-collapse:separate;border-spacing:0}   /* مدلِ جدا تا خطِ موییِ سفیدِ وسطِ کارت (ناشی از collapse) پیش نیاید و جداکننده‌ها دقیق کنترل شوند */
 .arch-table td{border-bottom-color:#f2f1ee}
-#tab-archive .tablewrap::-webkit-scrollbar{width:9px;height:9px}
-#tab-archive .tablewrap::-webkit-scrollbar-thumb{background:#d9d8d4;border-radius:6px}
-#tab-archive .tablewrap::-webkit-scrollbar-track{background:transparent}
-/* همهٔ ستون‌ها وسط‌چین (تیتر + داده) */
+/* بدونِ اسکرولِ داخلی: با اکسپندِ هر ردیف، ارتفاعِ کلِ بخش زیاد می‌شود و اسکرول‌بار حذف است */
+#tab-archive .tablewrap{max-height:none;overflow:hidden}
+#tab-archive .arch-table thead th{position:static}
+/* همهٔ ستون‌ها وسط‌چین (تیتر + داده)؛ فونتِ یک‌دستِ ۱۲px برای همهٔ سلول‌های داده */
 .arch-table th,.arch-table td{text-align:center;vertical-align:middle}
+.arch-table tbody td{font-size:12px}
+/* تیترِ چسبان همیشه بالاتر از محتوای بدنه (آیکونِ z-3، خطِ نارنجیِ z-4، بَج/متن‌های z-5)
+   تا هنگام اسکرول، بَجِ سفیدِ بدنه از زیرش رد نشود و پس‌زمینهٔ طوسیِ تیتر بریده/سفید نشود */
+.arch-table thead th{z-index:6}
+/* ردیف کمی جمع‌تر (پدینگِ عمودیِ ۸px)؛ با بَجِ ۳۰px ارتفاعِ ردیف ۴۶px می‌شود و فلشِ وسط‌چین دقیقاً ۸px بالای دکمهٔ دانلود می‌نشیند */
+.arch-row>td{white-space:nowrap;padding-block:8px;
+  transition:padding-top .28s cubic-bezier(.2,0,0,1),padding-bottom .28s cubic-bezier(.2,0,0,1)}
+/* ستونِ نوع (اول) باریک؛ ستونِ کنترل (آخر، چپ‌ترین) باریک با عرضِ ثابت تا فلش و دکمه‌ها هم‌راستا بمانند */
+.arch-table th:first-child,.arch-table td:first-child{width:52px}
+.arch-table th.arch-actcol,.arch-table td.arch-actcol{width:52px;padding-inline:0}   /* فلش وسط‌چینِ عمودی (پیش‌فرضِ جدول) */
 /* المانِ نوعِ سند در راست‌ترین ستون — خطِ نازک‌تر، مثلِ جدولِ «انواع سند» */
 .arch-table .el-badge svg{stroke-width:1}
-/* شماره سند — عیناً سبکِ شمارهٔ سندِ پنلِ پروژه (.doc-num): ۱۱٫۵px/۵۰۰/ltr، هاور برند، کلیک‌پذیر */
-.arch-num{display:inline-block;font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;
-  font-variant-numeric:tabular-nums;letter-spacing:.5px;cursor:pointer;transition:color .12s}
-.arch-num:hover{color:var(--brand)}
-/* کد مشتری — کلیک‌پذیر (به پنلِ مشتری) با هاورِ برند؛ نامِ کامل در تولتیپ */
-.arch-client{display:inline-block;font-weight:500;direction:ltr;cursor:pointer;transition:color .12s}
-.arch-client:hover{color:var(--brand)}
-/* تاریخ — متنِ فرعیِ خاکستریِ وزن‌عادی */
-.arch-date{font-size:11.5px;color:var(--muted)}
+/* هنگامِ اکسپندِ ردیف: آیکونِ نوعِ سند به ۱٫۵ برابر بزرگ می‌شود؛ لبهٔ راست ثابت (۱۱px) و رشد به چپ.
+   translateY(7px): با اندازه‌گیریِ واقعی، فاصلهٔ راست ۲۱px و بالا ۱۷px بود؛ ۴px پایین‌تر → بالا هم ۲۱px، برابرِ راست */
+.arch-table td:first-child .el-badge{transform:translateX(-5px) translateY(0) scale(1);transition:transform .28s cubic-bezier(.2,0,0,1);transform-origin:top right;position:relative;z-index:1}   /* بسته: ۵px چپ */
+.arch-row.open>td:first-child .el-badge{transform:translateX(-6.25px) translateY(8px) scale(1.5);z-index:3}   /* باز: جابه‌جاییِ افقیِ باز/بست باز هم نصف شد (۱٫۲۵px نسبت به حالتِ بسته) */
+@media(prefers-reduced-motion:reduce){.arch-table td:first-child .el-badge{transition:none}}
+/* تیترِ «نوع» ثابت ۵px به چپ (بدونِ انیمیشنِ جابه‌جایی هنگامِ باز/بست) تا بالای آیکون وسط بماند */
+.arch-table thead th:first-child .th-lbl{display:inline-block;transform:translateX(-5px)}
+/* ستونِ شمارهٔ سند (دومین ستون) کاملاً راست‌چین — تیتر و همهٔ متن‌ها به سمتِ راست (نزدیکِ آیکون) */
+.arch-table th:nth-child(2),.arch-table td:nth-child(2){text-align:right;padding-inline-start:24px}
+/* کمی جابه‌جاییِ کلِ ستون به چپ با transform (بدونِ reflow، پس ستون‌های دیگر تکان نمی‌خورند)؛ فقط متنِ تیتر تا پس‌زمینه‌اش نبُرد */
+.arch-table th:nth-child(2) .th-lbl{display:inline-block;transform:translateX(6px)}
+/* ستون‌های مشتری/سفارش/پروژه/قطعه (۳ تا ۶) وسط‌چین — تیتر و هر دو خطِ داده وسط و زیرِ هم (عرضِ ستون با پدینگِ ۱۴px سراسری ثابت می‌ماند، پس بقیه جابه‌جا نمی‌شوند) */
+.arch-table th:nth-child(3),.arch-table td:nth-child(3),
+.arch-table th:nth-child(4),.arch-table td:nth-child(4),
+.arch-table th:nth-child(5),.arch-table td:nth-child(5),
+.arch-table th:nth-child(6),.arch-table td:nth-child(6){text-align:center}
+/* زیرنویسِ این ستون‌ها هم وسط بماند (حتی اگر دو خطی شد) */
+#tab-archive .adg-c-client .arch-date,#tab-archive .adg-c-order .arch-date,
+#tab-archive .adg-c-proj .arch-date,#tab-archive .adg-c-part .arch-date{text-align:center}
+/* شماره سند — عیناً سبکِ شمارهٔ سندِ پنلِ پروژه (.doc-num): ۱۲px/۵۰۰/ltr، هاور برند، کلیک‌پذیر */
+.arch-num{display:inline-block;font-weight:500;color:var(--txt);direction:ltr;
+  font-variant-numeric:tabular-nums;letter-spacing:.5px;cursor:pointer;transform-origin:right;
+  transform:translateX(6px);transition:color .12s,transform .28s cubic-bezier(.2,0,0,1)}
+.arch-row.open .arch-num:hover{color:var(--brand)}   /* هاورِ نارنجی فقط در حالتِ اکسپند */
+/* هنگامِ اکسپند: شمارهٔ سند بزرگ‌تر (و به‌همان‌نسبت ضخیم‌تر) می‌شود و کمی پایین می‌رود تا مرکزش با مرکزِ آیکونِ بزرگ‌شده هم‌ارتفاع بماند
+   translateY: قبلاً ۱۰٫۵px بود؛ چون آیکون ۴px بیشتر پایین رفت، این هم +۴ = 14.5px تا مرکز‌به‌مرکز بماند */
+.arch-row.open .arch-num{transform:translateX(6px) scale(1.1)}
+/* بزرگ‌شدنِ همهٔ مقادیرِ سطرِ اول هنگام اکسپند = فقط scale(1.1) در جای خود (بدونِ جابه‌جاییِ عمودی)
+   تا سطرِ اول بالا بماند و لبهٔ بالای متن هم‌ترازِ لبهٔ بالای آیکون شود */
+.arch-anim{display:inline-block;position:relative;z-index:5;transition:transform .28s cubic-bezier(.2,0,0,1)}
+.arch-row.open .arch-anim{transform:scale(1.1)}
+/* تگِ وضعیت (ستون ۸): نه بزرگ می‌شود نه پایین می‌آید — در خطِ اول ثابت می‌ماند (arch-anim نیست).
+   تاریخ در خطِ دوم زیرِ تگ می‌آید و چون ستون وسط‌چین است و باکسِ زیرنویس به‌اندازهٔ متن جمع می‌شود، خودبه‌خود زیرِ تگ وسط می‌نشیند. */
+.arch-hide{visibility:hidden}   /* ستونِ تاریخِ ادغام‌شده: فقط عرض را نگه می‌دارد تا بقیهٔ ستون‌ها جابه‌جا نشوند */
+.arch-stat{display:inline-block;position:relative}
+/* مقادیرِ سطرِ اول (مشتری/قطعه/سفارش/پروژه) — مطابقِ رفرنس مشکی و پررنگ: رنگِ --txt، وزن ۶۰۰ */
+.arch-client{display:inline-block;font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;
+  letter-spacing:.02em;cursor:pointer;transition:color .12s,transform .28s cubic-bezier(.2,0,0,1)}
+.arch-row.open .arch-client:hover{color:var(--brand)}   /* هاورِ نارنجی فقط در حالتِ اکسپند */
+.arch-row.open .arch-client.arch-anim{transform:scale(1.1)}
+/* سفارش/پروژه راست‌به‌چپ تا «سفارش ۰۱» درست نمایش داده شود (کلمه راست، عدد چپ) */
+.arch-code{font-size:11.5px;font-weight:500;color:var(--txt);direction:rtl;letter-spacing:.02em}
+.arch-cell{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;letter-spacing:.02em}
+/* سلولِ پروژه/قطعه هم مثلِ مشتری/شماره کلیک‌پذیر (فقط در حالتِ اکسپند ناوبری می‌کند) */
+.arch-lnk{transition:color .12s,transform .28s cubic-bezier(.2,0,0,1)}
+.arch-row.open .arch-lnk:hover{color:var(--brand)}   /* هاورِ نارنجی فقط در حالتِ اکسپند */
+/* تاریخ — عیناً برچسب‌های خاکستریِ پنلِ اکسپند (.adg-k): ۱۱٫۵px، وزن ۵۰۰، رنگِ --muted */
+.arch-date{font-size:11.5px;font-weight:500;color:var(--muted)}
+/* فلشِ اکسپندِ ردیف — بالای نوارِ کنترلِ چپ؛ هم‌سبکِ فلشِ جمع/بازِ جدول‌ها */
+.arch-exp{display:inline-grid;place-items:center;width:30px;height:30px;border:none;background:none;
+  cursor:pointer;color:var(--muted);border-radius:7px;transition:color .14s,background .14s,transform .28s cubic-bezier(.2,0,0,1);padding:0}
+.arch-exp:hover{color:var(--brand);background:#fff3e6}
+.arch-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
+.arch-row.open .arch-exp{color:var(--brand);transform:translateY(-16px)}   /* اکسپند: فلش بیشتر به بالا می‌آید (انیمیشنِ بالا رفتن هم‌زمان با چرخشِ فلش) */
+.arch-row.open .arch-exp .chev{transform:rotate(180deg)}   /* باز = فلش رو به بالا */
+.arch-row{cursor:pointer}
+/* ===== پس‌زمینهٔ رکوردِ باز = «کارتِ» نارنجیِ گوشه‌گردِ شناور، فرورفته از خطوطِ جداکننده (مثلِ گزینهٔ فعالِ دراپ‌داون) =====
+   کارت با شبه‌المانِ ::after (z-index:-1، درونِ stacking contextِ tablewrap) کشیده می‌شود تا پشتِ محتوا بماند و آیکونِ بیرون‌زده رویش.
+   خطوطِ جداکننده از border واقعیِ سلول‌ها می‌آید (صاف و تمام‌عرض). گوشه‌های بالا روی ردیفِ اصلی، پایین روی ردیفِ جزئیات. */
+#archiveBody tr:hover>td{background:transparent}
+/* هاورِ ردیفِ بسته: همان کارتِ نارنجیِ گوشه‌گردِ فرورفته (تک‌ردیف، هر چهار گوشه) — بدونِ انیمیشن؛ خطِ جداکننده (border سلول) دست‌نخورده می‌ماند */
+#archiveBody .arch-row.hov:not(.open)>td{background:transparent;position:relative}
+#archiveBody .arch-row.hov:not(.open)>td::after{content:"";position:absolute;z-index:-1;background:#fff3e6;
+  top:5px;right:0;bottom:5px;left:0;pointer-events:none}
+#archiveBody .arch-row.hov:not(.open)>td:first-child::after{right:8px;border-top-right-radius:12px;border-bottom-right-radius:12px}
+#archiveBody .arch-row.hov:not(.open)>td.arch-actcol::after{left:8px;border-top-left-radius:12px;border-bottom-left-radius:12px}
+/* tablewrap یک stacking context تا کارتِ z-index:-1 پشتِ .card پنهان نشود ولی آیکونِ بیرون‌زده رویش بماند */
+#tab-archive .tablewrap{position:relative;z-index:0}
+/* پس‌زمینهٔ سلولِ باز شفاف؛ خطوطِ جداکننده از border سلول‌ها می‌آید = صاف و تمام‌عرض (بالا: border ردیفِ قبلی؛ پایین: border ردیفِ جزئیات) */
+.arch-row.open>td{background:transparent;position:relative;padding-top:24px;padding-bottom:3px;border-bottom-width:0}   /* ۱۲px گپ + ۱۲px حاشیهٔ نارنجیِ بالای خطِ اول ⟵ سلول بلندتر، اندازهٔ کارت مثلِ قبل */
+.arch-detail.open>td{background:transparent;position:relative;border-bottom:1px solid #f2f1ee}
+/* بدنهٔ کارت (شبه‌المانِ شناور): فرورفتگیِ ۱۲px بالا/پایین و ۸px چپ/راست */
+.arch-row.open>td::after,.arch-detail.open>td::after{content:"";position:absolute;z-index:-1;background:#fff3e6;
+  top:0;right:0;bottom:0;left:0;pointer-events:none}
+.arch-row.open>td::after{top:6px}      /* کادرِ نارنجی ۶px بالاتر می‌رود (نزدیک‌تر به مرزِ بالایی سلول) — بدونِ تغییرِ ارتفاعِ سلول یا جای محتوا */
+.arch-detail.open>td::after{bottom:6px}   /* و ۶px پایین‌تر ⟵ نزدیک‌تر به مرزِ پایینی سلول */
+.arch-row.open>td:first-child::after,.arch-detail.open>td:first-child::after{right:8px}
+.arch-row.open>td.arch-actcol::after,.arch-detail.open>td.arch-actcol::after{left:8px}
+/* گوشه‌های گرد — بالا روی ردیفِ اصلی، پایین روی ردیفِ جزئیات */
+.arch-row.open>td:first-child::after{border-top-right-radius:12px}
+.arch-detail.open>td:first-child::after{border-bottom-right-radius:12px}
+.arch-row.open>td.arch-actcol::after{border-top-left-radius:12px}
+.arch-detail.open>td.arch-actcol::after{border-bottom-left-radius:12px}
+/* ردیفِ جزئیات: پایه بدونِ border/پس‌زمینه؛ vertical-align:top */
+.arch-detail>td{padding:0;border:none;background:transparent;vertical-align:top}
+/* نشانگرِ نارنجیِ لبهٔ راست — کنارِ لبهٔ راستِ کارت (۸px تو رفته) */
+.arch-detail>td:first-child{position:relative}
+.arch-detail>td:first-child::before{content:"";position:absolute;inset-inline-start:8px;top:-28px;bottom:30px;z-index:4;   /* پایین ۱۰px بالاتر ⟵ نوار کوتاه‌تر و مرکزش هم‌ارتفاعِ مرکزِ آیکونِ سند */
+  width:3px;border-radius:3px;background:var(--brand);pointer-events:none;transform-origin:center;
+  transform:scaleY(0);transition:transform .28s cubic-bezier(.2,0,0,1)}
+.arch-detail.open>td:first-child::before{transform:scaleY(1)}   /* فقط رشدِ عمودی در همان جای نهایی (بدونِ لغزشِ افقی از بیرونِ کادر) */
+/* اکسپندِ آکاردئونیِ هر سلول (grid 0fr→1fr، هم‌زمان) */
+.arch-det-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.2,0,0,1)}
+.arch-detail.open .arch-det-wrap{grid-template-rows:1fr}
+.arch-det-in{min-height:0;overflow:hidden}
+/* سطر دوم: پدینگِ بالا کم تا فاصلهٔ کمِ سطر اول‑دوم؛ باکس زیرِ تیترِ همان ستون قرار می‌گیرد */
+.arch-det-pad{padding:0 0 20px}   /* ۱۲px گپ + ۸px حاشیهٔ نارنجیِ زیرِ خطِ دوم ⟵ سلول بلندتر، کارت مثلِ قبل */
+/* متنِ فارسیِ زیرِ هر ستون از کلاسِ موجودِ .arch-date (خاکستری ۱۱٫۵px/۵۰۰) می‌آید؛ اینجا فقط چیدمان.
+   راست‌نویس، با محدودیتِ عرض (max-width)؛ اگر بیشتر شد به خط بعد می‌رود. باکس زیرِ تیترِ ستون تراز می‌شود */
+.arch-det-pad .arch-date{display:inline-block;vertical-align:top;text-align:right;white-space:normal;line-height:1.35}   /* top به‌جای baseline تا خطِ اولِ زیرنویسِ یک‌خطی و دوخطی هم‌تراز شوند */
+/* تاریخِ زیرِ تگِ وضعیت ۲۰px پایین‌تر — با آفستِ نسبی، پس جای هیچ عنصرِ دیگری جابه‌جا نمی‌شود */
+.arch-detail .adg-c-status .arch-det-pad .arch-date{position:relative;top:10px}
+/* نقطهٔ نارنجی پیش از متن از کلاسِ موجودِ .dot با رنگِ برند */
+.dot.brand{background:var(--brand);vertical-align:middle}
+/* محدودیتِ کاراکترِ هر ستون + هم‌ترازی با تیتر (شماره سند و مشتری هم‌قدرِ جابه‌جاییِ تیترشان) */
+.adg-c-doc    .arch-date{max-width:180px}   /* بدونِ translateX تا نقطهٔ نارنجی زیرِ overflow:hidden بریده نشود */
+.adg-c-client .arch-date{max-width:135px}
+.adg-c-order  .arch-date{max-width:130px}
+.adg-c-proj   .arch-date{max-width:150px}
+.adg-c-part   .arch-date{max-width:105px}
+/* نوارِ دانلود/حذف در آخرین سلول (چپ‌ترین)؛ با margin-top منفی بالاتر می‌آید و ارتفاعِ سلول کم می‌شود */
+/* ستونِ اکشن کلیپ نشود؛ چون بالای این ستون خالی است، دکمه‌ها با marginِ منفی به فضای زیرِ فلش بالا می‌آیند (بدونِ بریدگی) */
+.arch-actcol .arch-det-in{overflow:visible}
+.arch-det-actcol{display:flex;flex-direction:column;align-items:center;gap:var(--sp-1);margin-top:-21px;
+  opacity:0;pointer-events:none;transition:opacity .2s ease,margin-top .28s cubic-bezier(.2,0,0,1)}
+.arch-detail.open .arch-det-actcol{opacity:1;pointer-events:auto}   /* در حالتِ بسته پنهان و غیرفعال؛ در حالتِ باز دیده و کلیک‌پذیر */
+/* ===== جابه‌جاییِ ۵ ستونِ چپ (پروژه/قطعه/تاریخ/وضعیت/عملیات) به سمتِ چپ برای پرکردنِ فضای آزادشده از حذفِ اسکرول‌بار.
+   فقط محتوای سلول (نه خودِ سلول) با position:relative جابه‌جا می‌شود تا پس‌زمینهٔ نارنجی پیوسته بماند و انیمیشن‌ها نخورند.
+   یک مقدارِ واحد (--arch-shift) برای همه ⟵ فاصله‌ها ثابت می‌ماند. */
+#tab-archive{--arch-shift:9px}
+/* سفارش(۴): ۳۰px چپ | پروژه(۵): ۴۵px چپ | قطعه(۶): ۶۹px چپ | تاریخ(۷)/وضعیت(۸): بدونِ تغییر.
+   زیرنویسِ خط دوم روی .arch-det-wrap (بیرونِ overflow:hidden) جابه‌جا می‌شود، نه روی .arch-date، تا متنِ کامل بریده نشود. */
+/* تیترها */
+#tab-archive th:nth-child(4) .th-lbl,#tab-archive th:nth-child(4) .sort-ar{position:relative;right:30px}
+#tab-archive th:nth-child(5) .th-lbl,#tab-archive th:nth-child(5) .sort-ar{position:relative;right:45px}
+#tab-archive th:nth-child(6) .th-lbl,#tab-archive th:nth-child(6) .sort-ar{position:relative;right:69px}
+#tab-archive th:nth-child(8) .th-lbl,#tab-archive th:nth-child(8) .sort-ar{position:relative;right:-21px}   /* وضعیت(۸): از ۹px چپ، ۳۰px راست ⟹ خالص ۲۱px راست */
+/* مقادیرِ سطرِ اول */
+#tab-archive td:nth-child(4) .arch-anim{right:30px}
+#tab-archive td:nth-child(5) .arch-anim{right:45px}
+#tab-archive td:nth-child(6) .arch-anim{right:69px}
+#tab-archive .adg-c-status .arch-stat{right:-21px}
+/* زیرنویسِ سطرِ دوم — روی .arch-det-wrap تا داخلِ overflow بریده نشود */
+#tab-archive .adg-c-order .arch-det-wrap{position:relative;right:30px}
+#tab-archive .adg-c-proj .arch-det-wrap{position:relative;right:45px}
+#tab-archive .adg-c-part .arch-det-wrap{position:relative;right:69px}
+#tab-archive .adg-c-status .arch-det-wrap{position:relative;right:-21px}
+/* ستونِ عملیات (فلش + دکمه‌های دانلود/حذف): ۱۶px به راستِ موقعیتِ فعلی (۹ چپ − ۱۶ = ۷ راست) بدونِ اثر روی ستون‌های دیگر */
+#tab-archive td:nth-child(9) .arch-exp{position:relative;right:calc(var(--arch-shift) - 16px)}
+#tab-archive .arch-detail td.arch-actcol .arch-det-actcol{position:relative;right:calc(var(--arch-shift) - 16px)}
+@media(prefers-reduced-motion:reduce){.arch-det-wrap{transition:none}.arch-exp .chev{transition:none}.arch-detail>td:first-child::before{transition:none}}
+/* ===== فوترِ آرشیو: خروجی (راست) + صفحه‌بندی (چپ) ===== */
+.arch-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);
+  margin-top:12px;padding-top:12px;border-top:1px solid #f2f1ee;flex-wrap:wrap}
+/* دکمهٔ خروجی = همان .btn.sm استانداردِ سایت (مثلِ دکمه‌های متن‌دارِ ویرایش/حذف) */
+/* گروهِ صفحه‌بندی */
+.arch-pager{display:flex;align-items:center;gap:var(--sp-3)}
+.pg-lbl{font-size:11.5px;color:var(--muted);font-weight:500}
+.pg-range{font-size:11.5px;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums;min-width:0}
+/* دراپ‌داونِ سفارشیِ «تعدادِ سطر» — هم‌سبکِ منوی سه‌نقطه‌ای، با گوشهٔ گرد و انیمیشنِ باز/بست */
+.pg-drop{position:relative;display:inline-block}
+.pg-drop-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;border:1px solid var(--line);
+  border-radius:8px;background:#fff;color:var(--txt);font:inherit;font-size:12px;font-weight:600;cursor:pointer;
+  font-variant-numeric:tabular-nums;transition:border-color .15s,background .15s}
+.pg-drop-btn:hover{border-color:var(--brand)}
+.pg-drop.open .pg-drop-btn{border-color:var(--brand);background:#fff8f0}
+.pg-drop-val{min-width:18px;text-align:center}
+.pg-drop-chev{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;
+  color:var(--muted);transition:transform .22s,color .15s}
+.pg-drop.open .pg-drop-chev{transform:rotate(180deg);color:var(--brand)}
+.pg-drop-menu{position:absolute;top:calc(100% + 6px);inset-inline-start:0;width:100%;box-sizing:border-box;background:#fff;
+  border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px #00000022;padding:4px;
+  display:flex;flex-direction:column;gap:2px;z-index:60;transform-origin:top center;
+  transform:translateY(-6px) scale(.95);opacity:0;pointer-events:none;
+  transition:opacity .18s ease,transform .2s cubic-bezier(.2,0,0,1)}
+.pg-drop.open .pg-drop-menu{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+.pg-drop-opt{display:flex;align-items:center;justify-content:center;height:30px;padding:0 6px;
+  border:none;background:none;border-radius:7px;font:inherit;font-size:12px;font-weight:500;color:var(--txt);
+  cursor:pointer;font-variant-numeric:tabular-nums;transition:background .12s,color .12s}
+.pg-drop-opt:hover{background:var(--panel)}
+.pg-drop-opt.selected{background:#fff3e6;color:var(--brand);font-weight:600}
+@media(prefers-reduced-motion:reduce){.pg-drop-menu{transition:opacity .12s}.pg-drop-chev{transition:none}}
+/* ===== نوارِ ابزارِ آرشیو: جستجو + دکمه‌های فیلتر/مرتب‌سازی (مطابقِ رفرنس) ===== */
+.arch-tools{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.arch-search{position:relative;flex:1 1 240px;min-width:200px;max-width:440px}
+.arch-search>svg{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);
+  width:15px;height:15px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.arch-search input{width:100%;height:38px;box-sizing:border-box;padding-inline-start:34px;padding-inline-end:42px;
+  border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--txt);font:inherit;font-size:13px;
+  transition:border-color .15s,box-shadow .15s}
+.arch-search input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #f7941f22}
+.arch-search input::placeholder{color:var(--muted)}
+/* دکمهٔ فیلترِ آیکونیِ داخلِ باکسِ جستجو (سمتِ چپ) — بدونِ transform تا با :activeِ .icon-btn تداخل نکند */
+.arch-filter-btn{position:absolute;inset-inline-end:6px;top:6px;z-index:2}
+.arch-tool-btns{margin-inline-start:auto;display:flex;align-items:center;gap:8px}
+/* آیکونِ مرتب‌سازیِ کنارِ سرستون‌ها — دوفلشهٔ بالا/پایین.
+   داخلِ .th-lbl و absolute تا از جریانِ متن خارج بماند و وسط‌چینیِ تیتر را بر هم نزند؛
+   همیشه با فاصلهٔ کمی سمتِ چپِ متنِ تیتر می‌نشیند. */
+.arch-table th.sortable{cursor:pointer;user-select:none}
+.arch-table th.sortable .th-lbl{position:relative;display:inline-block}
+.sort-ic{position:absolute;top:50%;right:calc(100% + 6px);transform:translateY(-50%);display:inline-flex;line-height:0}
+.sort-ic svg{width:16px;height:16px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.sort-ic .s-up,.sort-ic .s-down{stroke:#c8c6c1;transition:stroke .14s}   /* غیرفعال: خاکستریِ کم‌رنگ */
+.arch-table th.sortable:hover .sort-ic .s-up,.arch-table th.sortable:hover .sort-ic .s-down{stroke:var(--muted)}
+.arch-table th.sortable.active .th-lbl{color:var(--brand)}
+.arch-table th.sortable.asc .sort-ic .s-up{stroke:var(--brand)}
+.arch-table th.sortable.desc .sort-ic .s-down{stroke:var(--brand)}
+/* سلکت‌های مخفیِ فیلتر (منبعِ حقیقت) */
+.arch-filters-hidden{display:none}
+
+/* ردیفِ چیپ‌های فیلترِ فعال */
+.arch-chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px}
+.arch-chips[hidden]{display:none}
+.filt-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 5px 0 11px;box-sizing:border-box;
+  border:1px solid var(--line);border-radius:9px;background:var(--panel);font-size:12.5px;line-height:1}
+.filt-chip .fc-k{color:var(--muted);font-weight:600}
+.filt-chip .fc-v{color:var(--txt);font-weight:700}
+.filt-chip .fc-x{display:inline-grid;place-items:center;width:20px;height:20px;border:none;background:none;
+  border-radius:6px;color:var(--muted);cursor:pointer;transition:background .12s,color .12s}
+.filt-chip .fc-x:hover{background:#0000000d;color:var(--err)}
+.filt-chip .fc-x .ic{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.filt-add{display:inline-grid;place-items:center;width:32px;height:32px;border:1px dashed var(--line);
+  border-radius:9px;background:#fff;color:var(--muted);cursor:pointer;transition:.14s}
+.filt-add:hover{border-color:var(--brand);border-style:solid;color:var(--brand);background:#fff8f0}
+.filt-add .ic{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* پاپ‌اوورِ جامعِ فیلتر — دو پنجرهٔ مستقلِ جدا (هرکدام کادر/سایهٔ خودش، ارتفاعِ مستقل) */
+.filt-pop{position:fixed;z-index:100;display:flex;flex-direction:row;align-items:flex-start;gap:4px;
+  background:none;border:none;box-shadow:none;padding:0;animation:filtPop .16s ease}
+@keyframes filtPop{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+.filt-fields,.filt-panel{display:flex;flex-direction:column;gap:2px;padding:6px;background:#fff;
+  border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px #00000022}
+.filt-fields{min-width:150px}
+.filt-panel{width:320px;box-sizing:border-box;max-height:300px;overflow:auto}   /* عرضِ ثابت برای همهٔ پارامترها */
+.filt-item{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;height:34px;flex:0 0 34px;
+  padding:0 10px;border:none;background:none;border-radius:8px;font:inherit;font-size:12.5px;font-weight:500;
+  color:var(--txt);cursor:pointer;text-align:start;transition:background .12s,color .12s}
+.filt-item:hover,.filt-item.active{background:var(--panel);color:var(--brand)}
+.filt-item .ic{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--muted);flex-shrink:0}
+.filt-item:hover .ic,.filt-item.active .ic{color:var(--brand)}
+.filt-empty{padding:12px 10px;font-size:12px;color:var(--muted);text-align:center;white-space:nowrap}
+/* فیلدِ دارای فیلترِ فعال: برچسبِ نارنجی به‌عنوانِ نشانه */
+.filt-field.has-val>span:first-child{color:var(--brand);font-weight:600}
+/* آیتمِ مقدار: تاگلِ .ed-check + فارسی (راست)، انگلیسی (چپ) */
+.filt-val{padding-inline-end:14px}   /* فاصلهٔ استاندارد بینِ متنِ انگلیسی و لبهٔ چپِ پنل */
+.filt-val .ff-l{display:flex;align-items:center;gap:8px;min-width:0;flex:1 1 auto}
+.filt-val .fv-fa{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filt-val .fv-en{color:var(--muted);font-size:11px;font-weight:600;direction:ltr;letter-spacing:.02em;white-space:nowrap;flex-shrink:0;margin-inline-start:12px}
+.filt-val .fv-tag{flex-shrink:0;margin-inline-start:12px;display:inline-flex}
+.filt-val.sel .fv-fa{color:var(--brand);font-weight:700}
+/* دایرهٔ تاگل داخلِ منوی فیلتر کوچک‌تر از .ed-checkِ سراسری */
+.filt-val .ed-check{width:13px;height:13px}
+.filt-val .ed-check::after{width:5px;height:5px}
+
+/* ===== سطلِ زباله (تبِ اسنادِ حذف‌شده) ===== */
+.rb-body{padding:0}
+.rb-empty{padding:8px}
+.rb-list{display:flex;flex-direction:column;gap:8px}
+.rb-item{display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid var(--line);border-radius:11px;background:#fff}
+/* آیکونِ نوعِ سند = دقیقاً همان المانِ آرشیو (.el-badge با کدِ نوع در وسط)، فقط کمی بزرگ‌تر و وسط‌چینِ عمودی */
+.rb-typeic.el-badge{flex-shrink:0;width:40px;height:40px;border-radius:10px}
+.rb-typeic.el-badge svg{width:28px;height:28px}
+.rb-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.rb-num{font-size:13px;font-weight:700;color:var(--txt);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rb-meta{display:flex;align-items:center;min-width:0;overflow:hidden;font-size:11.5px;color:var(--muted);line-height:1.5}
+.rb-meta>span{white-space:nowrap;flex-shrink:0}
+/* جداکنندهٔ نازک و کم‌رنگِ عمودی بینِ بخش‌های توضیحات (به‌جای نقطه) */
+.rb-sep{flex-shrink:0;width:1px;height:11px;background:var(--line);margin:0 7px;display:inline-block}
+/* تاریخِ حذف و کاربرِ حذف‌کننده — سمتِ چپِ سلول، دو خط زیرِ هم (خطِ اول تاریخ، خطِ دوم کاربر) */
+.rb-aside{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:left}
+.rb-del-date{font-size:11.5px;font-weight:600;color:var(--txt);white-space:nowrap}
+.rb-del-by{font-size:11px;color:var(--muted);white-space:nowrap}
+/* تگِ «روز مانده» با رنگِ نارنجیِ برند؛ ۵ روزِ آخر برای هشدار قرمز می‌شود */
+.rb-days{flex-shrink:0;font-size:11px;font-weight:600;color:var(--brand);background:#fff3e6;
+  border:1px solid #fbcf88;border-radius:20px;padding:3px 10px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rb-days.low{color:var(--err);background:var(--err-bg);border-color:var(--err-line)}
+.rb-acts{flex-shrink:0;display:flex;align-items:center;gap:6px}
+
+.pg-nav{display:flex;align-items:center;gap:2px}
+.pg-btn{display:inline-grid;place-items:center;width:30px;height:30px;border:none;background:none;border-radius:7px;
+  cursor:pointer;color:var(--muted);transition:color .14s,background .14s}
+.pg-btn:hover:not(:disabled){color:var(--brand);background:#fff3e6}
+.pg-btn:disabled{color:#d3d1cd;cursor:default}
+.pg-btn svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* دکمهٔ سه‌نقطه‌ای عملیات */
 .kebab-btn{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;
   border:none;background:none;border-radius:8px;cursor:pointer;color:var(--muted);transition:.12s}

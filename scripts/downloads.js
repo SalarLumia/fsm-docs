@@ -8,50 +8,82 @@
 var _dlJobs = [];      // {id, fileId, label, name, status, pct, loaded, total, blobUrl, msg}
 var _dlSeq  = 0;       // شمارندهٔ یکتای کارها
 var _dlActive = false; // آیا کارگرِ صف مشغولِ یک دانلود است؟
-var _dlMin = false;    // وضعیتِ جمع‌شدهٔ پنل
+var _dlOpen = false;   // آیا دراپ‌داونِ مرکز انتقال باز است؟
+var _dlUnseen = false; // آیا کارِ تمام‌شده‌ای هست که کاربر هنوز پنل را برایش باز نکرده؟ (نشانِ سبز)
+var _dlLastKind = "download"; // نوعِ آخرین کارِ فعال/تمام‌شده — برای آیکونِ دکمه (آپلود/دانلود)
 
 /* افزودنِ یک درخواست به صف. label = برچسبِ نمایشیِ اولیه (معمولاً شمارهٔ سند) تا پیش از رسیدنِ
    نامِ واقعیِ فایل چیزی برای نشان‌دادن باشد. */
 function dlEnqueue(fileId, label){
   if(!fileId){ toast("این مورد فایلی برای دانلود ندارد.",true); return; }
   var id = ++_dlSeq;
-  _dlJobs.push({ id:id, fileId:fileId, label:(label||"سند"), name:"", status:"queued",
+  _dlJobs.push({ id:id, kind:"download", fileId:fileId, label:(label||"سند"), name:"", status:"queued",
                  pct:0, loaded:0, total:0, blobUrl:null, msg:"" });
-  _dlMin=false;   // با افزودنِ کارِ نو، پنل باز شود
-  dlRender();
+  xferOpen();     // با افزودنِ کارِ نو، دراپ‌داون باز شود (+ شنوندهٔ کلیکِ بیرون)
   dlPump();
 }
 
-/* کارگرِ صف: هر بار اولین کارِ «در صف» را برمی‌دارد و کاملش می‌کند، سپس سراغِ بعدی می‌رود. */
+/* افزودنِ یک کارِ آپلود به همان صف/پنل. opts = { label, action, payload, onSuccess(r) }.
+   آپلود در پس‌زمینه انجام می‌شود (با پیشرفتِ واقعیِ XHR) و سایت آزاد می‌ماند. */
+function dlEnqueueUpload(opts){
+  opts=opts||{};
+  var id = ++_dlSeq;
+  _dlJobs.push({ id:id, kind:"upload", label:(opts.label||"سند"), name:(opts.label||"سند"), status:"queued",
+                 pct:0, loaded:0, total:0, processing:false, msg:"",
+                 action:opts.action, payload:opts.payload, onSuccess:opts.onSuccess });
+  xferOpen();
+  dlPump();
+  return id;
+}
+
+/* کارگرِ صف: هر بار اولین کارِ «در صف» را برمی‌دارد و کاملش می‌کند، سپس سراغِ بعدی می‌رود.
+   دو نوعِ کار: دانلود (استریمِ فایل + سپردن به مرورگر) و آپلود (ارسالِ درخواست با پیشرفتِ واقعی). */
 async function dlPump(){
   if(_dlActive) return;
   var job = _dlJobs.filter(function(j){ return j.status==="queued"; })[0];
   if(!job) return;
   _dlActive = true;
-  job.status="working"; job.pct=0; job.loaded=0; job.total=0; job.msg="";
+  job.status="working"; job.pct=0; job.loaded=0; job.total=0; job.processing=false; job.msg="";
   dlRender();
   try{
-    var r = await getFileRetry(job.fileId, { onProgress:function(loaded,total){
-      job.loaded=loaded; job.total=total;
-      if(total>0) job.pct=Math.min(99, Math.round(loaded/total*100));
-      dlProgress(job);   // به‌روزرسانیِ سبکِ فقطِ همان کارت (بدونِ بازسازیِ کلِ فهرست)
-    }});
-    if(!r || !r.ok){
-      job.status="error"; job.msg=(r&&r.message)||"دریافتِ فایل ناموفق بود.";
-      dlRender();
+    if(job.kind==="upload"){
+      var ru = await apiUpload(job.action, job.payload, function(loaded,total){
+        if(loaded<0){ job.processing=true; job.pct=100; dlProgress(job); return; }   // آپلود تمام → پردازشِ سرور
+        job.loaded=loaded; job.total=total;
+        if(total>0) job.pct=Math.min(99, Math.round(loaded/total*100));
+        dlProgress(job);
+      });
+      if(!ru || !ru.ok){ job.status="error"; job.msg=(ru&&ru.message)||"ثبت ناموفق بود."; dlRender(); }
+      else { job.pct=100; job.status="done"; job.result=ru; dlRender();
+             if(typeof job.onSuccess==="function"){ try{ job.onSuccess(ru); }catch(e){} } }
     } else {
-      var blob = b64toBlob(r.base64, r.mimeType);
-      job.name = r.name || (job.label+"");
-      job.mimeType = r.mimeType||"";
-      job.blobUrl = URL.createObjectURL(blob);
-      job.pct = 100; job.status="done";
-      dlRender();
-      dlHandOff(job);   // سپردن به دانلودِ مرورگر
+      var r = await getFileRetry(job.fileId, { onProgress:function(loaded,total){
+        job.loaded=loaded; job.total=total;
+        if(total>0) job.pct=Math.min(99, Math.round(loaded/total*100));
+        dlProgress(job);   // به‌روزرسانیِ سبکِ فقطِ همان کارت (بدونِ بازسازیِ کلِ فهرست)
+      }});
+      if(!r || !r.ok){
+        job.status="error"; job.msg=(r&&r.message)||"دریافتِ فایل ناموفق بود.";
+        dlRender();
+      } else {
+        var blob = b64toBlob(r.base64, r.mimeType);
+        job.name = r.name || (job.label+"");
+        job.mimeType = r.mimeType||"";
+        job.blobUrl = URL.createObjectURL(blob);
+        job.pct = 100; job.status="done";
+        dlRender();
+        dlHandOff(job);   // سپردن به دانلودِ مرورگر
+      }
     }
   }catch(e){
-    job.status="error"; job.msg="خطا در دریافتِ فایل.";
+    job.status="error"; job.msg=(job.kind==="upload")?"خطا در ثبت.":"خطا در دریافتِ فایل.";
     dlRender();
   } finally {
+    if(job.status==="done" || job.status==="error"){
+      _dlLastKind=job.kind;
+      if(!_dlOpen) _dlUnseen=true;   // اگر پنل باز نیست، نشانِ سبز/قرمز تا بازشدنِ پنل بماند
+      dlUpdateHeader();
+    }
     _dlActive=false;
     dlPump();   // کارِ بعدیِ صف (اگر باشد)
   }
@@ -66,7 +98,7 @@ function dlHandOff(job){
   // blobUrl را نگه می‌داریم تا «دانلودِ دوباره» ممکن باشد؛ با حذفِ کارت یا «پاک‌کردن» آزاد می‌شود.
 }
 
-/* ---------- رندرِ پنل ---------- */
+/* ---------- رندرِ پنل (دراپ‌داونِ زیرِ دکمهٔ هدر) ---------- */
 function dlHost(){
   var h=document.getElementById("dlCenter");
   if(!h){ h=document.createElement("div"); h.id="dlCenter"; h.className="dl-center"; document.body.appendChild(h); }
@@ -74,44 +106,54 @@ function dlHost(){
 }
 function dlRender(){
   var host=dlHost();
-  if(!_dlJobs.length){ host.className="dl-center"; host.innerHTML=""; return; }
   var activeN=_dlJobs.filter(function(j){ return j.status==="working"||j.status==="queued"; }).length;
   var doneN =_dlJobs.filter(function(j){ return j.status==="done"; }).length;
-  var title = activeN ? ("در حال دانلود ("+activeN+")") : "دانلودها";
-  host.className="dl-center show"+(_dlMin?" min":"");
+  var title = activeN ? ("در حال انتقال ("+faN(activeN)+")") : "انتقال‌ها";
+  host.className="dl-center"+(_dlOpen?" open":"");
+  var listHTML = _dlJobs.length
+    ? '<div class="dl-list">'+_dlJobs.map(dlItemHTML).join("")+'</div>'
+    : '<div class="dl-empty">'+DL_IC.center+'<span>انتقالی وجود ندارد</span></div>';
   host.innerHTML=
-    '<div class="dl-head" onclick="dlToggleMin()" title="'+(_dlMin?"بازکردن":"جمع‌کردن")+'">'+
+    '<div class="dl-head">'+
       '<span class="dl-title">'+DL_IC.center+'<span>'+esc(title)+'</span></span>'+
-      '<div class="dl-head-acts" onclick="event.stopPropagation()">'+
+      '<div class="dl-head-acts">'+
         (doneN? '<button class="dl-textbtn" onclick="dlClearDone()" title="پاک‌کردنِ کامل‌شده‌ها">پاک‌کردن</button>':'')+
-        '<button class="dl-iconbtn" onclick="dlToggleMin()" title="'+(_dlMin?"بازکردن":"جمع‌کردن")+'" aria-label="جمع/باز">'+
-          (_dlMin?DL_IC.up:DL_IC.down)+'</button>'+
       '</div>'+
-    '</div>'+
-    '<div class="dl-list">'+_dlJobs.map(dlItemHTML).join("")+'</div>';
+    '</div>'+listHTML;
+  dlUpdateHeader();
 }
 
+/* متنِ وضعیتِ یک کار — بسته به نوع (آپلود/دانلود) و مرحله */
+function dlStateText(j){
+  var up=(j.kind==="upload");
+  if(j.status==="queued")  return "در صف…";
+  if(j.status==="working"){
+    if(up){ if(j.processing) return "در حال پردازش…";
+            return j.total>0 ? ("در حال بارگذاری… "+faN(j.pct)+"٪")
+                             : "در حال بارگذاری…"; }   /* آپلود درصدِ واقعی ندارد (محدودیتِ Apps Script) → نوارِ نامعیّن */
+    return j.total>0 ? ("در حال دریافت… "+faN(j.pct)+"٪")
+                     : ("در حال دریافت… "+(j.loaded/1048576).toFixed(1)+" MB");
+  }
+  if(j.status==="done") return up ? "بارگذاری شد" : "دریافت شد";
+  return j.msg || "ناموفق";
+}
 function dlItemHTML(j){
+  var up=(j.kind==="upload");
   var name = esc(j.name||j.label);
-  var state, cls="";
-  if(j.status==="queued")      state="در صف…";
-  else if(j.status==="working") state = j.total>0 ? ("در حال دریافت… "+j.pct+"٪")
-                                                  : ("در حال دریافت… "+(j.loaded/1048576).toFixed(1)+" MB");
-  else if(j.status==="done"){   state="دانلود شد"; cls="ok"; }
-  else {                        state=j.msg||"ناموفق"; cls="err"; }
-
-  var indet=(j.status==="working" && !(j.total>0));
+  var state=dlStateText(j), cls = j.status==="done"?"ok" : (j.status==="error"?"err":"");
+  // نوارِ نامعیّن وقتی درصدِ واقعی نداریم (یا مرحلهٔ پردازشِ سرور در آپلود)
+  var indet=(j.status==="working" && ((up && j.processing) || !(j.total>0)));
   var bar=(j.status==="working"||j.status==="queued")
-    ? '<div class="dl-bar'+(indet?" indet":"")+'"><span class="dl-fill" style="width:'+(indet?100:j.pct)+'%"></span></div>'
+    ? '<div class="dl-bar'+(indet?" indet":"")+'"><span class="dl-fill"'+(indet?'':' style="width:'+j.pct+'%"')+'></span></div>'
     : '';
 
   var acts="";
-  if(j.status==="done")       acts+='<button class="dl-iconbtn" onclick="dlRedownload('+j.id+')" title="دانلودِ دوباره" aria-label="دانلودِ دوباره">'+DL_IC.dl+'</button>';
-  else if(j.status==="error") acts+='<button class="dl-iconbtn" onclick="dlRetry('+j.id+')" title="تلاشِ دوباره" aria-label="تلاشِ دوباره">'+DL_IC.retry+'</button>';
-  acts+='<button class="dl-iconbtn" onclick="dlRemove('+j.id+')" title="حذف از فهرست" aria-label="حذف">'+DL_IC.x+'</button>';
+  if(j.status==="done" && !up) acts+='<button class="dl-iconbtn" onclick="dlRedownload('+j.id+')" title="دانلودِ دوباره" aria-label="دانلودِ دوباره">'+DL_IC.dl+'</button>';
+  else if(j.status==="error")  acts+='<button class="dl-iconbtn" onclick="dlRetry('+j.id+')" title="تلاشِ دوباره" aria-label="تلاشِ دوباره">'+DL_IC.retry+'</button>';
 
-  return '<div class="dl-item '+j.status+'" data-id="'+j.id+'">'+
-    '<span class="dl-fileic">'+dlFileIcon(j)+'</span>'+
+  // آیکونِ سرِ هر رکورد بسته به نوع: آپلود = فلشِ بالا، دانلود = فلشِ پایین
+  return '<div class="dl-item '+j.status+(up?" up":" down")+'" data-id="'+j.id+'">'+
+    '<span class="dl-fileic'+(up?" up":" down")+'">'+(up?DL_IC.up_badge:DL_IC.dl)+'</span>'+
     '<div class="dl-main">'+
       '<div class="dl-name" title="'+name+'">'+name+'</div>'+
       '<div class="dl-state '+cls+'">'+esc(state)+'</div>'+
@@ -125,15 +167,53 @@ function dlItemHTML(j){
 function dlProgress(j){
   var host=document.getElementById("dlCenter"); if(!host) return;
   var el=host.querySelector('.dl-item[data-id="'+j.id+'"]'); if(!el){ dlRender(); return; }
-  var st=el.querySelector(".dl-state");
-  if(st) st.textContent = j.total>0 ? ("در حال دریافت… "+j.pct+"٪")
-                                    : ("در حال دریافت… "+(j.loaded/1048576).toFixed(1)+" MB");
-  if(j.total>0){ var f=el.querySelector(".dl-fill"); if(f){ el.querySelector(".dl-bar").classList.remove("indet"); f.style.width=j.pct+"%"; } }
+  var st=el.querySelector(".dl-state"); if(st) st.textContent = dlStateText(j);
+  var bar=el.querySelector(".dl-bar"), f=el.querySelector(".dl-fill");
+  var indet=(j.kind==="upload" && j.processing) || !(j.total>0);
+  if(bar) bar.classList.toggle("indet", indet);
+  if(f) f.style.width = indet ? "" : (j.pct+"%");   // نامعیّن: عرض را به CSS بسپار (sweepِ ۴۵٪)
+  dlUpdateHeader();
+}
+
+/* ---------- نشانگرِ هدر (سمتِ چپِ نوارِ بالا) ---------- */
+function dlUpdateHeader(){
+  var btn=document.getElementById("xferBtn"); if(!btn) return;
+  var activeN=_dlJobs.filter(function(j){ return j.status==="working"||j.status==="queued"; }).length;
+  var errN  =_dlJobs.filter(function(j){ return j.status==="error"; }).length;
+  var doneN =_dlJobs.filter(function(j){ return j.status==="done"; }).length;
+  var badge=btn.querySelector(".xfer-badge");
+  // آیکونِ دکمه ثابت است (فلشِ بالا+پایینِ «انتقال»)؛ شکل هرگز عوض نمی‌شود، فقط رنگ (کلاس‌های زیر).
+  // نشانِ «تمام‌شدهٔ ندیده»: فقط رنگ (سبز برای موفق، قرمز برای خطا) — شکلِ آیکون همان می‌ماند
+  var notifyErr  = (activeN===0 && _dlUnseen && errN>0);
+  var notifyDone = (activeN===0 && _dlUnseen && doneN>0 && !notifyErr);
+  btn.classList.toggle("busy", activeN>0);
+  btn.classList.toggle("alldone", notifyDone);
+  btn.classList.toggle("err", notifyErr);
+  btn.classList.toggle("open", _dlOpen);
+  var n = activeN || (notifyErr ? errN : 0);
+  if(badge) badge.textContent = n ? faN(n) : "";
+  btn.setAttribute("title", activeN? ("در حال انتقال ("+faN(activeN)+")") : "انتقال‌ها");
 }
 
 /* ---------- اکشن‌ها ---------- */
 function _dlById(id){ return _dlJobs.filter(function(j){ return j.id===id; })[0]||null; }
-function dlToggleMin(){ _dlMin=!_dlMin; dlRender(); }
+/* دراپ‌داونِ مرکز انتقال: باز/بست با انیمیشن، بستن با کلیکِ بیرون */
+function xferToggle(){ if(_dlOpen) xferClose(); else xferOpen(); }
+function xferOpen(){
+  _dlOpen=true; _dlUnseen=false;   // بازکردنِ پنل = دیده‌شدن؛ نشانِ سبز/قرمز پاک می‌شود
+  dlRender();
+  document.removeEventListener("click", xferOutside, true);
+  setTimeout(function(){ document.addEventListener("click", xferOutside, true); }, 0);
+}
+function xferClose(){
+  _dlOpen=false; dlRender();
+  document.removeEventListener("click", xferOutside, true);
+}
+function xferOutside(e){
+  var wrap=document.getElementById("xferWrap");
+  if(wrap && wrap.contains(e.target)) return;   // کلیک داخلِ دکمه/پنل → باز بماند
+  xferClose();
+}
 function dlRedownload(id){ var j=_dlById(id); if(j && j.blobUrl) dlHandOff(j); }
 function dlRetry(id){ var j=_dlById(id); if(!j) return; j.status="queued"; j.pct=0; j.msg=""; dlRender(); dlPump(); }
 function dlRemove(id){
@@ -150,12 +230,13 @@ function dlClearDone(){
 
 /* ---------- آیکون‌ها ---------- */
 var DL_IC = {
-  center:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
+  center:'<svg viewBox="0 0 24 24"><polyline points="4 8 8 4 12 8"/><line x1="8" y1="4" x2="8" y2="20"/><polyline points="12 16 16 20 20 16"/><line x1="16" y1="20" x2="16" y2="4"/></svg>',
   dl:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>',
   retry:'<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>',
   x:'<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
   up:'<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>',
-  down:'<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'
+  down:'<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>',
+  up_badge:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
 };
 function dlFileIcon(j){
   var m=String(j.mimeType||"").toLowerCase(), n=String(j.name||j.label||"").toLowerCase();

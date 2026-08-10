@@ -42,16 +42,50 @@ async function api(action, payload, opts){
   }
 }
 
+/* آپلودِ غیرمسدودکننده (XMLHttpRequest).
+   نکتهٔ مهمِ CORS: هر شنونده‌ای روی xhr.upload درخواست را «غیرِساده» می‌کند و مرورگر یک preflight
+   به‌صورتِ OPTIONS می‌فرستد؛ وب‌اپِ Apps Script فقط doGet/doPost دارد و به OPTIONS جواب نمی‌دهد،
+   پس آپلود با خطای شبکه می‌افتد. برای همین هیچ شنونده‌ای روی xhr.upload نمی‌گذاریم تا درخواست
+   «ساده» بماند و بدونِ preflight کار کند. در نتیجه درصدِ واقعیِ آپلود در دسترس نیست و نوار
+   «نامعیّن» نمایش داده می‌شود. onProgress اینجا فراخوانی نمی‌شود (برای سازگاریِ امضا نگه داشته شده). */
+function apiUpload(action, payload, onProgress){
+  return new Promise(function(resolve){
+    if(!API_URL || API_URL.indexOf("PASTE_")===0){ resolve({ ok:false, message:"آدرس سرویس (API_URL) تنظیم نشده است." }); return; }
+    try{
+      var xhr=new XMLHttpRequest();
+      xhr.open("POST", API_URL, true);
+      xhr.setRequestHeader("Content-Type","text/plain;charset=utf-8");
+      xhr.onload=function(){
+        var data=null; try{ data=JSON.parse(xhr.responseText); }catch(e){}
+        if(!data){ resolve({ ok:false, message:"پاسخِ نامعتبر از سرویس." }); return; }
+        if(data.error==="AUTH"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
+        resolve(data);
+      };
+      xhr.onerror  =function(){ resolve({ ok:false, message:"خطا در ارتباط با سرویس.", netError:true }); };
+      xhr.ontimeout=function(){ resolve({ ok:false, message:"زمانِ ارتباط با سرویس به پایان رسید.", netError:true }); };
+      xhr.send(JSON.stringify({ action:action, token:ME.token, payload:payload||{} }));
+    }catch(e){ resolve({ ok:false, message:"خطا در ارسال.", netError:true }); }
+  });
+}
+
+/* حجمِ فایل (بایت) از بک‌اند — برای محاسبهٔ پیشرفتِ واقعیِ دانلود پیش از استریم. بهترین‌تلاش و بی‌صدا. */
+async function apiFileSize(fileId){
+  try{ var r=await api("fileMeta",{fileId:fileId},{silent:true, quiet:true}); return (r&&r.ok)?(Number(r.size)||0):0; }
+  catch(e){ return 0; }
+}
+
 /* دریافتِ فایل به‌صورتِ استریمی — برای نمایشِ پیشرفتِ بارگذاری بدونِ اورلیِ سراسری.
-   onProgress(loaded,total): اگر total>0 (سرور Content-Length داد) درصدِ دقیق ممکن است؛
-   اگر total=0 (روی Apps Script معمولاً همین‌طور است چون پاسخ gzip/chunked است) حجمِ دریافتی نشان داده می‌شود. */
-async function apiGetFileStreamed(fileId, onProgress, quiet){
+   onProgress(loaded,total): اگر total>0 (Content-Length یا expectedTotalِ داده‌شده) درصدِ دقیق ممکن است؛
+   وگرنه (روی Apps Script معمولاً Content-Length نیست) حجمِ دریافتی نشان داده می‌شود.
+   expectedTotal: طولِ تقریبیِ پاسخِ JSON (base64 + سرریز) که از حجمِ فایل حساب می‌شود تا درصد واقعی باشد. */
+async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal){
   if(!API_URL || API_URL.indexOf("PASTE_")===0) return { ok:false, message:"آدرس سرویس تنظیم نشده است." };
   try{
     var res=await fetch(API_URL,{ method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify({ action:"getFile", token:ME.token, payload:{ fileId:fileId } }), redirect:"follow" });
     if(!res.ok) throw new Error("HTTP "+res.status);
     var total=parseInt(res.headers.get("Content-Length")||"0",10)||0;
+    if(!total && expectedTotal>0) total=expectedTotal;   // بدونِ Content-Length: از حجمِ فایل درصدِ واقعی بساز
     if(!res.body || typeof res.body.getReader!=="function") return await res.json();   // مرورگرِ بدونِ استریم: یک‌جا
     var reader=res.body.getReader(), chunks=[], loaded=0, rd;
     while(!(rd=await reader.read()).done){
@@ -76,8 +110,14 @@ async function apiGetFileStreamed(fileId, onProgress, quiet){
 function fileSleep(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
 async function getFileRetry(fileId, o){
   o=o||{}; var tries=3, r=null;
+  // اگر onProgress هست ولی حجمِ موردانتظار داده نشده، یک‌بار از بک‌اند بگیر تا درصد واقعی شود (بهترین‌تلاش)
+  var exp=Number(o.expectedTotal)||0;
+  if(o.onProgress && !exp && typeof apiFileSize==="function"){
+    var sz=await apiFileSize(fileId);
+    if(sz>0) exp=Math.ceil(sz/3)*4 + 120;   // طولِ base64 + سرریزِ JSON
+  }
   for(var i=0;i<tries;i++){
-    if(o.onProgress && typeof apiGetFileStreamed==="function") r=await apiGetFileStreamed(fileId, o.onProgress, true);
+    if(o.onProgress && typeof apiGetFileStreamed==="function") r=await apiGetFileStreamed(fileId, o.onProgress, true, exp);
     else r=await api("getFile",{fileId:fileId},{silent:true, quiet:true});
     if(r && r.ok) return r;                     // موفق شد
     if(i<tries-1) await fileSleep(650*(i+1));   // ۰٫۶۵s سپس ۱٫۳s پیش از تلاشِ بعدی
