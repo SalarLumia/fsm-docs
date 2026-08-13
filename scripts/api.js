@@ -19,7 +19,9 @@ async function api(action, payload, opts){
   }
   // bootstrap با اسکلت/حالت خطای اختصاصی مدیریت می‌شود؛ overlay و توستِ عمومی لازم ندارد.
   // opts.silent = فراخوان خودش لودینگ را داخلِ خودش نشان می‌دهد (مثلِ ویوئرِ سه‌بعدی) و اورلیِ تمام‌صفحه نمی‌خواهد.
-  var silent = (action === "ping" || action === "nextRevision" || action === "bootstrap") || !!(opts && opts.silent);
+  // login هم silent است: خودِ دکمهٔ ورود اسپینر و متنِ «در حال ورود…» را نشان می‌دهد،
+  // پس اورلیِ تمام‌صفحه اضافه و مزاحم است.
+  var silent = (action === "ping" || action === "nextRevision" || action === "bootstrap" || action === "login") || !!(opts && opts.silent);
   if(!silent) setLoading(true, action);
   try {
     var res = await fetch(API_URL, {

@@ -15,9 +15,10 @@
 .rq-num:hover{color:var(--brand)}
 .rq-meta{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.7}
 .rq-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-/* بخشِ کناریِ کارتِ فعالیت (مودال): تاریخ + بَجِ وضعیت، در سمتِ چپ */
+/* بخشِ کناریِ کارتِ فعالیت (مودال): فقط تاریخ (تگِ وضعیت به ردیفِ «کاربر» درونِ rq-meta منتقل شد) */
 .rq-aside{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
-.rq-date{font-size:11px;color:var(--muted);white-space:nowrap}
+/* هم‌کلاسِ متنیِ act-who (نامِ کاربر): ۱۱٫۵px، وزنِ ۵۰۰، رنگِ muted */
+.rq-date{font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap}
 /* کارت‌های مودال («همهٔ فعالیت‌ها» و «کارتابل بازبینی»): مارکرِ دایره+خط کنارِ متن.
    .seeall-body مخصوصِ مودال‌هاست، پس مینی‌پنل‌های داشبورد دست‌نخورده می‌مانند.
    ارتفاعِ کارت با کِش‌آمدن (stretch) کامل می‌شود تا خط از زیرِ دایره تا تهِ متن (دو خطِ بعدی) برسد؛
@@ -25,7 +26,7 @@
 .seeall-body .rq-item{align-items:stretch}
 .seeall-body .rq-marker{display:flex;flex-direction:column;align-items:center;flex-shrink:0;padding-top:3px}
 .seeall-body .rq-line{flex:1;width:2px;background:var(--line);border-radius:2px;margin-top:4px;min-height:10px;
-  transform:scaleY(.75);transform-origin:top}   /* ۲۵٪ از پایین کوتاه‌تر؛ بالا ثابت */
+  transform:scaleY(.75) translateY(8px);transform-origin:top}   /* ۲۵٪ از پایین کوتاه‌تر؛ بالا ثابت؛ +۶px از پایین (translateY درونِ فضای مقیاس‌شده اجرا می‌شود، پس بر ۰٫۷۵ تقسیم شد) */
 .seeall-body .rq-aside,.seeall-body .rq-actions{align-self:center}
 
 /* ===== فهرست پروژه‌ها ===== */
@@ -61,6 +62,28 @@
 /* دکمه‌های اکشن، زیرِ پیش‌نمایش (ارسال/بارگذاری + دانلود) */
 .dp-actions{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:#fff}
 .dp-actions .btn{flex:1;justify-content:center}
+/* دکمهٔ «بارگذاریِ نسخهٔ جدید» وقتی سند در حالِ بازبینی است: خاکستری، ولی کلیک‌پذیر (برای نمایشِ پیامِ راهنما) */
+.dm-act-disabled{color:var(--muted);background:var(--panel);border-color:var(--line);cursor:pointer}
+.dm-act-disabled:hover{color:var(--muted);background:var(--panel);border-color:var(--line)}
+
+/* دانلودِ اسنادِ سه‌بعدی: هاور روی دکمه یک پاپ‌آورِ انتخابِ فرمت (GLB/STP/USDZ) بالای دکمه باز می‌کند.
+   حالتِ اولیه (هیچ فرمتی انتخاب نشده) = ظاهرِ ناقص/خاکستری؛ با اولین تاگل، دکمه نارنجی (فعال) می‌شود. */
+.dm-dl-wrap{position:relative;flex:1;display:flex}
+.dm-dl-wrap .dm-dl{width:100%}
+.dm-dl-incomplete{color:var(--txt);background:var(--panel);border-color:var(--line)}
+.dm-dl-incomplete:hover{color:var(--txt);background:var(--panel);border-color:var(--line)}
+.dm-dl-active{background:var(--brand);border:1px solid var(--brand);color:#fff;font-weight:700;box-shadow:0 2px 8px #f7941f33}
+.dm-dl-active:hover{background:var(--brand2);border-color:var(--brand2);color:#fff}
+.dm-dl-pop{position:absolute;bottom:calc(100% + 8px);left:0;right:0;background:#fff;border:1px solid var(--line);
+  border-radius:11px;box-shadow:0 10px 28px #00000022;padding:6px;opacity:0;visibility:hidden;
+  transform:translateY(4px);transition:opacity .15s,transform .15s,visibility .15s;z-index:5}
+.dm-dl-wrap:hover .dm-dl-pop,.dm-dl-wrap:focus-within .dm-dl-pop{opacity:1;visibility:visible;transform:translateY(0)}
+.dm-dl-opt{display:flex;align-items:center;gap:9px;width:100%;padding:8px 9px;border:none;background:none;
+  border-radius:8px;cursor:pointer;font-family:inherit;text-align:right;transition:background .12s}
+.dm-dl-opt:hover{background:var(--panel)}
+.dm-dl-opt-t{display:flex;flex-direction:column;gap:1px;min-width:0}
+.dm-dl-opt-l{font-size:12.5px;font-weight:600;color:var(--txt)}
+.dm-dl-opt-s{font-size:10.5px;color:var(--muted)}
 .doc-side{direction:rtl;padding:18px 18px;overflow:auto;max-height:80vh}
 /* پنجرهٔ جزئیاتِ سند: ارتفاعِ ثابت تا با باز/بسته‌شدنِ یک ریویژن یا زیادشدنِ رکوردها اندازهٔ پنجره تغییر نکند؛
    فقط ستونِ سمت‌راست (اطلاعات) داخلِ خودش اسکرول می‌شود. روی موبایل، چیدمانِ یک‌ستونه و اسکرولِ کلی می‌ماند. */
@@ -71,10 +94,20 @@
   .doc-box .doc-preview{min-height:0}
   .doc-box .doc-side{max-height:none;min-height:0;height:100%}
 }
-/* بنر رد سند (بالای مشخصات) + مودال ثبت دلیل رد */
-.dm-reject{background:var(--err-bg);border:1px solid var(--err-line);color:var(--err);border-radius:9px;
-  padding:9px 12px;font-size:12.5px;line-height:1.7;margin-bottom:14px}
-.dm-reject b{color:var(--err)}
+/* بنر رد سند (بینِ سکشنِ مشخصات و تاریخچه) + مودال ثبت دلیل رد.
+   تیتر هم‌سایزِ پارامترهای مشخصات (dm-k/dm-v: 11.5px) با نقطهٔ قرمزِ پالس‌دار پیشش (هم‌الگوی نقطهٔ
+   فعالیتِ اخیرِ داشبورد: .tl-dot::after)؛ متنِ علت همیشه در خطِ دوم، هم‌فونتِ dm-k (کم‌رنگ/خاکستری). */
+.dm-reject{background:var(--err-bg);border:1px solid var(--err-line);border-radius:9px;
+  padding:10px 12px 11px;margin-bottom:14px}
+.dm-reject-t{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--err)}
+.dm-reject-dot{position:relative;width:7px;height:7px;border-radius:50%;background:var(--err);flex-shrink:0}
+.dm-reject-dot::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;
+  border:2px solid var(--err);transform:translate(-50%,-50%) scale(.4);opacity:.6;
+  pointer-events:none;animation:dmRejectPing 1.7s cubic-bezier(0,0,.2,1) infinite}
+@keyframes dmRejectPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}
+  58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
+.dm-reject-note{margin-top:5px;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.7}
+@media(prefers-reduced-motion:reduce){.dm-reject-dot::after{animation:none;opacity:0}}
 .rej-box{padding:18px 20px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
 .rej-lead{margin:0 0 2px;font-size:13.5px;color:var(--txt)}
 .rej-ta{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;
@@ -285,6 +318,9 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .nd-revnote.warn{color:var(--err)}
 .nd-revnote.warn::before{background:var(--err)}
 .nd-revnote.warn b{color:var(--err)}
+/* توضیحِ کوچکِ زیرِ دراپ‌زون‌های سه‌بعدی (بارگذاریِ نسخهٔ جدید): آیکونِ ریز + متنِ کم‌رنگ، هم‌سبکِ .nd-revnote */
+.rv-3d-hint{display:flex;align-items:flex-start;gap:7px;margin-top:10px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.8}
+.rv-3d-hint svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px}
 .nd-final-num{font-size:15px;font-weight:800;color:var(--brand);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 /* چیدمانِ عمودی: یادداشتِ افقی بالا، سپس ردیفِ باکس‌های آپلود */
 .nd-fstack{display:flex;flex-direction:column;gap:14px}
@@ -341,11 +377,24 @@ button.nd-chip:hover{border-color:var(--charcoal)}
   font-size:14px;font-weight:700;color:var(--txt)}
 .cp-rail-hd>span{display:flex;align-items:center;gap:8px}
 .cp-rail-hd>span svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
-.cp-client-list{display:flex;flex-direction:column;max-height:70vh;overflow:auto}
+.cp-client-list{display:flex;flex-direction:column;max-height:70vh;overflow:auto;position:relative;z-index:0}
 .cp-client-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:none;border-bottom:1px solid var(--line);
-  background:none;cursor:pointer;width:100%;text-align:right;transition:.12s;border-right:3px solid transparent}
-.cp-client-item:hover{background:#fff8f0}
-.cp-client-item.sel{background:#fff3e6;border-right-color:var(--brand)}
+  background:none;cursor:pointer;width:100%;text-align:right;transition:.12s;position:relative}
+/* هاور و انتخاب، هر دو با همان کارتِ نارنجیِ گوشه‌گردِ شناور (هم‌سبک با آرشیو/جدول‌های تنظیمات)؛
+   تفاوتِ سلولِ انتخاب‌شده فقط خطِ عمودیِ کنارش است، نه پس‌زمینهٔ متفاوت. */
+.cp-client-item:hover,.cp-client-item.sel{background:transparent}
+.cp-client-item:hover::before,.cp-client-item.sel::before{content:"";position:absolute;z-index:-1;background:#fff3e6;
+  top:4px;bottom:4px;right:8px;left:8px;border-radius:12px;pointer-events:none}
+/* لوگو (و به‌تبعِ آن نام/نامِ لاتینِ کنارش، چون هم‌فرزندِ فلکس‌اند) ۴px به چپ می‌رود تا فاصلهٔ افقیِ لوگو-خط از ۲px به ۶px برسد؛
+   خودِ خط ثابت می‌ماند (right:8px بدونِ تغییر) */
+.cp-client-item .cp-logo{margin-inline-start:4px}
+/* سلولِ انتخاب‌شده: خطِ عمودیِ نارنجی — داخلِ کادرِ گردگوشه (هم‌مرزِ لبهٔ راستِ ::before، نه لبهٔ خودِ سلول)،
+   کوتاه‌تر از ارتفاعِ سلول و هم‌مرکز با آیکون/سلول؛ هم‌سبک با نشانگرِ فعالِ سایدمنو */
+.cp-client-item.sel::after{content:"";position:absolute;right:8px;top:50%;width:2px;height:calc(60% - 6px);
+  background:var(--brand);border-radius:2px;transform:translateY(-50%) scaleY(0);transform-origin:center;
+  animation:cliSelIn .22s cubic-bezier(.2,0,0,1) forwards}
+@keyframes cliSelIn{from{transform:translateY(-50%) scaleY(0)}to{transform:translateY(-50%) scaleY(1)}}
+@media(prefers-reduced-motion:reduce){.cp-client-item.sel::after{animation:none;transform:translateY(-50%) scaleY(1)}}
 .cp-ci-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .cp-ci-name{font-size:13px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cp-ci-meta{font-size:11px;color:var(--muted)}
@@ -362,9 +411,11 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 
 /* لوگوی مشتری یا جایگزین حرفی */
 .cp-logo{border-radius:10px;object-fit:contain;background:#ffffff;border:1px solid var(--line);flex-shrink:0;display:block}
-/* متادیتای مشتری: ترتیب راست‌به‌چپِ قطعی (کد · سفارش · پروژه) */
-.cmeta{display:inline-flex;align-items:baseline;gap:6px;flex-wrap:wrap}
-.cmeta-sep{color:var(--muted);opacity:.55}
+/* متادیتای مشتری: ترتیب راست‌به‌چپِ قطعی (نامِ لاتین | کد | سفارش | پروژه) */
+.cmeta{display:inline-flex;align-items:center;gap:0;flex-wrap:wrap}
+/* جداکننده = خطِ عمودیِ نازکِ کم‌رنگ، هم‌سبک با سطلِ زباله (.rb-sep) */
+.cmeta-sep{flex-shrink:0;width:1px;height:11px;background:var(--line);margin:0 7px;display:inline-block}
+.cmeta-en{direction:ltr}   /* نامِ لاتین همیشه چپ‌به‌راست خوانده شود */
 .cp-logo-ph{display:grid;place-items:center;font-weight:800;color:var(--brand);background:#fff3e6;border-color:#f7941f33;direction:ltr}
 
 /* هویت مشتری (تبِ اختصاصی) */
@@ -386,8 +437,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .cp-order-strip{display:flex;flex-wrap:wrap;gap:10px}
 .cp-order-card{position:relative;width:190px;min-height:112px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;
   cursor:pointer;transition:.14s;background:#fafafa;display:flex;flex-direction:column}
-.cp-order-card:hover{border-color:var(--brand);background:#fff8f0}
-.cp-order-card.sel{border-color:var(--brand);background:#fff8f0;box-shadow:0 0 0 3px #f7941f1f}
+.cp-order-card:hover{background:#fff8f0}   /* فقط پس‌زمینه؛ کادر تغییرِ رنگ ندارد */
+.cp-order-card.sel{border-color:var(--brand);background:#fff8f0}   /* حالتِ فعال/انتخاب‌شده: کادر نارنجی می‌شود (بدونِ سایه‌ای که از کادر بیرون بزند) */
 .coc-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .coc-title{font-size:13px;font-weight:700;color:var(--txt)}
 .coc-acts{display:flex;gap:3px;opacity:0;transition:.12s}
@@ -604,6 +655,22 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* خطِ جداکنندهٔ بینِ سطرهای داده = خطِ نازکِ روشنِ استانداردِ سایت (#f2f1ee)؛
    خطِ زیرِ تیتر (th) همچنان پررنگ (var(--line)) می‌ماند. */
 .mgmt-table td,.users-table td{border-bottom-color:#f2f1ee}
+/* ===== هاورِ ردیف = کارتِ نارنجیِ گوشه‌گردِ شناور، هم‌سبک با آرشیوِ اسناد (features.css: arch-row.hov) =====
+   تفاوت با آرشیو: اینجا کلیک/اکسپندی در کار نیست؛ صرفاً هاور.
+   نکتهٔ کلیدی: پس‌زمینهٔ خودِ سلول باید شفاف بماند؛ تنها رنگ‌آمیزی با شبه‌المان انجام می‌شود
+   (اگر td پس‌زمینه بگیرد، مستطیلِ تیزگوشه روی کارتِ گردگوشه می‌افتد و گِردی دیده نمی‌شود). */
+/* هر سلولِ هاورشده خودش یک stacking contextِ مستقل می‌سازد (isolation:isolate)؛
+   بنابراین ::before با z-index:-1 دقیقاً پشتِ محتوای همان سلول می‌ماند و از کارت/tablewrap بیرون نمی‌زند.
+   مزیت نسبت به بالا بردنِ محتوا: متنِ لختِ داخلِ td (مثلِ ستونِ «سمت» در جدولِ کاربران) هم پوشانده نمی‌شود. */
+.mgmt-table tbody tr:hover>td,.users-table tbody tr:hover>td{background:transparent;position:relative;isolation:isolate}
+.mgmt-table tbody tr:hover>td::before,.users-table tbody tr:hover>td::before{
+  content:"";position:absolute;z-index:-1;background:#fff3e6;
+  top:5px;bottom:5px;right:0;left:0;pointer-events:none}
+/* گوشه‌های بیرونی: در RTL سلولِ اول سمتِ راست و سلولِ آخر سمتِ چپ است */
+.mgmt-table tbody tr:hover>td:first-child::before,.users-table tbody tr:hover>td:first-child::before{
+  right:8px;border-top-right-radius:12px;border-bottom-right-radius:12px}
+.mgmt-table tbody tr:hover>td:last-child::before,.users-table tbody tr:hover>td:last-child::before{
+  left:8px;border-top-left-radius:12px;border-bottom-left-radius:12px}
 
 /* ===== آرشیو: هم‌ترازیِ «چرمِ جدول» با استانداردِ جدول‌های تنظیمات =====
    خطِ جداکنندهٔ ردیف‌ها همان روشنِ #f2f1ee (خطِ زیرِ تیتر پررنگ می‌ماند) + نوارِ اسکرولِ باریک (افقی و عمودی). */
@@ -694,6 +761,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 #archiveBody .arch-row.hov:not(.open)>td.arch-actcol::after{left:8px;border-top-left-radius:12px;border-bottom-left-radius:12px}
 /* tablewrap یک stacking context تا کارتِ z-index:-1 پشتِ .card پنهان نشود ولی آیکونِ بیرون‌زده رویش بماند */
 #tab-archive .tablewrap{position:relative;z-index:0}
+#tab-data .tablewrap{position:relative;z-index:0}   /* همان محافظِ stacking context برای کارتِ هاورِ ۴ جدولِ تنظیمات */
 /* پس‌زمینهٔ سلولِ باز شفاف؛ خطوطِ جداکننده از border سلول‌ها می‌آید = صاف و تمام‌عرض (بالا: border ردیفِ قبلی؛ پایین: border ردیفِ جزئیات) */
 .arch-row.open>td{background:transparent;position:relative;padding-top:24px;padding-bottom:3px;border-bottom-width:0}   /* ۱۲px گپ + ۱۲px حاشیهٔ نارنجیِ بالای خطِ اول ⟵ سلول بلندتر، اندازهٔ کارت مثلِ قبل */
 .arch-detail.open>td{background:transparent;position:relative;border-bottom:1px solid #f2f1ee}

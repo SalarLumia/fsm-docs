@@ -1,32 +1,264 @@
-/* ===== صفحهٔ ورود — مدرن و مینیمال، دو ستونه ===== */
-.login-wrap{min-height:100vh;display:flex;background:#f4f4f3}
-.login-brand{flex:1.05;position:relative;overflow:hidden;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:14px;padding:48px 40px;color:#fff;
-  background:radial-gradient(120% 90% at 75% 10%,#33333a 0,#1d1d20 55%,#161618 100%)}
-.login-brand::before{content:"";position:absolute;left:-18%;bottom:14%;width:150%;height:54px;
-  background:#f7941f;transform:rotate(-13deg);opacity:.92}
-.login-brand::after{content:"";position:absolute;left:-18%;bottom:7%;width:150%;height:14px;
-  background:#fbcf88;transform:rotate(-13deg);opacity:.85}
-.login-brand .mark{width:132px;height:auto;position:relative;z-index:1;filter:drop-shadow(0 10px 30px #0007)}
-.login-brand h2{position:relative;z-index:1;margin:6px 0 0;font-size:25px;font-weight:700;color:#fbcf88}
-.login-brand .en{position:relative;z-index:1;margin:0;font-size:12px;letter-spacing:3px;color:#c7c7c7}
-.login-brand .tag{position:relative;z-index:1;margin:10px 0 0;max-width:300px;text-align:center;
-  line-height:2;font-size:13px;color:#b6b6b6;display:block;background:none;border:none;border-radius:0;padding:0;font-weight:400}
-.login-form{flex:1;display:flex;align-items:center;justify-content:center;padding:40px}
-.login-card{width:min(360px,92%)}
-.login-card h1{font-size:23px;margin:0 0 6px;color:#1c1c1e;font-weight:700}
-.login-card .sub{color:#6f6f6f;font-size:13px;margin:0 0 28px}
-.login-card label{display:block;font-size:12.5px;color:#1c1c1e;margin:0 0 7px;font-weight:500}
-.login-card input{width:100%;background:#fff;border:1px solid #dcdcd8;color:#1c1c1e;
-  padding:12px 13px;border-radius:11px;margin-bottom:18px;font-family:inherit;font-size:14px;transition:.15s}
-.login-card input::placeholder{color:#b3b3ad}
-.login-card input:focus{outline:none;border-color:#f7941f;box-shadow:0 0 0 3px #f7941f26}
-.btn-login{width:100%;padding:13px;border:none;border-radius:11px;cursor:pointer;font-family:inherit;
-  font-size:15px;font-weight:700;color:#231405;background:linear-gradient(135deg,#fbcf88,#f7941f);transition:.15s}
-.btn-login:hover{filter:brightness(1.05);box-shadow:0 8px 22px #f7941f44}
-.login-card .err{color:#d23b2f;font-size:12.5px;min-height:18px;margin-top:14px}
+/* ===== صفحهٔ ورود — تک‌ستونیِ وسط‌چین، روی تصویرِ کارخانه =====
+   لایه‌ها از پایین به بالا: تصویرِ کارخانه ← روکشِ سفیدِ محو ← نوارهای موربِ گوشه ← محتوا. */
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:40px 20px;position:relative;overflow:hidden;background:var(--bg)}
+/* تصویرِ پس‌زمینه + روکشِ تیره در یک لایه.
+   ▼ شدتِ تیرگی فقط با همین دو عدد کنترل می‌شود (هرچه به ۱ نزدیک‌تر، تصویر محوتر) ▼
+   عمداً بالا کم‌رنگ‌تر و پایین تیره‌تر است تا کارت روی زمینهٔ یکدست بنشیند و چهره‌ها ناپیدا شوند. */
+.login-wrap::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    linear-gradient(rgba(22,22,24,.74),rgba(22,22,24,.82)),   /* ← روکشِ تیره */
+    url("../login-bg.webp") center/cover no-repeat;
+  filter:saturate(.5) blur(1.5px);   /* بلورِ ملایم: چهره‌ها قابلِ تشخیص نمانند */
+  transform:scale(1.03);transform-origin:center;   /* scale پایه تا لبه‌های بلور سفید نشوند */
+  /* بستن: مثلِ بقیه ۴۵۰ms صبر می‌کند تا اول پنل جمع شود */
+  transition:transform .7s cubic-bezier(.22,.61,.36,1) .45s}
+/* با بازشدنِ مرحلهٔ ۲، پس‌زمینه از مرکز زوم می‌شود (هم‌گام با بزرگ‌شدنِ نوارهای گوشه) */
+/* ۵۵۰ms = دقیقاً همان لحظه‌ای که نوار به بیشترین پهنایش می‌رسد؛ بعد از آن زوم متوقف است */
+.login-wrap.open::before{transform:scale(1.10);
+  transition:transform .55s cubic-bezier(.22,.61,.36,1)}
+/* گوهٔ گوشه با نوارهای نارنجی/طلایی — یک مجموعه پایین-راست، قرینه‌اش بالا-چپ.
+   خودِ SVG همیشه به گوشه چسبیده و بزرگ‌تر از کادرِ دید است (viewBox برش می‌خورد)؛
+   بنابراین در هر دو مرحله تا لبهٔ صفحه ادامه دارد و گوشه هرگز خالی نمی‌ماند.
+   ▼ فقط گروهِ داخلی (.lg-shift) جابه‌جا می‌شود — با translate نه scale، تا ضخامت ثابت بماند ▼ */
+.lg-wedge{position:absolute;width:min(760px,68vw);aspect-ratio:760/600;height:auto;
+  z-index:1;pointer-events:none;display:block}
+.lg-wedge.br{right:0;bottom:0}
+.lg-wedge.tl{left:0;top:0;transform:rotate(180deg)}
+/* ← مقدارِ نزدیک‌شدن به مرکز در مرحلهٔ ۱، بر حسبِ واحدِ داخلیِ viewBox (نه پیکسلِ صفحه)،
+   تا با هر عرضِ صفحه نسبتش ثابت بماند. */
+.lg-shift{--lg-in:85;
+  transform:translate(calc(var(--lg-in) * -1px),calc(var(--lg-in) * -1px));
+  transform-box:view-box;
+  transition:transform .7s cubic-bezier(.22,.61,.36,1) .45s}
+.login-wrap.open .lg-shift{transform:translate(0,0);
+  transition:transform .55s cubic-bezier(.22,.61,.36,1)}
+/* ===== دو مرحله‌ای =====
+   مرحلهٔ ۱ (پیش‌فرض): فقط برندِ بزرگ در مرکز + دکمهٔ «ورود به سامانه».
+   مرحلهٔ ۲ (کلاسِ .open روی .login-wrap): برند کوچک و جمع می‌شود، کارتِ ورود باز می‌شود.
+   همهٔ گذارها با transition روی همان خصوصیت‌ها انجام می‌شود (بدونِ جابه‌جاییِ ناگهانی). */
+.login-form{--lg-w:min(470px,94%);--lg-ease:cubic-bezier(.22,.61,.36,1)}
+/* ═══ بلوکِ برند ═══
+   ⚠ ارتفاعش ثابت است و هرگز انیمیت نمی‌شود، و هر سه فرزندش absolute هستند.
+   دلیل: تا وقتی عناصر در جریانِ عادیِ چیدمان بودند، هر تغییرِ اندازه در یکی،
+   بقیه را هم جابه‌جا می‌کرد و حرکت‌ها به هم آلوده می‌شدند. حالا هر عنصر دقیقاً
+   یک حرکتِ مستقل دارد و روی هیچ عنصرِ دیگری اثر نمی‌گذارد. */
+/* ⚠ در مرحلهٔ ۲ کلِ بلوک با هم بالا می‌رود (--lg-lift). چون لوگو، خط و پنل هر سه
+   داخلِ همین بلوک‌اند، رابطهٔ بینشان دست‌نخورده می‌ماند و فقط مجموعه جابه‌جا می‌شود.
+   ارتفاعِ بلوک هرگز انیمیت نمی‌شود؛ فقط جایش عوض می‌شود. */
+.login-brand{position:relative;z-index:2;width:100%;text-align:center;
+  height:var(--lg-brand-h,430px);
+  transform:translateY(0);
+  /* تأخیرِ ۴۵۰ms در حالتِ بسته = مدتِ جمع‌شدنِ پنل. یعنی هنگامِ بستن، اول کشو
+     برعکس جمع می‌شود و بعد بلوک پایین می‌آید (توالیِ دقیقاً معکوسِ بازشدن). */
+  transition:transform .55s var(--lg-ease) .45s}
+.login-wrap.open .login-brand{transform:translateY(var(--lg-lift,-300px));
+  transition:transform .55s var(--lg-ease)}
+/* لوگو — لنگرِ افقی وسط، لنگرِ عمودی بالا (top ثابت).
+   تنها حرکتش یک transform است: هم‌زمان بالا می‌رود و کوچک می‌شود.
+   چون هر دو در یک خصوصیت و یک کلاک‌اند، پیوسته و جدایی‌ناپذیرند. */
+.login-brand .mark{--lg-mark-w:224px;   /* ← عرضِ لوگو در مرحلهٔ ۲ (auth.js از همین می‌خواند) */
+  position:absolute;top:0;left:50%;width:325px;height:auto;   /* نسبتِ ۳۲۵→۲۲۴ همان ۰٫۶۹ قبلی */
+  filter:drop-shadow(0 10px 26px #00000033);
+  transform-origin:center top;
+  transform:translate(-50%,0) scale(1);
+  /* بازگشت به اندازهٔ اصلی فقط پس از جمع‌شدنِ کاملِ پنل */
+  transition:transform .55s var(--lg-ease) .45s}
+.login-wrap.open .login-brand .mark{
+  transform:translate(-50%,var(--lg-mark-y,-46px)) scale(var(--lg-mark-s,.69));
+  transition:transform .55s var(--lg-ease)}
+/* متنِ برند فقط برای صفحه‌خوان/جست‌وجو — دیده نمی‌شود ولی از درخت دسترس‌پذیری حذف نشده */
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+/* ═══ نوارِ نارنجی = قابِ پنل (یک عنصرِ واحد) ═══
+   دو مسیرِ قرینه که هر دو از بالا-وسط شروع می‌شوند، به دو طرف می‌روند، پایین می‌آیند
+   و در وسطِ پایین به هم می‌رسند. با stroke-dasharray فقط بخشی از هر مسیر آشکار است:
+   • مرحلهٔ ۱ → تکهٔ کوتاه از هر مسیر = همان خطِ جداکنندهٔ زیرِ لوگو
+   • مرحلهٔ ۲ → آشکارسازی تا انتها = قابِ کاملِ دورِ پنل
+   چون هر دو حالت یک مسیرِ واحدند، نوار «تبدیل» می‌شود؛ هیچ عنصری جایگزینِ دیگری نمی‌شود. */
+/* ⚠ ابعادِ SVG همیشه هم‌اندازهٔ پنلِ نهایی است و تغییر نمی‌کند؛ اگر ابعاد انیمیت می‌شد
+   مسیرها هم مقیاس می‌خوردند و شکلِ خط به‌هم می‌ریخت.
+   آنچه حرکت می‌کند فقط جای قاب (top) و مقدارِ آشکارسازیِ مسیر است. */
+.lg-frame{position:absolute;z-index:4;left:50%;transform:translateX(-50%);
+  top:var(--lg-div-top,300px);
+  width:var(--lg-w);height:var(--lg-card-h,430px);
+  overflow:visible;pointer-events:none;
+  transition:top .55s var(--lg-ease) .45s}
+/* بالا‌رفتن در ۵۵۰ms تمام می‌شود، ولی پهن‌شدنِ خط تا ۱۳۰۰ms ادامه دارد؛
+   پس در حینِ بالا‌رفتن هم عرض به‌آرامی زیاد می‌شود. */
+.login-wrap.open .lg-frame{top:var(--lg-card-top,254px);
+  transition:top .55s var(--lg-ease)}
+/* ⚠ به‌جای بازیِ offset، خودِ طولِ خطِ نمایان (dasharray) انیمیت می‌شود.
+   الگو = «خط به‌اندازهٔ --lg-shown + فاصله‌ای به‌اندازهٔ کلِ مسیر»، و offset صفر.
+   چون فاصله کاملِ مسیر را می‌پوشاند، هیچ تکه‌ای از دنباله نمی‌تواند از سرِ دیگر
+   برگردد — مشکلِ دیده‌شدنِ لبهٔ پایین از ابتدا دقیقاً همین بود.
+   خط همیشه از سرِ مسیر (بالا-وسط) شروع می‌شود و فقط جلوتر می‌رود. */
+/* ⚠ فاصله باید بزرگ‌تر از کلِ مسیر باشد (۱۰، نه ۱).
+   الگوی خط‌چین تکرار می‌شود؛ با فاصلهٔ ۱ دقیقاً بعد از یک دورِ کامل دوباره شروع
+   به کشیدن می‌کرد و همان تکه‌های اضافیِ لبهٔ پایین ظاهر می‌شدند.
+   با فاصلهٔ ۱۰ تکرار هرگز روی مسیر نمی‌افتد و فقط یک خط از سرِ مسیر می‌ماند. */
+.lg-frame path{fill:none;stroke:var(--brand);stroke-width:2;stroke-linecap:butt;
+  stroke-dashoffset:0;
+  stroke-dasharray:var(--lg-shown,27px) var(--lg-gap,4000px);
+  /* بستن: قاب از پایین به بالا جمع می‌شود و به همان خطِ کوتاه برمی‌گردد */
+  transition:stroke-dasharray .8s cubic-bezier(.33,0,.2,1)}
+/* یک حرکتِ پیوسته که از همان ابتدا (بدونِ تأخیر) شروع می‌شود:
+   خط هم‌زمان با بالا‌رفتنِ قاب پهن می‌شود و بی‌وقفه ادامه می‌دهد تا کلِ قاب کامل شود. */
+.login-wrap.open .lg-frame path{stroke-dasharray:var(--lg-full,2000px) var(--lg-gap,4000px);
+  transition:stroke-dasharray 1.3s cubic-bezier(.33,0,.2,1)}
+/* شرحِ سامانه — کلاسش عمداً lg-tag است نه tag:
+   کلاسِ سراسریِ .tag در components.css یک نشانِ وضعیتِ گرد با پس‌زمینهٔ روشن است
+   و اگر همان نام را به کار ببریم، آن استایل روی این متن هم می‌نشیند. */
+.login-brand .lg-tag{margin:0;max-width:360px;text-align:center;
+  line-height:2;font-size:14px;display:block;font-weight:400;color:#b8b8b8}
+/* ═══ شرح + دکمهٔ ورود ═══
+   ⚠ هیچ انیمیشنی ندارند و ذره‌ای تکان نمی‌خورند؛ فقط پنل از رویشان رد می‌شود.
+   opacity در انتهای حرکتِ پنل آنی صفر می‌شود تا وقتی پنل کوتاه‌تر از آنهاست از زیر بیرون نزنند. */
+.lg-below{position:absolute;top:var(--lg-below-top,330px);left:0;right:0;
+  display:flex;flex-direction:column;align-items:center;gap:30px;
+  transform:translateY(0);opacity:1;
+  /* transform باید هم‌کلاکِ والد بماند (همان ۴۵۰ms تأخیر) وگرنه خنثی‌سازی به‌هم می‌خورد
+     و متن هنگامِ بستن تکان می‌خورد. opacity بعد از کنار‌رفتنِ پنل برمی‌گردد. */
+  transition:transform .55s var(--lg-ease) .45s,opacity .2s ease .45s}
+/* بالا‌رفتنِ بلوکِ والد با یک translate معکوس خنثی می‌شود تا شرح و دکمه
+   واقعاً بی‌حرکت بمانند و فقط پنل از رویشان رد شود. */
+/* محوشدنِ تدریجی در ثانیه‌های پایانیِ شکل‌گرفتنِ پنل (۹۵۰ تا ۱۳۵۰ms)،
+   نه یک قطعِ ناگهانی؛ تا هم‌زمان با کامل‌شدنِ لایهٔ سلول روی آنها آرام محو شوند. */
+.login-wrap.open .lg-below{opacity:0;pointer-events:none;
+  transform:translateY(calc(var(--lg-lift,-300px) * -1));
+  transition:transform .55s var(--lg-ease),opacity .4s ease .95s}
+/* دکمهٔ مرحلهٔ ۱ */
+.lg-start{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:14px 34px;border:none;border-radius:var(--radius-sm);cursor:pointer;   /* فاصله از gap والد می‌آید */
+  font-family:inherit;font-size:15px;font-weight:700;color:#231405;
+  background:linear-gradient(135deg,var(--gold1),var(--brand));
+  box-shadow:0 10px 30px #f7941f33;flex-shrink:0;
+  transition:transform .16s var(--lg-ease)}
+/* هاور = فقط بالا‌آمدنِ ملایم، بدونِ درخششِ نارنجی */
+.lg-start:hover{transform:translateY(-2px)}
+.lg-start svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2.2;
+  stroke-linecap:round;stroke-linejoin:round;transform:scaleX(-1)}   /* فلش به سمتِ چپ (جهتِ پیشرویِ RTL) */
+/* ظرف: چون فرزندانش absolute هستند، ارتفاعش را بلوکِ برند تعیین می‌کند */
+.login-form{position:relative;z-index:2;width:100%;max-width:520px}
+/* ═══ کارتِ فرم ═══
+   دقیقاً از جایی که خطِ نارنجی ایستاد و محو شد، کشویی رو به پایین باز می‌شود.
+   ⚠ absolute است و top ثابت دارد، پس هیچ تغییری در بلوکِ برند جایش را عوض نمی‌کند.
+   پرده با clip-path از بالا به پایین کنار می‌رود: لبهٔ بالایی میخکوب، فقط کف پایین می‌آید.
+   clip-path به‌جای scale است تا محتوای فرم ذره‌ای کشیده نشود. */
+/* ذغالیِ برند — همان رنگِ گوه‌های گوشهٔ صفحه. چون زمینه تیره شد،
+   متن، فیلدها و آیکون‌های داخلِ پنل هم پایین‌تر به نسخهٔ روشن تبدیل شده‌اند.
+   ⚠ border ندارد: قاب را SVG می‌کشد تا بتواند جریان‌وار ترسیم شود. */
+.login-card{position:absolute;z-index:3;   /* بالاتر از متن و دکمه، تا پنل از رویشان باز شود */
+  top:var(--lg-card-top,254px);left:50%;transform:translateX(-50%);
+  width:var(--lg-w);background:#4a4a4a;
+  /* پدینگِ پایین کمتر است چون دیگر محتوایی زیرِ دکمه نیست (لینکِ فراموشی حذف شد).
+     پدینگِ بالا را auth.js تنظیم می‌کند تا دکمه با دکمهٔ مرحلهٔ ۱ هم‌جا باشد. */
+  border-radius:var(--radius-lg);padding:var(--sp-8) var(--sp-6) var(--sp-5);
+  box-shadow:0 18px 50px #0000002e,0 2px 8px #00000014;
+  /* خودِ سکشن از حالتِ بلور و کمی جمع‌شده، آرام‌آرام شکل می‌گیرد.
+     بستن = آینهٔ همین حرکت: پنل دوباره بلور و کمی جمع می‌شود و آرام محو می‌گردد
+     (بدونِ تأخیر، تا پیش از باریک‌شدنِ قاب کارش تمام شود). */
+  opacity:0;filter:blur(14px);transform:translateX(-50%) scale(.97);
+  pointer-events:none;
+  transition:opacity .5s ease,filter .6s var(--lg-ease),transform .6s var(--lg-ease)}
+/* تأخیرِ ۳۰۰ms: پنل زودتر و هم‌زمان با جریانِ قاب شروع به شکل‌گرفتن می‌کند،
+   نه بعد از پایانِ حرکتِ خط. */
+.login-wrap.open .login-card{opacity:1;filter:blur(0);transform:translateX(-50%) scale(1);
+  pointer-events:auto;
+  transition:opacity .6s ease .3s,filter .85s var(--lg-ease) .3s,
+    transform .85s var(--lg-ease) .3s}
+/* محتوای پنل کمی دیرتر از خودِ سکشن ظاهر می‌شود تا ترتیبِ «قاب ← بدنه ← متن» حفظ شود.
+   ⚠ text-align:right لازم است چون بلوکِ برند وسط‌چین است و ارث می‌رسد؛
+   بدونِ آن برچسبِ «نام کاربری» و «رمز عبور» وسطِ کارت می‌افتند. */
+/* بستن: محتوا اول محو می‌شود، بعد خودِ پنل — معکوسِ ترتیبِ بازشدن */
+.lg-body{position:relative;z-index:2;opacity:0;text-align:right;
+  transition:opacity .3s ease}
+.login-wrap.open .lg-body{opacity:1;transition:opacity .5s ease .62s}
+/* ▼ متن‌های داخلِ پنلِ ذغالی — روشن، برای کنتراستِ کافی روی زمینهٔ تیره ▼ */
+.login-card h1{font-size:23px;margin:0 0 6px;color:#f5f5f3;font-weight:700}
+.login-card .sub{color:#b8b8b8;font-size:13px;margin:0 0 28px}
+.login-card label{display:block;font-size:12.5px;color:#e8e8e6;margin:0 0 7px;font-weight:500}
+/* ظرفِ فیلد: آیکونِ راهنما داخلِ اینپوت (سمتِ راست در RTL) — هم‌سبک با فیلدهای آیکون‌دارِ سایت */
+.lg-field{display:block;position:relative;margin-bottom:18px}
+/* آیکونِ کاربر/قفل سمتِ چپِ فیلد (هم‌سمتِ متنِ لاتین) */
+.lg-field .lg-ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;stroke:#a8a8a6;fill:none;stroke-width:1.8;pointer-events:none;transition:stroke .15s}
+.lg-field:focus-within .lg-ic{stroke:var(--brand)}
+/* اینپوت‌ها روی زمینهٔ ذغالی: کمی تیره‌تر از خودِ پنل تا به‌عنوانِ فیلد تفکیک شوند */
+/* محتوای این دو فیلد لاتین است، پس متن چپ‌چین می‌شود (برچسب‌ها راست‌چین می‌مانند).
+   direction دست‌نخورده می‌ماند تا ترتیبِ نویسه‌ها و جای مکان‌نما به‌هم نریزد. */
+.login-card input{width:100%;background:#3d3d3d;border:1px solid #5f5f5f;color:#f2f2f0;
+  padding:12px 13px;padding-left:38px;border-radius:var(--radius-sm);margin-bottom:0;
+  font-family:inherit;font-size:14px;text-align:left;transition:.15s}
+.login-card input::placeholder{color:#8f8f8d}
+.login-card input:focus{outline:none;border-color:var(--brand);background:#454545;
+  box-shadow:0 0 0 3px #f7941f2e}
+/* پرکردنِ خودکارِ مرورگر (Chrome) پس‌زمینهٔ آبی می‌گذارد و کلِ رنگ‌بندیِ فرم را می‌شکند؛
+   با inset shadow پس‌زمینهٔ ذغالیِ فیلد بازنویسی می‌شود و متن هم روشن می‌ماند. */
+.login-card input:-webkit-autofill,
+.login-card input:-webkit-autofill:hover,
+.login-card input:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 100px #3d3d3d inset;box-shadow:0 0 0 100px #3d3d3d inset;
+  -webkit-text-fill-color:#f2f2f0;caret-color:#f2f2f0;transition:background-color 9999s ease-out}
+.login-card input:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 100px #454545 inset,0 0 0 3px #f7941f2e;
+  box-shadow:0 0 0 100px #454545 inset,0 0 0 3px #f7941f2e}
+/* فاصله از توضیحِ بالا؛ ۶px کمتر از قبل تا دکمه کمی بالاتر بنشیند */
+.btn-login{width:100%;margin-top:20px;
+  padding:13px;border:none;border-radius:var(--radius-sm);cursor:pointer;font-family:inherit;
+  font-size:15px;font-weight:700;color:#231405;background:linear-gradient(135deg,var(--gold1),var(--brand));
+  transition:transform .16s var(--lg-ease)}
+.btn-login:hover{transform:translateY(-2px)}
+/* حالتِ در حالِ ورود: دکمه غیرفعال + اسپینرِ کوچک، تا کلیکِ دوباره ممکن نباشد */
+.btn-login:disabled{cursor:default;filter:grayscale(.15) brightness(.98);opacity:.75}
+.btn-login:disabled:hover{transform:none}   /* وسطِ ارسال، هاور اثری ندارد */
+.btn-login .lg-spin{display:none;width:15px;height:15px;margin-inline-end:8px;vertical-align:-2px;
+  border:2px solid #23140540;border-top-color:#231405;border-radius:50%;animation:lgSpin .7s linear infinite}
+.btn-login.loading .lg-spin{display:inline-block}
+@keyframes lgSpin{to{transform:rotate(360deg)}}
+/* پیامِ خطا: هم‌الگو با بنرهای خطای سایت (آیکون + پس‌زمینه + کادر)، نه متنِ لخت */
+/* بنرها روی زمینهٔ ذغالی: پس‌زمینهٔ نیمه‌شفافِ هم‌رنگ به‌جای پاستلِ روشن،
+   تا با تمِ تیرهٔ پنل بنشیند و متنش خوانا بماند. */
+.login-card .err{display:none;align-items:flex-start;gap:8px;margin-top:14px;padding:10px 12px;
+  border-radius:var(--radius-sm);background:#e5393526;border:1px solid #ef535966;
+  color:#ffb4b0;font-size:12.5px;line-height:1.6}
+.login-card .err.show{display:flex}
+.login-card .err svg{width:15px;height:15px;flex-shrink:0;margin-top:3px;stroke:currentColor;fill:none;stroke-width:2}
+/* حالتِ اطلاع‌رسانی (نه خطا) — مثلِ راهنمای بازنشانیِ رمز */
+.login-card .err.info{background:#0ea5e926;border-color:#38bdf866;color:#a5daf5}
+/* دکمهٔ نمایش/پنهان‌سازیِ رمز — سمتِ چپِ فیلد در RTL (مقابلِ آیکونِ قفل) */
+/* دکمهٔ چشم سمتِ راست — چون آیکونِ قفل به چپ منتقل شد و نباید روی هم بیفتند */
+.lg-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  display:grid;place-items:center;width:28px;height:28px;padding:0;border:none;background:none;
+  border-radius:7px;color:#a8a8a6;cursor:pointer;transition:color .14s,background .14s}
+.lg-eye:hover{color:var(--brand);background:#ffffff14}   /* روشناییِ ملایم، نه نارنجیِ روشن */
+.lg-eye svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lg-eye .eye-off{display:none}
+.lg-eye.on .eye-on{display:none}
+.lg-eye.on .eye-off{display:block}
+/* وقتی دکمهٔ چشم هست، متن نباید زیرش برود (دکمه سمتِ راست است) */
+.lg-field:has(.lg-eye) input{padding-right:42px}
+/* توضیحِ راهنما بینِ فیلدِ رمز و دکمهٔ ورود — هم‌الگو با .ed-req-note در پنلِ تنظیمات:
+   آیکونِ دایره‌ایِ اطلاع پیش از متن. رنگ روشن‌تر است چون زمینه ذغالی است. */
+.lg-note{display:flex;align-items:flex-start;gap:7px;margin:22px 0 0;
+  font-size:11.5px;font-weight:500;color:#b0b0ae;line-height:1.9;text-align:right}
+.lg-note svg{width:14px;height:14px;flex-shrink:0;margin-top:4px;
+  stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:780px){
-  .login-wrap{flex-direction:column}
-  .login-brand{flex:none;min-height:34vh;padding:34px 20px}
-  .login-brand .mark{width:96px}
+  .login-wrap{padding:28px 16px}
+  /* موقعیت‌های عمودی را auth.js از روی همین اندازه‌ها دوباره حساب می‌کند */
+  .login-brand .mark{width:252px;--lg-mark-w:180px}
+  .login-brand .lg-tag{font-size:12.5px}
+  .login-card{padding:var(--sp-6) var(--sp-5)}
+  /* روی صفحهٔ کوچک، دورشدنِ نوارها کمتر است تا از کادر بیرون نزنند */
+  .lg-shift{--lg-in:90}
+}
+/* صفحهٔ کوتاه (لپ‌تاپِ کم‌ارتفاع): لوگوی کوچک‌تر تا اسکرول لازم نشود */
+@media(max-height:700px){
+  .login-brand .mark{width:240px;--lg-mark-w:173px}
+}
+/* احترام به تنظیمِ «کاهشِ حرکت» سیستم — همه‌چیز بدونِ انیمیشن، فقط تغییرِ حالت */
+@media(prefers-reduced-motion:reduce){
+  .login-wrap::before,.lg-shift,.lg-div,.lg-below,.login-card,
+  .login-brand,.login-brand .mark{transition-duration:.01ms !important;transition-delay:0s !important}
 }

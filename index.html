@@ -18,24 +18,78 @@
 
 <!-- ============ صفحهٔ ورود ============ -->
 <div id="loginView" class="login-wrap">
-  <div class="login-brand">
-    <img class="mark" src="fsm-mark.svg" alt="فولاد شرق ماهان">
-    <h2>فولاد شرق ماهان</h2>
-    <p class="en">FOOLAD SHARGH MAHAN</p>
-    <p class="tag">سامانهٔ مدیریت شماره و اسناد نقشه<br>دفتر فنی، تحقیق و توسعه و کنترل کیفی</p>
-  </div>
+  <!-- گوهٔ تیره + دو نوارِ نارنجی/طلاییِ کاملاً موازی — پایین‌راست.
+       نوارها با <line> و stroke کشیده می‌شوند تا ضخامتشان در کلِ طول ثابت بماند
+       (مسیرِ چندضلعی + preserveAspectRatio=none باعثِ تغییرِ ضخامت در طول می‌شد). -->
+  <svg class="lg-wedge br" viewBox="-330 -300 760 600" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
+    <g class="lg-shift">
+      <!-- مثلثِ ذغالی: ضلعِ مورب هم‌شیبِ نوارها (شیبِ ‎-1.0625‎)، امتدادیافته تا بیرونِ کادر -->
+      <path d="M630 500 L630 0 L159 500 Z" fill="#4a4a4a"/>
+      <line x1="1090.8" y1="-527.6" x2="-177.1" y2="819.6" stroke="#f7941f" stroke-width="34"/>
+      <line x1="1069.0" y1="-548.1" x2="-198.9" y2="799.0" stroke="#fbcf88" stroke-width="11"/>
+    </g>
+  </svg>
+  <!-- همان مجموعه، قرینه در بالا-چپ (چرخشِ ۱۸۰ درجه) -->
+  <svg class="lg-wedge tl" viewBox="-330 -300 760 600" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
+    <g class="lg-shift">
+      <!-- مثلثِ ذغالی: ضلعِ مورب هم‌شیبِ نوارها (شیبِ ‎-1.0625‎)، امتدادیافته تا بیرونِ کادر -->
+      <path d="M630 500 L630 0 L159 500 Z" fill="#4a4a4a"/>
+      <line x1="1090.8" y1="-527.6" x2="-177.1" y2="819.6" stroke="#f7941f" stroke-width="34"/>
+      <line x1="1069.0" y1="-548.1" x2="-198.9" y2="799.0" stroke="#fbcf88" stroke-width="11"/>
+    </g>
+  </svg>
   <div class="login-form">
-    <div class="login-card">
+    <div class="login-brand">
+      <!-- نشان + نامِ شرکت به‌صورتِ یک تصویرِ واحد (نسخهٔ روشن، برای زمینهٔ تیره).
+           متنِ واقعی زیرش با کلاسِ sr-only می‌ماند تا screen reader و جست‌وجوی مرورگر آن را بخوانند. -->
+      <img class="mark" src="fsm-brand-light.webp" alt="فولاد شرق ماهان — FOOLAD SHARGH MAHAN (سهامی خاص)">
+      <h2 class="sr-only">فولاد شرق ماهان</h2>
+      <p class="en sr-only">FOOLAD SHARGH MAHAN</p>
+      <!-- ⚠ قابِ نارنجی و «خطِ زیرِ لوگو» یک چیزِ واحدند، نه دو عنصر.
+           دو مسیرِ قرینه که از بالا-وسط شروع می‌شوند: در مرحلهٔ ۱ فقط تکهٔ کوتاهی از
+           هرکدام آشکار است و همان خطِ کوتاه دیده می‌شود؛ در مرحلهٔ ۲ همان دو مسیر
+           جلو می‌روند، پایین می‌آیند و در وسطِ پایین به هم می‌رسند و قاب کامل می‌شود. -->
+      <svg class="lg-frame" aria-hidden="true">
+        <path class="r"/>
+        <path class="l"/>
+      </svg>
+      <!-- محتوای زیرِ خط: در مرحلهٔ ۲ به پایین می‌لغزد و زیرِ کارتِ در حالِ بازشدن ناپدید می‌شود -->
+      <div class="lg-below">
+        <p class="lg-tag">سامانهٔ مدیریت شماره و اسناد نقشه<br>دفتر فنی، تحقیق و توسعه و کنترل کیفی</p>
+        <!-- مرحلهٔ ۱: دکمهٔ آغاز — با کلیک، برند جمع می‌شود و کارتِ ورود باز می‌شود -->
+        <button type="button" class="lg-start" onclick="lgOpen()">
+          <span>ورود به سامانه</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+      <!-- ⚠ کارت عمداً داخلِ همین بلوک است: بلوک در مرحلهٔ ۲ بالا می‌رود و کارت باید
+           همراهِ خطِ نارنجی بالا بیاید، وگرنه از آن جدا می‌افتد. -->
+      <div class="login-card">
+      <div class="lg-body">
       <h1>ورود به سامانه</h1>
       <p class="sub">برای ادامه، نام کاربری و رمز عبور خود را وارد کنید.</p>
-      <label>نام کاربری</label>
-      <input id="lgUser" placeholder="نام کاربری" autocomplete="username">
-      <label>رمز عبور</label>
-      <input id="lgPass" type="password" placeholder="رمز عبور" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
-      <button class="btn-login" onclick="doLogin()">ورود</button>
-      <p id="lgErr" class="err"></p>
-    </div>
-  </div>
+      <label for="lgUser">نام کاربری</label>
+      <span class="lg-field">
+        <svg class="lg-ic" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <input id="lgUser" placeholder="Username" autocomplete="username">
+      </span>
+      <label for="lgPass">رمز عبور</label>
+      <span class="lg-field">
+        <svg class="lg-ic" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input id="lgPass" type="password" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+        <button type="button" id="lgEye" class="lg-eye" aria-label="نمایش رمز عبور" aria-pressed="false" title="نمایش رمز عبور" onclick="lgTogglePass()">
+          <svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+        </button>
+      </span>
+      <!-- توضیح هم‌سبکِ .ed-req-note: آیکونِ دایره‌ایِ اطلاع پیش از متن -->
+      <p class="lg-note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای دریافت نام کاربری و رمز عبور با مدیر سیستم تماس بگیرید.</p>
+      <button id="lgBtn" class="btn-login" onclick="doLogin()"><span class="lg-spin" aria-hidden="true"></span><span class="lg-lbl">ورود</span></button>
+      <p id="lgErr" class="err" role="alert"></p>
+      </div><!-- /.lg-body -->
+      </div><!-- /.login-card -->
+    </div><!-- /.login-brand -->
+  </div><!-- /.login-form -->
 </div>
 
 <!-- ============ برنامهٔ اصلی ============ -->
@@ -152,28 +206,28 @@
             <div class="kpi-figures"><div class="kpi-val" id="kpiActiveProjects">—</div><div class="kpi-label">پروژه‌های فعال</div></div>
             <div class="kpi-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
           </div>
-          <div class="kpi-foot kf-warn"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+          <div class="kpi-foot kf-brand" id="kpiFootActiveProjects"><span class="kpi-dot"></span><span>—</span></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-top">
             <div class="kpi-figures"><div class="kpi-val" id="kpiDocs">—</div><div class="kpi-label">اسناد ثبت‌شده</div></div>
-            <div class="kpi-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+            <div class="kpi-icon" style="background:var(--panel2)"><svg viewBox="0 0 24 24" style="stroke:var(--charcoal)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
           </div>
-          <div class="kpi-foot kf-ok"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+          <div class="kpi-foot kf-gray" id="kpiFootDocs"><span class="kpi-dot"></span><span>—</span></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-top">
             <div class="kpi-figures"><div class="kpi-val" id="kpiApproved">—</div><div class="kpi-label">اسناد تأییدشده</div></div>
             <div class="kpi-icon" style="background:#dcfce7"><svg viewBox="0 0 24 24" style="stroke:var(--ok)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
           </div>
-          <div class="kpi-foot kf-ok"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+          <div class="kpi-foot kf-ok" id="kpiFootApproved"><span class="kpi-dot"></span><span>—</span></div>
         </div>
         <div class="kpi-card">
           <div class="kpi-top">
             <div class="kpi-figures"><div class="kpi-val" id="kpiPending">—</div><div class="kpi-label">در انتظار بازبینی</div></div>
             <div class="kpi-icon" style="background:#fef3c7"><svg viewBox="0 0 24 24" style="stroke:var(--warn)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
           </div>
-          <div class="kpi-foot kf-warn"><span class="kpi-dot"></span><span>تغییری نسبت به دیروز ندارد</span></div>
+          <div class="kpi-foot kf-warn" id="kpiFootPending"><span class="kpi-dot"></span><span>—</span></div>
         </div>
       </div>
       <div class="dash-panels rv-group">

@@ -145,13 +145,13 @@ function railHTML(clients){
 
 function clientItemHTML(c){
   var admin=cpIsAdmin();
-  var n=projectsOf(c.code).length;
+  var en=clientNameEn(c.code);
   return '<div class="cp-client-item'+(c.code===_cp.client?" sel":"")+'" data-code="'+esc(c.code)+'"'+(admin?' draggable="true"':'')+' tabindex="0" role="button"'+
     (admin?' ondragstart="clientDragStart(event,\''+esc(c.code)+'\')" ondragend="clientDragEnd(event)"':'')+
     ' onclick="selectClient(\''+esc(c.code)+'\')">'+
     cpLogo(c,34)+
     '<div class="cp-ci-body"><span class="cp-ci-name">'+esc(c.name)+'</span>'+
-      '<span class="cp-ci-meta">'+clientMetaHTML(c.code, ordersOf(c.code).length, n)+'</span></div>'+
+      (en?'<span class="cp-ci-meta cmeta-en">'+esc(en)+'</span>':'')+'</div>'+
     (admin?'<span class="cp-grip" title="بکشید تا ترتیب عوض شود" aria-label="جابجاییِ ترتیب" onmousedown="cliGripDown()" onclick="event.stopPropagation()">'+
       '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>':'')+
     '</div>';
@@ -244,7 +244,7 @@ function ordersSectionHTML(c,orders){
           '<button class="icon-btn sm danger" title="حذف سفارش" onclick="event.stopPropagation();del(\'deleteOrder\',{clientCode:\''+esc(c.code)+'\',orderNo:\''+esc(pad2(o.orderNo))+'\'})">'+ICON.trash+'</button>'+
         '</span>':'')+'</div>'+
       '<div class="coc-desc">'+esc(o.title||"بدون عنوان")+'</div>'+
-      '<div class="coc-meta"><bdi>'+np+' پروژه</bdi>'+(o.date?' · <bdi>'+fmtDate(o.date)+'</bdi>':'')+'</div>'+
+      '<div class="coc-meta"><bdi>'+faN(np)+' پروژه</bdi>'+(o.date?' · <bdi>'+fmtDate(o.date)+'</bdi>':'')+'</div>'+
     '</div>';
   }).join("");
   var addCard=admin?'<button class="cp-order-add" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'<span>سفارش جدید</span></button>':'';
@@ -1076,7 +1076,7 @@ function drawProjectSpecsBody(c,o,pr){
   /* کارتِ ۲: اسناد پروژه — فقط روشن/خاموش؛ افزودنِ نوعِ جدید فقط در تنظیمات */
   var nOn=PSED.projDocs.filter(function(x){ return x.on; }).length;
   var docRows=PSED.projDocs.map(function(x,i){ return pedDragRow(x.on,x.label,x.code,"psedToggleDoc("+i+")"); }).join("");
-  var docsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'اسناد پروژه<span class="ed-count">'+nOn+' سند</span></h4>'+
+  var docsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'اسناد پروژه<span class="ed-count">'+faN(nOn)+' سند</span></h4>'+
     (docRows?'<div class="ed-scroll" data-reorder="proj" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">نوعِ سندِ سطحِ پروژه‌ای تعریف نشده.</div>')+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودنِ نوعِ جدیدِ سند، به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>برای بارگذاریِ فایلِ هر سند، در پنلِ مدیریتِ پروژه روی آیکونِ همان سند کلیک کنید.</div>'+
@@ -1266,9 +1266,9 @@ function drawPartsBody(){
   /* کارتِ ۱: قطعاتِ پروژه (روشن/خاموش) — فهرست داخلِ خودش اسکرول می‌شود تا پنجره کوتاه بماند */
   var partRows=PED.parts.map(function(x,i){ return pedCheckRow(x.on,x.fa,x.en||"","pedTogglePart("+i+")")+'</div>'; }).join("");
   var partNote=(nPart>0)
-    ? '<div class="ed-req-note"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+nPart+' قطعه انتخاب شده.</div>'
+    ? '<div class="ed-req-note"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+faN(nPart)+' قطعه انتخاب شده.</div>'
     : '<div class="ed-req-note"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>دست‌کم یک قطعه انتخاب کنید.</div>';
-  var partsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_PART+'قطعات پروژه<span class="ed-count">'+nPart+' قطعه</span></h4>'+
+  var partsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_PART+'قطعات پروژه<span class="ed-count">'+faN(nPart)+' قطعه</span></h4>'+
     '<div class="ed-scroll">'+partRows+'</div>'+partNote+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودنِ قطعهٔ جدید، به «تنظیمات ◂ قطعات» بروید.</div>'+
     '</div>';

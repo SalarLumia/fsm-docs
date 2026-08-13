@@ -99,15 +99,19 @@ function projectsOf(clientCode, orderNo){
   return DB.projects.filter(function(p){ return p.clientCode===clientCode && (orderNo===undefined || pad2(p.orderNo)===pad2(orderNo)); })
     .sort(function(a,b){ return (numOf(a.orderNo)-numOf(b.orderNo)) || (numOf(a.projectNo)-numOf(b.projectNo)); });
 }
-/* متادیتای مشتری (راست‌به‌چپ و بدون ایراد bidi): «کد · N سفارش · M پروژه».
-   با inline-flex ترتیب قطعی می‌شود و با <bdi> هر بخش از بقیه ایزوله می‌ماند. */
+/* متادیتای مشتری (راست‌به‌چپ و بدون ایراد bidi): «نامِ لاتین | کد | N سفارش | M پروژه».
+   با inline-flex ترتیب قطعی می‌شود و با <bdi> هر بخش از بقیه ایزوله می‌ماند.
+   جداکننده = خطِ عمودیِ نازک (هم‌سبکِ سطلِ زباله). شمارشگرها با ارقامِ فارسی. */
 function clientMetaHTML(code, ordersCount, projectsCount){
+  var en=clientNameEn(code);
+  var sep='<span class="cmeta-sep" aria-hidden="true"></span>';
   return '<span class="cmeta">'+
+    (en?'<bdi class="cmeta-en">'+esc(en)+'</bdi>'+sep:'')+
     '<bdi class="mono">'+esc(code)+'</bdi>'+
-    '<span class="cmeta-sep">·</span>'+
-    '<bdi>'+ordersCount+' سفارش</bdi>'+
-    '<span class="cmeta-sep">·</span>'+
-    '<bdi>'+projectsCount+' پروژه</bdi>'+
+    sep+
+    '<bdi>'+faN(ordersCount)+' سفارش</bdi>'+
+    sep+
+    '<bdi>'+faN(projectsCount)+' پروژه</bdi>'+
   '</span>';
 }
 /* نام نمایشی کاربر از روی نام کاربری (نه خود نام کاربری) */
@@ -318,6 +322,9 @@ function workflowOf(drawingNumber){
   return DB.workflow.filter(function(w){ return w.drawingNumber===drawingNumber; })
     .sort(function(a,b){ return (a.timestamp||"").localeCompare(b.timestamp||""); });
 }
-/* اسناد در انتظار بازبینی */
-function pendingDocs(){ return DB.documents.filter(function(d){ return String(d.status||"").toLowerCase()==="pending"; }); }
+/* اسناد در انتظار بازبینی — جدیدترین (آخرین ارسال‌شده) بالاترین */
+function pendingDocs(){
+  return DB.documents.filter(function(d){ return String(d.status||"").toLowerCase()==="pending"; })
+    .sort(function(a,b){ return (b.timestamp||"").localeCompare(a.timestamp||""); });
+}
 function approvedDocs(){ return DB.documents.filter(function(d){ var s=String(d.status||"").toLowerCase(); return s==="approved"||s==="active"; }); }

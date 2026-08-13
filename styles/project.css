@@ -20,9 +20,12 @@
 .pp-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-5);
   padding-bottom:var(--sp-3);border-bottom:1px solid var(--line)}
 .pp-head-main{display:flex;align-items:center;gap:var(--sp-3);min-width:0}
-.pp-head h1{margin:0;font-size:19px;font-weight:700;color:var(--txt);min-width:0;
-  padding-right:10px;border-right:3px solid var(--brand);line-height:1.2;
+/* خطِ عمودیِ نارنجیِ پیشِ عنوان با ::before (نه border) تا گوشه‌هایش گرد شوند، هم‌سبکِ کارتِ پروژهٔ داشبورد */
+.pp-head h1{position:relative;margin:0;font-size:19px;font-weight:700;color:var(--txt);min-width:0;
+  padding-right:13px;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp-head h1::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
+  width:3px;height:20px;border-radius:2px;background:var(--brand)}
 .pp-head-actions{display:flex;align-items:center;gap:var(--sp-2);flex-shrink:0}
 
 /* تگِ وضعیتِ پروژه — متریکِ .tag سایت */
