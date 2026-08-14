@@ -108,7 +108,8 @@ function buildArchChips(){
   var host=document.getElementById("archChips"); if(!host) return;
   var chips=FILT_FIELDS.filter(function(f){ var s=document.getElementById(f.id); return s && s.value; }).map(function(f){
     var s=document.getElementById(f.id);
-    return '<span class="filt-chip"><span class="fc-k">'+esc(f.label)+'</span>'+
+    // نامِ دسته (مشتری/پروژه/…) نوشته نمی‌شود؛ خودِ مقدار گویاست. عنوانِ دسته در tooltip می‌ماند.
+    return '<span class="filt-chip" title="'+esc(f.label)+'">'+
       '<span class="fc-v">'+esc(filtOptLabel(f.id,s.value))+'</span>'+
       '<button class="fc-x" title="حذفِ این فیلتر" onclick="filtClear(\''+f.id+'\')">'+ICON.x+'</button></span>';
   });

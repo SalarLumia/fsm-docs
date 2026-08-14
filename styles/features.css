@@ -899,13 +899,16 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* ردیفِ چیپ‌های فیلترِ فعال */
 .arch-chips{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:14px}
 .arch-chips[hidden]{display:none}
+/* چیپِ فیلترِ فعال — هم‌رنگ و هم‌اندازهٔ .tag (کوچک‌ترین کلاسِ متنیِ استانداردِ سایت: ۱۱px) */
 .filt-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 5px 0 11px;box-sizing:border-box;
-  border:1px solid var(--line);border-radius:9px;background:var(--panel);font-size:12.5px;line-height:1}
-.filt-chip .fc-k{color:var(--muted);font-weight:600}
-.filt-chip .fc-v{color:var(--txt);font-weight:700}
+  border:1px solid #f7941f33;border-radius:9px;background:#fff3e6;
+  font-size:11px;font-weight:500;line-height:1;color:var(--brand)}
+.filt-chip .fc-v{color:var(--brand);font-weight:600}
 .filt-chip .fc-x{display:inline-grid;place-items:center;width:20px;height:20px;border:none;background:none;
-  border-radius:6px;color:var(--muted);cursor:pointer;transition:background .12s,color .12s}
-.filt-chip .fc-x:hover{background:#0000000d;color:var(--err)}
+  color:var(--brand);cursor:pointer;transition:color .12s}
+/* بدونِ کادر/پس‌زمینه در هوور — فقط خودِ ضربدر قرمز می‌شود */
+.filt-chip .fc-x:hover,.filt-chip .fc-x:active,
+.filt-chip .fc-x:focus-visible{background:none;color:var(--err);outline:none}
 .filt-chip .fc-x .ic{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 .filt-add{display:inline-grid;place-items:center;width:32px;height:32px;border:1px dashed var(--line);
   border-radius:9px;background:#fff;color:var(--muted);cursor:pointer;transition:.14s}
