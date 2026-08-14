@@ -148,7 +148,9 @@
 /* گروهِ انتهایِ سر (اکشن‌ها + فلش) به سمتِ چپ رانده می‌شود؛ حذف/تأیید/رد و فلش در یک خط با شماره */
 .ver-head-end{display:flex;align-items:center;gap:8px;margin-inline-start:auto;flex-shrink:0}
 .ver-chev{display:inline-flex;flex-shrink:0}
-.ver-chev svg{width:14px;height:14px;fill:none;stroke:var(--muted);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.ver-chev svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+.ver-chev{color:var(--muted);transition:color .18s}
+.ver-row.open .ver-chev{color:var(--brand)}   /* باز = فلشِ نارنجی، هم‌رفتارِ بقیهٔ آکاردئون‌ها */
 .ver-row.open .ver-chev svg{transform:rotate(180deg)}
 /* گردش‌کار: باز/بسته‌شدنِ روان (grid 0fr→1fr) هم‌سبکِ آکاردئون‌های سایت */
 .ver-wf{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.2,0,0,1)}
@@ -991,6 +993,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .tbl-exp:hover{color:var(--brand);background:#fff3e6}
 .tbl-exp:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .tbl-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
+.tbl-exp.open{color:var(--brand)}   /* باز = فلشِ نارنجی */
 .tbl-exp.open .chev{transform:rotate(180deg)}   /* باز = فلش رو به بالا (مثلِ سایدبار) */
 /* جمع‌شدنِ نرمِ سطرها (tbody) با انیمیشنِ max-height + محوشدگی — معادلِ گرید 0fr↔1fr سایدبار در ساختارِ table */
 .mgmt-table tbody,.users-table tbody{transition:max-height .26s cubic-bezier(0,0,.2,1),opacity .2s}

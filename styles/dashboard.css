@@ -81,18 +81,23 @@
 .proj-more:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
 .proj-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;transition:.15s;box-shadow:0 1px 3px #00000006}
 .proj-card:hover{border-color:#d8d6d0;box-shadow:0 3px 10px #0000000d}
-.proj-card-head{padding:13px 15px 13px;cursor:pointer;display:flex;flex-direction:column;gap:8px;
+.proj-card-head{padding:13px 15px 13px;display:flex;flex-direction:column;gap:8px;
   transition:padding-bottom .28s cubic-bezier(0,0,.2,1)}   /* هم‌زمان با انیمیشنِ باز/بستنِ proj-card-detail */
 /* فقط در حالتِ بسته: کفِ کارت ۱۰px پایین‌تر (بخشِ اکسپندشونده در این حالت با grid-rows:0fr نامرئی است) */
 .proj-card:not(.open) .proj-card-head{padding-bottom:23px}
 .proj-card-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 /* خطِ عمودیِ نارنجی پیشِ تیتر، هم‌سبکِ عنوانِ صفحهٔ جزئیاتِ پروژه (.pp-head h1)؛ ارتفاعِ خط با ::before
    مستقل از line-heightِ متن و کوتاه‌تر از قدِ کامل، به‌طورِ مساوی از بالا/پایین وسط‌چین می‌شود */
-.proj-card-name{position:relative;font-size:13.5px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;transition:color .12s;
-  padding-right:10px}
+/* تیترِ پروژه = دکمهٔ رفتن به صفحهٔ پروژه (نه دکمهٔ باز/بستن) */
+.proj-card-name{position:relative;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--txt);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0;
+  display:block;text-align:right;border:none;background:none;cursor:pointer;
+  padding:3px 10px 3px 8px;margin:-3px -8px -3px 0;border-radius:7px;
+  transition:color .12s,background-color .12s}
 .proj-card-name::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
   width:2px;height:17px;border-radius:2px;background:var(--brand)}
-.proj-card-head:hover .proj-card-name{color:var(--brand)}
+.proj-card-name:hover{color:var(--brand);background:#fff3e6}
+.proj-card-name:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .proj-card-meta{font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap}
 /* پیشرفت (مثلِ حلقهٔ «مستندات پروژه»): درصدِ کلیِ بزرگ بالای نوارِ دو‌لایه؛ نوار کوتاه و از سمتِ چپ */
 .proj-prog{display:flex;flex-direction:column;align-items:flex-start;gap:6px;direction:ltr;margin-top:1px;padding-inline-start:12px}
@@ -106,16 +111,22 @@
 .proj-prog .proj-bar-bg{width:82%;min-width:120px;max-width:420px;top:-20px;margin-bottom:-20px}   /* ~۵۰٪ بلندتر، از سمتِ راست؛ ۲۰px بالاتر */
 .proj-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:4px;transition:width .6s cubic-bezier(0,0,.2,1)}
 .proj-bar-fill.faint{background:var(--brand);opacity:.26}
-.proj-chevron{transition:.2s;color:#b9b7b1;flex-shrink:0;display:flex}
-.proj-chevron svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2}
-.proj-card.open .proj-chevron{transform:rotate(180deg)}
+/* فلش = تنها دکمهٔ باز/بستنِ کارت؛ در حالتِ باز نارنجی می‌شود (هم‌رفتارِ فلش‌های آرشیو و جدول‌ها) */
+.proj-chevron{width:26px;height:26px;flex-shrink:0;display:inline-grid;place-items:center;
+  border:none;background:none;border-radius:7px;cursor:pointer;color:#b9b7b1;
+  transition:color .18s,background-color .18s}
+.proj-chevron svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .22s}
+.proj-chevron:hover{color:var(--brand);background:#fff3e6}
+.proj-chevron:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
+.proj-card.open .proj-chevron{color:var(--brand)}
+.proj-card.open .proj-chevron svg{transform:rotate(180deg)}
 /* باز/بسته‌شدنِ متحرک با grid-rows 0fr↔1fr (بدون پرش). در حالتِ بسته grid-template-rows:0fr خودش
    ارتفاعِ محتوا را صفر می‌کند؛ pcd-inner هم overflow:hidden دارد، پس چیزی از کادرِ کارت بیرون نمی‌زند. */
 .proj-card-detail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(0,0,.2,1)}
 .proj-card.open .proj-card-detail{grid-template-rows:1fr}
 .pcd-inner{overflow:hidden;min-height:0}
 .pcd-body{padding:8px 15px 13px}   /* بدونِ خطِ جداکننده؛ فاصلهٔ بالا ۸px؛ کفِ کارت ۱۰px کوتاه‌تر (۲۳→۱۳) */
-@media(prefers-reduced-motion:reduce){.proj-card-detail{transition:none}.proj-bar-fill{transition:none}.proj-card-head{transition:none}}
+@media(prefers-reduced-motion:reduce){.proj-card-detail{transition:none}.proj-bar-fill{transition:none}.proj-card-head{transition:none}.proj-chevron svg{transition:none}}
 /* هم‌کلاسِ متنیِ proj-card-meta (نامِ مشتری): ۱۱٫۵px، وزنِ ۵۰۰، رنگِ muted. */
 .detail-stats{display:flex;gap:16px;padding:0;font-size:11.5px;font-weight:500;color:var(--muted);flex-wrap:wrap}
 .detail-stats b{color:var(--txt);font-weight:700}

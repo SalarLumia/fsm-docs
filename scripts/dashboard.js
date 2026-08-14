@@ -141,9 +141,10 @@ function renderProjectCards(animate){
     var pctText=doAnim?"0":r.pct, regW=doAnim?0:r.regPct, solW=doAnim?0:r.pct;
     var openCls=(i===openIdx)?" open":"";
     return '<div class="proj-card'+openCls+'" data-pct="'+r.pct+'" data-regpct="'+r.regPct+'" data-bar="'+esc(r.status.bar)+'" data-i="'+i+'" data-key="'+esc(projKey(r))+'">'+
-      '<div class="proj-card-head" onclick="toggleProjCard(this)">'+
-        '<div class="proj-card-row"><span class="proj-card-name">پروژه تولید '+esc(r.name)+'</span>'+
-          '<span class="proj-chevron"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span></div>'+
+      '<div class="proj-card-head">'+
+        '<div class="proj-card-row">'+
+          '<button type="button" class="proj-card-name" onclick="openProject(\''+esc(r.c)+'\',\''+esc(r.o)+'\',\''+esc(r.pr)+'\')" title="مشاهدهٔ پروژه">پروژه تولید '+esc(r.name)+'</button>'+
+          '<button type="button" class="proj-chevron" onclick="toggleProjCard(this)" aria-label="باز/بستنِ جزئیات" aria-expanded="'+((i===openIdx)?'true':'false')+'"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></div>'+
         '<div class="proj-card-row"><span class="proj-card-meta">'+esc(r.client)+'</span></div>'+
         '<div class="proj-prog">'+
           '<span class="pp-big pp-pct">'+pctText+'٪</span>'+
@@ -196,8 +197,10 @@ function countUpPercent(el, target){
    - کلیک روی کارتِ بسته: همان باز می‌شود (و بقیه بسته)، _projOpenKey به‌روزرسانی می‌شود.
    - کلیک روی کارتِ بازِ فعلی (یعنی «می‌خواهم مینیمایزش کنم»): به‌جای بستنِ کامل، پروژهٔ بعدیِ فهرست
      به‌جایش باز می‌شود (یا اگر آخری بود، اولین)، تا همیشه یکی باز بماند. */
-function toggleProjCard(head){
-  var card=head.parentElement, list=card.parentElement;
+function toggleProjCard(el){
+  var card=el.closest?el.closest(".proj-card"):null;
+  if(!card) return;
+  var list=card.parentElement;
   if(!list) return;
   var wasOpen=card.classList.contains("open");
   var cards=[].slice.call(list.querySelectorAll(".proj-card"));
@@ -206,8 +209,12 @@ function toggleProjCard(head){
     var i=cards.indexOf(card);
     target=cards[(i+1)%cards.length];   // پروژهٔ بعدی؛ اگر آخری بود، برمی‌گردد به اولین
   }
-  cards.forEach(function(c){ c.classList.remove("open"); });
+  cards.forEach(function(c){
+    c.classList.remove("open");
+    var b=c.querySelector(".proj-chevron"); if(b) b.setAttribute("aria-expanded","false");
+  });
   target.classList.add("open");
+  var tb=target.querySelector(".proj-chevron"); if(tb) tb.setAttribute("aria-expanded","true");
   _projOpenKey=target.getAttribute("data-key")||null;
 }
 
