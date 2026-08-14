@@ -108,9 +108,9 @@ function dlHandOff(job){
 
 /* ---------- رندرِ پنل (دراپ‌داونِ زیرِ دکمهٔ هدر) ---------- */
 /* ⚠ پنل باید فرزندِ مستقیمِ body باشد، نه داخلِ هدر.
-   دلیل: .top-bar با position:sticky و z-index:30 یک «زمینهٔ چیدمان» می‌سازد و هر
-   چیزی داخلش — حتی با position:fixed و z-index:120 — زیرِ سقفِ همان ۳۰ حبس می‌شود،
-   پس هرگز روی مودالِ z-index:80 دیده نمی‌شد. با انتقال به body این سقف برداشته می‌شود. */
+   دلیل: .top-bar یک «زمینهٔ چیدمان» می‌سازد (sticky + z-index) و هر چیزی داخلش —
+   حتی با position:fixed و z-index بالا — زیرِ سقفِ همان زمینه حبس می‌شود.
+   با انتقال به body، پنل مستقل از هدر روی مودال‌ها دیده می‌شود. */
 function dlHost(){
   var h=document.getElementById("dlCenter");
   if(!h){ h=document.createElement("div"); h.id="dlCenter"; h.className="dl-center"; }
@@ -160,13 +160,15 @@ function dlItemHTML(j){
     ? '<div class="dl-bar'+(indet?" indet":"")+'"><span class="dl-fill"'+(indet?'':' style="width:'+j.pct+'%"')+'></span></div>'
     : '';
 
+  /* ⚠ آیکونِ «تکرار» است نه «دانلود»: این دکمه کارِ انجام‌شده را دوباره اجرا می‌کند
+     (چه دانلود، چه آپلود) و آیکونِ فلشِ دانلود با کارکردش جور نبود. */
   var acts="";
-  if(j.status==="done" && !up) acts+='<button class="dl-iconbtn" onclick="dlRedownload('+j.id+')" title="دانلودِ دوباره" aria-label="دانلودِ دوباره">'+DL_IC.dl+'</button>';
+  if(j.status==="done" && !up) acts+='<button class="dl-iconbtn" onclick="dlRedownload('+j.id+')" title="دریافتِ دوباره" aria-label="دریافتِ دوباره">'+DL_IC.retry+'</button>';
   else if(j.status==="error")  acts+='<button class="dl-iconbtn" onclick="dlRetry('+j.id+')" title="تلاشِ دوباره" aria-label="تلاشِ دوباره">'+DL_IC.retry+'</button>';
 
-  // آیکونِ سرِ هر رکورد بسته به نوع: آپلود = فلشِ بالا، دانلود = فلشِ پایین
+  // آیکونِ سرِ هر رکورد = نوعِ فایل (سند/تصویر/مدلِ سه‌بعدی)، نه جهتِ انتقال
   return '<div class="dl-item '+j.status+(up?" up":" down")+'" data-id="'+j.id+'">'+
-    '<span class="dl-fileic'+(up?" up":" down")+'">'+(up?DL_IC.up_badge:DL_IC.dl)+'</span>'+
+    '<span class="dl-fileic'+(up?" up":" down")+'">'+dlFileIcon(j)+'</span>'+
     '<div class="dl-main">'+
       '<div class="dl-name" title="'+name+'">'+name+'</div>'+
       '<div class="dl-state '+cls+'">'+esc(state)+'</div>'+
@@ -290,12 +292,18 @@ var DL_IC = {
   down:'<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>',
   up_badge:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
 };
+/* آیکونِ سرِ هر رکورد بر اساسِ نوعِ فایل (نه جهتِ انتقال).
+   رنگِ سبز/قرمزِ وضعیت روی همین آیکون می‌نشیند (قواعدِ .dl-item.done/.error). */
 function dlFileIcon(j){
   var m=String(j.mimeType||"").toLowerCase(), n=String(j.name||j.label||"").toLowerCase();
-  if(m.indexOf("image/")===0)
+  if(m.indexOf("image/")===0 || /\.(png|jpe?g|gif|webp|bmp|svg)$/.test(n))
     return '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>';
-  if(/^model\//.test(m) || /\.(glb|gltf)$/.test(n))
+  if(/^model\//.test(m) || /\.(glb|gltf|usdz|stl|obj|step|stp|iges|igs)$/.test(n))
     return '<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+  if(/pdf/.test(m) || /\.pdf$/.test(n))
+    return '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>';
+  if(/\.(dwg|dxf)$/.test(n))
+    return '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 17l3-4 2 2.5L15 13"/></svg>';
   // پیش‌فرض: سند
   return '<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
 }
