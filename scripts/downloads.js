@@ -98,6 +98,10 @@ function dlHandOff(job){
   if(!job || !job.blobUrl) return;
   var a=document.createElement("a");
   a.href=job.blobUrl; a.download=job.name||"file";
+  /* ⚠ این کلیکِ ساختگی روی body می‌نشیند و تا شنوندهٔ «کلیکِ بیرون» بالا می‌رود،
+     پس با تمام‌شدنِ هر دانلود، پنل خودبه‌خود بسته می‌شد. با این نشانه، آن شنونده
+     کلیکِ خودی را نادیده می‌گیرد و پنل تا کلیکِ واقعیِ کاربر باز می‌ماند. */
+  a.dataset.dlInternal="1";
   document.body.appendChild(a); a.click(); a.remove();
   // blobUrl را نگه می‌داریم تا «دانلودِ دوباره» ممکن باشد؛ با حذفِ کارت یا «پاک‌کردن» آزاد می‌شود.
 }
@@ -229,7 +233,17 @@ function xferPlace(){
   host.style.left=Math.round(left)+"px";
 }
 function xferOpen(){
-  _dlOpen=true; _dlUnseen=false;   // بازکردنِ پنل = دیده‌شدن؛ نشانِ سبز/قرمز پاک می‌شود
+  _dlUnseen=false;                 // بازکردنِ پنل = دیده‌شدن؛ نشانِ سبز/قرمز پاک می‌شود
+  /* ⚠ ترتیب مهم است: اول محتوا و مختصات در حالتِ بسته ست می‌شود، بعد در فریمِ
+     بعدی کلاسِ open می‌آید. اگر جای عنصر هم‌زمان با کلاس عوض شود، مرورگر گذار را
+     از موقعیتِ قبلی شروع می‌کند و پنل به‌جای بازشدنِ نرم، از جای دیگری می‌پرد. */
+  if(!_dlOpen){
+    _dlOpen=false; dlRender();     // رندر در حالتِ بسته
+    xferPlace();                   // جای درست پیش از شروعِ انیمیشن
+    var host=document.getElementById("dlCenter");
+    if(host) void host.offsetWidth; // اعمالِ فوریِ حالتِ اولیه (reflow)
+  }
+  _dlOpen=true;
   dlRender();
   xferPlace();
   document.removeEventListener("click", xferOutside, true);
@@ -242,6 +256,8 @@ function xferClose(){
   document.removeEventListener("click", xferOutside, true);
 }
 function xferOutside(e){
+  // کلیکِ ساختگیِ تحویلِ فایل به مرورگر، نه کلیکِ کاربر → پنل نباید بسته شود
+  if(e.target && e.target.dataset && e.target.dataset.dlInternal) return;
   var wrap=document.getElementById("xferWrap");
   if(wrap && wrap.contains(e.target)) return;   // کلیک روی دکمهٔ هدر → باز بماند
   /* ⚠ پنل فرزندِ body است نه xferWrap، پس باید جداگانه بررسی شود؛ وگرنه کلیک روی
