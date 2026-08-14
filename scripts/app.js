@@ -12,7 +12,18 @@
   try{
     var saved=JSON.parse(s);
     if(!saved || typeof saved.token!=="string" || !saved.token){ localStorage.removeItem("fsm_session"); return; }
+    /* توکن ۱۲ ساعته است و زمانِ انقضا هنگامِ ورود ذخیره می‌شود. اگر از آن گذشته،
+       اصلاً درخواستی نمی‌فرستیم: مستقیم صفحهٔ ورود می‌آید و کاربر هرگز پوستهٔ
+       برنامه را نمی‌بیند که بعد پرتاب شود. (نشستِ قدیمی که expiresAt ندارد،
+       اعتبارش را بک‌اند تعیین می‌کند.) */
+    if(saved.expiresAt && Date.now() >= saved.expiresAt){
+      localStorage.removeItem("fsm_session");
+      if(typeof toast==="function") toast("نشست منقضی شد. دوباره وارد شوید.");
+      return;
+    }
     ME=saved;
-    startApp().catch(function(){ logout(); });
+    /* deferReveal: تا وقتی بک‌اند نشست را تأیید نکرده، برنامه نمایش داده نمی‌شود.
+       بدونِ این، صفحه باز می‌شد و چند ثانیه بعد کاربر بیرون انداخته می‌شد. */
+    startApp({deferReveal:true}).catch(function(){ logout(); });
   }catch(e){ localStorage.removeItem("fsm_session"); }
 })();

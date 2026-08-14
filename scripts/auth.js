@@ -1,4 +1,7 @@
 /* ================= ورود / خروج ================= */
+/* عمرِ توکنِ بک‌اند (۱۲ ساعت). اگر در Code.gs عوض شد، این هم باید هم‌گام شود؛
+   بدترین حالتِ ناهماهنگی این است که یک بار درخواست به سرور می‌رود و رد می‌شود. */
+var LG_TOKEN_TTL = 12*60*60*1000;
 /* خطاهای ورود جای همان خطِ راهنما (تماس با مدیر) می‌نشینند، نه در یک بنرِ جداگانه:
    آیکون به مثلثِ اخطار عوض می‌شود و رنگ به قرمز. با پاک‌شدنِ خطا، متنِ راهنما برمی‌گردد. */
 var LG_INFO_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
@@ -218,6 +221,10 @@ async function doLogin(){
       lgBusy(false); return;
     }
     ME={ token:r.token, role:r.role, name:r.name, username:r.username, gender:r.gender||"", position:r.position||"", avatar:r.avatar||"" };
+    /* زمانِ انقضا کنارِ توکن ذخیره می‌شود تا در بازگشاییِ بعدی، نشستِ تمام‌شده
+       بدونِ رفت‌وبرگشت به سرور تشخیص داده شود (توکنِ بک‌اند ۱۲ ساعته است).
+       اگر روزی خودِ بک‌اند expiresAt بفرستد، همان ملاک قرار می‌گیرد. */
+    ME.expiresAt = r.expiresAt || (Date.now() + LG_TOKEN_TTL);
     localStorage.setItem("fsm_session", JSON.stringify(ME));
     // رمز نباید پس از ورود در DOM بماند
     var pw=document.getElementById("lgPass");
@@ -248,16 +255,39 @@ function logout(){
   var eye=document.getElementById("lgEye");
   if(eye){ eye.classList.remove("on"); eye.setAttribute("aria-pressed","false"); }
 }
-async function startApp(){
-  // پوستهٔ برنامه را فوراً نشان بده و اسکلت بارگذاری بگذار، سپس داده را بگیر
-  document.getElementById("loginView").classList.add("hidden");
-  document.getElementById("appView").classList.remove("hidden");
-  renderUserHeader();
-  applyRoleVisibility();
-  if(typeof showDashboardSkeleton==="function") showDashboardSkeleton();
+/* opts.deferReveal=true → پوستهٔ برنامه تا تأییدِ نشست نشان داده نمی‌شود.
+   برای بازگشایی از نشستِ ذخیره‌شده لازم است: قبلاً برنامه فوراً باز می‌شد و اگر
+   توکن منقضی بود چند ثانیه بعد کاربر به بیرون پرتاب می‌شد. با ورودِ دستی این
+   تأخیر لازم نیست، چون توکن همان لحظه از سرور گرفته شده و قطعاً معتبر است. */
+async function startApp(opts){
+  var defer=!!(opts&&opts.deferReveal);
+  if(!defer){
+    // پوستهٔ برنامه را فوراً نشان بده و اسکلت بارگذاری بگذار، سپس داده را بگیر
+    document.getElementById("loginView").classList.add("hidden");
+    document.getElementById("appView").classList.remove("hidden");
+    renderUserHeader();
+    applyRoleVisibility();
+    if(typeof showDashboardSkeleton==="function") showDashboardSkeleton();
+  }
 
   var r=await api("bootstrap",{});
-  if(!r || !r.ok){ if(typeof showBootstrapError==="function") showBootstrapError(); return; }
+  /* نشستِ نامعتبر: api خودش logout() را صدا زده و صفحهٔ ورود را آورده،
+     پس این‌جا فقط باید بی‌سروصدا برگردیم (وگرنه خطای bootstrap هم روی آن می‌نشیند). */
+  if(!ME.token) return;
+  if(!r || !r.ok){
+    if(defer){   // هنوز چیزی نمایش داده نشده؛ حالا پوسته را بیاور تا خطا جایی دیده شود
+      document.getElementById("loginView").classList.add("hidden");
+      document.getElementById("appView").classList.remove("hidden");
+      renderUserHeader(); applyRoleVisibility();
+    }
+    if(typeof showBootstrapError==="function") showBootstrapError(); return;
+  }
+  if(defer){   // نشست تأیید شد؛ حالا با اطمینان برنامه را نشان بده
+    document.getElementById("loginView").classList.add("hidden");
+    document.getElementById("appView").classList.remove("hidden");
+    renderUserHeader();
+    applyRoleVisibility();
+  }
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
