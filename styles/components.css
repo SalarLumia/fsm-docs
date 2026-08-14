@@ -244,19 +244,16 @@ th.sortable.active{color:var(--brand)}
 
 /* ===== نشانگرِ «مرکز انتقال» در هدر (سمتِ چپ) ===== */
 .xfer-wrap{position:relative;display:inline-flex}
-/* هنگامِ بازبودنِ مودال، دکمهٔ انتقال هم مثلِ پنلش از زیرِ پوششِ تیره بیرون می‌آید.
-   ⚠ فقط بالا‌بردنِ z-index دکمه کافی نیست: .top-bar با sticky و z-index:30 یک
-   زمینهٔ چیدمان می‌سازد و فرزندانش نمی‌توانند از سقفِ ۳۰ بالاتر بروند. پس خودِ
-   هدر هم باید بالای مودال برود؛ چون هدر پس‌زمینهٔ سفیدِ تمام‌عرض دارد، فقط دکمه
-   قابلِ کلیک می‌ماند و بقیهٔ نوار رویدادی نمی‌گیرد تا مودال پشتش قفل نشود. */
-body.modal-open .top-bar{z-index:100;pointer-events:none;background:transparent;
-  border-bottom-color:transparent;box-shadow:none}
-body.modal-open .top-bar .xfer-wrap{pointer-events:auto}
-/* بقیهٔ محتوای هدر زیرِ پوششِ تیره می‌ماند تا تمرکز روی مودال بماند */
-body.modal-open .top-bar>*:not(.top-bar-left){opacity:0}
-body.modal-open .top-bar-left>*:not(.xfer-wrap){opacity:0}
-/* هالهٔ ملایم پشتِ دکمه تا روی زمینهٔ تیره‌شده جدا و خوانا دیده شود */
-body.modal-open .xfer-btn{background:var(--card);box-shadow:0 2px 14px #00000047}
+/* هنگامِ بازبودنِ مودال: هدر سرِ جایش و زیرِ پوششِ تیره می‌ماند (مثلِ بقیهٔ صفحه)،
+   و فقط دکمهٔ انتقال از پوشش بیرون می‌آید تا پیشرفتِ دانلود/آپلود دیده شود.
+   ⚠ دکمه نمی‌تواند به‌تنهایی بالا برود، چون .top-bar با sticky+z-index یک زمینهٔ
+   چیدمان می‌سازد و فرزندش زیرِ سقفِ آن حبس است. راهِ حل: خودِ دکمه (نه هدر) با
+   position:fixed از جریانِ هدر بیرون کشیده می‌شود؛ مختصاتش را xferPlaceBtn
+   در JS از روی جای اصلی‌اش ست می‌کند. */
+body.modal-open #xferBtn{position:fixed;z-index:120;
+  background:var(--card);box-shadow:0 2px 16px #0000004d}
+/* جای خالیِ دکمه در هدر حفظ می‌شود تا چیدمانِ نوار به‌هم نریزد (هم‌اندازهٔ خودِ دکمه) */
+body.modal-open .xfer-wrap{width:34px;height:34px}
 .xfer-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
   border:1px solid var(--line);background:var(--card);border-radius:9px;cursor:pointer;color:var(--muted);
   padding:0;transition:border-color .15s,color .15s,background .15s}

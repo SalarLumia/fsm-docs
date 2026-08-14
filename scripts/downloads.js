@@ -234,6 +234,19 @@ function xferPlace(){
   var left=Math.max(12, Math.min(r.left, window.innerWidth-330-12));
   host.style.left=Math.round(left)+"px";
 }
+/* دکمهٔ انتقال هنگامِ بازبودنِ مودال با position:fixed از هدر بیرون کشیده می‌شود
+   (تا از پوششِ تیره جدا شود)، پس مختصاتش باید دستی ست شود.
+   ⚠ اندازه‌گیری باید پیش از fixed‌شدن انجام گیرد، وگرنه rect به جای قبلیِ خودش
+   وابسته می‌شود و دکمه در هر بار باز‌شدنِ مودال جابه‌جا می‌شود. */
+function xferPlaceBtn(){
+  var btn=document.getElementById("xferBtn"), wrap=document.getElementById("xferWrap");
+  if(!btn||!wrap) return;
+  if(!document.body.classList.contains("modal-open")){ btn.style.top=""; btn.style.left=""; return; }
+  var r=wrap.getBoundingClientRect();      // جای رزروشدهٔ دکمه در هدر
+  if(r.width===0) return;
+  btn.style.top=Math.round(r.top)+"px";
+  btn.style.left=Math.round(r.left)+"px";
+}
 function xferOpen(){
   _dlUnseen=false;                 // بازکردنِ پنل = دیده‌شدن؛ نشانِ سبز/قرمز پاک می‌شود
   /* ⚠ ترتیب مهم است: اول محتوا و مختصات در حالتِ بسته ست می‌شود، بعد در فریمِ
@@ -251,7 +264,7 @@ function xferOpen(){
   document.removeEventListener("click", xferOutside, true);
   setTimeout(function(){ document.addEventListener("click", xferOutside, true); }, 0);
 }
-window.addEventListener("resize", function(){ if(_dlOpen) xferPlace(); });
+window.addEventListener("resize", function(){ xferPlaceBtn(); if(_dlOpen) xferPlace(); });
 window.addEventListener("scroll", function(){ if(_dlOpen) xferPlace(); }, true);
 function xferClose(){
   _dlOpen=false; dlRender();

@@ -564,12 +564,15 @@ function modalLock(){
   if(_mlY>0) window.scrollTo(0,0);   // هدر به بالای کادرِ دید بیاید
   document.body.classList.add("modal-open");
   _mlOn=true;
+  // دکمهٔ انتقال با این کلاس fixed می‌شود؛ مختصاتش باید همین‌جا ست شود
+  if(typeof xferPlaceBtn==="function") xferPlaceBtn();
 }
 function modalUnlock(){
   if(!_mlOn) return;
   document.body.classList.remove("modal-open");
   if(_mlY>0) window.scrollTo(0,_mlY);   // بازگشت به همان جای قبلی
   _mlOn=false;
+  if(typeof xferPlaceBtn==="function") xferPlaceBtn();   // دکمه به جریانِ هدر برگردد
 }
 function showModal(title,innerHTML,boxClass){
   var host=document.getElementById("modalHost");
