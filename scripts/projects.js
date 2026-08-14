@@ -632,6 +632,16 @@ function projectPartsDocsHTML(p){
         partDocRowsHTML(p,pn,partTypes,latest,admin)+
       '</div></div>';
   }).join("");
+  /* گریدِ دو‌ستونه است، پس تعدادِ فردِ قطعه یک جای خالیِ سفید می‌گذارد. آن جای خالی با
+     یک باکسِ هم‌اندازهٔ «افزودنِ قطعه» پر می‌شود (هم‌سبکِ باکسِ «سفارش جدید»): هم چیدمان
+     متقارن می‌ماند، هم افزودنِ قطعهٔ بعدی یک کلیک است. برای ۳ قطعه هم همین‌طور کار
+     می‌کند، چون شرط «فرد بودن» است نه «یک بودن». */
+  var canAdd = admin && partsSorted().some(function(pt){ return parts.indexOf(pad2(pt.partNo))<0; });
+  if(canAdd && (parts.length%2)===1){
+    groups+='<button type="button" class="spec-group spec-add" '+
+      'onclick="openPartsPanel(\''+esc(pc)+'\',\''+esc(po)+'\',\''+esc(ppr)+'\')" '+
+      'title="افزودنِ قطعه به این پروژه">'+ICON.plus+'<span>افزودنِ قطعه</span></button>';
+  }
   return '<div class="spec-groups">'+groups+'</div>';
 }
 /* ردیف‌های اطلاعاتِ قطعه (وزن/جنس/…)؛ مقدار برای مدیر با کلیک قابلِ ویرایش است. */
