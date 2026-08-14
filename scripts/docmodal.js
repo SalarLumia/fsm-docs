@@ -11,7 +11,12 @@ function _dpStopPreview(){ _dpSeq++; if(_dpEst){ _dpEst.stop(); _dpEst=null; } }
 
 async function openDocDetail(num){
   var d=docByNumber(num);
-  if(!d){ toast("سند یافت نشد.",true); return; }
+  if(!d){
+    // سندِ حذف‌شده هنوز در سطلِ زباله است؛ پیام باید همین را بگوید، نه «یافت نشد»
+    if(trashedDocByNumber(num)) toast("این سند حذف شده و در سطلِ زباله است.",true);
+    else toast("سند یافت نشد.",true);
+    return;
+  }
   var si=statusInfo(d.status);
   _dm.num=num; _dm.selNum=num;
 

@@ -25,7 +25,10 @@ function dlEnqueue(fileId, label){
 /* پنل در هر حالتی باز می‌شود — حتی وقتی مودال باز است. دکمهٔ هدر و پنل با کلاسِ
    body.modal-open از زیرِ پوششِ تیره بیرون می‌آیند، پس پیشرفتِ دانلود دیده می‌شود
    و کاربر فکر نمی‌کند دکمهٔ دانلود کار نکرده است. */
-function xferAutoOpen(){ xferOpen(); }
+function xferAutoOpen(){
+  xferPlaceBtn();   // اول دکمه سرِ جایش بنشیند، بعد پنل مختصاتش را از روی همان بخواند
+  xferOpen();
+}
 
 /* افزودنِ یک کارِ آپلود به همان صف/پنل. opts = { label, action, payload, onSuccess(r) }.
    آپلود در پس‌زمینه انجام می‌شود (با پیشرفتِ واقعیِ XHR) و سایت آزاد می‌ماند. */
@@ -208,6 +211,8 @@ function dlUpdateHeader(){
   var n = activeN || (notifyErr ? errN : 0);
   if(badge) badge.textContent = n ? faN(n) : "";
   btn.setAttribute("title", activeN? ("در حال انتقال ("+faN(activeN)+")") : "انتقال‌ها");
+  // شرطِ بالا آمدنِ دکمه به وضعیتِ کارها وابسته است، پس با هر تغییرِ وضعیت بازبینی می‌شود
+  xferPlaceBtn();
 }
 
 /* ---------- اکشن‌ها ---------- */
@@ -242,7 +247,10 @@ function xferPlace(){
 function xferPlaceBtn(){
   var btn=document.getElementById("xferBtn"), wrap=document.getElementById("xferWrap");
   if(!btn||!wrap) return;
-  var lifted=document.body.classList.contains("modal-open");
+  /* بالا آمدن فقط وقتی معنا دارد که واقعاً انتقالی در جریان باشد یا پنل باز باشد؛
+     صرفِ بازبودنِ یک پنجره دلیلِ جداشدنِ دکمه از هدر نیست. */
+  var busy=_dlJobs.some(function(j){ return j.status==="queued"||j.status==="working"; });
+  var lifted=document.body.classList.contains("modal-open") && (busy || _dlOpen);
   if(!lifted){
     if(btn.parentNode!==wrap){ wrap.appendChild(btn); }   // بازگشت به هدر
     btn.classList.remove("xfer-float");

@@ -638,6 +638,7 @@ async function refreshDocuments(){
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
+  DB.trashedDocs=r.trashedDocs||[];
   if(r.users&&r.users.length) DB.users=r.users;
   refreshAllSelects();
   renderArchive(); renderDataTables(); renderDashboard();

@@ -67,6 +67,14 @@
 .login-wrap.open .login-brand .mark{
   transform:translate(-50%,var(--lg-mark-y,-46px)) scale(var(--lg-mark-s,.69));
   transition:transform .55s var(--lg-ease)}
+/* ⚠ پیش از نخستین اندازه‌گیریِ واقعی (lgSyncGeom)، عنصرها روی مقادیرِ پیش‌فرضِ CSS
+   نشسته‌اند. لحظه‌ای که مقادیرِ واقعی نوشته می‌شوند، این اختلاف نباید «حرکت» دیده شود؛
+   پس تا آن لحظه گذارِ جای‌گیری خاموش است. فقط همین چند خصوصیتِ چیدمانی را می‌پوشاند و
+   با کلاسِ .open کاری ندارد، پس انیمیشنِ تبدیلِ نوار به قاب دست‌نخورده می‌ماند. */
+.login-wrap.lg-premeasure .login-brand,
+.login-wrap.lg-premeasure .login-brand .mark,
+.login-wrap.lg-premeasure .lg-frame,
+.login-wrap.lg-premeasure .lg-below{transition:none !important}
 /* متنِ برند فقط برای صفحه‌خوان/جست‌وجو — دیده نمی‌شود ولی از درخت دسترس‌پذیری حذف نشده */
 .sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;
   clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}

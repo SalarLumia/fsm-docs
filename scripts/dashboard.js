@@ -235,10 +235,11 @@ function wfActionBadge(action){
 }
 /* یک ردیفِ فعالیت = یک رویدادِ گردش‌کار (ثبت/ارسال/تأیید/رد/بارگذاریِ نسخه) */
 function activityItemHTML(ev, isLast, asCard){
-  var d=docByNumber(ev.drawingNumber);
+  // سندِ زنده، وگرنه شناسنامهٔ همان سند در سطلِ زباله — تا رویدادهای گذشته با حذفِ سند بی‌معنا نشوند
+  var d=docByNumberAny(ev.drawingNumber);
   var meName=ev.user?esc(userName(ev.user)):'';
   var b=wfActionBadge(ev.action);
-  var ctx=d?esc(docPhrase(d)):'';   // زمینه (نوع/قطعه/پروژه/مشتری)؛ اگر سند حذف شده باشد، فقط شماره
+  var ctx=d?esc(docPhrase(d)):'';   // زمینه (نوع/قطعه/پروژه/مشتری)
   var dateHTML='<span class="rq-date">'+fmtDate(ev.timestamp)+'</span>';
   var tagHTML=badgeHTML("wf-badge act-tag "+b.cls, b.label);
   /* بلوکِ متنیِ دو‌خطیِ ثابت: توضیح و «کاربر: نام» در یک جریانِ متنیِ واحد‌اند.

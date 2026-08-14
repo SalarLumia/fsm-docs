@@ -1,5 +1,5 @@
 /* ================= حالت برنامه ================= */
-var DB = { clients:[], orders:[], projects:[], parts:[], docTypes:[], documents:[], users:[], templates:[], workflow:[], partMods:[] };
+var DB = { clients:[], orders:[], projects:[], parts:[], docTypes:[], documents:[], users:[], templates:[], workflow:[], partMods:[], trashedDocs:[] };
 var ME = { token:null, role:null, name:null, username:null, gender:null, position:null, avatar:null };
 
 /* مجموعهٔ آواتارهای قابل‌انتخاب (خودبسنده، بدون منبع بیرونی) */
@@ -309,6 +309,19 @@ function projectStats(p){
 
 /* ================= ریویژن‌ها و گردش‌کار ================= */
 function docByNumber(num){ return DB.documents.find(function(d){return d.drawingNumber===num;})||null; }
+/* سندِ حذف‌شده (سطلِ زباله) — فقط شناسنامه، بدونِ فایل */
+function trashedDocByNumber(num){
+  return (DB.trashedDocs||[]).find(function(d){return d.drawingNumber===num;})||null;
+}
+/* برای «تاریخچه»: سندِ زنده، و اگر نبود سندِ حذف‌شده.
+   عمداً از docByNumber جداست تا هیچ نمای عادی سندِ حذف‌شده را زنده نپندارد.
+   خروجی با isTrashed مشخص می‌شود تا فراخوان بداند با چه چیزی طرف است. */
+function docByNumberAny(num){
+  var d=docByNumber(num);
+  if(d) return d;
+  var t=trashedDocByNumber(num);
+  return t?Object.assign({},t,{isTrashed:true}):null;
+}
 /* همهٔ ریویژن‌های یک مبنا (جدید به قدیم) */
 function revisionsOf(doc){
   return DB.documents.filter(function(d){

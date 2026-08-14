@@ -83,7 +83,17 @@ function lgSyncGeom(){
   brand.style.setProperty("--lg-brand-h", (belowTop+belowH)+"px");
   lgSyncBtn();         // جای دکمهٔ مرحلهٔ ۱ ذخیره شود تا در مرحلهٔ ۲ مبنای هم‌ترازی باشد
   lgSyncFrame(card);   // ابعادِ قاب و --lg-card-h را خودش تنظیم می‌کند
+  /* اندازه‌ها واقعی شدند؛ از این لحظه گذارها آزادند. یک فریم صبر می‌کنیم تا مقادیرِ
+     تازه رندر شوند و برداشتنِ کلاس، خودِ همان جابه‌جایی را انیمیت نکند. */
+  if(_lgPre){
+    _lgPre=false;
+    requestAnimationFrame(function(){
+      var w=document.getElementById("loginView");
+      if(w) w.classList.remove("lg-premeasure");
+    });
+  }
 }
+var _lgPre=true;   // تا نخستین اندازه‌گیریِ موفق، گذارهای جای‌گیری خاموش‌اند
 /* دکمهٔ «ورود» داخلِ پنل را روی همان نقطه‌ای می‌نشاند که دکمهٔ «ورود به سامانه» بود.
    ⚠ به‌جای محاسبهٔ زنجیره‌ایِ مختصات (که با offsetParentهای متفاوت و lift به‌سادگی
    غلط می‌شود)، اختلافِ واقعیِ دو دکمه روی صفحه اندازه گرفته و همان‌قدر جبران می‌شود.
@@ -145,6 +155,26 @@ function lgSyncFrame(card){
   if(brand) brand.style.setProperty("--lg-card-h", h+"px");
   return {w:w,h:h};
 }
+/* ⚠ چرا فقط load کافی نیست: load منتظرِ دانلودِ کاملِ تصویرها و فونت‌هاست. تا آن لحظه
+   صفحه با مقادیرِ پیش‌فرضِ CSS رسم شده و نوارِ نارنجی جایی می‌ایستد که جای واقعی‌اش نیست؛
+   بعد با رسیدنِ اندازه‌های واقعی سُر می‌خورد سرِ جای درست. راهِ حل: به‌محضِ آماده‌شدنِ
+   لوگو (نه کلِ صفحه) اندازه‌گیری شود، و تا آن زمان گذارها خاموش بمانند. */
+(function lgEarlySync(){
+  var img=document.querySelector(".login-brand .mark");
+  if(img){
+    if(img.complete && img.naturalWidth) lgSyncGeom();
+    else img.addEventListener("load", lgSyncGeom, {once:true});
+    img.addEventListener("error", lgSyncGeom, {once:true});   // حتی اگر لوگو نیامد، قفل باز شود
+  }
+  // فونتِ IRANSans ارتفاعِ شرح و دکمه را عوض می‌کند → پس از آماده‌شدنِ فونت‌ها یک‌بار دیگر
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ lgSyncGeom(); });
+  /* تورِ ایمنی: اگر به هر دلیل اندازه‌گیری موفق نشد، قفلِ گذارها نباید برای همیشه بماند
+     وگرنه انیمیشنِ باز‌شدنِ پنل هم اجرا نمی‌شود. */
+  setTimeout(function(){
+    var w=document.getElementById("loginView");
+    if(w && w.classList.contains("lg-premeasure")){ _lgPre=false; w.classList.remove("lg-premeasure"); }
+  }, 3000);
+})();
 window.addEventListener("load", lgSyncGeom);
 window.addEventListener("resize", function(){
   var w=document.getElementById("loginView");
@@ -291,6 +321,7 @@ async function startApp(opts){
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
+  DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسنادِ حذف‌شده، برای معنا‌دار ماندنِ رویدادهای گذشته
   if(!r.backendVersion){ toast("بک‌اندِ سرویس هنوز نسخهٔ قدیمی است. در Apps Script از Deploy ▸ Manage deployments، روی همان deployment «New version» را دیپلوی کنید.", true); }
   /* نقشِ معتبر همان است که بک‌اند اعلام می‌کند، نه آنچه در localStorage نوشته شده.
      بدونِ این خط، دست‌کاریِ fsm_session می‌توانست دکمه‌های مدیر را در رابط باز کند
