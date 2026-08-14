@@ -38,17 +38,27 @@ function partName(no){ if(pad2(no)==="00")return"سند پروژه"; var p=DB.pa
 function partRec(no){ return DB.parts.find(function(x){return pad2(x.partNo)===pad2(no);})||null; }
 /* نام فارسی قطعه (اگر بود)، وگرنه نام انگلیسی */
 function partNameFa(no){ if(pad2(no)==="00")return"سند پروژه"; var p=partRec(no); return p?(p.nameFa||p.name||pad2(no)):pad2(no); }
-/* نام متنی پروژه (توضیح واردشده) از روی مختصات یک سند */
-function projectLabel(d){
+/* نامِ خالصِ پروژه (توضیحِ واردشده) از روی مختصاتِ یک سند — بدونِ هیچ پیشوند.
+   ⚠ عمداً «خالص» است: اگر خودش پیشوند بگذارد، فراخوان نمی‌تواند بداند پیشوند دارد یا نه
+   و نتیجه‌اش «پروژه پروژهٔ ۰۱» می‌شود. پیشوند فقط کارِ projectTitle است. */
+function projectName(d){
   var p=(DB.projects||[]).find(function(x){ return x.clientCode===d.clientCode && pad2(x.orderNo)===pad2(d.orderNo) && pad2(x.projectNo)===pad2(d.projectNo); });
-  return (p&&p.description)?p.description:("پروژهٔ "+pad2(d.projectNo));
+  return (p&&p.description)?String(p.description).trim():"";
 }
+/* عنوانِ کاملِ پروژه، هم‌واژهٔ تیترِ صفحهٔ پروژه و کارتِ داشبورد: «پروژه تولید <نام>».
+   اگر پروژه هنوز نامی ندارد، به شماره برمی‌گردد و آن‌وقت پیشوندِ درست «پروژهٔ» است. */
+function projectTitle(d){
+  var n=projectName(d);
+  return n ? ("پروژه تولید "+n) : ("پروژهٔ "+pad2(d.projectNo));
+}
+/* سازگاری با فراخوان‌های قدیمی — همان عنوانِ کامل */
+function projectLabel(d){ return projectTitle(d); }
 /* توصیف طبیعیِ یک سند (راست‌به‌چپ): نوع نقشه، قطعه، پروژه (بدون شماره)، مشتری.
    برای اسناد سطح‌پروژه (قطعهٔ ۰۰) بخش «قطعه» حذف می‌شود. */
 function docPhrase(d){
   var parts=[typeName(d.typeCode)];
   if(pad2(d.partNo)!=="00") parts.push("قطعه "+partNameFa(d.partNo));
-  parts.push("پروژه "+projectLabel(d));
+  parts.push(projectTitle(d));   // خودِ عنوان پیشوند دارد؛ پیشوندِ دوم = «پروژه پروژهٔ ۰۱»
   parts.push(clientName(d.clientCode));
   return parts.join(" ");
 }

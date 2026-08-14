@@ -24,7 +24,8 @@ async function openDocDetail(num){
   var meta=[
     ["شماره سند", '<span class="mono" style="direction:ltr">'+esc(d.drawingNumber)+'</span>'],
     ["مشتری", esc(clientName(d.clientCode))],
-    ["پروژه", esc(projectLabel(d))],
+    // برچسبِ ردیف خودش «پروژه» است؛ پس مقدار باید نامِ خالص باشد، نه عنوانِ پیشونددار
+    ["پروژه", esc(projectName(d)||("شمارهٔ "+pad2(d.projectNo)))],
     ["قطعه", esc(partName(d.partNo))],
     ["نوع سند", esc(typeName(d.typeCode))],
     ["ثبت‌کننده", esc(userName(d.uploadedBy)||"—")],
