@@ -67,9 +67,8 @@
 .nav-exp:hover{color:#ffffff}
 .nav-exp:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .nav-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
-/* باز = فلشِ نارنجی (قانونِ یکسانِ همهٔ آکاردئون‌های سایت). پس از قاعدهٔ «موردِ جاری» می‌آید تا
-   در حالتِ باز برنده شود؛ هوور همچنان سفید است تا بازخوردِ کلیک محسوس بماند. */
-.nav-trow .nav-exp.open,.nav-trow:hover .nav-exp.open{color:var(--brand)}
+/* استثنا از قانونِ «باز = فلشِ نارنجی»: اینجا نارنجی معنیِ «موردِ جاری» را دارد،
+   پس فلشِ باز رنگ عوض نمی‌کند و فقط می‌چرخد. */
 .nav-exp.open .chev{transform:rotate(180deg)}
 .nav-exp-sp{width:34px;flex-shrink:0}   /* جای‌گیرِ فلش برای مشتریِ بدونِ پروژه */
 /* ظرفِ آکاردئونی: بازشدنِ نرمِ ارتفاع با ترفندِ گرید 0fr↔1fr (تنها راهِ انیمیشنِ height تا «اندازهٔ محتوا»).

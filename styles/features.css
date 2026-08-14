@@ -275,7 +275,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .nd-sec-add-slot{margin-inline-start:auto;display:inline-flex;align-items:center}   /* فلش و دکمهٔ افزودن به سمتِ چپ رانده می‌شوند */
 .nd-sec-chev{display:inline-flex;flex-shrink:0;color:#b9b7b1;transition:transform .3s,color .25s}   /* هم‌رنگِ فلش‌های بقیهٔ سایت */
 .nd-sec-chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
-.nd-sec.active .nd-sec-chev{transform:rotate(180deg);color:var(--brand)}   /* باز = فلشِ نارنجی (قانونِ یکسانِ همهٔ آکاردئون‌ها) */
+.nd-sec.active .nd-sec-chev{transform:rotate(180deg);color:#b9b7b1}   /* استثنا از قانونِ «باز = نارنجی»: فلشِ سلولِ فعال طوسی می‌ماند */
 .nd-sec.done .nd-sec-chev,.nd-sec.locked .nd-sec-chev{opacity:.45}
 /* بدنهٔ کولپس‌شونده — انیمیشنِ نرمِ ارتفاع با grid (0fr→1fr) تا دقیقاً به‌اندازهٔ محتوا باز شود */
 .nd-sec-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s cubic-bezier(.2,0,0,1)}   /* کند، تا کلِ انیمیشنِ بالا (پالس→ریسایز→رینگ) هم‌زمان داخلش جا شود */
