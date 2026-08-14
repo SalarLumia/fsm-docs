@@ -275,7 +275,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .nd-sec-add-slot{margin-inline-start:auto;display:inline-flex;align-items:center}   /* فلش و دکمهٔ افزودن به سمتِ چپ رانده می‌شوند */
 .nd-sec-chev{display:inline-flex;flex-shrink:0;color:#b9b7b1;transition:transform .3s,color .25s}   /* هم‌رنگِ فلش‌های بقیهٔ سایت */
 .nd-sec-chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
-.nd-sec.active .nd-sec-chev{transform:rotate(180deg);color:#b9b7b1}   /* فلشِ سلولِ فعال هم طوسی، نه نارنجی */
+.nd-sec.active .nd-sec-chev{transform:rotate(180deg);color:var(--brand)}   /* باز = فلشِ نارنجی (قانونِ یکسانِ همهٔ آکاردئون‌ها) */
 .nd-sec.done .nd-sec-chev,.nd-sec.locked .nd-sec-chev{opacity:.45}
 /* بدنهٔ کولپس‌شونده — انیمیشنِ نرمِ ارتفاع با grid (0fr→1fr) تا دقیقاً به‌اندازهٔ محتوا باز شود */
 .nd-sec-body{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s cubic-bezier(.2,0,0,1)}   /* کند، تا کلِ انیمیشنِ بالا (پالس→ریسایز→رینگ) هم‌زمان داخلش جا شود */
@@ -745,8 +745,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .arch-date{font-size:11.5px;font-weight:500;color:var(--muted)}
 /* فلشِ اکسپندِ ردیف — بالای نوارِ کنترلِ چپ؛ هم‌سبکِ فلشِ جمع/بازِ جدول‌ها */
 .arch-exp{display:inline-grid;place-items:center;width:30px;height:30px;border:none;background:none;
-  cursor:pointer;color:var(--muted);border-radius:7px;transition:color .14s,background .14s,transform .28s cubic-bezier(.2,0,0,1);padding:0}
-.arch-exp:hover{color:var(--brand);background:#fff3e6}
+  cursor:pointer;color:var(--muted);border-radius:7px;transition:color .14s,transform .28s cubic-bezier(.2,0,0,1);padding:0}
+.arch-exp:hover{color:var(--brand)}
 .arch-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
 .arch-row.open .arch-exp{color:var(--brand);transform:translateY(-16px)}   /* اکسپند: فلش بیشتر به بالا می‌آید (انیمیشنِ بالا رفتن هم‌زمان با چرخشِ فلش) */
 .arch-row.open .arch-exp .chev{transform:rotate(180deg)}   /* باز = فلش رو به بالا */
@@ -989,8 +989,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
    .th-exp: کنارِ هدرهای متنی (کاربران/پارامترها) فلش را ابتدای سطر، بالای آواتار/شروعِ ردیف قرار می‌دهد. */
 .th-exp{display:flex;align-items:center;gap:8px}
 .tbl-exp{width:26px;height:26px;flex-shrink:0;display:inline-grid;place-items:center;border:none;background:none;
-  padding:0;cursor:pointer;color:var(--muted);border-radius:7px;transition:color .15s,background .15s}
-.tbl-exp:hover{color:var(--brand);background:#fff3e6}
+  padding:0;cursor:pointer;color:var(--muted);border-radius:7px;transition:color .15s}
+.tbl-exp:hover{color:var(--brand)}
 .tbl-exp:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .tbl-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
 .tbl-exp.open{color:var(--brand)}   /* باز = فلشِ نارنجی */

@@ -114,9 +114,9 @@
 /* فلش = تنها دکمهٔ باز/بستنِ کارت؛ در حالتِ باز نارنجی می‌شود (هم‌رفتارِ فلش‌های آرشیو و جدول‌ها) */
 .proj-chevron{width:26px;height:26px;flex-shrink:0;display:inline-grid;place-items:center;
   border:none;background:none;border-radius:7px;cursor:pointer;color:#b9b7b1;
-  transition:color .18s,background-color .18s}
+  transition:color .18s}
 .proj-chevron svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;transition:transform .22s}
-.proj-chevron:hover{color:var(--brand);background:#fff3e6}
+.proj-chevron:hover{color:var(--brand)}
 .proj-chevron:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .proj-card.open .proj-chevron{color:var(--brand)}
 .proj-card.open .proj-chevron svg{transform:rotate(180deg)}
