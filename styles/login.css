@@ -177,7 +177,9 @@
 /* ▼ متن‌های داخلِ پنلِ ذغالی — روشن، برای کنتراستِ کافی روی زمینهٔ تیره ▼ */
 .login-card h1{font-size:23px;margin:0 0 6px;color:#f5f5f3;font-weight:700}
 .login-card .sub{color:#b8b8b8;font-size:13px;margin:0 0 28px}
-.login-card label{display:block;font-size:12.5px;color:#e8e8e6;margin:0 0 7px;font-weight:500}
+/* padding سمتِ راست تا برچسب کمی از لبهٔ باکس فاصله بگیرد و چسبیده نباشد */
+.login-card label{display:block;font-size:12.5px;color:#e8e8e6;margin:0 0 7px;
+  padding-right:6px;font-weight:500}
 /* ظرفِ فیلد: آیکونِ راهنما داخلِ اینپوت (سمتِ راست در RTL) — هم‌سبک با فیلدهای آیکون‌دارِ سایت */
 .lg-field{display:block;position:relative;margin-bottom:18px}
 /* آیکونِ کاربر/قفل سمتِ چپِ فیلد (هم‌سمتِ متنِ لاتین) */
@@ -187,10 +189,18 @@
 /* اینپوت‌ها روی زمینهٔ ذغالی: کمی تیره‌تر از خودِ پنل تا به‌عنوانِ فیلد تفکیک شوند */
 /* محتوای این دو فیلد لاتین است، پس متن چپ‌چین می‌شود (برچسب‌ها راست‌چین می‌مانند).
    direction دست‌نخورده می‌ماند تا ترتیبِ نویسه‌ها و جای مکان‌نما به‌هم نریزد. */
+/* محتوای این دو فیلد کاملاً لاتین است، پس هم جهت و هم ترازش چپ‌به‌راست می‌شود.
+   direction اینجا لازم است: بدونِ آن، فیلد جهتِ rtl صفحه را ارث می‌برد و
+   متنِ راهنما و جای مکان‌نما از سمتِ راست شروع می‌شوند. */
 .login-card input{width:100%;background:#3d3d3d;border:1px solid #5f5f5f;color:#f2f2f0;
   padding:12px 13px;padding-left:38px;border-radius:var(--radius-sm);margin-bottom:0;
-  font-family:inherit;font-size:14px;text-align:left;transition:.15s}
-.login-card input::placeholder{color:#8f8f8d}
+  font-family:inherit;font-size:14px;
+  direction:ltr;text-align:left;transition:.15s}
+.login-card input::placeholder{color:#8f8f8d;direction:ltr;text-align:left}
+/* دکمهٔ نمایشِ رمزِ خودِ مرورگر (Edge/Chrome) حذف می‌شود، وگرنه کنارِ دکمهٔ چشمِ
+   خودمان یک آیکونِ دوم نشان می‌دهد. */
+.login-card input::-ms-reveal,
+.login-card input::-ms-clear{display:none;width:0;height:0}
 .login-card input:focus{outline:none;border-color:var(--brand);background:#454545;
   box-shadow:0 0 0 3px #f7941f2e}
 /* پرکردنِ خودکارِ مرورگر (Chrome) پس‌زمینهٔ آبی می‌گذارد و کلِ رنگ‌بندیِ فرم را می‌شکند؛
@@ -209,24 +219,24 @@
   font-size:15px;font-weight:700;color:#231405;background:linear-gradient(135deg,var(--gold1),var(--brand));
   transition:transform .16s var(--lg-ease)}
 .btn-login:hover{transform:translateY(-2px)}
-/* حالتِ در حالِ ورود: دکمه غیرفعال + اسپینرِ کوچک، تا کلیکِ دوباره ممکن نباشد */
+/* حالتِ در حالِ ورود: دکمه غیرفعال تا کلیکِ دوباره ممکن نباشد */
 .btn-login:disabled{cursor:default;filter:grayscale(.15) brightness(.98);opacity:.75}
 .btn-login:disabled:hover{transform:none}   /* وسطِ ارسال، هاور اثری ندارد */
-.btn-login .lg-spin{display:none;width:15px;height:15px;margin-inline-end:8px;vertical-align:-2px;
-  border:2px solid #23140540;border-top-color:#231405;border-radius:50%;animation:lgSpin .7s linear infinite}
-.btn-login.loading .lg-spin{display:inline-block}
-@keyframes lgSpin{to{transform:rotate(360deg)}}
-/* پیامِ خطا: هم‌الگو با بنرهای خطای سایت (آیکون + پس‌زمینه + کادر)، نه متنِ لخت */
-/* بنرها روی زمینهٔ ذغالی: پس‌زمینهٔ نیمه‌شفافِ هم‌رنگ به‌جای پاستلِ روشن،
-   تا با تمِ تیرهٔ پنل بنشیند و متنش خوانا بماند. */
-.login-card .err{display:none;align-items:flex-start;gap:8px;margin-top:14px;padding:10px 12px;
-  border-radius:var(--radius-sm);background:#e5393526;border:1px solid #ef535966;
-  color:#ffb4b0;font-size:12.5px;line-height:1.6}
-.login-card .err.show{display:flex}
-.login-card .err svg{width:15px;height:15px;flex-shrink:0;margin-top:3px;stroke:currentColor;fill:none;stroke-width:2}
-/* حالتِ اطلاع‌رسانی (نه خطا) — مثلِ راهنمای بازنشانیِ رمز */
-.login-card .err.info{background:#0ea5e926;border-color:#38bdf866;color:#a5daf5}
-/* دکمهٔ نمایش/پنهان‌سازیِ رمز — سمتِ چپِ فیلد در RTL (مقابلِ آیکونِ قفل) */
+/* به‌جای دایرهٔ چرخان: نقطه‌ها یکی‌یکی روشن می‌شوند (۱ تا ۴) و از نو شروع می‌کنند.
+   ⚠ با انیمیتِ خصوصیتِ content پیاده نشد، چون غیرِاستاندارد است و در فایرفاکس
+   کار نمی‌کند؛ چهار نقطهٔ واقعی با opacity پلکانی، همه‌جا یکسان اجرا می‌شود.
+   جای هر چهار نقطه همیشه رزرو است، پس متنِ دکمه هنگامِ انیمیشن نمی‌لرزد. */
+.btn-login .lg-spin{display:none;margin-inline-start:2px;vertical-align:baseline}
+.btn-login.loading .lg-spin{display:inline-flex;gap:1px}
+.btn-login.loading .lg-spin i{font-style:normal;opacity:0;
+  animation:lgDot 1.2s steps(1,end) infinite}
+.btn-login.loading .lg-spin i:nth-child(1){animation-delay:0s}
+.btn-login.loading .lg-spin i:nth-child(2){animation-delay:.3s}
+.btn-login.loading .lg-spin i:nth-child(3){animation-delay:.6s}
+.btn-login.loading .lg-spin i:nth-child(4){animation-delay:.9s}
+@keyframes lgDot{0%,74%{opacity:1} 75%,100%{opacity:0}}
+/* بنرِ خطای جداگانه حذف شد؛ خطاها روی همان خطِ .lg-note نشان داده می‌شوند. */
+/* دکمهٔ نمایش/پنهان‌سازیِ رمز */
 /* دکمهٔ چشم سمتِ راست — چون آیکونِ قفل به چپ منتقل شد و نباید روی هم بیفتند */
 .lg-eye{position:absolute;right:10px;top:50%;transform:translateY(-50%);
   display:grid;place-items:center;width:28px;height:28px;padding:0;border:none;background:none;
@@ -240,10 +250,21 @@
 .lg-field:has(.lg-eye) input{padding-right:42px}
 /* توضیحِ راهنما بینِ فیلدِ رمز و دکمهٔ ورود — هم‌الگو با .ed-req-note در پنلِ تنظیمات:
    آیکونِ دایره‌ایِ اطلاع پیش از متن. رنگ روشن‌تر است چون زمینه ذغالی است. */
-.lg-note{display:flex;align-items:flex-start;gap:7px;margin:22px 0 0;
+.lg-note{display:flex;align-items:flex-start;gap:7px;margin:22px 0 0;padding-right:6px;
   font-size:11.5px;font-weight:500;color:#b0b0ae;line-height:1.9;text-align:right}
 .lg-note svg{width:14px;height:14px;flex-shrink:0;margin-top:4px;
   stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* حالتِ خطا: همین خط جای متنِ راهنما پیامِ خطا را با آیکونِ اخطار نشان می‌دهد،
+   با یک لرزشِ کوتاه در لحظهٔ ظاهر‌شدن تا توجه جلب شود. */
+.lg-note.err{color:#ffb4b0;animation:lgShake .4s cubic-bezier(.36,.07,.19,.97)}
+@keyframes lgShake{
+  0%,100%{transform:translateX(0)}
+  15%{transform:translateX(-5px)}
+  30%{transform:translateX(4px)}
+  45%{transform:translateX(-3px)}
+  60%{transform:translateX(2px)}
+  75%{transform:translateX(-1px)}
+}
 @media(max-width:780px){
   .login-wrap{padding:28px 16px}
   /* موقعیت‌های عمودی را auth.js از روی همین اندازه‌ها دوباره حساب می‌کند */

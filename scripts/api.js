@@ -32,7 +32,11 @@ async function api(action, payload, opts){
     });
     if(!res.ok) throw new Error("HTTP "+res.status);
     var data = await res.json();
-    if(data && data.error==="AUTH"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
+    /* ⚠ خودِ login از این قاعده مستثناست: بک‌اند برای رمزِ اشتباه هم error:"AUTH"
+       برمی‌گرداند، و اگر این‌جا logout() صدا زده شود پنلِ ورود بسته و پیامِ
+       «نشست منقضی شد» داده می‌شود — در حالی که هنوز نشستی وجود ندارد.
+       پیامِ رمزِ اشتباه را خودِ doLogin روی خطِ راهنما نشان می‌دهد. */
+    if(data && data.error==="AUTH" && action!=="login"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
     return data;
   } catch(e){
     // خطای شبکه/سرویس: پیام دوستانه (مگر برای فراخوانی‌های خاموش یا quiet که خودشان مدیریت می‌کنند)

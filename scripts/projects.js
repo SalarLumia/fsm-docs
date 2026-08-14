@@ -1605,10 +1605,16 @@ function arPlatform(){
 /* سندِ مربوط به ویوئرِ همین دکمه: مودالِ سند → از روی ریویژنِ انتخاب‌شده؛ پنلِ پروژه → از روی شناسهٔ GLBِ درحال‌نمایش */
 function mvArDoc(btn){
   var box=mvBoxOf(btn);
-  if(box && box.querySelector("#dmMv") && typeof _dm!=="undefined" && _dm && _dm.selNum){
-    var d=docByNumber(_dm.selNum); if(d) return d;
+  // ویوئرِ مودالِ سند: سند از روی ریویژنِ انتخاب‌شده مشخص می‌شود
+  if(box && box.querySelector("#dmMv")){
+    if(typeof _dm!=="undefined" && _dm && _dm.selNum){
+      var d=docByNumber(_dm.selNum); if(d) return d;
+    }
+    return null;   // ⚠ به _mvCurFileId برنگرد: آن مالِ پنلِ پروژه است
   }
-  if(_mvCurFileId){
+  /* پنلِ پروژه: شناسهٔ مدلِ درحال‌نمایش. فقط وقتی معتبر است که همین ویوئر روی صفحه باشد،
+     وگرنه مقدارِ به‌جامانده از مدلِ قبلی باعث می‌شد AR سندِ اشتباهی را باز کند. */
+  if(_mvCurFileId && document.getElementById("mvShell")){
     var m=(DB.documents||[]).filter(function(x){ return String(x.fileId)===String(_mvCurFileId); })[0];
     if(m) return m;
   }
@@ -1629,13 +1635,14 @@ function mvAR(btn){
 function arLaunch(src, mv){
   var plat=arPlatform();
   if(plat==="ios"){
-    if(!src.usdzUrl){ toast("برای نمایشِ AR روی iPhone به فایلِ USDZ نیاز است؛ این سند آن را ندارد.",true); return; }
+    // نبودِ فایل → همان پنلِ هشدار (هم‌شکل با دسکتاپ)، نه فقط یک توستِ گذرا
+    if(!src.usdzUrl){ showARQr(src); return; }
     var a=document.createElement("a"); a.setAttribute("rel","ar"); a.href=src.usdzUrl;
     var img=document.createElement("img"); img.style.display="none"; a.appendChild(img);   // Quick Look به یک فرزندِ img نیاز دارد
     document.body.appendChild(a); a.click();
     setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); }, 1500);
   } else if(plat==="android"){
-    if(!src.glbUrl){ toast("برای نمایشِ AR به فایلِ GLB نیاز است.",true); return; }
+    if(!src.glbUrl){ showARQr(src); return; }
     var fb=arPageUrl(src);   // اگر ARCore نبود، به همان صفحهٔ ar.html برگردد
     window.location.href="intent://arvr.google.com/scene-viewer/1.0?file="+encodeURIComponent(src.glbUrl)+
       "&mode=ar_preferred&title="+encodeURIComponent(src.drawingNumber||"مدلِ سه‌بعدی")+
@@ -1654,37 +1661,52 @@ function arPageUrl(src){
   if(src.drawingNumber) u+="&n="+encodeURIComponent(src.drawingNumber);
   return u;
 }
+/* هشدارِ کمبودِ فایلِ AR — همان الگوی .ed-req-note: آیکون + متن، این‌بار قرمز.
+   GLB برای اندروید لازم است و USDZ برای آیفون؛ نبودِ هرکدام یک پلتفرم را از کار می‌اندازد. */
+function arWarnHTML(src){
+  var miss=[];
+  if(!src || !src.glbId)  miss.push("GLB (برای اندروید)");
+  if(!src || !src.usdzId) miss.push("USDZ (برای آیفون)");
+  if(!miss.length) return "";
+  var ic='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>'+
+         '<line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+  var txt = miss.length===2
+    ? "برای این سند هیچ فایلِ واقعیتِ افزوده‌ای بارگذاری نشده است؛ نمایش در AR ممکن نیست."
+    : "فایلِ "+miss[0]+" برای این سند بارگذاری نشده است؛ روی آن دستگاه نمایش در AR ممکن نیست.";
+  return '<div class="ar-warn">'+ic+'<span>'+esc(txt)+'</span></div>';
+}
 function showARQr(src){
   var url=(src && (src.glbId||src.usdzId)) ? arPageUrl(src) : null;
-  var code=(url && typeof qrcode!=="undefined") ? qrSvg(url) : fakeQrSvg();
-  showModal("مشاهده در واقعیت افزوده",
-    '<div class="qr-body">'+
-      '<div class="qr-sub">این کد را با دوربینِ موبایل اسکن کنید تا مدل به‌صورتِ واقعیتِ افزوده روی گوشی باز شود.</div>'+
-      '<div class="qr-code">'+code+'</div>'+
-      (src&&src.drawingNumber?'<div class="qr-sub mono" style="direction:ltr;margin:14px 0 0">'+esc(src.drawingNumber)+'</div>':'')+
-    '</div>', "box-narrow");
+  var warn=arWarnHTML(src);
+  /* ⚠ اگر هیچ فایلی نباشد، QR ساخته نمی‌شود. پیش‌تر این‌جا یک کدِ تصادفیِ بی‌معنی
+     (fakeQrSvg) نمایش داده می‌شد که اسکن نمی‌شد و کاربر را سردرگم می‌کرد. */
+  var code=url?qrSvg(url):"";
+  var body='<div class="qr-body">'+warn;
+  if(code){
+    body+='<div class="qr-sub">این کد را با دوربینِ موبایل اسکن کنید تا مدل به‌صورتِ واقعیتِ افزوده روی گوشی باز شود.</div>'+
+          '<div class="qr-code">'+code+'</div>'+
+          (src.drawingNumber?'<div class="qr-sub mono" style="direction:ltr;margin:14px 0 0">'+esc(src.drawingNumber)+'</div>':'');
+  } else if(url){
+    // فایل هست ولی ساختِ QR ممکن نشد — نشانی را مستقیم بده تا کاربر بی‌راه‌حل نماند
+    body+='<div class="qr-sub">ساختِ کدِ QR ممکن نشد. این نشانی را روی موبایل باز کنید:</div>'+
+          '<div class="qr-sub mono" style="direction:ltr;word-break:break-all">'+esc(url)+'</div>';
+  }
+  body+='</div>';
+  showModal("مشاهده در واقعیت افزوده", body, "box-narrow");
 }
-/* کدِ QRِ واقعی از روی کتابخانهٔ vendor/qrcode.min.js (byte mode، سطحِ M). ماژول‌ها به‌صورتِ SVG با حاشیهٔ آرام (quiet zone). */
+/* کدِ QRِ واقعی از روی کتابخانهٔ vendor/qrcode.min.js (byte mode، سطحِ M). ماژول‌ها به‌صورتِ SVG با حاشیهٔ آرام (quiet zone).
+   ⚠ اگر کتابخانه در دسترس نباشد یا رمزگذاری شکست بخورد، رشتهٔ خالی برمی‌گردد.
+   قبلاً این‌جا یک کدِ تصادفی (fakeQrSvg) ساخته می‌شد که ظاهرِ QR داشت ولی اسکن نمی‌شد؛
+   کدِ بی‌معنی بدتر از نبودِ کد است، چون کاربر بیهوده تلاش می‌کند. */
 function qrSvg(text){
-  var q; try{ q=qrcode(0,"M").addData(text).make(); }catch(e){ return fakeQrSvg(); }
+  var q;
+  if(typeof qrcode==="undefined") return "";
+  try{ q=qrcode(0,"M").addData(text).make(); }catch(e){ return ""; }
   var n=q.getModuleCount(), quiet=4, size=n+quiet*2, rects="";
   for(var r=0;r<n;r++) for(var c=0;c<n;c++) if(q.isDark(r,c))
     rects+='<rect x="'+(c+quiet)+'" y="'+(r+quiet)+'" width="1" height="1"/>';
   return '<svg viewBox="0 0 '+size+' '+size+'" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet">'+
     '<rect width="'+size+'" height="'+size+'" fill="#fff"/><g fill="#1c1c1e">'+rects+'</g></svg>';
-}
-/* الگوی نمونهٔ کدِ QR (تزئینی؛ در نسخهٔ عملیاتی محتوای کد = نشانیِ صفحهٔ موبایلِ همین مدل خواهد بود) */
-function fakeQrSvg(){
-  var N=25, cell=100/N, s='<svg viewBox="0 0 100 100" shape-rendering="crispEdges"><rect width="100" height="100" fill="#fff"/>';
-  function isFinder(r,c){ function box(br,bc){ return r>=br&&r<br+7&&c>=bc&&c<bc+7; } return box(0,0)||box(0,N-7)||box(N-7,0); }
-  for(var r=0;r<N;r++) for(var c=0;c<N;c++){
-    var fill=false;
-    if(isFinder(r,c)){ var rr=(r<7?r:r-(N-7)), cc=(c<7?c:c-(N-7));
-      fill=(rr===0||rr===6||cc===0||cc===6||(rr>=2&&rr<=4&&cc>=2&&cc<=4)); }
-    else if(r>7||c>7){ fill=Math.random()>0.5; }
-    if(fill) s+='<rect x="'+(c*cell).toFixed(2)+'" y="'+(r*cell).toFixed(2)+'" width="'+cell.toFixed(2)+'" height="'+cell.toFixed(2)+'" fill="#1c1c1e"/>';
-  }
-  return s+'</svg>';
 }
 
 /* بازسازی تب پس از reload داده */

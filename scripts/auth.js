@@ -1,18 +1,33 @@
 /* ================= ورود / خروج ================= */
-/* پیامِ خطای ورود: بنرِ آیکون‌دار (هم‌الگو با بنرهای خطای سایت) — خالی = پنهان */
-var LG_ERR_IC='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+/* خطاهای ورود جای همان خطِ راهنما (تماس با مدیر) می‌نشینند، نه در یک بنرِ جداگانه:
+   آیکون به مثلثِ اخطار عوض می‌شود و رنگ به قرمز. با پاک‌شدنِ خطا، متنِ راهنما برمی‌گردد. */
+var LG_INFO_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
+var LG_WARN_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+var LG_HINT_TXT='برای دریافت نام کاربری و رمز عبور با مدیر سیستم تماس بگیرید.';
 function lgSetErr(msg){
-  var el=document.getElementById("lgErr"); if(!el) return;
-  if(!msg){ el.classList.remove("show","info"); el.innerHTML=""; return; }
-  el.innerHTML=LG_ERR_IC+"<span>"+esc(msg)+"</span>";
-  el.classList.remove("info"); el.classList.add("show");
+  var el=document.querySelector(".lg-note"); if(!el) return;
+  if(!msg){   // بازگشت به حالتِ راهنما
+    el.classList.remove("err");
+    el.innerHTML=LG_INFO_IC+"<span>"+LG_HINT_TXT+"</span>";
+    el.removeAttribute("role");
+    return;
+  }
+  el.innerHTML=LG_WARN_IC+"<span>"+esc(msg)+"</span>";
+  /* اگر کلاسِ err از خطای قبلی مانده باشد، انیمیشنِ لرزش دوباره اجرا نمی‌شود؛
+     برداشتن و reflow و افزودنِ دوباره، آن را برای هر خطای جدید از سر می‌گیرد. */
+  el.classList.remove("err");
+  void el.offsetWidth;
+  el.classList.add("err");
+  el.setAttribute("role","alert");   // صفحه‌خوان خطا را اعلام کند
 }
 /* دکمهٔ ورود در حالتِ در حالِ پردازش: غیرفعال + اسپینر، تا کلیکِ دوباره ثبت نشود */
 function lgBusy(on){
   var b=document.getElementById("lgBtn"); if(!b) return;
   b.disabled=!!on;
   b.classList.toggle("loading", !!on);
-  var l=b.querySelector(".lg-lbl"); if(l) l.textContent = on ? "در حال ورود…" : "ورود";
+  var l=b.querySelector(".lg-lbl");
+  // نقطه‌ها با CSS متحرک می‌شوند (۱ تا ۴ و تکرار)، پس متن بدونِ نقطه نوشته می‌شود
+  if(l) l.textContent = on ? "در حال ورود" : "ورود";
 }
 /* مرحلهٔ ۲ صفحهٔ ورود: برند جمع می‌شود و کارتِ ورود با انیمیشن باز می‌شود */
 /* ═══ محاسبهٔ هندسهٔ صفحهٔ ورود ═══
@@ -195,12 +210,31 @@ async function doLogin(){
   lgBusy(true);
   try{
     var r=await api("login",{username:u,password:p});
-    if(!r.ok){ lgSetErr(r.message||"ورود ناموفق بود."); lgBusy(false); return; }
+    if(!r.ok){
+      /* پیامِ یکسان برای «کاربر پیدا نشد» و «رمز اشتباه»: اگر این دو از هم
+         تفکیک شوند، می‌شود با آزمون‌وخطا فهمید کدام نام‌کاربری‌ها وجود دارند.
+         خطای شبکه استثناست، چون کاربر باید بداند مشکل از اتصال است نه رمز. */
+      lgSetErr(r.netError ? (r.message||"خطا در ارتباط با سرویس.") : "نام کاربری یا رمز عبور نادرست است.");
+      lgBusy(false); return;
+    }
     ME={ token:r.token, role:r.role, name:r.name, username:r.username, gender:r.gender||"", position:r.position||"", avatar:r.avatar||"" };
     localStorage.setItem("fsm_session", JSON.stringify(ME));
+    // رمز نباید پس از ورود در DOM بماند
+    var pw=document.getElementById("lgPass");
+    if(pw){ pw.value=""; pw.type="password"; }
+    var eye=document.getElementById("lgEye");
+    if(eye){ eye.classList.remove("on"); eye.setAttribute("aria-pressed","false"); }
     await startApp();
     lgBusy(false);
   }catch(e){ lgSetErr("خطا در اتصال به سرویس."); lgBusy(false); }
+}
+/* خروجِ دستی (دکمهٔ سایدبار): اول تأیید می‌گیرد.
+   ⚠ عمداً جدا از logout() است — خروجِ خودکار (نشستِ منقضی یا نشستِ نامعتبر)
+   نباید منتظرِ تأییدِ کاربر بماند و باید فوراً انجام شود. */
+async function confirmLogout(){
+  var ok=await uiConfirm("از حساب کاربری خود خارج می‌شوید؟",
+    { title:"خروج از سامانه", okLabel:"خروج", cancelLabel:"انصراف", danger:true });
+  if(ok) logout();
 }
 function logout(){
   ME={token:null}; localStorage.removeItem("fsm_session");
@@ -228,9 +262,18 @@ async function startApp(){
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
   if(!r.backendVersion){ toast("بک‌اندِ سرویس هنوز نسخهٔ قدیمی است. در Apps Script از Deploy ▸ Manage deployments، روی همان deployment «New version» را دیپلوی کنید.", true); }
+  /* نقشِ معتبر همان است که بک‌اند اعلام می‌کند، نه آنچه در localStorage نوشته شده.
+     بدونِ این خط، دست‌کاریِ fsm_session می‌توانست دکمه‌های مدیر را در رابط باز کند
+     (اقدامِ واقعی را بک‌اند رد می‌کند، ولی نباید اصلاً نمایش داده شود). */
+  if(r.role) ME.role=r.role;
   // غنی‌سازی پروفایل کاربر جاری از رکورد خودش (برای مدیر که فهرست کاربران را دارد)
   var meRec=(DB.users||[]).find(function(x){return x.username===ME.username;});
-  if(meRec){ ME.name=meRec.name||ME.name; ME.gender=meRec.gender||ME.gender; ME.position=meRec.position||ME.position; ME.avatar=meRec.avatar||ME.avatar; }
+  if(meRec){
+    if(meRec.role) ME.role=meRec.role;
+    ME.name=meRec.name||ME.name; ME.gender=meRec.gender||ME.gender; ME.position=meRec.position||ME.position; ME.avatar=meRec.avatar||ME.avatar;
+  }
+  localStorage.setItem("fsm_session", JSON.stringify(ME));   // نشستِ ذخیره‌شده با مقادیرِ تأییدشده هم‌گام شود
+  applyRoleVisibility();   // اگر نقش اصلاح شد، رابط فوراً با آن هماهنگ شود
   renderUserHeader();
   startClock();
   applyRoleVisibility();

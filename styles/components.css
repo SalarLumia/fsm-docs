@@ -5,8 +5,18 @@
 .btn svg{width:15px;height:15px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2}
 .btn.primary{background:var(--brand);border:1px solid var(--brand);color:#ffffff;font-weight:700;box-shadow:0 2px 8px #f7941f33}
 .btn.primary:hover{background:var(--brand2);border-color:var(--brand2);color:#fff;box-shadow:0 4px 14px #f7941f44}
+/* دکمهٔ قرمزِ درونِ صفحه: حالتِ کم‌رنگ با کادر (سبکِ اصلیِ سایت) */
 .btn.danger{color:var(--err);border-color:var(--err-line);background:#fff5f5}
 .btn.danger:hover{background:var(--err-bg);border-color:var(--err)}
+/* ⚠ فقط اقدامِ اصلیِ دیالوگ‌های تأیید تُوپُر است — هم‌فرمِ .primary با رنگِ قرمز.
+   دکمه‌های داخلِ صفحه (حذفِ مشتری، حذف همه در سطلِ زباله، رد سند و…) عمداً
+   کم‌رنگ می‌مانند تا صفحه از بلوک‌های قرمزِ سنگین پر نشود. */
+.confirm-acts .btn.danger,
+.rej-acts .btn.danger{background:var(--err);border:1px solid var(--err);color:#ffffff;
+  font-weight:700;box-shadow:0 2px 8px #dc262633}
+.confirm-acts .btn.danger:hover,
+.rej-acts .btn.danger:hover{background:var(--err2);border-color:var(--err2);color:#fff;
+  box-shadow:0 4px 14px #dc262644}
 .btn.sm{padding:5px 11px;font-size:12px;border-radius:7px}
 .btn:active,.icon-btn:active{transform:translateY(1px)}
 .btn:disabled{opacity:.55;cursor:not-allowed;transform:none}

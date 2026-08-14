@@ -84,8 +84,7 @@
       </span>
       <!-- توضیح هم‌سبکِ .ed-req-note: آیکونِ دایره‌ایِ اطلاع پیش از متن -->
       <p class="lg-note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای دریافت نام کاربری و رمز عبور با مدیر سیستم تماس بگیرید.</p>
-      <button id="lgBtn" class="btn-login" onclick="doLogin()"><span class="lg-spin" aria-hidden="true"></span><span class="lg-lbl">ورود</span></button>
-      <p id="lgErr" class="err" role="alert"></p>
+      <button id="lgBtn" class="btn-login" onclick="doLogin()"><span class="lg-lbl">ورود</span><span class="lg-spin" aria-hidden="true"><i>.</i><i>.</i><i>.</i><i>.</i></span></button>
       </div><!-- /.lg-body -->
       </div><!-- /.login-card -->
     </div><!-- /.login-brand -->
@@ -140,7 +139,7 @@
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r="1" fill="currentColor" stroke="none"/></svg>
         راهنما
       </button>
-      <button class="nav-item nav-logout" onclick="logout()">
+      <button class="nav-item nav-logout" onclick="confirmLogout()">
         <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         خروج
       </button>

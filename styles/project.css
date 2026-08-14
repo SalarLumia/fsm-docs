@@ -254,6 +254,14 @@ button.doc-ic:disabled{cursor:default}
 .mv-ar{display:none}
 /* پاپ‌آپِ کدِ QRِ واقعیت افزوده (درونِ مودالِ استانداردِ سایت) */
 .qr-body{padding:20px 22px;text-align:center}
+/* هشدارِ کمبودِ فایلِ AR — هم‌الگو با .ed-req-note ولی قرمز: آیکونِ اخطار پیش از متن */
+.ar-warn{display:flex;align-items:flex-start;gap:8px;text-align:right;
+  margin:0 0 16px;padding:10px 12px;border-radius:var(--radius-sm);
+  background:var(--err-bg);border:1px solid var(--err-line);
+  font-size:12px;font-weight:500;color:var(--err);line-height:1.8}
+.ar-warn svg{width:15px;height:15px;flex-shrink:0;margin-top:3px;
+  stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.qr-body .ar-warn:only-child{margin-bottom:0}
 .qr-sub{font-size:11.5px;color:var(--muted);line-height:1.9;margin-bottom:16px}
 .qr-code{width:200px;height:200px;margin:0 auto;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}
 .qr-code svg{width:100%;height:100%;display:block}
