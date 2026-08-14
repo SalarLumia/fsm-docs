@@ -172,14 +172,18 @@ th.sortable.active{color:var(--brand)}
   background:#000000aa;padding:8px 20px;border-radius:20px}
 @keyframes ld-spin{to{transform:rotate(360deg)}}
 
-/* ===== مرکز انتقال (دراپ‌داونِ زیرِ دکمهٔ هدر، سبکِ مرورگر) ===== */
-.dl-center{position:absolute;top:calc(100% + 10px);left:0;z-index:88;width:330px;
+/* ===== مرکز انتقال (دراپ‌داونِ زیرِ دکمهٔ هدر، سبکِ مرورگر) =====
+   ⚠ position:fixed است نه absolute: این عنصر فرزندِ body است (نه فرزندِ هدر)،
+   پس با absolute مبنایش کلِ صفحه می‌شد و top:100% یعنی «زیرِ کلِ body».
+   مختصاتِ واقعی در xferOpen از روی جای دکمهٔ هدر حساب و ست می‌شود.
+   z-index بالاتر از مودال‌ها (۸۰ تا ۹۶) تا روی پنلِ جزئیاتِ سند هم دیده شود. */
+.dl-center{position:fixed;z-index:120;width:330px;
   max-width:calc(100vw - 32px);background:var(--card);border:1px solid var(--line);
   border-radius:var(--radius);box-shadow:0 14px 44px #00000026;overflow:hidden;color:var(--txt);
   transform-origin:top left;opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none;
   transition:opacity .18s ease,transform .2s cubic-bezier(.2,0,0,1)}
 .dl-center.open{opacity:1;transform:none;pointer-events:auto}
-@media(max-width:520px){.dl-center{position:fixed;top:58px;left:16px;right:16px;width:auto}}
+@media(max-width:520px){.dl-center{top:58px!important;left:16px!important;right:16px;width:auto}}
 .dl-head{display:flex;align-items:center;justify-content:space-between;gap:8px;
   padding:10px 12px;background:var(--panel);border-bottom:1px solid var(--line);user-select:none}
 .dl-empty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:26px 16px;

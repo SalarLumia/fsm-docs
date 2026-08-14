@@ -19,8 +19,15 @@ function dlEnqueue(fileId, label){
   var id = ++_dlSeq;
   _dlJobs.push({ id:id, kind:"download", fileId:fileId, label:(label||"سند"), name:"", status:"queued",
                  pct:0, loaded:0, total:0, blobUrl:null, msg:"" });
-  xferOpen();     // با افزودنِ کارِ نو، دراپ‌داون باز شود (+ شنوندهٔ کلیکِ بیرون)
+  xferAutoOpen();
   dlPump();
+}
+/* بازکردنِ خودکارِ پنل — ولی نه وقتی مودالی (مثلِ جزئیاتِ سند) باز است.
+   آن‌جا پنل زیرِ پوششِ تیرهٔ مودال می‌افتاد و نیمه‌دیده می‌شد؛ به‌جایش فقط
+   نشانِ فعالیت روی دکمهٔ هدر می‌نشیند تا کاربر هر وقت خواست بازش کند. */
+function xferAutoOpen(){
+  if(document.querySelector(".modal")){ dlRender(); dlUpdateHeader(); return; }
+  xferOpen();
 }
 
 /* افزودنِ یک کارِ آپلود به همان صف/پنل. opts = { label, action, payload, onSuccess(r) }.
@@ -31,7 +38,7 @@ function dlEnqueueUpload(opts){
   _dlJobs.push({ id:id, kind:"upload", label:(opts.label||"سند"), name:(opts.label||"سند"), status:"queued",
                  pct:0, loaded:0, total:0, processing:false, msg:"",
                  action:opts.action, payload:opts.payload, onSuccess:opts.onSuccess });
-  xferOpen();
+  xferAutoOpen();
   dlPump();
   return id;
 }
@@ -199,19 +206,38 @@ function dlUpdateHeader(){
 function _dlById(id){ return _dlJobs.filter(function(j){ return j.id===id; })[0]||null; }
 /* دراپ‌داونِ مرکز انتقال: باز/بست با انیمیشن، بستن با کلیکِ بیرون */
 function xferToggle(){ if(_dlOpen) xferClose(); else xferOpen(); }
+/* پنل زیرِ دکمهٔ هدر جای می‌گیرد. چون position:fixed است، مختصات باید این‌جا
+   از روی جای واقعیِ دکمه حساب شود؛ این‌طور روی مودال هم درست می‌نشیند و با
+   اسکرول یا تغییرِ اندازهٔ صفحه از جای دکمه جدا نمی‌افتد. */
+function xferPlace(){
+  var host=document.getElementById("dlCenter"), btn=document.getElementById("xferBtn");
+  if(!host||!btn) return;
+  var r=btn.getBoundingClientRect();
+  host.style.top=Math.round(r.bottom+10)+"px";
+  // در RTL دکمه سمتِ چپِ هدر است؛ پنل از همان لبه باز می‌شود ولی از کادر بیرون نزند
+  var left=Math.max(12, Math.min(r.left, window.innerWidth-330-12));
+  host.style.left=Math.round(left)+"px";
+}
 function xferOpen(){
   _dlOpen=true; _dlUnseen=false;   // بازکردنِ پنل = دیده‌شدن؛ نشانِ سبز/قرمز پاک می‌شود
   dlRender();
+  xferPlace();
   document.removeEventListener("click", xferOutside, true);
   setTimeout(function(){ document.addEventListener("click", xferOutside, true); }, 0);
 }
+window.addEventListener("resize", function(){ if(_dlOpen) xferPlace(); });
+window.addEventListener("scroll", function(){ if(_dlOpen) xferPlace(); }, true);
 function xferClose(){
   _dlOpen=false; dlRender();
   document.removeEventListener("click", xferOutside, true);
 }
 function xferOutside(e){
   var wrap=document.getElementById("xferWrap");
-  if(wrap && wrap.contains(e.target)) return;   // کلیک داخلِ دکمه/پنل → باز بماند
+  if(wrap && wrap.contains(e.target)) return;   // کلیک روی دکمهٔ هدر → باز بماند
+  /* ⚠ پنل فرزندِ body است نه xferWrap، پس باید جداگانه بررسی شود؛ وگرنه کلیک روی
+     دکمه‌های داخلِ خودِ پنل (تلاشِ دوباره، حذف، پاک‌کردن) آن را می‌بست. */
+  var host=document.getElementById("dlCenter");
+  if(host && host.contains(e.target)) return;
   xferClose();
 }
 function dlRedownload(id){ var j=_dlById(id); if(j && j.blobUrl) dlHandOff(j); }
