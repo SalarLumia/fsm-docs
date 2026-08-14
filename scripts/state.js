@@ -42,7 +42,14 @@ function partNameFa(no){ if(pad2(no)==="00")return"سند پروژه"; var p=par
    ⚠ عمداً «خالص» است: اگر خودش پیشوند بگذارد، فراخوان نمی‌تواند بداند پیشوند دارد یا نه
    و نتیجه‌اش «پروژه پروژهٔ ۰۱» می‌شود. پیشوند فقط کارِ projectTitle است. */
 function projectName(d){
-  var p=(DB.projects||[]).find(function(x){ return x.clientCode===d.clientCode && pad2(x.orderNo)===pad2(d.orderNo) && pad2(x.projectNo)===pad2(d.projectNo); });
+  if(!d) return "";
+  // مقایسهٔ نرمال‌شده: کدِ مشتری گاهی با حروفِ کوچک/بزرگِ متفاوت ذخیره شده و شماره‌ها
+  // ممکن است از شیت به‌صورتِ عدد بیایند (۱ به‌جای «۰۱»)، پس هر دو سمت یکسان‌سازی می‌شوند.
+  var cc=String(d.clientCode||"").trim().toUpperCase();
+  var p=(DB.projects||[]).find(function(x){
+    return String(x.clientCode||"").trim().toUpperCase()===cc &&
+           pad2(x.orderNo)===pad2(d.orderNo) && pad2(x.projectNo)===pad2(d.projectNo);
+  });
   return (p&&p.description)?String(p.description).trim():"";
 }
 /* عنوانِ کاملِ پروژه، هم‌واژهٔ تیترِ صفحهٔ پروژه و کارتِ داشبورد: «پروژه تولید <نام>».
