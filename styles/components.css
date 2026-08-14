@@ -246,11 +246,11 @@ th.sortable.active{color:var(--brand)}
 .xfer-wrap{position:relative;display:inline-flex}
 /* هنگامِ بازبودنِ مودال: هدر سرِ جایش و زیرِ پوششِ تیره می‌ماند (مثلِ بقیهٔ صفحه)،
    و فقط دکمهٔ انتقال از پوشش بیرون می‌آید تا پیشرفتِ دانلود/آپلود دیده شود.
-   ⚠ دکمه نمی‌تواند به‌تنهایی بالا برود، چون .top-bar با sticky+z-index یک زمینهٔ
-   چیدمان می‌سازد و فرزندش زیرِ سقفِ آن حبس است. راهِ حل: خودِ دکمه (نه هدر) با
-   position:fixed از جریانِ هدر بیرون کشیده می‌شود؛ مختصاتش را xferPlaceBtn
-   در JS از روی جای اصلی‌اش ست می‌کند. */
-body.modal-open #xferBtn{position:fixed;z-index:120;
+   ⚠ position:fixed به‌تنهایی کافی نیست: .top-bar با sticky+z-index یک زمینهٔ
+   چیدمان می‌سازد و فرزندش — حتی fixed — نمی‌تواند از سقفِ آن بالاتر برود.
+   پس دکمه در JS (xferPlaceBtn) موقتاً به body منتقل می‌شود و با این کلاس
+   سرِ جای اصلی‌اش می‌نشیند. جای خالی‌اش در هدر با .xfer-wrap حفظ می‌شود. */
+#xferBtn.xfer-float{position:fixed;z-index:119;   /* یک پله زیرِ پنل (۱۲۰) تا پنل رویش باز شود */
   background:var(--card);box-shadow:0 2px 16px #0000004d}
 /* جای خالیِ دکمه در هدر حفظ می‌شود تا چیدمانِ نوار به‌هم نریزد (هم‌اندازهٔ خودِ دکمه) */
 body.modal-open .xfer-wrap{width:34px;height:34px}

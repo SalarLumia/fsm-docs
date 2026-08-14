@@ -234,16 +234,25 @@ function xferPlace(){
   var left=Math.max(12, Math.min(r.left, window.innerWidth-330-12));
   host.style.left=Math.round(left)+"px";
 }
-/* دکمهٔ انتقال هنگامِ بازبودنِ مودال با position:fixed از هدر بیرون کشیده می‌شود
-   (تا از پوششِ تیره جدا شود)، پس مختصاتش باید دستی ست شود.
-   ⚠ اندازه‌گیری باید پیش از fixed‌شدن انجام گیرد، وگرنه rect به جای قبلیِ خودش
-   وابسته می‌شود و دکمه در هر بار باز‌شدنِ مودال جابه‌جا می‌شود. */
+/* دکمهٔ انتقال هنگامِ بازبودنِ مودال باید روی پوششِ تیره دیده شود.
+   ⚠ صرفِ position:fixed کافی نیست: .top-bar یک زمینهٔ چیدمان می‌سازد و هیچ
+   فرزندی (حتی fixed) نمی‌تواند از سقفِ آن بالاتر برود. پس دکمه موقتاً به body
+   منتقل می‌شود — دقیقاً همان کاری که برای خودِ پنل هم لازم بود — و با مختصاتِ
+   جای اصلی‌اش سرِ همان‌جا می‌نشیند. با بسته‌شدنِ مودال به هدر برمی‌گردد. */
 function xferPlaceBtn(){
   var btn=document.getElementById("xferBtn"), wrap=document.getElementById("xferWrap");
   if(!btn||!wrap) return;
-  if(!document.body.classList.contains("modal-open")){ btn.style.top=""; btn.style.left=""; return; }
+  var lifted=document.body.classList.contains("modal-open");
+  if(!lifted){
+    if(btn.parentNode!==wrap){ wrap.appendChild(btn); }   // بازگشت به هدر
+    btn.classList.remove("xfer-float");
+    btn.style.top=""; btn.style.left="";
+    return;
+  }
   var r=wrap.getBoundingClientRect();      // جای رزروشدهٔ دکمه در هدر
   if(r.width===0) return;
+  if(btn.parentNode!==document.body) document.body.appendChild(btn);
+  btn.classList.add("xfer-float");
   btn.style.top=Math.round(r.top)+"px";
   btn.style.left=Math.round(r.left)+"px";
 }
@@ -275,6 +284,10 @@ function xferOutside(e){
   if(e.target && e.target.dataset && e.target.dataset.dlInternal) return;
   var wrap=document.getElementById("xferWrap");
   if(wrap && wrap.contains(e.target)) return;   // کلیک روی دکمهٔ هدر → باز بماند
+  /* دکمه هنگامِ بازبودنِ مودال به body منتقل می‌شود و دیگر داخلِ wrap نیست،
+     پس جداگانه بررسی می‌شود؛ وگرنه کلیک روی خودِ دکمه پنل را می‌بست. */
+  var btn=document.getElementById("xferBtn");
+  if(btn && btn.contains(e.target)) return;
   /* ⚠ پنل فرزندِ body است نه xferWrap، پس باید جداگانه بررسی شود؛ وگرنه کلیک روی
      دکمه‌های داخلِ خودِ پنل (تلاشِ دوباره، حذف، پاک‌کردن) آن را می‌بست. */
   var host=document.getElementById("dlCenter");
