@@ -239,14 +239,10 @@ th.sortable.active{color:var(--brand)}
 
 /* ===== نشانگرِ «مرکز انتقال» در هدر (سمتِ چپ) ===== */
 .xfer-wrap{position:relative;display:inline-flex}
-/* وقتی مودالی باز است، دکمهٔ انتقال و پنلش از زیرِ پوششِ تیرهٔ مودال بیرون می‌آیند
-   (کلاسِ modal-open روی body در showModal/closeModal گذاشته می‌شود).
-   دلیل: کاربر در پنلِ جزئیاتِ سند دانلود می‌زند و باید پیشرفتِ کار را ببیند؛
-   پیش‌تر همه‌چیز زیرِ فیلترِ تیره می‌رفت و به‌نظر می‌رسید دکمه کار نکرده است.
-   z-index بالاتر از بالاترین مودال (۹۶) انتخاب شده است. */
-body.modal-open .xfer-wrap{z-index:120}
-/* هالهٔ ملایم پشتِ دکمه تا روی زمینهٔ تیره‌شده جدا و خوانا دیده شود */
-body.modal-open .xfer-btn{background:var(--card);box-shadow:0 2px 14px #00000040}
+/* ⚠ دکمهٔ هدر نمی‌تواند از پوششِ مودال بیرون بیاید: .top-bar با sticky و z-index:30
+   یک زمینهٔ چیدمان می‌سازد و هر z-indexی داخلِ آن زیرِ همان سقف می‌ماند. بالا‌بردنِ
+   z-index خودِ .top-bar هم آن را روی مودال می‌آورد که نتیجه‌اش بدتر است.
+   به‌جایش خودِ پنلِ انتقال (فرزندِ body، بیرون از این زمینه) روی مودال دیده می‌شود. */
 .xfer-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;
   border:1px solid var(--line);background:var(--card);border-radius:9px;cursor:pointer;color:var(--muted);
   padding:0;transition:border-color .15s,color .15s,background .15s}

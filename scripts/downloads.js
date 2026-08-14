@@ -103,9 +103,14 @@ function dlHandOff(job){
 }
 
 /* ---------- رندرِ پنل (دراپ‌داونِ زیرِ دکمهٔ هدر) ---------- */
+/* ⚠ پنل باید فرزندِ مستقیمِ body باشد، نه داخلِ هدر.
+   دلیل: .top-bar با position:sticky و z-index:30 یک «زمینهٔ چیدمان» می‌سازد و هر
+   چیزی داخلش — حتی با position:fixed و z-index:120 — زیرِ سقفِ همان ۳۰ حبس می‌شود،
+   پس هرگز روی مودالِ z-index:80 دیده نمی‌شد. با انتقال به body این سقف برداشته می‌شود. */
 function dlHost(){
   var h=document.getElementById("dlCenter");
-  if(!h){ h=document.createElement("div"); h.id="dlCenter"; h.className="dl-center"; document.body.appendChild(h); }
+  if(!h){ h=document.createElement("div"); h.id="dlCenter"; h.className="dl-center"; }
+  if(h.parentNode!==document.body) document.body.appendChild(h);
   return h;
 }
 function dlRender(){

@@ -568,7 +568,7 @@ function closeNewDocModal(){
   ndCloseMenu();
   var m=document.getElementById("newDocModal"); if(m) m.classList.add("hidden");
   // اگر مودالِ دیگری هنوز باز است، کلاس باید بماند (وگرنه دکمهٔ انتقال زیرِ پوششِ آن می‌رود)
-  if(!document.querySelector(".modal")) document.body.classList.remove("modal-open");
+  if(typeof anyModalOpen!=="function" || !anyModalOpen()) document.body.classList.remove("modal-open");
 }
 document.addEventListener("keydown",function(e){
   if(e.key!=="Escape") return;

@@ -535,6 +535,20 @@ function b64toBlob(b64,mime){
   for(var i=0;i<len;i++) arr[i]=bin.charCodeAt(i);
   return new Blob([arr],{type:mime||"application/octet-stream"});
 }
+/* آیا مودالِ *باز*ی روی صفحه هست؟
+   ⚠ صرفِ querySelector(".modal") کافی نیست: #newDocModal همیشه در DOM هست و فقط
+   با کلاسِ hidden پنهان می‌شود، پس همیشه پیدا می‌شد و کلاسِ modal-open هرگز
+   برداشته نمی‌شد — نتیجه‌اش قفل‌ماندنِ اسکرولِ کلِ سایت بود. */
+function anyModalOpen(){
+  var all=document.querySelectorAll(".modal");
+  for(var i=0;i<all.length;i++){
+    var m=all[i];
+    if(m.classList.contains("hidden")) continue;
+    if(m.offsetParent===null && getComputedStyle(m).display==="none") continue;
+    return true;
+  }
+  return false;
+}
 function showModal(title,innerHTML,boxClass){
   var host=document.getElementById("modalHost");
   host.innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box'+(boxClass?" "+boxClass:"")+'">'+
@@ -549,9 +563,7 @@ function closeModal(){
   // آزادسازیِ URLهای بلابِ مودال (پیش‌نمایشِ سند/فایل) تا در جلسه‌های طولانی حافظه نشت نکند
   if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
   document.getElementById("modalHost").innerHTML="";
-  /* کلاس فقط وقتی برداشته می‌شود که هیچ مودالِ دیگری باز نمانده باشد؛
-     پنلِ جزئیاتِ سند مودالِ جداگانه‌ای است و خودش این کلاس را مدیریت می‌کند. */
-  if(!document.querySelector(".modal")) document.body.classList.remove("modal-open");
+  if(!anyModalOpen()) document.body.classList.remove("modal-open");
 }
 
 /* ================= خروجی CSV ================= */
