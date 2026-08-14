@@ -550,24 +550,25 @@ function anyModalOpen(){
   return false;
 }
 /* ===== قفلِ اسکرولِ پس‌زمینه =====
-   ⚠ صرفِ overflow:hidden کافی نیست: هدر position:sticky است و با قفل‌شدنِ body
-   زمینهٔ اسکرولش را از دست می‌دهد؛ اگر صفحه پایین آمده باشد، هدر بالای کادرِ دید
-   می‌ماند و اصلاً دیده نمی‌شود (همان چیزی که در پنلِ جزئیاتِ سند اتفاق می‌افتاد).
-   راهِ استاندارد: body را با position:fixed در همان offset فریز کن و هنگامِ
-   بازکردنِ قفل، اسکرول را دقیقاً به جای قبلی برگردان. */
+   ⚠ هدر position:sticky است و به اسکرولِ صفحه چسبیده. اگر صفحه پایین آمده باشد
+   و همان‌جا قفل شود، هدر بالای کادرِ دید می‌ماند و دیده نمی‌شود — همان باگی که
+   در پنلِ جزئیاتِ سند رخ می‌داد.
+   راه‌حل: پیش از قفل، صفحه به بالا برده می‌شود تا هدر در کادر باشد؛ موقعیتِ قبلی
+   نگه داشته و هنگامِ بستن دقیقاً برگردانده می‌شود، پس کاربر جایش را گم نمی‌کند.
+   (position:fixed روی body امتحان شد و غلط بود: ارتفاعِ صفحه جمع می‌شد،
+   نوارِ اسکرول غیب می‌شد و هدر با topِ منفی بریده می‌شد.) */
 var _mlY=0, _mlOn=false;
 function modalLock(){
   if(_mlOn) return;
   _mlY=window.pageYOffset||document.documentElement.scrollTop||0;
-  document.body.style.top=(-_mlY)+"px";
+  if(_mlY>0) window.scrollTo(0,0);   // هدر به بالای کادرِ دید بیاید
   document.body.classList.add("modal-open");
   _mlOn=true;
 }
 function modalUnlock(){
   if(!_mlOn) return;
   document.body.classList.remove("modal-open");
-  document.body.style.top="";
-  window.scrollTo(0,_mlY);
+  if(_mlY>0) window.scrollTo(0,_mlY);   // بازگشت به همان جای قبلی
   _mlOn=false;
 }
 function showModal(title,innerHTML,boxClass){

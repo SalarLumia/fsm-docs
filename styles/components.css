@@ -107,10 +107,11 @@ input::placeholder{color:#b0afa9}
 .ra-pager{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);
   margin:12px -18px -16px;padding:12px 18px;justify-content:center}
 /* قفلِ اسکرولِ پس‌زمینه هنگامِ بازبودنِ مودال.
-   ⚠ position:fixed (نه فقط overflow:hidden): با overflow تنها، هدرِ sticky
-   زمینهٔ اسکرولش را از دست می‌داد و اگر صفحه پایین آمده بود بالای کادرِ دید
-   می‌ماند. مقدارِ top را modalLock در JS ست می‌کند تا صفحه سرِ جایش بماند. */
-body.modal-open{position:fixed;left:0;right:0;width:100%;overflow-y:scroll}
+   ⚠ فقط overflow:hidden — نه position:fixed روی body. با fixed، ارتفاعِ صفحه به
+   اندازهٔ کادرِ دید جمع می‌شد، نوارِ اسکرول کلاً غیب می‌شد و چون top منفی هم ست
+   می‌شد، هدر بالای کادر می‌رفت و بریده می‌شد.
+   هدر با scrollTo(0,0) در modalLock به بالای کادر می‌آید، پس همیشه دیده می‌شود. */
+body.modal-open{overflow:hidden}
 
 /* ===== جدول‌ها ===== */
 table{width:100%;border-collapse:collapse;font-size:13px}
