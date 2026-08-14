@@ -540,6 +540,8 @@ function showModal(title,innerHTML,boxClass){
   host.innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box'+(boxClass?" "+boxClass:"")+'">'+
     '<header><strong>'+title+'</strong><button class="modal-x" onclick="closeModal()" aria-label="بستن" title="بستن">✕</button></header>'+
     '<div class="body">'+innerHTML+'</div></div></div>';
+  // نشانهٔ «مودالی باز است» — دکمهٔ مرکزِ انتقال با همین کلاس از زیرِ پوششِ تیره بیرون می‌آید
+  document.body.classList.add("modal-open");
 }
 function closeModal(){
   // توقفِ برآوردگرِ نوارِ پیشرفتِ پیش‌نمایش تا تایمرش پس از بسته‌شدن روی پیش‌نمایشِ بعدی ننویسد
@@ -547,6 +549,9 @@ function closeModal(){
   // آزادسازیِ URLهای بلابِ مودال (پیش‌نمایشِ سند/فایل) تا در جلسه‌های طولانی حافظه نشت نکند
   if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
   document.getElementById("modalHost").innerHTML="";
+  /* کلاس فقط وقتی برداشته می‌شود که هیچ مودالِ دیگری باز نمانده باشد؛
+     پنلِ جزئیاتِ سند مودالِ جداگانه‌ای است و خودش این کلاس را مدیریت می‌کند. */
+  if(!document.querySelector(".modal")) document.body.classList.remove("modal-open");
 }
 
 /* ================= خروجی CSV ================= */
