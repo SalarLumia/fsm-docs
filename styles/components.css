@@ -106,7 +106,9 @@ input::placeholder{color:#b0afa9}
 /* صفحه‌بندیِ پنجرهٔ «همهٔ فعالیت‌ها»: چسبیده به کفِ ناحیهٔ اسکرول‌شونده (نه اسکرول با فهرست)، هم‌سبکِ صفحه‌بندیِ آرشیو */
 .ra-pager{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);
   margin:12px -18px -16px;padding:12px 18px;justify-content:center}
-body.modal-open{overflow:hidden}
+/* قفلِ اسکرولِ پس‌زمینه هنگامِ بازبودنِ مودال.
+   ⚠ scrollbar-gutter تا نبودِ نوارِ اسکرول باعثِ پرشِ افقیِ محتوا نشود. */
+body.modal-open{overflow:hidden;scrollbar-gutter:stable}
 
 /* ===== جدول‌ها ===== */
 table{width:100%;border-collapse:collapse;font-size:13px}

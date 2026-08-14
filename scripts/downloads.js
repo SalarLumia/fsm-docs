@@ -213,8 +213,16 @@ function xferToggle(){ if(_dlOpen) xferClose(); else xferOpen(); }
    اسکرول یا تغییرِ اندازهٔ صفحه از جای دکمه جدا نمی‌افتد. */
 function xferPlace(){
   var host=document.getElementById("dlCenter"), btn=document.getElementById("xferBtn");
-  if(!host||!btn) return;
-  var r=btn.getBoundingClientRect();
+  if(!host) return;
+  var r=btn?btn.getBoundingClientRect():null;
+  /* ⚠ اگر مودالی باز باشد، هدر دیده نمی‌شود (body با overflow:hidden قفل می‌شود و
+     هدرِ sticky زمینهٔ اسکرولش را از دست می‌دهد)، پس مختصاتِ دکمه بی‌معنی است.
+     در آن حالت پنل را مستقل از دکمه، به گوشهٔ بالای صفحه می‌چسبانیم تا دیده شود. */
+  if(!r || r.width===0 || r.bottom<=0){
+    host.style.top="16px";
+    host.style.left="16px";
+    return;
+  }
   host.style.top=Math.round(r.bottom+10)+"px";
   // در RTL دکمه سمتِ چپِ هدر است؛ پنل از همان لبه باز می‌شود ولی از کادر بیرون نزند
   var left=Math.max(12, Math.min(r.left, window.innerWidth-330-12));
