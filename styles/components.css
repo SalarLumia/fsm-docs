@@ -107,8 +107,10 @@ input::placeholder{color:#b0afa9}
 .ra-pager{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);
   margin:12px -18px -16px;padding:12px 18px;justify-content:center}
 /* قفلِ اسکرولِ پس‌زمینه هنگامِ بازبودنِ مودال.
-   ⚠ scrollbar-gutter تا نبودِ نوارِ اسکرول باعثِ پرشِ افقیِ محتوا نشود. */
-body.modal-open{overflow:hidden;scrollbar-gutter:stable}
+   ⚠ position:fixed (نه فقط overflow:hidden): با overflow تنها، هدرِ sticky
+   زمینهٔ اسکرولش را از دست می‌داد و اگر صفحه پایین آمده بود بالای کادرِ دید
+   می‌ماند. مقدارِ top را modalLock در JS ست می‌کند تا صفحه سرِ جایش بماند. */
+body.modal-open{position:fixed;left:0;right:0;width:100%;overflow-y:scroll}
 
 /* ===== جدول‌ها ===== */
 table{width:100%;border-collapse:collapse;font-size:13px}

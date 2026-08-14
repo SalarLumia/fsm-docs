@@ -559,7 +559,7 @@ function openNewDocModal(){
   var rail=document.getElementById("ndRail"); if(rail) rail.innerHTML="";
   var stage=document.getElementById("ndStage"); if(stage) stage.innerHTML="";
   m.classList.remove("hidden");
-  document.body.classList.add("modal-open");
+  modalLock();   // قفلِ اسکرول با حفظِ موقعیت (تعریف در archive.js)
   var sc=document.getElementById("ndScroll"); if(sc) sc.scrollTop=0;   // اسکرول از ابتدا
   ndRender();                                         // ریل و آکاردئون از نو، انیمیشن‌ها از ابتدا
   if(sc) sc.scrollTop=0;
@@ -567,8 +567,8 @@ function openNewDocModal(){
 function closeNewDocModal(){
   ndCloseMenu();
   var m=document.getElementById("newDocModal"); if(m) m.classList.add("hidden");
-  // اگر مودالِ دیگری هنوز باز است، کلاس باید بماند (وگرنه دکمهٔ انتقال زیرِ پوششِ آن می‌رود)
-  if(typeof anyModalOpen!=="function" || !anyModalOpen()) document.body.classList.remove("modal-open");
+  // قفل فقط وقتی باز می‌شود که هیچ مودالِ دیگری باز نمانده باشد
+  if(typeof anyModalOpen!=="function" || !anyModalOpen()) modalUnlock();
 }
 document.addEventListener("keydown",function(e){
   if(e.key!=="Escape") return;

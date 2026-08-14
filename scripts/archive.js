@@ -549,13 +549,33 @@ function anyModalOpen(){
   }
   return false;
 }
+/* ===== قفلِ اسکرولِ پس‌زمینه =====
+   ⚠ صرفِ overflow:hidden کافی نیست: هدر position:sticky است و با قفل‌شدنِ body
+   زمینهٔ اسکرولش را از دست می‌دهد؛ اگر صفحه پایین آمده باشد، هدر بالای کادرِ دید
+   می‌ماند و اصلاً دیده نمی‌شود (همان چیزی که در پنلِ جزئیاتِ سند اتفاق می‌افتاد).
+   راهِ استاندارد: body را با position:fixed در همان offset فریز کن و هنگامِ
+   بازکردنِ قفل، اسکرول را دقیقاً به جای قبلی برگردان. */
+var _mlY=0, _mlOn=false;
+function modalLock(){
+  if(_mlOn) return;
+  _mlY=window.pageYOffset||document.documentElement.scrollTop||0;
+  document.body.style.top=(-_mlY)+"px";
+  document.body.classList.add("modal-open");
+  _mlOn=true;
+}
+function modalUnlock(){
+  if(!_mlOn) return;
+  document.body.classList.remove("modal-open");
+  document.body.style.top="";
+  window.scrollTo(0,_mlY);
+  _mlOn=false;
+}
 function showModal(title,innerHTML,boxClass){
   var host=document.getElementById("modalHost");
   host.innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box'+(boxClass?" "+boxClass:"")+'">'+
     '<header><strong>'+title+'</strong><button class="modal-x" onclick="closeModal()" aria-label="بستن" title="بستن">✕</button></header>'+
     '<div class="body">'+innerHTML+'</div></div></div>';
-  // نشانهٔ «مودالی باز است» — دکمهٔ مرکزِ انتقال با همین کلاس از زیرِ پوششِ تیره بیرون می‌آید
-  document.body.classList.add("modal-open");
+  modalLock();
 }
 function closeModal(){
   // توقفِ برآوردگرِ نوارِ پیشرفتِ پیش‌نمایش تا تایمرش پس از بسته‌شدن روی پیش‌نمایشِ بعدی ننویسد
@@ -563,7 +583,7 @@ function closeModal(){
   // آزادسازیِ URLهای بلابِ مودال (پیش‌نمایشِ سند/فایل) تا در جلسه‌های طولانی حافظه نشت نکند
   if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
   document.getElementById("modalHost").innerHTML="";
-  if(!anyModalOpen()) document.body.classList.remove("modal-open");
+  if(!anyModalOpen()) modalUnlock();
 }
 
 /* ================= خروجی CSV ================= */
