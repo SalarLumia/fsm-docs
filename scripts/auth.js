@@ -32,6 +32,14 @@ function lgBusy(on){
   // نقطه‌ها با CSS متحرک می‌شوند (۱ تا ۴ و تکرار)، پس متن بدونِ نقطه نوشته می‌شود
   if(l) l.textContent = on ? "در حال ورود" : "ورود";
 }
+/* مرحلهٔ دومِ دکمهٔ ورود: احرازِ هویت موفق بوده و حالا داده‌ها می‌آیند.
+   بدونِ این، کاربر در فاصلهٔ bootstrap نمی‌داند ورودش پذیرفته شده یا سایت گیر کرده. */
+function lgStage2(){
+  var b=document.getElementById("lgBtn"); if(!b) return;
+  b.disabled=true; b.classList.add("loading");
+  var l=b.querySelector(".lg-lbl");
+  if(l) l.textContent="در حال بارگذاری اطلاعات";
+}
 /* مرحلهٔ ۲ صفحهٔ ورود: برند جمع می‌شود و کارتِ ورود با انیمیشن باز می‌شود */
 /* ═══ محاسبهٔ هندسهٔ صفحهٔ ورود ═══
    همهٔ عناصرِ بلوکِ برند absolute هستند تا حرکتشان روی هم اثر نگذارد؛ در نتیجه
@@ -273,7 +281,13 @@ async function confirmLogout(){
     { title:"خروج از سامانه", okLabel:"خروج", cancelLabel:"انصراف", danger:true });
   if(ok) logout();
 }
+/* شمارندهٔ «نسلِ نشست»: هر ورود/خروج یک واحد جلو می‌برد. هر اجرای startApp نسلِ خودش را
+   نگه می‌دارد و پس از بازگشتِ bootstrap بررسی می‌کند که هنوز جدیدترین است یا نه.
+   بدونِ این، اگر کاربر سریع خارج و دوباره وارد شود، پاسخِ درخواستِ قبلی دیرتر می‌رسد و
+   دادهٔ نشستِ قدیمی را روی نشستِ جدید رسم می‌کند. */
+var _appRun = 0;
 function logout(){
+  _appRun++;                              // هر اجرای در جریانِ startApp از این لحظه بی‌اعتبار است
   ME={token:null}; localStorage.removeItem("fsm_session");
   stopClock();
   document.getElementById("appView").classList.add("hidden");
@@ -285,45 +299,31 @@ function logout(){
   var eye=document.getElementById("lgEye");
   if(eye){ eye.classList.remove("on"); eye.setAttribute("aria-pressed","false"); }
 }
-/* opts.deferReveal=true → پوستهٔ برنامه تا تأییدِ نشست نشان داده نمی‌شود.
-   برای بازگشایی از نشستِ ذخیره‌شده لازم است: قبلاً برنامه فوراً باز می‌شد و اگر
-   توکن منقضی بود چند ثانیه بعد کاربر به بیرون پرتاب می‌شد. با ورودِ دستی این
-   تأخیر لازم نیست، چون توکن همان لحظه از سرور گرفته شده و قطعاً معتبر است. */
-async function startApp(opts){
-  var defer=!!(opts&&opts.deferReveal);
-  if(!defer){
-    // پوستهٔ برنامه را فوراً نشان بده و اسکلت بارگذاری بگذار، سپس داده را بگیر
-    document.getElementById("loginView").classList.add("hidden");
-    document.getElementById("appView").classList.remove("hidden");
-    renderUserHeader();
-    applyRoleVisibility();
-    /* ⚠ تبِ داشبورد در این مرحله نمایان نمی‌شود و فقط محتوایش با اسکلت پر می‌شود.
-       اگر نمایان شود، قابِ پنل‌ها (تیتر و کادر) همان‌جا دیده می‌شود و بعد در آبشارِ
-       واقعی دوباره از opacity:0 بالا می‌آید — همان «دوبار پخش‌شدن». حالا پنل‌ها
-       تنها یک‌بار، هم‌زمان با دادهٔ واقعی، وارد می‌شوند. */
-    if(typeof showDashboardSkeleton==="function") showDashboardSkeleton();
-  }
+/* پوستهٔ برنامه در هر دو مسیر (ورودِ دستی و نشستِ ذخیره‌شده) فقط پس از رسیدنِ
+   دادهٔ کامل نمایش داده می‌شود؛ پس opts دیگر لازم نیست و نگه داشته شده تا
+   فراخوان‌های قدیمی خطا ندهند. */
+async function startApp(){
+  var myRun=++_appRun;   // نسلِ این اجرا؛ اگر بعداً نسلِ تازه‌تری بیاید، این اجرا حق رسم ندارد
+  /* ⚠ در هیچ مسیری پیش از رسیدنِ داده چیزی نمایش داده نمی‌شود.
+     کاربر روی صفحهٔ ورود می‌ماند (دکمه در حالتِ «در حال بارگذاری اطلاعات…») و
+     پوستهٔ برنامه فقط یک‌بار، آن هم با دادهٔ کامل، وارد می‌شود.
+     دلیل: هر نمایشِ زودهنگام باعث می‌شد پنل‌ها یک‌بار خالی/اسکلتی دیده شوند و
+     بعد در آبشارِ واقعی دوباره از opacity:0 بالا بیایند. */
+  lgStage2();   // متنِ دکمه: ورود موفق بود، حالا داده می‌آید
 
   var r=await api("bootstrap",{});
   /* نشستِ نامعتبر: api خودش logout() را صدا زده و صفحهٔ ورود را آورده،
      پس این‌جا فقط باید بی‌سروصدا برگردیم (وگرنه خطای bootstrap هم روی آن می‌نشیند). */
   if(!ME.token) return;
+  if(myRun!==_appRun) return;   // نشستِ تازه‌تری شروع شده؛ این پاسخ کهنه است و نباید چیزی رسم کند
   if(!r || !r.ok){
-    if(defer){   // هنوز چیزی نمایش داده نشده؛ حالا پوسته را بیاور تا خطا جایی دیده شود
-      document.getElementById("loginView").classList.add("hidden");
-      document.getElementById("appView").classList.remove("hidden");
-      renderUserHeader(); applyRoleVisibility();
-    }
-    // پنل باید نمایان شود، وگرنه پیامِ خطا جایی برای دیده‌شدن ندارد
+    // هنوز چیزی نمایش داده نشده؛ حالا پوسته را بیاور تا خطا جایی برای دیده‌شدن داشته باشد
+    document.getElementById("loginView").classList.add("hidden");
+    document.getElementById("appView").classList.remove("hidden");
+    renderUserHeader(); applyRoleVisibility();
     var dashErr=document.getElementById("tab-dashboard");
     if(dashErr) dashErr.classList.remove("hidden");
     if(typeof showBootstrapError==="function") showBootstrapError(); return;
-  }
-  if(defer){   // نشست تأیید شد؛ حالا با اطمینان برنامه را نشان بده
-    document.getElementById("loginView").classList.add("hidden");
-    document.getElementById("appView").classList.remove("hidden");
-    renderUserHeader();
-    applyRoleVisibility();
   }
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
@@ -348,7 +348,13 @@ async function startApp(opts){
   refreshAllSelects();
   renderArchive(); renderDataTables();
   if(typeof renderNavTree==="function") renderNavTree();
-  switchTab("dashboard");   // خودش پنل را نمایان می‌کند و آبشار را یک‌بار روی دادهٔ واقعی پخش می‌کند
+  /* ⚠ پوسته دقیقاً همین‌جا نمایان می‌شود: پس از آنکه همهٔ نماها با دادهٔ واقعی رسم
+     شده‌اند و بلافاصله پیش از آبشار. اگر زودتر نمایان شود، پنل‌ها یک لحظه خالی
+     دیده می‌شوند و بعد دوباره در آبشار وارد می‌شوند. */
+  document.getElementById("loginView").classList.add("hidden");
+  document.getElementById("appView").classList.remove("hidden");
+  switchTab("dashboard");   // پنلِ داشبورد را نمایان می‌کند و آبشار را یک‌بار پخش می‌کند
+  lgBusy(false);            // دکمهٔ ورود برای دفعهٔ بعد به حالتِ عادی برگردد
 }
 /* هدر کاربر: آواتار + (آقای/خانم + نام) + تگِ نقش | سمت */
 function renderUserHeader(){

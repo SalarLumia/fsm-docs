@@ -22,8 +22,8 @@
       return;
     }
     ME=saved;
-    /* deferReveal: تا وقتی بک‌اند نشست را تأیید نکرده، برنامه نمایش داده نمی‌شود.
-       بدونِ این، صفحه باز می‌شد و چند ثانیه بعد کاربر بیرون انداخته می‌شد. */
-    startApp({deferReveal:true}).catch(function(){ logout(); });
+    /* startApp خودش تا رسیدنِ دادهٔ کامل چیزی نشان نمی‌دهد؛ پس اگر توکن نامعتبر
+       باشد کاربر هرگز پوستهٔ برنامه را نمی‌بیند که بعد بیرون انداخته شود. */
+    startApp().catch(function(){ logout(); });
   }catch(e){ localStorage.removeItem("fsm_session"); }
 })();
