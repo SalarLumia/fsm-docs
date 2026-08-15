@@ -36,6 +36,11 @@ async function openDocDetail(num){
 
   /* بنرِ رد: بینِ سکشنِ مشخصات و تاریخچه؛ هم‌سبکِ ردیف‌های مشخصات (dm-row/dm-k/dm-v) با نقطهٔ قرمزِ پالس‌دار
      پیشِ تیتر (هم‌الگوی نقطهٔ فعالیتِ اخیرِ داشبورد) به‌جای بنرِ توپُرِ قبلی. */
+  /* هشدارِ «نسخهٔ جدیدتر»: وقتی کاربر با اسکنِ QRِ یک نقشهٔ کاغذی وارد می‌شود، ممکن است
+     کاغذِ دستش قدیمی باشد. اگر ویرایشِ تأییدشدهٔ جدیدتری هست، همین‌جا اعلام می‌شود تا
+     کسی با نقشهٔ منسوخ قطعه نسازد. */
+  var newerBanner=dmNewerRevBanner(d);
+
   var rejBanner = (String(d.status||"").toLowerCase()==="rejected")
     ? '<div class="dm-reject">'+
         '<div class="dm-reject-t"><span class="dm-reject-dot"></span>این سند نیاز به اعمال تغییرات دارد.</div>'+
@@ -73,16 +78,71 @@ async function openDocDetail(num){
         '<div class="dp-actions">'+actionBtn+dlBtnHTML+'</div>'+
       '</div>'+
       '<div class="doc-side">'+
+        newerBanner+
         '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>مشخصات سند</div>'+metaHTML+'</div>'+
         rejBanner+
         '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><polyline points="12 7 12 12 15 15"/></svg>تاریخچهٔ سند</div>'+
           '<div class="ver-list">'+revHTML+'</div></div>'+
+        dmQrSectionHTML(d)+
       '</div>'+
     '</div>';
   showModal(esc(docPhrase(d)), body, "doc-box");
 
   /* ریویژن جاری را به‌صورت پیش‌فرض در پیش‌نمایش بارگذاری کن (بدون باز کردن گردش‌کار) */
   dmSelectVersion(num);
+}
+
+/* بنرِ «نسخهٔ جدیدتر موجود است».
+   فقط وقتی نشان داده می‌شود که ویرایشِ *تأییدشدهٔ* جدیدتری وجود داشته باشد؛ پیش‌نویس یا
+   در انتظارِ بازبینی هنوز مبنای ساخت نیست و اعلامش کاربر را گمراه می‌کند. */
+function dmNewerRevBanner(d){
+  var cur=parseInt(d.rev,10); if(isNaN(cur)) return "";
+  var newer=revisionsOf(d).filter(function(rv){
+    return (parseInt(rv.rev,10)||0)>cur && String(rv.status||"").toLowerCase()==="approved";
+  }).sort(function(a,b){ return (parseInt(b.rev,10)||0)-(parseInt(a.rev,10)||0); })[0];
+  if(!newer) return "";
+  return '<div class="dm-newer">'+
+    '<div class="dm-newer-t"><span class="dm-newer-dot"></span>ویرایشِ جدیدتری تأیید شده است</div>'+
+    '<div class="dm-newer-note">این سند ویرایشِ '+faN(pad2(d.rev))+' است؛ ویرایشِ '+faN(pad2(newer.rev))+' تأیید شده. '+
+      'اگر نقشهٔ چاپیِ همین ویرایش را در دست دارید، از نسخهٔ تأییدشده استفاده کنید.</div>'+
+    '<button class="btn sm" onclick="openDocDetail(\''+esc(newer.drawingNumber)+'\')">مشاهدهٔ ویرایشِ '+faN(pad2(newer.rev))+'</button>'+
+  '</div>';
+}
+
+/* ═══ بخشِ کدِ QR سند ═══
+   کد به همان ویرایشی اشاره می‌کند که رویش چاپ می‌شود (شمارهٔ ویرایش انتهای شمارهٔ سند است)،
+   پس نقشهٔ کاغذیِ دستِ پیمانکار همیشه نسخهٔ خودش را باز می‌کند — نه نسخه‌ای که بعداً آمده.
+   اگر ویرایشِ تأییدشدهٔ جدیدتری وجود داشته باشد، خودِ سامانه پس از باز شدن به کاربر می‌گوید. */
+function dmQrSectionHTML(d){
+  var url=(typeof qrDocUrl==="function")?qrDocUrl(d.drawingNumber):"";
+  if(!url) return "";
+  var svg=(typeof qrSvg==="function")?qrSvg(url):"";
+  if(!svg) return "";   // کتابخانهٔ QR نیامده — بخش اصلاً ساخته نمی‌شود
+  return '<div class="dm-sec dm-qr-sec">'+
+    '<div class="dm-sec-t"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="18" y1="14" x2="18" y2="18"/><line x1="21" y1="18" x2="21" y2="21"/></svg>کدِ QR سند</div>'+
+    '<div class="dm-qr-body">'+
+      '<div class="dm-qr-img" id="dmQrImg">'+svg+'</div>'+
+      '<div class="dm-qr-side">'+
+        '<p class="dm-qr-note">برای درج کنارِ جدولِ مشخصاتِ نقشه. با اسکن، همین ویرایشِ سند در سامانه باز می‌شود.</p>'+
+        '<button class="btn sm" onclick="dmDownloadQr(\''+esc(d.drawingNumber)+'\')">'+ICON.download+'دریافت تصویر</button>'+
+      '</div>'+
+    '</div></div>';
+}
+/* دانلودِ QR به‌صورت SVG — برداری است، پس در هر ابعادی روی نقشه چاپ شود لبه‌هایش تیز می‌ماند
+   (تصویرِ نقطه‌ای در چاپِ بزرگ پله‌پله می‌شود و اسکنر را به زحمت می‌اندازد). */
+function dmDownloadQr(num){
+  var host=document.getElementById("dmQrImg");
+  var svg=host?host.querySelector("svg"):null;
+  if(!svg){ toast("تصویر آماده نیست.",true); return; }
+  var src='<?xml version="1.0" encoding="UTF-8"?>\n'+
+    svg.outerHTML.replace("<svg ",'<svg xmlns="http://www.w3.org/2000/svg" ');
+  var blob=new Blob([src],{type:"image/svg+xml;charset=utf-8"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="QR-"+String(num||"doc")+".svg";
+  a.dataset.dlInternal="1";   // کلیکِ ساختگی نباید پنلِ انتقال را ببندد
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 4000);
 }
 
 /* یک ردیف ریویژن در تاریخچه: سرِ فشرده + اکشن‌های کارت (فقط حذف/رد/تأیید) + گردش‌کارِ اکسپند‌شونده */

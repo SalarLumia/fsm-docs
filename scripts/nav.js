@@ -13,6 +13,37 @@ document.addEventListener("keydown",function(e){
     e.preventDefault(); t.click();
   }
 });
+/* ═══ مقصدِ ورود از بیرون (اسکنِ QR) ═══
+   نشانی به دو شکل می‌تواند بیاید:
+     ۱) fooladshargh.com/d?n=<شماره>&r=<ویرایش>   ← همان چیزی که در QR چاپ می‌شود
+     ۲) index.html#/doc/<شماره>                    ← لینکِ داخلیِ قابلِ اشتراک
+   نکتهٔ مهم: کاربر معمولاً وارد نشده است، پس مقصد نگه داشته می‌شود تا پس از ورود
+   به آن پرش کنیم. بخشِ پس از # هرگز به سرور نمی‌رود، پس شمارهٔ سند در لاگِ هیچ
+   سروری ثبت نمی‌شود. */
+var _pendingRoute = null;
+function readRoute(){
+  var n="";
+  var qs=new RegExp("[?&]n=([^&]*)").exec(location.search);
+  if(qs) n=decodeURIComponent(qs[1]);
+  if(!n){
+    var m=/^#\/doc\/([^\/?]+)/.exec(String(location.hash||""));
+    if(m) n=decodeURIComponent(m[1]);
+  }
+  n=String(n||"").trim().toUpperCase();
+  return n?{num:n}:null;
+}
+/* مقصد را در همان بارگذاریِ اول می‌خوانیم، پیش از آنکه چیزی نشانی را عوض کند */
+_pendingRoute = readRoute();
+/* پس از آماده‌شدنِ کامل سایت صدا زده می‌شود: اگر مقصدی بوده، همان سند باز می‌شود. */
+function consumePendingRoute(){
+  var rt=_pendingRoute; _pendingRoute=null;
+  if(!rt) return false;
+  if(typeof openDocDetail!=="function") return false;
+  // نشانی تمیز شود تا رفرشِ بعدی دوباره همین سند را باز نکند
+  try{ history.replaceState(null,"",location.pathname); }catch(e){}
+  openDocDetail(rt.num);
+  return true;
+}
 function switchTab(name){
   // ترکِ نمای فعلی: مدلِ سه‌بعدیِ بارگذاری‌شده (اگر بود) و URLِ بلابش آزاد می‌شود تا حافظه نشت نکند
   if(typeof releaseBlobUrl==="function") releaseBlobUrl("mvModel");

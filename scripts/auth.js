@@ -355,6 +355,8 @@ async function startApp(){
   document.getElementById("appView").classList.remove("hidden");
   switchTab("dashboard");   // پنلِ داشبورد را نمایان می‌کند و آبشار را یک‌بار پخش می‌کند
   lgBusy(false);            // دکمهٔ ورود برای دفعهٔ بعد به حالتِ عادی برگردد
+  // اگر کاربر با اسکنِ QR آمده، حالا که داده آماده است همان سند باز می‌شود
+  if(typeof consumePendingRoute==="function") consumePendingRoute();
 }
 /* هدر کاربر: آواتار + (آقای/خانم + نام) + تگِ نقش | سمت */
 function renderUserHeader(){
