@@ -180,7 +180,10 @@
     <main class="app-main">
 
     <!-- ---------- داشبورد ---------- -->
-    <section id="tab-dashboard" class="tabpane">
+    <!-- مثلِ بقیهٔ تب‌ها با hidden شروع می‌شود؛ switchTab("dashboard") در پایانِ startApp
+         آن را نشان می‌دهد. بدونِ این، پنل پیش از رسیدنِ داده دیده می‌شد و بعد با اسکلت و
+         سپس با دادهٔ واقعی دوباره رسم می‌شد — همان «رفرشِ چندباره». -->
+    <section id="tab-dashboard" class="tabpane hidden">
       <div class="dash-hero">
         <div class="hero-txt">
           <h2>به سامانه مدیریت اسناد فولاد شرق ماهان خوش آمدید</h2>

@@ -402,6 +402,11 @@ function showDashboardSkeleton(){
   });
   var pc=document.getElementById("projCardsList"); if(pc) pc.innerHTML='<div class="proj-list">'+skBlocks(3,"sk-card")+'</div>';
   var rc=document.getElementById("recentDocsList"); if(rc) rc.innerHTML=skBlocks(4,"sk-row");
+  /* کارتابل بازبینی هم اسکلت بگیرد: پیش از این تنها بخشی بود که پاک نمی‌شد، پس
+     رکوردهای نشستِ قبلی لحظه‌ای دیده می‌شدند و بعد جای خود را به دادهٔ تازه می‌دادند. */
+  var rq=document.getElementById("reviewQueueList"); if(rq) rq.innerHTML=skBlocks(2,"sk-row");
+  var rqc=document.getElementById("reviewQueueCount"); if(rqc) rqc.textContent="";
+  var rqs=document.getElementById("reviewSeeAll"); if(rqs) rqs.hidden=true;
 }
 /* حالت خطای بارگذاری اولیه با دکمهٔ تلاش دوباره */
 function showBootstrapError(){

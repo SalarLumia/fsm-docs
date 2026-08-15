@@ -297,6 +297,10 @@ async function startApp(opts){
     document.getElementById("appView").classList.remove("hidden");
     renderUserHeader();
     applyRoleVisibility();
+    /* تبِ داشبورد در HTML با hidden شروع می‌شود؛ اینجا عمداً باز می‌شود تا اسکلتِ
+       بارگذاری دیده شود. محتوایش هنوز اسکلت است، نه دادهٔ کهنه. */
+    var dash=document.getElementById("tab-dashboard");
+    if(dash) dash.classList.remove("hidden");
     if(typeof showDashboardSkeleton==="function") showDashboardSkeleton();
   }
 
