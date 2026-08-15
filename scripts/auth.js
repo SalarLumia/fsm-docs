@@ -298,9 +298,11 @@ async function startApp(opts){
     renderUserHeader();
     applyRoleVisibility();
     /* تبِ داشبورد در HTML با hidden شروع می‌شود؛ اینجا عمداً باز می‌شود تا اسکلتِ
-       بارگذاری دیده شود. محتوایش هنوز اسکلت است، نه دادهٔ کهنه. */
+       بارگذاری دیده شود. محتوایش هنوز اسکلت است، نه دادهٔ کهنه.
+       ⚠ کلاسِ lg-noreveal: مرحلهٔ اسکلت نباید انیمیشنِ ورودِ آبشاری بگیرد، وگرنه
+       آبشار دوبار پخش می‌شود — یک‌بار روی اسکلت و یک‌بار روی دادهٔ واقعی. */
     var dash=document.getElementById("tab-dashboard");
-    if(dash) dash.classList.remove("hidden");
+    if(dash){ dash.classList.add("no-reveal"); dash.classList.remove("hidden"); }
     if(typeof showDashboardSkeleton==="function") showDashboardSkeleton();
   }
 
@@ -314,6 +316,9 @@ async function startApp(opts){
       document.getElementById("appView").classList.remove("hidden");
       renderUserHeader(); applyRoleVisibility();
     }
+    // قفلِ مرحلهٔ اسکلت باید برداشته شود، وگرنه پیامِ خطا هم بی‌انیمیشن و پنهان می‌ماند
+    var dashErr=document.getElementById("tab-dashboard");
+    if(dashErr){ dashErr.classList.remove("no-reveal"); dashErr.classList.remove("hidden"); }
     if(typeof showBootstrapError==="function") showBootstrapError(); return;
   }
   if(defer){   // نشست تأیید شد؛ حالا با اطمینان برنامه را نشان بده
@@ -345,6 +350,9 @@ async function startApp(opts){
   refreshAllSelects();
   renderArchive(); renderDataTables();
   if(typeof renderNavTree==="function") renderNavTree();
+  // قفلِ مرحلهٔ اسکلت برداشته می‌شود تا آبشار دقیقاً یک‌بار، روی دادهٔ واقعی، پخش شود
+  var dashPane=document.getElementById("tab-dashboard");
+  if(dashPane) dashPane.classList.remove("no-reveal");
   switchTab("dashboard");
 }
 /* هدر کاربر: آواتار + (آقای/خانم + نام) + تگِ نقش | سمت */

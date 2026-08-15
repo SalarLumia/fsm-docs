@@ -54,6 +54,9 @@
    تأخیر پنهان بمانند و پرشِ نمایش رخ ندهد. */
 @keyframes fsmRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .rv-in{animation:fsmRise .5s cubic-bezier(0,0,.2,1) both}
+/* مرحلهٔ اسکلتِ بارگذاری: هیچ ورودِ آبشاری‌ای پخش نشود تا انیمیشن فقط یک‌بار،
+   آن هم روی دادهٔ واقعی، دیده شود. */
+.no-reveal .rv-in,.no-reveal.rv-in{animation:none}
 @media(prefers-reduced-motion:reduce){
   .rv-in{animation:none}
   .kpi-card:hover .kpi-icon{transform:none}
