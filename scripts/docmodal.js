@@ -92,6 +92,74 @@ async function openDocDetail(num){
   dmSelectVersion(num);
 }
 
+/* ═══ افزودنِ فرمتِ مکمل به سندِ سه‌بعدیِ موجود ═══
+   دکمه فقط وقتی می‌آید که واقعاً کاری برای انجام باشد: سندِ سه‌بعدی، مدیر، و دست‌کم یکی از
+   دو فرمتِ STP/USDZ جا افتاده باشد. اگر هر دو موجودند دکمه اصلاً ساخته نمی‌شود. */
+function dmMissingFormats(d){
+  var out=[];
+  if(!String(d.stpFileId||"").trim())  out.push({kind:"stp",  label:"STP",  accept:".stp,.step", tag:"فرمتِ اصلی برای آرشیوِ اسناد"});
+  if(!String(d.usdzFileId||"").trim()) out.push({kind:"usdz", label:"USDZ", accept:".usdz",      tag:"برای نمایشِ واقعیتِ افزوده در iOS"});
+  return out;
+}
+function dmAddFormatBtnHTML(d, is3DType){
+  if(!is3DType || ME.role!=="admin" || !d) return "";
+  if(!dmMissingFormats(d).length) return "";
+  return '<button class="btn dm-act" onclick="openAddFormatModal(\''+esc(d.drawingNumber)+'\')">'+ICON.plus+'افزودن فرمت</button>';
+}
+var _af={ num:"", kind:"", file:null };
+function openAddFormatModal(num){
+  var d=docByNumber(num); if(!d){ toast("سند یافت نشد.",true); return; }
+  var miss=dmMissingFormats(d);
+  if(!miss.length){ toast("همهٔ فرمت‌ها از قبل ثبت شده‌اند.",true); return; }
+  _af={ num:num, kind:miss[0].kind, file:null };
+  var tabs = miss.length>1
+    ? '<div class="af-tabs">'+miss.map(function(m,i){
+        return '<button type="button" class="af-tab'+(i===0?' on':'')+'" data-kind="'+m.kind+'" onclick="afPickKind(\''+m.kind+'\')">'+esc(m.label)+'</button>';
+      }).join("")+'</div>'
+    : '';
+  var zones = miss.map(function(m,i){
+    return '<div class="af-zone" data-kind="'+m.kind+'"'+(i===0?'':' hidden')+'>'+
+      rvDropzoneHTML("afDrop_"+m.kind,"afFile_"+m.kind,m.accept,"فایل "+m.label,m.tag)+'</div>';
+  }).join("");
+  showModal("افزودنِ فرمت به سند",
+    '<div class="rv-up">'+
+      '<div class="rv-num mono" style="direction:ltr">'+esc(num)+'</div>'+
+      '<p class="rv-lead">فایلِ تکمیلی به همین سند افزوده می‌شود؛ '+
+        'شمارهٔ سند و ویرایش تغییر نمی‌کند و سند دوباره به بازبینی نمی‌رود.</p>'+
+      tabs+zones+
+      '<div class="lg-note" style="margin-top:14px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'+
+        '<span>اگر خودِ طراحی تغییر کرده، به‌جای این کار ریویژنِ جدید بسازید.</span></div>'+
+      '<div class="clm-actions"><button class="btn" onclick="closeModal()">انصراف</button>'+
+        '<button class="btn primary" id="afSave" onclick="submitAddFormat()">'+ICON.plus+'افزودن</button></div>'+
+    '</div>', "box-narrow");
+  miss.forEach(function(m){ rvInitDrop("afDrop_"+m.kind,"afFile_"+m.kind); });
+}
+function afPickKind(kind){
+  _af.kind=kind; _af.file=null;
+  [].forEach.call(document.querySelectorAll(".af-tab"), function(b){ b.classList.toggle("on", b.getAttribute("data-kind")===kind); });
+  [].forEach.call(document.querySelectorAll(".af-zone"), function(z){ z.hidden = z.getAttribute("data-kind")!==kind; });
+}
+async function submitAddFormat(){
+  var inp=document.getElementById("afFile_"+_af.kind);
+  var f=inp&&inp.files&&inp.files[0];
+  if(!f){ toast("فایلی انتخاب نشده است.",true); return; }
+  if(f.size>25*1024*1024){ toast("حجم فایل بیش از ۲۵ مگابایت است.",true); return; }
+  var b64=await fileToBase64(f);
+  var num=_af.num, kind=_af.kind;
+  /* مثلِ بقیهٔ آپلودها از «مرکزِ انتقال» عبور می‌کند تا رابط قفل نشود و پیشرفت دیده شود.
+     ⚙ برخلافِ ریویژن، عمداً submitForReview صدا زده نمی‌شود: سند تأییدشده می‌ماند. */
+  closeModal();
+  dlEnqueueUpload({
+    label: num+" ‹ "+kind.toUpperCase(),
+    action: "addFormat",
+    payload: { drawingNumber:num, kind:kind, fileBase64:b64, fileName:f.name, mimeType:f.type },
+    onSuccess: async function(r){
+      if(!r || !r.ok){ toast((r&&r.message)||"افزودنِ فرمت ناموفق بود.",true); return; }
+      toast("فرمتِ "+kind.toUpperCase()+" افزوده شد.");
+      await refreshDocuments();
+    }
+  });
+}
 /* بنرِ «نسخهٔ جدیدتر موجود است».
    فقط وقتی نشان داده می‌شود که ویرایشِ *تأییدشدهٔ* جدیدتری وجود داشته باشد؛ پیش‌نویس یا
    در انتظارِ بازبینی هنوز مبنای ساخت نیست و اعلامش کاربر را گمراه می‌کند. */

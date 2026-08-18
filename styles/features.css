@@ -61,14 +61,24 @@
 .dm-loading{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--muted);font-size:12.5px}
 /* دکمه‌های اکشن، زیرِ پیش‌نمایش (ارسال/بارگذاری + دانلود) */
 .dp-actions{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:#fff}
-.dp-actions .btn{flex:1;justify-content:center}
+/* flex-basis:0 عمدی است: با basis:auto هر دکمه اول عرضِ متنِ خودش را می‌گیرد و فقط
+   فضای اضافه تقسیم می‌شود، پس دکمهٔ با متنِ بلندتر پهن‌تر می‌ماند. با basis:0 هر سه
+   دکمه دقیقاً هم‌عرض‌اند، مستقل از طولِ نوشته. */
+.dp-actions .btn,.dp-actions .dm-dl-wrap{flex:1 1 0;min-width:0;justify-content:center}
+.dp-actions .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* انتخابِ فرمت در مودالِ افزودنِ فرمت (فقط وقتی هر دو فرمت جا افتاده باشند) */
+.af-tabs{display:flex;gap:8px;margin:10px 0 4px}
+.af-tab{flex:1 1 0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;
+  font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.14s}
+.af-tab:hover{border-color:var(--brand);color:var(--brand)}
+.af-tab.on{border-color:var(--brand);background:#fff3e6;color:var(--brand);font-weight:700}
 /* دکمهٔ «بارگذاریِ نسخهٔ جدید» وقتی سند در حالِ بازبینی است: خاکستری، ولی کلیک‌پذیر (برای نمایشِ پیامِ راهنما) */
 .dm-act-disabled{color:var(--muted);background:var(--panel);border-color:var(--line);cursor:pointer}
 .dm-act-disabled:hover{color:var(--muted);background:var(--panel);border-color:var(--line)}
 
 /* دانلودِ اسنادِ سه‌بعدی: هاور روی دکمه یک پاپ‌آورِ انتخابِ فرمت (GLB/STP/USDZ) بالای دکمه باز می‌کند.
    حالتِ اولیه (هیچ فرمتی انتخاب نشده) = ظاهرِ ناقص/خاکستری؛ با اولین تاگل، دکمه نارنجی (فعال) می‌شود. */
-.dm-dl-wrap{position:relative;flex:1;display:flex}
+.dm-dl-wrap{position:relative;flex:1 1 0;min-width:0;display:flex}
 .dm-dl-wrap .dm-dl{width:100%}
 .dm-dl-incomplete{color:var(--txt);background:var(--panel);border-color:var(--line)}
 .dm-dl-incomplete:hover{color:var(--txt);background:var(--panel);border-color:var(--line)}

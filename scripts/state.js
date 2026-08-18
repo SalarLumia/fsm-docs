@@ -213,14 +213,16 @@ function badgeIcon(cls){
 function badgeHTML(cls,label){ return '<span class="badge '+cls+'">'+badgeIcon(cls)+esc(label)+'</span>'; }
 function workflowActionLabel(a){
   return { created:"ایجاد سند", revision:"ایجاد سند", submitted:"ارسال برای بازبینی",
-           newversion:"بارگذاری نسخهٔ جدید", approved:"تأیید شد", rejected:"تأیید نشد" }[a] || a;
+           newversion:"بارگذاری نسخهٔ جدید", approved:"تأیید شد", rejected:"تأیید نشد",
+           addformat:"افزودن فرمت" }[a] || a;
 }
 /* رنگ حلقهٔ هر رویداد در تایم‌لاین گردش‌کار.
    مراحل پیشروی همگی نارنجیِ برند‌اند (یک‌دست، بدون اختلاف سایه)؛
    فقط نتیجهٔ نهایی رنگ معنایی می‌گیرد: تأیید سبز، رد قرمز. */
 function wfDotColor(action){
   return { created:"var(--brand)", revision:"var(--brand)", submitted:"var(--brand)",
-           newversion:"var(--brand)", approved:"var(--ok)", rejected:"var(--err)" }[action] || "var(--muted)";
+           newversion:"var(--brand)", approved:"var(--ok)", rejected:"var(--err)",
+           addformat:"var(--brand)" }[action] || "var(--muted)";
 }
 /* برچسب مراحلِ هنوز‌انجام‌نشده (حلقه‌های توخالیِ آینده) */
 function wfFutureLabel(a){
