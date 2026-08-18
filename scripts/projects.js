@@ -1123,6 +1123,7 @@ async function saveProjectSpecs(){
 var PED=null;
 /* ساختِ وضعیتِ مشترکِ پنلِ ویرایش — هم پنجرهٔ افزودنِ قطعه، هم ویرایشِ تک‌قطعه */
 function pedInitState(c,o,pr,p){
+  var inProj={}; projectPartsList(p).forEach(function(pn){ inProj[pn]=1; });   // قطعاتی که الان عضوِ پروژه‌اند
   PED={ c:c,o:o,pr:pr,
     parts: partsSorted().map(function(pt){ var no=pad2(pt.partNo); return {no:no,fa:partNameFa(no),en:pt.name||"",on:!!inProj[no]}; }),
     docMaster: partDocMaster(),          // فهرستِ اصلیِ انواعِ سندِ سطحِ قطعه [{code,label}]
