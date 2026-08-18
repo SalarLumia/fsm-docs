@@ -593,6 +593,12 @@ function showProjectDetail(c,o,pr){
     '</section>';
   // ورودِ آبشاریِ بالا‌به‌پایین: هدر ← نوارِ شاخص ← کارتِ مشخصات ← کارتِ قطعات
   if(typeof revealCascade==="function") revealCascade(host.querySelector(".ppanel"));
+  /* اولین مدلِ فهرست (مونتاژ اگر باشد، وگرنه قطعهٔ اول) خودکار بار می‌شود تا پنل
+     با ویوئرِ خالی باز نشود. پس از رندرِ DOM اجرا می‌شود چون mvLoadPart به #mvShell نیاز دارد. */
+  var first=(_mvParts||[]).filter(function(x){ return x.fileId; })[0];
+  if(first) setTimeout(function(){
+    if(document.getElementById("mvShell")) mvLoadPart(first.fileId, first.part);
+  },0);
 }
 
 /* کارت «اسناد عمومی پروژه»: ماژول‌های سطح‌پروژه (scope=project روی قطعهٔ 00).
@@ -1499,14 +1505,23 @@ var _mvLoadSeq=0;           // توکنِ بارگذاری — فقط جدیدت
 var _mvEst=null;            // برآوردگرِ نوارِ پیشرفتِ فعالِ ویوئر — تا تایمرِ بارگذاریِ قبلی با بارگذاریِ جدید روی یک المانِ درصد ننویسد
 var _mvCurFileId=null;      // شناسهٔ فایلِ GLBِ مدلِ درحال‌نمایش در پنلِ پروژه (برای منابعِ AR)
 function projectModelParts(p){
-  var docs=projectDocs(p).filter(function(d){ return String(d.typeCode).toUpperCase()==="3D" &&
-    pad2(d.partNo)!=="00" && String(d.isLatest).toLowerCase()==="true"; });
-  var byPart={}; docs.forEach(function(d){ byPart[pad2(d.partNo)]=d; });
-  // ترتیب دقیقاً مثلِ فهرستِ قطعاتِ پروژه؛ شماره‌گذاریِ متوالی از ۱ (نه کدِ قطعه). نام = نامِ انگلیسیِ قطعه.
-  var pns=projectPartsList(p).filter(function(pn){ return byPart[pn]; });
-  Object.keys(byPart).forEach(function(pn){ if(pns.indexOf(pn)<0) pns.push(pn); });   // احتیاط: مدلی که در فهرست نیست
-  return pns.map(function(pn,i){ var d=byPart[pn];
-    return {part:pn, name:partName(pn), fileId:d.fileId||"", num:d.drawingNumber, idx:i+1}; });
+  /* هر نوعِ سندی که با 3D شروع می‌شود مدلِ سه‌بعدی است (3D برای قطعه، 3DA برای مونتاژ). */
+  var all=projectDocs(p).filter(function(d){ return String(d.typeCode).toUpperCase().indexOf("3D")===0 &&
+    String(d.isLatest).toLowerCase()==="true"; });
+  var byPart={}; all.forEach(function(d){ byPart[pad2(d.partNo)]=d; });
+  var out=[];
+  /* مدلِ مونتاژِ سطحِ پروژه (قطعهٔ ۰۰) همیشه سلولِ اول است — کلِّ مجموعه پیش از اجزای آن. */
+  /* برچسب عمداً ثابتِ Assembly است، نه نامِ کاملِ نوعِ سند: ردیف‌های دیگرِ این منو
+     نامِ قطعه‌اند (Shaft، Drive Pinion)، پس این‌جا هم باید کوتاه و هم‌وزن باشد. */
+  if(byPart["00"]) out.push({part:"00", name:"Assembly", fileId:byPart["00"].fileId||"", num:byPart["00"].drawingNumber});
+  // سپس قطعات، دقیقاً به ترتیبِ فهرستِ قطعاتِ پروژه
+  var pns=projectPartsList(p).filter(function(pn){ return pn!=="00" && byPart[pn]; });
+  Object.keys(byPart).forEach(function(pn){ if(pn!=="00" && pns.indexOf(pn)<0) pns.push(pn); });   // احتیاط: مدلی که در فهرست نیست
+  pns.forEach(function(pn){ var d=byPart[pn];
+    out.push({part:pn, name:partName(pn), fileId:d.fileId||"", num:d.drawingNumber}); });
+  // شماره‌گذاریِ متوالی از ۱ پس از چیدنِ کاملِ ترتیب
+  out.forEach(function(x,i){ x.idx=i+1; });
+  return out;
 }
 /* منوی انتخابِ قطعه — عیناً هم‌طراحیِ تولباکسِ سمتِ راست (شیشه‌ای، ۳۳px، فونتِ ۱۲٫۵)، ولی سمتِ چپ */
 var MV_LAYERS_IC='<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>';
@@ -1519,7 +1534,7 @@ function mvPickerHTML(parts, selPart){
   }).join("");
   var attn = selPart ? '' : ' attn';   // تا وقتی مدلی انتخاب نشده، منو آرام «تنفس» می‌کند تا جلبِ توجه شود
   return '<div class="mv-picker'+(_mvPickerExpanded?' expanded':'')+attn+'" id="mvPicker">'+
-    '<button class="mv-pick mv-pick-hd" onclick="mvPickerToggle()" title="انتخابِ قطعه برای نمایشِ سه‌بعدی" aria-label="انتخابِ قطعه">'+MV_LAYERS_IC+'</button>'+
+    '<button class="mv-pick mv-pick-hd" onclick="mvPickerToggle()" title="انتخابِ مدلِ سه‌بعدی" aria-label="انتخابِ مدل">'+MV_LAYERS_IC+'</button>'+
     rows+'</div>';
 }
 function projectModelHTML(p,admin,c,o,pr){
@@ -1538,7 +1553,7 @@ function projectModelHTML(p,admin,c,o,pr){
     '<div class="mv-ph" id="mvPh">'+
       '<div class="mv-empty-ic">'+MODEL_IC+'</div>'+
       '<div class="mv-empty-t">نمایشِ مدلِ سه‌بعدی</div>'+
-      '<div class="mv-empty-s">قطعه‌ای را از منوی سمتِ چپ انتخاب کنید.</div>'+
+      '<div class="mv-empty-s">مدلی را از منوی سمتِ چپ انتخاب کنید.</div>'+
     '</div>'+
   '</div>';
 }
@@ -1559,7 +1574,7 @@ function ensureModelViewer(){
 function mvSelectPart(part){
   var mp=(_mvParts||[]).filter(function(x){ return pad2(x.part)===pad2(part); })[0];
   if(!mp){ return; }
-  if(!mp.fileId){ toast("این قطعه مدلی برای نمایش ندارد.",true); return; }
+  if(!mp.fileId){ toast("این مورد مدلی برای نمایش ندارد.",true); return; }
   mvLoadPart(mp.fileId, part);
 }
 function mvPickerToggle(){ _mvPickerExpanded=!_mvPickerExpanded;
@@ -1602,9 +1617,11 @@ async function mvLoadPart(fileId, part){
   if(_mvEst){ _mvEst.stop(); _mvEst=null; }   // برآوردگرِ بارگذاریِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
   var scope=function(){ return document.getElementById("mvShell"); };
   // به‌جای اورلیِ تمام‌صفحه، نوارِ لودینگِ درون‌ویوئری تا بقیهٔ سایت هم دیده شود
+  var _mp=(_mvParts||[]).filter(function(x){ return pad2(x.part)===pad2(part); })[0];
+  var _mnm=_mp?_mp.name:"";   // نامِ مدلِ در‌حالِ بارگذاری — تا کاربر بداند کدام قطعه دارد می‌آید
   shell.innerHTML=mvPickerHTML(_mvParts, part)+
     '<div class="mv-ph" id="mvPh"><div class="mv-empty-ic">'+MODEL_IC+'</div>'+
-      '<div class="mv-empty-t">در حال بارگذاری مدل…</div></div>'+
+      '<div class="mv-empty-t">در حال بارگذاریِ '+(_mnm?esc(_mnm):"مدل")+'…</div></div>'+
     loadBarHTML(false, true);
   await ensureModelViewer();
   if(myToken!==_mvLoadSeq) return;   // بارگذاریِ جدیدتری جای این را گرفت؛ به DOM دست نزن
