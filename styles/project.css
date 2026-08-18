@@ -230,12 +230,16 @@ button.doc-ic:disabled{cursor:default}
   animation:mvDrawPoly 2.6s cubic-bezier(.4,0,.2,1) infinite}
 .mv-ph .mv-empty-ic svg line{stroke-dasharray:11;stroke-dashoffset:11;
   animation:mvDrawLine 2.6s cubic-bezier(.4,0,.2,1) infinite .32s}
-@keyframes mvCubeBreath{0%,100%{transform:scale(1) rotate(0deg);stroke-opacity:.75}
-  50%{transform:scale(1.07) rotate(3deg);stroke-opacity:1}}
-@keyframes mvDrawPoly{0%{stroke-dashoffset:21}45%{stroke-dashoffset:0}
-  75%{stroke-dashoffset:0}100%{stroke-dashoffset:-21}}
-@keyframes mvDrawLine{0%{stroke-dashoffset:11}45%{stroke-dashoffset:0}
-  75%{stroke-dashoffset:0}100%{stroke-dashoffset:-11}}
+/* بدونِ rotate: مکعبِ ایزومتریک با چرخشِ جزئی کج به‌نظر می‌رسد، چون خطوطِ موربِ
+   طراحی‌شده‌اش دیگر با محورِ قائم جور درنمی‌آید. فقط مقیاس و شفافیت نفس می‌کشند. */
+@keyframes mvCubeBreath{0%,100%{transform:scale(1);stroke-opacity:.72}
+  50%{transform:scale(1.05);stroke-opacity:1}}
+/* کشیده می‌شوند، مکث می‌کنند، سپس از همان سمت جمع می‌شوند — بازگشت به حالتِ
+   اول پیوسته است و پرشی بینِ دو دور دیده نمی‌شود. */
+@keyframes mvDrawPoly{0%{stroke-dashoffset:21}40%{stroke-dashoffset:0}
+  70%{stroke-dashoffset:0}100%{stroke-dashoffset:21}}
+@keyframes mvDrawLine{0%{stroke-dashoffset:11}40%{stroke-dashoffset:0}
+  70%{stroke-dashoffset:0}100%{stroke-dashoffset:11}}
 @media(prefers-reduced-motion:reduce){
   .mv-ph .mv-empty-ic svg,
   .mv-ph .mv-empty-ic svg polyline,
