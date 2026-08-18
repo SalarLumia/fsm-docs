@@ -903,8 +903,18 @@ function partModMaster(p){
 /* پارامترهای یک قطعهٔ خاص: [{label,on,legacy}] */
 function partModsForPart(p,part){
   var pn=pad2(part), r=specsRoot(p), master=partModMaster(p), bp=r.partModsByPart||{};
-  if(bp[pn]){ var on={}; bp[pn].forEach(function(l){ on[String(l)]=1; });
-    return master.map(function(m){ return {label:m.label,on:!!on[m.label],legacy:m.legacy}; }); }
+  /* ترتیبِ ذخیره‌شدهٔ همین قطعه مبناست: اول پارامترهای فعال به همان ترتیبی که کاربر
+     چیده، سپس بقیه به ترتیبِ فهرستِ اصلی. پیش از این همیشه از master.map ساخته می‌شد،
+     پس ترتیبِ دلخواه ذخیره می‌شد ولی هیچ‌جا دیده نمی‌شد. */
+  if(bp[pn]){
+    var on={}; bp[pn].forEach(function(l){ on[String(l)]=1; });
+    var by={}; master.forEach(function(m){ by[m.label]=m; });
+    var out=[], seen={};
+    bp[pn].forEach(function(l){ l=String(l); var m=by[l];
+      if(m&&!seen[l]){ out.push({label:m.label,on:true,legacy:m.legacy}); seen[l]=1; } });
+    master.forEach(function(m){ if(!seen[m.label]) out.push({label:m.label,on:!!on[m.label],legacy:m.legacy}); });
+    return out;
+  }
   var proj={}; (r.partMods||[]).forEach(function(x){ if(x.label) proj[String(x.label)]=(x.on!==false); });   // fallbackِ پروژه‌ای
   return master.map(function(m){ return {label:m.label,on: proj.hasOwnProperty(m.label)?proj[m.label]:true, legacy:m.legacy}; });
 }
@@ -1127,6 +1137,9 @@ function openPartsPanel(c,o,pr){
       out[pn]=partDocTypesForPart(p,pn).map(function(T){ return String(T).toUpperCase(); }); }); return out; })(),
     modsByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
       var m={}; partModsForPart(p,pn).forEach(function(x){ m[x.label]=x.on; }); out[pn]=m; }); return out; })(),
+    // ترتیبِ دلخواهِ نمایشِ پارامترها برای هر قطعه — هم‌الگوی docOrderByPart
+    modOrderByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
+      out[pn]=partModsForPart(p,pn).map(function(x){ return x.label; }); }); return out; })(),
     vals: (function(){ var src=specsRoot(p).partVals||{}, out={};
       Object.keys(src).forEach(function(k){ var r=src[k]||{}, kk=pad2(k); out[kk]={};
         Object.keys(r).forEach(function(l){ out[kk][l]=String(r[l]==null?"":r[l]); }); });
@@ -1230,6 +1243,7 @@ function edRowDragEnd(e){
   var kind=list.getAttribute("data-reorder");
   if(kind==="proj") edCommitProjOrder(codes);
   else if(kind==="part") edCommitPartOrder(codes);
+  else if(kind==="mod") edCommitModOrder(codes);   // پارامترها: data-code همان برچسبِ پارامتر است
 }
 if(typeof document!=="undefined" && document.addEventListener) document.addEventListener("mouseup",function(){ _edGripArmed=false; });
 /* ترتیبِ جدیدِ DOM را در آرایهٔ وضعیت بنویس، سپس رندرِ دوباره تا اندیس‌های onclick درست بمانند */
@@ -1259,6 +1273,27 @@ function pedPartDocList(pn){
   PED.docMaster.forEach(function(x){ if(!seen[x.code]){ out.push(x); seen[x.code]=1; } });
   return out;
 }
+/* فهرستِ پارامترهای یک قطعه به ترتیبِ دلخواهِ همان قطعه؛ اگر ترتیبی نبود، ترتیبِ فهرستِ اصلی */
+function pedPartModList(pn){
+  var ord=PED.modOrderByPart?PED.modOrderByPart[pn]:null, by={};
+  PED.paramMaster.forEach(function(x){ by[x.label]=x; });
+  var out=[], seen={};
+  (ord||[]).forEach(function(l){ l=String(l); if(by[l]&&!seen[l]){ out.push(by[l]); seen[l]=1; } });
+  PED.paramMaster.forEach(function(x){ if(!seen[x.label]){ out.push(x); seen[x.label]=1; } });
+  return out;
+}
+/* ثبتِ ترتیبِ جدیدِ پارامترها پس از کشیدن */
+function edCommitModOrder(labels){
+  if(!PED||!PED.selPart) return;
+  var pn=PED.selPart, valid={};
+  PED.paramMaster.forEach(function(x){ valid[x.label]=1; });
+  var next=[], seen={};
+  labels.forEach(function(l){ l=String(l||""); if(valid[l]&&!seen[l]){ next.push(l); seen[l]=1; } });
+  pedPartModList(pn).forEach(function(x){ if(!seen[x.label]){ next.push(x.label); seen[x.label]=1; } });
+  PED.modOrderByPart[pn]=next;
+  drawPartsBody();
+}
+
 /* ردیفِ چک‌لیستِ قابلِ کشیدن: دایرهٔ روشن/خاموش + نام + (اکسترا مثلِ قفل) + کد + دستهٔ ۶‌نقطه‌ای (سمتِ چپ) */
 function pedDragRow(on,label,code,fn,extra,dis){
   return '<div class="ed-doc-row ed-drag'+(on?'':' off')+'" draggable="true" data-code="'+esc(code)+'" ondragstart="edRowDragStart(event)" ondragend="edRowDragEnd(event)">'+
@@ -1323,15 +1358,21 @@ function drawPartsBody(){
       modsCard='<div class="ed-card">'+modHead+promptNote+'</div>';
     } else {
       var mmap=PED.modsByPart[sel]||(PED.modsByPart[sel]={});
-      var modRows=PED.paramMaster.map(function(x,i){ var on=!!mmap[x.label];
-        return '<div class="ed-doc-row'+(on?'':' off')+'">'+
-          '<button type="button" class="ed-check'+(on?' on':'')+'" role="checkbox" aria-checked="'+(on?'true':'false')+'" aria-label="'+esc(x.label)+'" onclick="pedTogglePartMod('+i+')"></button>'+
+      /* به ترتیبِ دلخواهِ همین قطعه رسم می‌شود (نه فهرستِ اصلی)، و مثلِ انواعِ سند قابلِ کشیدن است.
+         شناسهٔ ردیف برچسبِ پارامتر است، چون پارامتر کدِ کوتاه ندارد. */
+      var mIdx={}; PED.paramMaster.forEach(function(m,i){ mIdx[m.label]=i; });
+      var modRows=pedPartModList(sel).map(function(x){ var on=!!mmap[x.label];
+        var mi=mIdx[x.label];   // اندیس در فهرستِ اصلی — مستقل از ترتیبِ نمایش
+        var extra=x.legacy?'<span class="ed-doc-code" title="در فهرستِ اصلی نیست">قدیمی</span>':'';
+        return '<div class="ed-doc-row ed-drag'+(on?'':' off')+'" draggable="true" data-code="'+esc(x.label)+'" ondragstart="edRowDragStart(event)" ondragend="edRowDragEnd(event)">'+
+          '<button type="button" class="ed-check'+(on?' on':'')+'" role="checkbox" aria-checked="'+(on?'true':'false')+'" aria-label="'+esc(x.label)+'" onclick="pedTogglePartMod('+mi+')"></button>'+
           '<span class="ed-name"><span>'+esc(x.label)+'</span></span>'+
-          (x.legacy?'<span class="ed-doc-code" title="در فهرستِ اصلی نیست">قدیمی</span>':'')+
+          extra+
+          edGripHTML()+
         '</div>';
       }).join("");
       modsCard='<div class="ed-card">'+modHead+
-        (modRows?'<div class="ed-scroll">'+modRows+'</div>':'<div class="ed-req-note">پارامتری تعریف نشده.</div>')+
+        (modRows?'<div class="ed-scroll" data-reorder="mod" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+modRows+'</div>':'<div class="ed-req-note">پارامتری تعریف نشده.</div>')+
         '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>پارامترهای بالا مخصوصِ قطعهٔ انتخاب‌شده است؛ برای افزودن/ویرایشِ پارامتر به «تنظیمات ◂ انواع پارامتر های قطعات» بروید.</div></div>';
     }
 
@@ -1387,7 +1428,7 @@ async function savePartsPanel(){
     var lock=partDocLockedTypes(p,pn); Object.keys(lock).forEach(function(T){ if(arrD.indexOf(T)<0) arrD.push(T); });
     docsByPart[pn]=arrD;
     var m=PED.modsByPart[pn]||{}, arrM=[];
-    PED.paramMaster.forEach(function(x){ if(m[x.label]) arrM.push(x.label); });
+    pedPartModList(pn).forEach(function(x){ if(m[x.label]) arrM.push(x.label); });   // فقط فعال‌ها، به ترتیبِ دلخواهِ همین قطعه
     modsByPart[pn]=arrM;
   });
   var root=specsRoot(p);
