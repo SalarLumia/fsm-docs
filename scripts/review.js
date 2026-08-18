@@ -1,13 +1,14 @@
 /* ================= گردش تأیید ================= */
 async function submitReview(num){
   var r=await api("submitForReview",{drawingNumber:num});
-  if(r.ok){ toast("برای بازبینی ارسال شد"); closeModal(); await refreshDocuments(); }
+  /* مودالِ جزئیات بسته نمی‌شود؛ refreshDocuments خودش آن را با وضعیتِ تازه بازرسم می‌کند */
+  if(r.ok){ toast("برای بازبینی ارسال شد"); await refreshDocuments(); }
   else toast(r.message||"خطا",true);
 }
 async function approveDoc(num){
   if(!(await uiConfirm("تأیید سند «"+num+"»؟",{okLabel:"تأیید"}))) return;
   var r=await api("approveDocument",{drawingNumber:num});
-  if(r.ok){ toast("سند تأیید شد"); closeModal(); await refreshDocuments(); }
+  if(r.ok){ toast("سند تأیید شد"); await refreshDocuments(); }
   else toast(r.message||"خطا",true);
 }
 /* رد سند: مودال با باکس دلیل (اختیاری) */
@@ -26,6 +27,7 @@ async function confirmReject(num){
   var ta=document.getElementById("rejReason");
   var reason=ta?String(ta.value).trim():"";
   var r=await api("rejectDocument",{drawingNumber:num, comment:reason});
+  /* اول فرمِ رد بسته می‌شود (فقط لایهٔ رویی)؛ سپس جزئیاتِ زیرین با وضعیتِ تازه بازرسم می‌شود */
   if(r.ok){ toast("سند رد شد"); closeModal(); await refreshDocuments(); }
   else toast(r.message||"خطا",true);
 }

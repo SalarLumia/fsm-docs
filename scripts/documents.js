@@ -643,4 +643,7 @@ async function refreshDocuments(){
   refreshAllSelects();
   renderArchive(); renderDataTables(); renderDashboard();
   if(!document.getElementById("tab-project").classList.contains("hidden")) rerenderProjectTab();
+  /* اگر مودالِ جزئیاتِ سند زیرِ پنجرهٔ بسته‌شده باز مانده، با دادهٔ تازه دوباره رسم
+     شود — وگرنه پس از تأیید/رد/افزودنِ فرمت، وضعیتِ کهنه را نشان می‌دهد. */
+  if(typeof dmRefreshOpen==="function") dmRefreshOpen();
 }

@@ -575,19 +575,42 @@ function modalUnlock(){
   _mlOn=false;
   if(typeof xferPlaceBtn==="function") xferPlaceBtn();   // دکمه به جریانِ هدر برگردد
 }
+/* پنجره‌ها روی هم انباشته می‌شوند (پشته).
+   پیش از این، showModal محتوای modalHost را بازنویسی می‌کرد و closeModal همه را یکجا پاک
+   می‌کرد؛ پس بازکردنِ پنجره‌ای از درونِ پنجرهٔ دیگر، پنجرهٔ زیرین را نابود می‌کرد و بستنِ
+   رویی کاربر را تا صفحهٔ زیرین عقب می‌برد. حالا هر پنجره یک لایهٔ مستقل است و
+   closeModal فقط لایهٔ رویی را برمی‌دارد. */
 function showModal(title,innerHTML,boxClass){
   var host=document.getElementById("modalHost");
-  host.innerHTML='<div class="modal" onclick="if(event.target===this)closeModal()"><div class="box'+(boxClass?" "+boxClass:"")+'">'+
+  var layer=document.createElement("div");
+  layer.className="modal";
+  layer.onclick=function(e){ if(e.target===layer) closeModal(); };
+  layer.innerHTML='<div class="box'+(boxClass?" "+boxClass:"")+'">'+
     '<header><strong>'+title+'</strong><button class="modal-x" onclick="closeModal()" aria-label="بستن" title="بستن">✕</button></header>'+
-    '<div class="body">'+innerHTML+'</div></div></div>';
+    '<div class="body">'+innerHTML+'</div></div>';
+  host.appendChild(layer);
   modalLock();
 }
+/* بستنِ فقط بالاترین پنجره؛ اگر زیرش پنجره‌ای بود، همان دوباره دیده می‌شود. */
 function closeModal(){
-  // توقفِ برآوردگرِ نوارِ پیشرفتِ پیش‌نمایش تا تایمرش پس از بسته‌شدن روی پیش‌نمایشِ بعدی ننویسد
+  var host=document.getElementById("modalHost");
+  var top=host?host.lastElementChild:null;
+  /* پاکسازیِ پیش‌نمایش فقط وقتی که همین لایه صاحبِ پیش‌نمایش باشد؛ وگرنه بستنِ
+     یک پنجرهٔ کوچکِ رویی، پیش‌نمایشِ مودالِ زیرین را هم خاموش می‌کند. */
+  var ownsPreview = !!(top && top.querySelector && top.querySelector("#docPreviewHost, #filePreviewHost"));
+  if(ownsPreview){
+    if(typeof _dpStopPreview==="function") _dpStopPreview();
+    if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
+  }
+  if(top) host.removeChild(top); else if(host) host.innerHTML="";
+  if(!anyModalOpen()) modalUnlock();
+}
+/* بستنِ کلِ پشته — برای جاهایی که پس از یک عمل، ماندنِ پنجرهٔ زیرین بی‌معناست */
+function closeAllModals(){
+  var host=document.getElementById("modalHost");
   if(typeof _dpStopPreview==="function") _dpStopPreview();
-  // آزادسازیِ URLهای بلابِ مودال (پیش‌نمایشِ سند/فایل) تا در جلسه‌های طولانی حافظه نشت نکند
   if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
-  document.getElementById("modalHost").innerHTML="";
+  if(host) host.innerHTML="";
   if(!anyModalOpen()) modalUnlock();
 }
 

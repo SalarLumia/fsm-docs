@@ -18,6 +18,12 @@ async function openDocDetail(num){
     return;
   }
   var si=statusInfo(d.status);
+  /* اگر خودِ پنجرهٔ جزئیاتِ سند بالاترین لایه باشد، جایِ همان را می‌گیرد نه اینکه رویِ
+     خودش باز شود (مثلاً دکمهٔ «مشاهدهٔ ویرایشِ جدیدتر» درونِ همین پنجره).
+     پنجرهٔ از نوعِ دیگر (کارتابل، فهرست) دست‌نخورده زیر می‌ماند. */
+  var _mh=document.getElementById("modalHost");
+  var _topLayer=_mh?_mh.lastElementChild:null;
+  if(_topLayer && _topLayer.querySelector && _topLayer.querySelector(".doc-modal")) _mh.removeChild(_topLayer);
   _dm.num=num; _dm.selNum=num;
 
   /* ---------- مشخصات سند: فقط نام‌های متنی (بدون کد) ---------- */
@@ -160,6 +166,18 @@ async function submitAddFormat(){
     }
   });
 }
+/* بازرسمِ مودالِ جزئیاتِ سند پس از تازه‌شدنِ داده.
+   فقط وقتی که خودش بالاترین لایهٔ پشته باشد؛ وگرنه پنجرهٔ رویی (مثلِ فرمِ رد یا
+   افزودنِ فرمت) که کاربر در حالِ پرکردنِ آن است نابود می‌شود. */
+function dmRefreshOpen(){
+  var host=document.getElementById("modalHost");
+  var top=host?host.lastElementChild:null;
+  if(!top || !top.querySelector || !top.querySelector(".doc-modal")) return;
+  var num=_dm.num; if(!num) return;
+  if(!docByNumber(num)) return;   // سند حذف شده — بازرسم بی‌معناست
+  openDocDetail(num);             // خودش جایِ لایهٔ هم‌نوعِ رویی را می‌گیرد
+}
+
 /* بنرِ «نسخهٔ جدیدتر موجود است».
    فقط وقتی نشان داده می‌شود که ویرایشِ *تأییدشدهٔ* جدیدتری وجود داشته باشد؛ پیش‌نویس یا
    در انتظارِ بازبینی هنوز مبنای ساخت نیست و اعلامش کاربر را گمراه می‌کند. */
@@ -430,7 +448,7 @@ async function dmDeleteVersion(num){
   });
   if(remaining.length){
     var latest=remaining.filter(function(x){return String(x.isLatest).toLowerCase()==="true";})[0]||remaining[0];
-    openDocDetail(latest.drawingNumber);
+    openDocDetail(latest.drawingNumber);   // خودش جایِ لایهٔ جزئیاتِ کنونی را می‌گیرد
   } else { closeModal(); }
 }
 

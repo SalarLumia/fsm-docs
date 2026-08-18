@@ -286,6 +286,9 @@ body.modal-open .xfer-wrap{width:34px;height:34px}
 
 /* ===== مودال ===== */
 .modal{position:fixed;inset:0;background:#0000007a;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
+/* پنجرهٔ روی پنجره: لایهٔ دوم به بعد پوششِ کم‌رنگ‌تر می‌گیرد، وگرنه دو پوششِ
+   تیره روی هم می‌افتد و صفحه تقریباً سیاه می‌شود. */
+#modalHost .modal ~ .modal{background:#00000038}
 /* وقتی مودالِ *دیده‌شده‌ای* باز است، اسکرولِ صفحهٔ زیرین قفل می‌شود.
    نکته: #newDocModal همیشه در DOM هست و با کلاسِ .hidden پنهان می‌شود؛ پس باید :not(.hidden) باشد
    وگرنه اسکرولِ کلِ سایت حتی بدونِ مودالِ باز قفل می‌ماند. */
