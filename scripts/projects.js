@@ -555,7 +555,7 @@ function showProjectDetail(c,o,pr){
   var admin=ME.role==="admin";
   var stCls=s.status.cls==="badge-approved"?"s-done":(s.status.cls==="badge-pending"?"s-run":"s-idle");
   var specEdit=admin?'<span class="sec-act"><button class="icon-btn" title="ویرایش مشخصات پروژه" onclick="openProjectSpecs(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')">'+ICON.edit+'</button></span>':'';
-  var partsEdit=admin?'<span class="sec-act"><button class="icon-btn" title="ویرایشِ قطعات و پارامترهای اطلاعات" onclick="openPartsPanel(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')">'+ICON.edit+'</button></span>':'';
+  var partsEdit=admin?'<span class="sec-act"><button class="icon-btn" title="افزودنِ قطعه به پروژه" onclick="openPartsPanel(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')">'+ICON.plus+'</button></span>':'';
 
   host.innerHTML=''+
     '<section class="ppanel">'+
@@ -618,14 +618,15 @@ function projectPartsDocsHTML(p){
   var latest=projectDocs(p).filter(function(d){ return String(d.isLatest).toLowerCase()==="true"; });
   var partTypes=docTypesSorted().filter(function(t){ return t.scope==="part"; });
   var parts=projectPartsList(p);
-  if(!parts.length) return '<div class="cp-empty-hint">هنوز قطعه‌ای به این پروژه اضافه نشده. با دکمهٔ ویرایشِ کنارِ عنوان، قطعه اضافه کنید.</div>';
+  if(!parts.length) return '<div class="cp-empty-hint">هنوز قطعه‌ای به این پروژه اضافه نشده. با دکمهٔ + کنارِ عنوان، قطعه اضافه کنید.</div>';
   var pc=p.clientCode, po=pad2(p.orderNo), ppr=pad2(p.projectNo);
   var groups=parts.map(function(pn){
     var rec=partRec(pn);
     return '<div class="spec-group" id="pdpart-'+esc(pc)+'-'+esc(po)+'-'+esc(ppr)+'-'+esc(pad2(pn))+'">'+
       '<div class="spec-hd">'+
+        '<span class="spec-dot" aria-hidden="true"></span>'+
         '<span class="spec-name">'+esc(partNameFa(pn))+'</span>'+
-        (rec&&rec.name&&rec.name!==partNameFa(pn)?'<span class="spec-en">'+esc(rec.name)+'</span>':'')+
+        (admin?'<button class="icon-btn sm spec-edit" title="ویرایشِ اسناد و پارامترهای این قطعه" onclick="openPartEditPanel(\''+esc(pc)+'\',\''+esc(po)+'\',\''+esc(ppr)+'\',\''+esc(pad2(pn))+'\')">'+ICON.edit+'</button>':'')+
       '</div>'+
       '<div class="spec-body">'+
         partSpecRowsHTML(p,pn,admin)+
@@ -1120,10 +1121,8 @@ async function saveProjectSpecs(){
 
 /* ============ پنلِ ویرایشِ قطعات پروژه: عضویتِ قطعات + انواعِ سند + ماژول‌های اطلاعاتِ قطعه ============ */
 var PED=null;
-function openPartsPanel(c,o,pr){
-  if(ME.role!=="admin"){ toast("فقط مدیر می‌تواند ویرایش کند.",true); return; }
-  var p=findProject(c,o,pr); if(!p) return;
-  var inProj={}; projectPartsList(p).forEach(function(pn){ inProj[pn]=1; });
+/* ساختِ وضعیتِ مشترکِ پنلِ ویرایش — هم پنجرهٔ افزودنِ قطعه، هم ویرایشِ تک‌قطعه */
+function pedInitState(c,o,pr,p){
   PED={ c:c,o:o,pr:pr,
     parts: partsSorted().map(function(pt){ var no=pad2(pt.partNo); return {no:no,fa:partNameFa(no),en:pt.name||"",on:!!inProj[no]}; }),
     docMaster: partDocMaster(),          // فهرستِ اصلیِ انواعِ سندِ سطحِ قطعه [{code,label}]
@@ -1145,7 +1144,31 @@ function openPartsPanel(c,o,pr){
         Object.keys(r).forEach(function(l){ out[kk][l]=String(r[l]==null?"":r[l]); }); });
       return out; })()   // کپیِ مقادیرِ per-part تا تا زمانِ ذخیره، محلی ویرایش شوند
   };
-  showModal("ویرایشِ قطعات پروژه",
+  PED.single=false;
+}
+function openPartsPanel(c,o,pr){
+  if(ME.role!=="admin"){ toast("فقط مدیر می‌تواند ویرایش کند.",true); return; }
+  var p=findProject(c,o,pr); if(!p) return;
+  pedInitState(c,o,pr,p);
+  showModal("افزودنِ قطعه به پروژه",
+    '<div class="ed-body" id="pedBody"></div>'+
+    '<div class="ed-foot"><div class="btn-row">'+
+      '<button class="btn" onclick="closeModal()">انصراف</button>'+
+      '<button class="btn primary" id="pedSave" onclick="savePartsPanel()">ذخیره</button>'+
+    '</div></div>', "edit-box");
+  drawPartsBody();
+}
+/* ═══ ویرایشِ یک قطعهٔ مشخص ═══
+   همان دو کارتِ «انواعِ سند» و «پارامترها»، ولی بدونِ دراپ‌داونِ انتخابِ قطعه:
+   قطعه از همان کارتی می‌آید که کاربر دکمهٔ ویرایشِ آن را زده، پس یک مرحلهٔ انتخاب حذف می‌شود.
+   عضویتِ قطعات در این پنجره دست‌کاری نمی‌شود — آن کارِ دکمهٔ افزودنِ سربرگ است. */
+function openPartEditPanel(c,o,pr,pn){
+  if(ME.role!=="admin"){ toast("فقط مدیر می‌تواند ویرایش کند.",true); return; }
+  var p=findProject(c,o,pr); if(!p) return;
+  pedInitState(c,o,pr,p);
+  PED.selPart=pad2(pn);
+  PED.single=true;   // حالتِ تک‌قطعه‌ای: کارتِ عضویتِ قطعات رسم نمی‌شود
+  showModal("ویرایشِ قطعهٔ «"+esc(partNameFa(pn))+"»",
     '<div class="ed-body" id="pedBody"></div>'+
     '<div class="ed-foot"><div class="btn-row">'+
       '<button class="btn" onclick="closeModal()">انصراف</button>'+
@@ -1308,12 +1331,13 @@ function drawPartsBody(){
   pedDDCloseAll();   // هر بار رندر، منوهای بازِ قبلی و لیسنرِ کلیکِ بیرون پاک می‌شوند
   var host=document.getElementById("pedBody"); if(!host) return;
   var nPart=pedCountParts();
-  /* کارتِ ۱: قطعاتِ پروژه (روشن/خاموش) — فهرست داخلِ خودش اسکرول می‌شود تا پنجره کوتاه بماند */
+  var single=!!PED.single;   // حالتِ ویرایشِ یک قطعهٔ مشخص
+  /* کارتِ ۱: قطعاتِ پروژه (روشن/خاموش) — فقط در پنجرهٔ افزودن؛ در ویرایشِ تک‌قطعه معنا ندارد */
   var partRows=PED.parts.map(function(x,i){ return pedCheckRow(x.on,x.fa,x.en||"","pedTogglePart("+i+")")+'</div>'; }).join("");
   var partNote=(nPart>0)
     ? '<div class="ed-req-note"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+faN(nPart)+' قطعه انتخاب شده.</div>'
     : '<div class="ed-req-note"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>دست‌کم یک قطعه انتخاب کنید.</div>';
-  var partsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_PART+'قطعات پروژه<span class="ed-count">'+faN(nPart)+' قطعه</span></h4>'+
+  var partsCard=single?"":'<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_PART+'قطعات پروژه<span class="ed-count">'+faN(nPart)+' قطعه</span></h4>'+
     '<div class="ed-scroll">'+partRows+'</div>'+partNote+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودنِ قطعهٔ جدید، به «تنظیمات ◂ قطعات» بروید.</div>'+
     '</div>';
@@ -1321,7 +1345,10 @@ function drawPartsBody(){
   /* ---- پیکربندیِ per-part: اول قطعه را انتخاب کن، سپس انواعِ سند و پارامترهایش را تنظیم کن ---- */
   var onParts=PED.parts.filter(function(x){ return x.on; });
   var perPart="";
-  if(!onParts.length){
+  if(!single){
+    /* پنجرهٔ افزودن فقط عضویتِ قطعات را دارد؛ تنظیماتِ هر قطعه در کارتِ خودش ویرایش می‌شود */
+    perPart="";
+  } else if(!onParts.length){
     perPart='<div class="ed-card"><div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>ابتدا از کارتِ بالا یک قطعه انتخاب کنید تا انواعِ سند و پارامترهایش را جداگانه تنظیم کنید.</div></div>';
   } else {
     if(PED.selPart && !onParts.some(function(x){ return x.no===PED.selPart; })) PED.selPart=null;   // قطعهٔ خاموش‌شده؟ انتخاب پاک شود
@@ -1330,7 +1357,8 @@ function drawPartsBody(){
     var promptNote='<div class="ed-req-note attn">'+ED_ALERT_IC+'برای اعمالِ تغییرات در این بخش، ابتدا قطعهٔ موردِنظر را از منو انتخاب کنید.</div>';
 
     /* ---- کارتِ انواعِ سندِ قطعه ---- */
-    var docHead='<h4 class="ed-sec-t">'+SEC_IC_DOC+'انواعِ سندِ قطعه'+pedPartDD('doc',onParts,sel)+'</h4>';
+    /* در حالتِ تک‌قطعه‌ای دراپ‌داون لازم نیست: قطعه از قبل مشخص است */
+    var docHead='<h4 class="ed-sec-t">'+SEC_IC_DOC+'انواعِ سندِ قطعه'+(single?'':pedPartDD('doc',onParts,sel))+'</h4>';
     var docsCard;
     if(!sel){
       docsCard='<div class="ed-card">'+docHead+promptNote+'</div>';
@@ -1352,7 +1380,7 @@ function drawPartsBody(){
     }
 
     /* ---- کارتِ پارامترهای قطعه ---- */
-    var modHead='<h4 class="ed-sec-t">'+SEC_IC_INFO+'پارامترهای قطعه'+pedPartDD('mod',onParts,sel)+'</h4>';
+    var modHead='<h4 class="ed-sec-t">'+SEC_IC_INFO+'پارامترهای قطعه'+(single?'':pedPartDD('mod',onParts,sel))+'</h4>';
     var modsCard;
     if(!sel){
       modsCard='<div class="ed-card">'+modHead+promptNote+'</div>';
