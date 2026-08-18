@@ -75,7 +75,7 @@ async function openDocDetail(num){
     '<div class="doc-modal">'+
       '<div class="doc-preview">'+
         '<div class="dp-frame" id="docPreviewHost"></div>'+
-        '<div class="dp-actions">'+actionBtn+dlBtnHTML+'</div>'+
+        '<div class="dp-actions">'+actionBtn+dmAddFormatBtnHTML(cur,is3DType)+dlBtnHTML+'</div>'+
       '</div>'+
       '<div class="doc-side">'+
         newerBanner+
