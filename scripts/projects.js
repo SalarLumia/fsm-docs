@@ -523,8 +523,11 @@ function mbandHTML(p,s){
         '<div class="bar"><i class="faint" style="width:'+regPct+'%;background:var(--brand)"></i>'+
           '<i style="width:'+aprPct+'%;background:'+(aprPct===100?"var(--ok)":"var(--brand)")+'"></i></div>'+
       '</div>'+
+      /* لایهٔ کم‌رنگِ نوار همچنان «ثبت‌شده» است (نوار باید پیشرفت را نشان دهد، نه کمبود)؛
+         ولی راهنمای دوم به تعدادِ ماژول‌هایِ بدونِ سند تغییر کرد — همان عددی که می‌گوید چقدر کار مانده. */
       '<div class="mtext"><div class="mlabel">مستندات پروژه</div>'+
-        '<div class="mleg"><i></i>تأییدشده</div><div class="mleg faint"><i></i>ثبت‌شده</div></div>'+
+        '<div class="mleg"><i></i>تأییدشده <b>'+faN(apr)+'</b> از <b>'+faN(total)+'</b></div>'+
+        '<div class="mleg faint"><i></i>بارگذاری‌نشده <b>'+faN(total-reg)+'</b></div></div>'+
     '</div></div>';
   return hero+
     cellDonut("قطعات پروژه", partsApp, partsReg, parts.length)+
@@ -1621,7 +1624,9 @@ async function mvLoadPart(fileId, part){
   var _mnm=_mp?_mp.name:"";   // نامِ مدلِ در‌حالِ بارگذاری — تا کاربر بداند کدام قطعه دارد می‌آید
   shell.innerHTML=mvPickerHTML(_mvParts, part)+
     '<div class="mv-ph" id="mvPh"><div class="mv-empty-ic">'+MODEL_IC+'</div>'+
-      '<div class="mv-empty-t">در حال بارگذاریِ '+(_mnm?esc(_mnm):"مدل")+'…</div></div>'+
+      '<div class="mv-empty-t">در حال بارگذاری مدل…</div>'+
+      /* نامِ لاتین خطِ جداگانه و LTR است؛ در یک خطِ فارسی ترتیبِ کلمات به‌هم می‌ریخت */
+      (_mnm?'<div class="mv-load-name">'+esc(_mnm)+'</div>':'')+'</div>'+
     loadBarHTML(false, true);
   await ensureModelViewer();
   if(myToken!==_mvLoadSeq) return;   // بارگذاریِ جدیدتری جای این را گرفت؛ به DOM دست نزن

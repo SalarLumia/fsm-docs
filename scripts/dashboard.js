@@ -148,6 +148,9 @@ function renderProjectCards(animate){
         '<div class="proj-card-row"><span class="proj-card-meta">'+esc(r.client)+'</span></div>'+
         '<div class="proj-prog">'+
           '<span class="pp-big pp-pct">'+pctText+'٪</span>'+
+          /* تعدادِ ماژول‌هایِ بدونِ سند — در حالتِ بستهٔ کارت هم دیده می‌شود،
+             پس در یک نگاه معلوم است کدام پروژه هنوز سندِ بارگذاری‌نشده دارد. */
+          (r.miss>0?'<span class="pp-miss" title="ماژول‌هایی که هنوز سندِ بارگذاری‌شده ندارند">'+faN(r.miss)+' سند باقی‌مانده</span>':'')+
           '<div class="proj-bar-bg"><div class="proj-bar-fill faint" style="width:'+regW+'%"></div>'+
             '<div class="proj-bar-fill solid" style="width:'+solW+'%;background:'+esc(r.status.bar)+'"></div></div>'+
         '</div>'+

@@ -220,6 +220,30 @@ button.doc-ic:disabled{cursor:default}
   padding:34px 24px;min-height:var(--view-min);background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius-sm)}
 .mv-empty-ic{width:56px;height:56px;display:grid;place-items:center}
 .mv-empty-ic svg{width:44px;height:44px;stroke:#c9c7c2;fill:none;stroke-width:1.4}
+/* ═══ حالتِ بارگذاریِ آیکونِ سه‌بعدی ═══
+   مکعب آرام نفس می‌کشد و خطوطِ داخلی‌اش پیاپی کشیده می‌شوند — حسِ «در حالِ
+   ساخته‌شدن» می‌دهد به‌جای چرخشِ ساده. نوارِ درصد جداگانه پیشرفتِ واقعی را می‌گوید. */
+.mv-ph .mv-empty-ic svg{animation:mvCubeBreath 2.6s ease-in-out infinite;transform-origin:50% 50%}
+/* طولِ واقعیِ مسیرها حساب شده (۲۰٫۲ و ۱۰٫۱)؛ هرکدام داشِ خودش را دارد تا
+   سرعتِ کشیده‌شدنِ هر دو یکسان دیده شود. */
+.mv-ph .mv-empty-ic svg polyline{stroke-dasharray:21;stroke-dashoffset:21;
+  animation:mvDrawPoly 2.6s cubic-bezier(.4,0,.2,1) infinite}
+.mv-ph .mv-empty-ic svg line{stroke-dasharray:11;stroke-dashoffset:11;
+  animation:mvDrawLine 2.6s cubic-bezier(.4,0,.2,1) infinite .32s}
+@keyframes mvCubeBreath{0%,100%{transform:scale(1) rotate(0deg);stroke-opacity:.75}
+  50%{transform:scale(1.07) rotate(3deg);stroke-opacity:1}}
+@keyframes mvDrawPoly{0%{stroke-dashoffset:21}45%{stroke-dashoffset:0}
+  75%{stroke-dashoffset:0}100%{stroke-dashoffset:-21}}
+@keyframes mvDrawLine{0%{stroke-dashoffset:11}45%{stroke-dashoffset:0}
+  75%{stroke-dashoffset:0}100%{stroke-dashoffset:-11}}
+@media(prefers-reduced-motion:reduce){
+  .mv-ph .mv-empty-ic svg,
+  .mv-ph .mv-empty-ic svg polyline,
+  .mv-ph .mv-empty-ic svg line{animation:none;stroke-dashoffset:0}
+}
+/* نامِ مدلِ در‌حالِ بارگذاری — خطِ دوم، لاتین و LTR */
+.mv-load-name{margin-top:5px;font-size:12.5px;font-weight:600;color:var(--muted);
+  direction:ltr;letter-spacing:.02em}
 .mv-empty-t{font-size:13px;font-weight:700;color:var(--txt)}
 .mv-empty-t.mono{direction:ltr;font-weight:600;letter-spacing:.3px}
 .mv-empty-s{font-size:11.5px;color:var(--muted);line-height:1.9;max-width:340px}
