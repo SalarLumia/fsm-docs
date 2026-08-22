@@ -1,11 +1,13 @@
 /* ===== فونت ایران‌سنس (فایل‌ها در پوشهٔ fonts کنار index.html) ===== */
+/* woff2 اول می‌آید (حدود نصفِ حجمِ ttf)؛ ttf فقط پشتیبانِ مرورگرِ قدیمی است.
+   مرورگر فقط اولین قالبی را که می‌شناسد دانلود می‌کند، نه هر دو را. */
 /* ۴۰۰ و ۷۰۰ با optional: چون در index.html پیش‌بار می‌شوند، به‌موقع حاضرند و
    مرورگر متن را یک‌بار با فونتِ سیستم و بارِ دوم با IRANSans رسم نمی‌کند (پرشِ فونت).
    وزن‌های کمتر‌کاربرد روی swap می‌مانند تا اگر دیر رسیدند متن نامرئی نشود. */
-@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Light.ttf') format('truetype');font-weight:300;font-display:swap}
-@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans.ttf') format('truetype');font-weight:400;font-display:optional}
-@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Medium.ttf') format('truetype');font-weight:500;font-display:swap}
-@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Bold.ttf') format('truetype');font-weight:700;font-display:optional}
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Light.woff2') format('woff2'),url('../fonts/IRANSans_Light.ttf') format('truetype');font-weight:300;font-display:swap}
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans.woff2') format('woff2'),url('../fonts/IRANSans.ttf') format('truetype');font-weight:400;font-display:optional}
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Medium.woff2') format('woff2'),url('../fonts/IRANSans_Medium.ttf') format('truetype');font-weight:500;font-display:swap}
+@font-face{font-family:'IRANSans';src:url('../fonts/IRANSans_Bold.woff2') format('woff2'),url('../fonts/IRANSans_Bold.ttf') format('truetype');font-weight:700;font-display:optional}
 
 /* ===== پایه و تایپوگرافی ===== */
 *{box-sizing:border-box}
