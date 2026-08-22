@@ -242,7 +242,11 @@ function lgTogglePass(){
   b.setAttribute("aria-label", t); b.setAttribute("title", t);
   i.focus();
 }
-async function doLogin(){
+/* ⚠ ورود فقط با کنشِ واقعیِ کاربر (کلیک یا Enter) مجاز است.
+   بدونِ این نگهبان، مدیرِ رمزِ مرورگر که فیلدها را خودکار پر می‌کند می‌توانست
+   بلافاصله ورود را هم شروع کند — کاربر بدونِ زدنِ هیچ دکمه‌ای وارد می‌شد. */
+async function doLogin(trusted){
+  if(trusted!==true) return;   // فقط فراخوانیِ صریح از دکمه/کلید
   if(document.getElementById("lgBtn") && document.getElementById("lgBtn").disabled) return;   // جلوگیری از ارسالِ دوباره
   var u=document.getElementById("lgUser").value.trim();
   var p=document.getElementById("lgPass").value;
