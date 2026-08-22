@@ -21,6 +21,27 @@
 <link rel="stylesheet" href="styles/features.css">
 <link rel="stylesheet" href="styles/project.css">
 <link rel="stylesheet" href="styles/login.css">
+<script>
+/* ⚠ پیش از رندرِ صفحه اجرا می‌شود (عمداً در head و بدونِ defer).
+   اگر نشستِ معتبری ذخیره باشد، صفحهٔ ورود از همان اول پنهان می‌ماند.
+   بدونِ این، صفحهٔ ورود رندر و انیمیشن‌هایش پخش می‌شد و چند ثانیه بعد جایش را به
+   پنل می‌داد — کاربر شاهدِ یک «ورودِ خودکارِ نمایشی» بود که در هیچ سایتی مرسوم نیست.
+   اعتبارسنجیِ واقعی کارِ بک‌اند است؛ این‌جا فقط تصمیمِ نمایشی گرفته می‌شود. */
+(function(){
+  try{
+    var s=localStorage.getItem("fsm_session");
+    if(!s) return;
+    var v=JSON.parse(s);
+    if(!v || typeof v.token!=="string" || !v.token) return;
+    if(v.expiresAt && Date.now()>=v.expiresAt) return;   // منقضی شده → صفحهٔ ورود بیاید
+    document.documentElement.classList.add("has-session");
+  }catch(e){}
+})();
+</script>
+<style>
+  /* نشستِ معتبر: نه صفحهٔ ورود دیده می‌شود و نه انیمیشن‌هایش پخش می‌شوند */
+  html.has-session #loginView{display:none!important}
+</style>
 </head>
 <body>
 

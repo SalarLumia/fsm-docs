@@ -292,6 +292,9 @@ async function confirmLogout(){
 var _appRun = 0;
 function logout(){
   _appRun++;                              // هر اجرای در جریانِ startApp از این لحظه بی‌اعتبار است
+  /* قفلِ پنهان‌ماندنِ صفحهٔ ورود (که اسکریپتِ head برای نشستِ ذخیره‌شده گذاشته)
+     باید برداشته شود، وگرنه پس از خروج صفحهٔ ورود نامرئی می‌ماند. */
+  document.documentElement.classList.remove("has-session");
   ME={token:null}; localStorage.removeItem("fsm_session");
   stopClock();
   document.getElementById("appView").classList.add("hidden");
