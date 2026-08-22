@@ -183,6 +183,7 @@
    بدونِ آن برچسبِ «نام کاربری» و «رمز عبور» وسطِ کارت می‌افتند. */
 /* بستن: محتوا اول محو می‌شود، بعد خودِ پنل — معکوسِ ترتیبِ بازشدن */
 .lg-body{position:relative;z-index:2;opacity:0;text-align:right;
+  margin:0;   /* <form> حاشیهٔ پیش‌فرضِ مرورگر دارد */
   transition:opacity .3s ease}
 .login-wrap.open .lg-body{opacity:1;transition:opacity .5s ease .62s}
 /* ▼ متن‌های داخلِ پنلِ ذغالی — روشن، برای کنتراستِ کافی روی زمینهٔ تیره ▼ */
@@ -261,6 +262,20 @@
 .lg-field:has(.lg-eye) input{padding-right:42px}
 /* توضیحِ راهنما بینِ فیلدِ رمز و دکمهٔ ورود — هم‌الگو با .ed-req-note در پنلِ تنظیمات:
    آیکونِ دایره‌ایِ اطلاع پیش از متن. رنگ روشن‌تر است چون زمینه ذغالی است. */
+/* «مرا به خاطر بسپار» — چک‌باکسِ سفارشی روی زمینهٔ تیرهٔ پنل.
+   ورودیِ واقعی پنهان است ولی حذف نشده، پس صفحه‌خوان و صفحه‌کلید همچنان کار می‌کنند. */
+.lg-remember{display:flex;align-items:center;gap:8px;margin:16px 0 0;padding-right:6px;
+  font-size:12px;font-weight:500;color:#b0b0ae;cursor:pointer;user-select:none}
+.lg-remember input{position:absolute;opacity:0;width:0;height:0}
+.lg-rem-box{position:relative;width:16px;height:16px;flex-shrink:0;border-radius:4px;
+  border:1.5px solid #6a6a68;background:#3d3d3d;transition:.15s}
+.lg-rem-box::after{content:"";position:absolute;left:4.5px;top:1px;width:4px;height:8px;
+  border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) scale(0);
+  transition:transform .15s cubic-bezier(.2,0,0,1)}
+.lg-remember:hover .lg-rem-box{border-color:var(--brand)}
+.lg-remember input:checked + .lg-rem-box{background:var(--brand);border-color:var(--brand)}
+.lg-remember input:checked + .lg-rem-box::after{transform:rotate(45deg) scale(1)}
+.lg-remember input:focus-visible + .lg-rem-box{box-shadow:0 0 0 3px #f7941f55}
 .lg-note{display:flex;align-items:flex-start;gap:7px;margin:22px 0 0;padding-right:6px;
   font-size:11.5px;font-weight:500;color:#b0b0ae;line-height:1.9;text-align:right}
 .lg-note svg{width:14px;height:14px;flex-shrink:0;margin-top:4px;

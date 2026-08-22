@@ -2,6 +2,7 @@
 /* عمرِ توکنِ بک‌اند (۱۲ ساعت). اگر در Code.gs عوض شد، این هم باید هم‌گام شود؛
    بدترین حالتِ ناهماهنگی این است که یک بار درخواست به سرور می‌رود و رد می‌شود. */
 var LG_TOKEN_TTL = 12*60*60*1000;
+var LG_TOKEN_TTL_REMEMBER = 30*24*60*60*1000;   // ۳۰ روز — هم‌گام با TOKEN_TTL_REMEMBER در Code.gs
 /* خطاهای ورود جای همان خطِ راهنما (تماس با مدیر) می‌نشینند، نه در یک بنرِ جداگانه:
    آیکون به مثلثِ اخطار عوض می‌شود و رنگ به قرمز. با پاک‌شدنِ خطا، متنِ راهنما برمی‌گردد. */
 var LG_INFO_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
@@ -254,7 +255,9 @@ async function doLogin(trusted){
   if(!u||!p){ lgSetErr("نام کاربری و رمز را وارد کنید."); return; }
   lgBusy(true);
   try{
-    var r=await api("login",{username:u,password:p});
+    var rem=document.getElementById("lgRemember");
+    var remember=!!(rem&&rem.checked);
+    var r=await api("login",{username:u,password:p,remember:remember});
     if(!r.ok){
       /* پیامِ یکسان برای «کاربر پیدا نشد» و «رمز اشتباه»: اگر این دو از هم
          تفکیک شوند، می‌شود با آزمون‌وخطا فهمید کدام نام‌کاربری‌ها وجود دارند.
@@ -266,7 +269,9 @@ async function doLogin(trusted){
     /* زمانِ انقضا کنارِ توکن ذخیره می‌شود تا در بازگشاییِ بعدی، نشستِ تمام‌شده
        بدونِ رفت‌وبرگشت به سرور تشخیص داده شود (توکنِ بک‌اند ۱۲ ساعته است).
        اگر روزی خودِ بک‌اند expiresAt بفرستد، همان ملاک قرار می‌گیرد. */
-    ME.expiresAt = r.expiresAt || (Date.now() + LG_TOKEN_TTL);
+    /* ملاک همیشه expiresAt ِ سرور است (از v21 فرستاده می‌شود)؛ حدسِ محلی فقط
+       پشتیبانِ بک‌اندِ قدیمی است و با «مرا به خاطر بسپار» هم‌خوان نیست. */
+    ME.expiresAt = r.expiresAt || (Date.now() + (remember ? LG_TOKEN_TTL_REMEMBER : LG_TOKEN_TTL));
     localStorage.setItem("fsm_session", JSON.stringify(ME));
     // رمز نباید پس از ورود در DOM بماند
     var pw=document.getElementById("lgPass");
@@ -332,6 +337,9 @@ async function startApp(){
     if(dashErr) dashErr.classList.remove("hidden");
     if(typeof showBootstrapError==="function") showBootstrapError(); return;
   }
+  /* تمدیدِ خودکار: اگر بک‌اند توکنِ تازه فرستاده، جایگزین می‌شود تا کاربرِ
+     فعال وسطِ کار بیرون نیفتد. ذخیرهٔ نهایی چند خط پایین‌تر انجام می‌شود. */
+  if(r.token){ ME.token=r.token; if(r.expiresAt) ME.expiresAt=r.expiresAt; }
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
