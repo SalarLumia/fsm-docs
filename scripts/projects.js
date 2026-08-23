@@ -955,12 +955,19 @@ function partDocLockedTypes(p,part){
 /* نوشتنِ کاملِ ساختار به p.specs + ذخیرهٔ خوش‌بینانه در بک‌اند (بدونِ تغییرِ بک‌اند) */
 async function saveSpecs(c,o,pr,root,extra){
   var json=JSON.stringify(root);
-  var p=findProject(c,o,pr); if(p) p.specs=json;
+  var p=findProject(c,o,pr);
+  var before=p?p.specs:null;                // برای بازگرداندن اگر بک‌اند جلویِ ذخیره را گرفت
+  if(p) p.specs=json;
   var payload={clientCode:c,orderNo:o,projectNo:pr,specs:json};
   if(extra){ for(var k in extra){ if(extra.hasOwnProperty(k)) payload[k]=extra[k]; } }
   showProjectDetail(c,o,pr);
   var r=await api("saveProject",payload);
-  if(!r||!r.ok){ toast((r&&r.message)||"ذخیره ناموفق بود",true); }
+  if(!r||!r.ok){
+    /* تورِ ایمنیِ بک‌اند: این ذخیره می‌خواست specsِ پر را خالی کند و رد شد.
+       یعنی نسخهٔ داخلِ مرورگر ناقص است؛ تغییرِ محلی را برمی‌گردانیم تا روی صفحه هم دروغ نماند. */
+    if(r && r.code==="EMPTY_SPECS" && p){ p.specs=before; showProjectDetail(c,o,pr); }
+    toast((r&&r.message)||"ذخیره ناموفق بود",true);
+  }
 }
 
 /* ترتیبِ ثابتِ اسنادِ سطحِ پروژه؛ انواعِ ناشناخته پس از این ترتیب می‌آیند (به ترتیبِ تنظیمات) */
@@ -1493,7 +1500,7 @@ async function savePartsPanel(){
   root.partVals=pv;
   p.projectParts=parts.join(",");
   closeModal();
-  var extra={projectParts:p.projectParts};
+  var extra={projectParts:p.projectParts, allowEmptySpecs:true};   // خالی‌شدن از این پنل خواستهٔ صریحِ کاربر است
   if(removed.length) extra.enabledSlots=p.enabledSlots;
   await saveSpecs(c,o,pr,root,extra);
 }
