@@ -226,7 +226,10 @@ main{max-width:none;margin:0;padding:0}
 .nav-item.active .ni-search .sr-hit line:last-child{transition-delay:.06s}
 
 /* سطل زباله: درب بلند می‌شود و زاویه می‌گیرد (لولا روی گوشهٔ راست) */
+/* ⚠ svg به‌طورِ پیش‌فرض overflow:hidden دارد، پس دربِ بلندشده از لبهٔ viewBox
+   بریده می‌شد و بالارفتنش دیده نمی‌شد. فقط همین آیکون اجازهٔ سرریز می‌گیرد. */
+.ni-trash{overflow:visible}
 .ni-trash .tr-lid{transform-origin:88% 90%}
-.nav-item.active .ni-trash .tr-lid{transform:rotate(-18deg) translate(-.6px,-3.2px)}
+.nav-item.active .ni-trash .tr-lid{transform:rotate(-18deg) translate(-.6px,-4.2px)}
 .nav-item.active .ni-trash .tr-b1{transform:translateY(.6px)}
 .nav-item.active .ni-trash .tr-b2{transform:translateY(.6px)}
