@@ -313,7 +313,7 @@ async function dmSelectVersion(num){
   else { var dl=document.getElementById("dpDownload"); if(dl) dl.disabled=!d.fileId; }
   // پیش‌نمایش
   var host=document.getElementById("docPreviewHost"); if(!host) return;
-  host.classList.remove("is-3d");   // پیش‌فرض: قابِ عادیِ flex (عکس/PDF)؛ فقط شاخهٔ سه‌بعدی دوباره فعالش می‌کند
+  host.classList.remove("is-3d"); host.classList.remove("is-frame");   // پیش‌فرض: قابِ عادیِ flex (عکس/PDF)؛ فقط شاخهٔ سه‌بعدی دوباره فعالش می‌کند
   if(!d.fileId){
     host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="es-title">این ریویژن فایلی ندارد</div></div>';
     return;
@@ -357,7 +357,15 @@ async function dmSelectVersion(num){
         host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><div class="es-title">نمایشِ سه‌بعدی در دسترس نیست</div><div class="es-desc">فایلِ کتابخانهٔ model-viewer در پوشهٔ vendor موجود نیست.</div></div>';
       }
     } else {
-      host.innerHTML=(r.mimeType.indexOf("image/")===0)?'<img src="'+url+'">':'<iframe src="'+url+'"></iframe>';
+      if(r.mimeType.indexOf("image/")===0){
+        host.innerHTML='<img src="'+url+'">';
+      }else{
+        /* PDF (و هر چیزی که در iframe می‌رود) ویوئرِ داخلیِ خودش را دارد و خودش اسکرول می‌کند؛
+           پس اسکرولِ قاب خاموش می‌شود تا دو اسکرول‌بارِ هم‌زمان پیدا نشود. */
+        host.classList.add("is-frame");
+        host.scrollLeft=0; host.scrollTop=0;
+        host.innerHTML='<iframe src="'+url+'"></iframe>';
+      }
     }
   }catch(e){
     if(est) est.stop();

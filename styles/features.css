@@ -53,6 +53,11 @@
 .dp-frame{flex:1;display:flex;align-items:center;justify-content:center;min-height:300px;overflow:auto;position:relative}
 .dp-frame iframe,.dp-frame img{width:100%;height:78vh;border:0;background:#fff;display:block}
 .dp-frame img{object-fit:contain}
+/* PDF و هر فایلی که در iframe می‌رود، ویوئرِ داخلیِ خودش را دارد و خودش اسکرول می‌کند.
+   اگر قاب هم اسکرول داشته باشد دو اسکرول‌بار هم‌زمان پیدا می‌شود که هرکدام بخشی از
+   مسیر را جابه‌جا می‌کنند. پس در این حالت اسکرولِ قاب خاموش می‌شود تا تنها یک
+   اسکرولِ واقعی — اسکرولِ خودِ PDF — باقی بماند. */
+.dp-frame.is-frame{display:block;overflow:hidden;padding:0}
 /* پیش‌نمایشِ سه‌بعدی: قاب به‌جای flex-centering به حالتِ «پُر» می‌رود تا لبهٔ مدل بریده نشود؛
    ظرفِ .mv-toolwrap دقیقاً قاب را پر می‌کند و ویوئر + تولباکس درونش می‌نشینند (مثلِ پنلِ پروژه). */
 .dp-frame.is-3d{display:block;overflow:hidden;padding:0;min-height:60vh;
