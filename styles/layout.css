@@ -7,7 +7,10 @@
 .sb-logo{width:100%;max-width:176px;height:auto;object-fit:contain;display:block;
   background:#faf9f7;border-radius:12px;padding:12px 16px;box-sizing:border-box}
 .sb-caption{font-size:12px;font-weight:500;letter-spacing:.3px;color:#ffffff;text-align:center}
-.sb-nav{flex:1;padding:18px 10px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.sb-nav{flex:1;padding:18px 10px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;
+  /* تورفتگیِ باکسِ نارنجیِ حالتِ فعال و جایِ نوارِ لبه — تا با خطِ راهنمایِ
+     عمودیِ درخت (که روی مرکزِ آیکون است) تداخل نکند. */
+  --nav-pad:7px; --nav-ind:3px}
 .sb-divider{height:1px;background:rgba(255,255,255,0.08);margin:6px 8px}
 /* امضای توسعه‌دهنده در پایین منو، بالای خط جداکنندهٔ تنظیمات/خروج — ریزتر از آیتم‌های منو */
 .sb-dev{padding:8px 14px 10px;display:flex;flex-direction:column;gap:2px;text-align:center}
@@ -15,17 +18,24 @@
 .sb-dev-mail{font-size:10px;color:rgba(255,255,255,0.8);direction:ltr;text-decoration:none;transition:.15s}
 .sb-dev-mail:hover{color:var(--brand)}
 .sb-bottom{padding:10px 8px 14px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:1px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:none;
-  color:#ffffff;border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer;width:100%;
+/* باکسِ هایلایت از دو طرف تورفته می‌شود (margin) و همان مقدار از پدینگ
+   کم می‌شود؛ پس مرکزِ آیکون دقیقاً سرِ جایِ خودش می‌ماند و خطِ درخت هم‌تراز می‌ماند. */
+.nav-item{display:flex;align-items:center;gap:10px;
+  padding:10px calc(12px - var(--nav-pad));margin-inline:var(--nav-pad);
+  border:none;background:none;
+  color:#ffffff;border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer;
+  width:calc(100% - var(--nav-pad)*2);
   text-align:right;transition:.15s;font-weight:500;position:relative}
 .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8}
 .nav-item:hover{background:rgba(255,255,255,0.11);color:#ffffff}
 /* حالتِ انتخاب‌شده: تینتِ ملایم + نوارِ لبهٔ ثابت؛ متن و آیکون هر دو نارنجی می‌شوند (currentColor). */
-.nav-item.active{background:rgba(247,148,31,0.14);color:var(--brand)}
+/* نارنجی روی زمینهٔ تیره کنتراستِ کمتری از سفید دارد، پس همان وزن نازک‌تر دیده
+   می‌شود. یک پله وزنِ بیشتر این را جبران می‌کند تا ضخامتِ دیده‌شده ثابت بماند. */
+.nav-item.active{background:rgba(247,148,31,0.14);color:var(--brand);font-weight:600}
 .nav-item.active:hover{background:rgba(247,148,31,0.22)}
 /* نشانگرِ لبه — همیشه موجود ولی پنهان (scaleY 0 + کمی بیرونِ لبه)؛ هنگامِ active با انیمیشن
    از لبهٔ راست بیرون/چپ می‌آید و هم‌زمان به بالا و پایین کشیده می‌شود (مثلِ نشانگرِ ردیفِ آرشیو) */
-.nav-item::before{content:"";position:absolute;top:50%;inset-inline-start:0;pointer-events:none;
+.nav-item::before{content:"";position:absolute;top:50%;inset-inline-start:var(--nav-ind);pointer-events:none;
   width:3px;height:18px;border-radius:3px;background:var(--brand);
   transform:translateY(-50%) translateX(6px) scaleY(0);
   transition:transform .28s cubic-bezier(.2,0,0,1)}
@@ -38,26 +48,32 @@
 .nav-tree{display:flex;flex-direction:column}
 /* هر ردیف یک «سلولِ یکپارچه» است: پس‌زمینه/گردی و حالت‌ها روی خودِ ردیف‌اند، نه دکمه‌های داخلش؛
    نام و فلش هر دو داخلِ همین سلول‌اند (فلش بخشی از سلول). */
-.nav-trow{display:flex;align-items:stretch;border-radius:9px;margin:1px 0;position:relative;transition:background .15s,box-shadow .15s}
+.nav-trow{display:flex;align-items:stretch;border-radius:9px;margin:1px var(--nav-pad);position:relative;transition:background .15s,box-shadow .15s}
 .nav-trow:hover{background:rgba(255,255,255,0.10)}
 /* موردِ جاری (سلولِ ریشه یا مشتریِ انتخابی): تینت + نوارِ لبهٔ ثابت — مثلِ قبل */
 .nav-trow.cur,.nav-trow:has(.nav-tmain.active){background:rgba(247,148,31,0.14)}
 .nav-trow.cur:hover,.nav-trow:has(.nav-tmain.active):hover{background:rgba(247,148,31,0.22)}
 /* نشانگرِ لبه — همیشه موجود ولی پنهان؛ هنگامِ cur/active با همان انیمیشنِ بیرون‌آمدن+کشیده‌شدن آشکار می‌شود */
-.nav-trow::before{content:"";position:absolute;top:50%;inset-inline-start:0;z-index:1;pointer-events:none;
+.nav-trow::before{content:"";position:absolute;top:50%;inset-inline-start:var(--nav-ind);z-index:1;pointer-events:none;
   width:3px;height:18px;border-radius:3px;background:var(--brand);
   transform:translateY(-50%) translateX(6px) scaleY(0);
   transition:transform .28s cubic-bezier(.2,0,0,1)}
 .nav-trow.cur::before,.nav-trow:has(.nav-tmain.active)::before{transform:translateY(-50%) translateX(0) scaleY(1)}
 @media(prefers-reduced-motion:reduce){.nav-item::before,.nav-trow::before{transition:none}}
 /* دکمه‌های داخلِ سلول شفاف‌اند و پس‌زمینه/گردیِ مستقل ندارند */
-.nav-trow .nav-item,.nav-trow .nav-leaf{background:none!important;box-shadow:none!important;border-radius:0}
+/* داخلِ درخت، تورفتگی روی خودِ .nav-trow اعمال شده؛ پس دکمهٔ داخلی
+   نباید دوباره حاشیه بگیرد — وگرنه آیکون دو برابر تو می‌رود و از خطِ درخت جدا می‌افتد. */
+.nav-trow .nav-item,.nav-trow .nav-leaf{background:none!important;box-shadow:none!important;border-radius:0;
+  margin-inline:0;width:100%}
+.nav-trow .nav-item{padding-inline:12px}
+.nav-trow .nav-leaf{padding-inline:10px}
 .nav-trow:hover .nav-item,.nav-trow:hover .nav-leaf,.nav-trow:hover .nav-exp{color:#ffffff}
 /* متن، آیکون و چِورونِ موردِ جاری همگی نارنجی می‌شوند (currentColor).
    والدِ روی مسیر (.path) نارنجی نمی‌شود — فقط عمیق‌ترین موردِ انتخابی نارنجی است. */
 .nav-trow.cur .nav-leaf,
 .nav-trow:has(.nav-tmain.active) .nav-item,
 .nav-trow.cur .nav-exp,.nav-trow:has(.nav-tmain.active) .nav-exp{color:var(--brand)}
+
 .nav-trow .nav-item.active{background:none!important}
 .nav-trow .nav-item::before{content:none}   /* داخلِ درخت، نشانگر روی خودِ ردیف (.nav-trow) است نه دکمه */
 .nav-trow .nav-tmain{flex:1 1 0;min-width:0;width:auto}
@@ -104,11 +120,12 @@
    خودِ خط 1.5px پهنا دارد، پس margin = 20.5 − 0.75 = 19.75px تا مرکزِ خط روی مرکزِ آیکون بنشیند.
    پدینگ هم کم می‌شود تا تورفتگیِ نهاییِ محتوا دست‌نخورده بماند (19.75+1.5+ـ ≈ همانِ قبل). */
 .nav-children{display:flex;flex-direction:column;gap:1px;margin:4px 0 4px;
-  margin-inline-start:19.75px;border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:0}
+  margin-inline-start:calc(19.75px + var(--nav-pad));border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:0}
 .nav-cnode{display:flex;flex-direction:column}
 /* برگ (دکمهٔ رفتن به مشتری) داخلِ سلول */
 .nav-leaf{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;
-  font-family:inherit;color:#fff;text-align:right;padding:8px 10px;transition:color .15s}
+  font-family:inherit;color:#fff;text-align:right;
+  padding:8px calc(10px - var(--nav-pad)) 8px 10px;transition:color .15s}
 .nav-leaf .nav-lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-leaf:focus-visible{outline:none;box-shadow:0 0 0 3px #f7941f55;border-radius:8px}
 /* سطحِ ۱: مشتری‌ها (لوگوی کوچک + نام) — وزنِ ۴۰۰: یک پله سبک‌تر از آیتم‌های بالا (۵۰۰) */
@@ -129,7 +146,10 @@
 .nav-pleaf .nav-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.8);flex-shrink:0;transition:.15s}
 .nav-pleaf:hover .nav-dot{background:var(--brand)}
 /* پروژهٔ جاری: تینت + متنِ نارنجی + نقطهٔ نارنجی (بدونِ نوار — نقطه نشانگر است) */
-.nav-pleaf.cur{background:rgba(247,148,31,0.14);color:var(--brand)}
+/* جبرانِ وزن: نارنجی روی زمینهٔ تیره نازک‌تر دیده می‌شود؛
+   یک پله بالاتر از وزنِ عادیِ همان سطح، ضخامتِ دیده‌شده را ثابت نگه می‌دارد. */
+.nav-trow.cur .nav-cleaf{font-weight:500}
+.nav-pleaf.cur{background:rgba(247,148,31,0.14);color:var(--brand);font-weight:400}
 .nav-pleaf.cur:hover{background:rgba(247,148,31,0.22);color:var(--brand)}
 .nav-pleaf.cur .nav-dot{background:var(--brand)}
 .nav-empty{font-size:11px;color:rgba(255,255,255,0.45);padding:5px 11px}
@@ -166,3 +186,33 @@ main{max-width:none;margin:0;padding:0}
 /* ===== فوتر مینیمال (نازک، فقط شعار) ===== */
 .app-footer{border-top:1px solid var(--line);background:#fff;padding:6px 24px;text-align:center;
   font-size:10.5px;color:var(--muted);line-height:1.6}
+
+/* ===== آیکون‌های اصلیِ منو: تغییرِ ظریفِ حالتِ انتخاب‌شده، با انیمیشن =====
+   نکتهٔ کلیدی: آیکون عوض نمی‌شود؛ اجزای همان SVG جابه‌جا/چرخانده می‌شوند.
+   جای‌گزینیِ کاملِ شکل قابلِ انیمیشن نیست، ولی transform روی اجزا هست.
+   همهٔ چرخش‌ها transform-box:fill-box دارند تا مبدأ نسبت به خودِ شکل باشد
+   نه نسبت به viewBox — وگرنه اجزا از قاب بیرون می‌زنند. */
+.nav-item .ni *{transition:transform .32s cubic-bezier(.34,1.3,.64,1),opacity .24s ease}
+.nav-item .ni *{transform-box:fill-box;transform-origin:50% 50%}
+@media(prefers-reduced-motion:reduce){.nav-item .ni *{transition:none}}
+
+/* داشبورد: چهار مربع کمی به مرکز نزدیک می‌شوند (جمع‌وجور و «انتخاب‌شده») */
+.nav-item.active .ni-dash .q1{transform:translate(.9px,.9px)}
+.nav-item.active .ni-dash .q2{transform:translate(-.9px,.9px)}
+.nav-item.active .ni-dash .q3{transform:translate(.9px,-.9px)}
+.nav-item.active .ni-dash .q4{transform:translate(-.9px,-.9px)}
+
+/* پوشه: پنلِ جلویی در حالتِ عادی نامرئی است؛ در حالتِ فعال
+   محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالاییِ خودِ پنل است. */
+.ni-folder .fd-lid{transform-origin:50% 0;transform:scaleY(.55);opacity:0}
+.nav-item.active .ni-folder .fd-lid{opacity:1;transform:scaleY(1) rotate(-4deg)}
+
+/* آرشیو: ذره‌بین کمی بزرگ‌نمایی می‌کند و دسته بیرون‌تر می‌رود */
+.nav-item.active .ni-search .sr-glass{transform:scale(1.06) translate(-.3px,-.3px)}
+.nav-item.active .ni-search .sr-handle{transform:translate(1.1px,1.1px)}
+
+/* سطل زباله: درب بلند می‌شود و زاویه می‌گیرد (لولا روی گوشهٔ راست) */
+.ni-trash .tr-lid{transform-origin:88% 90%}
+.nav-item.active .ni-trash .tr-lid{transform:rotate(-18deg) translate(-.6px,-1.4px)}
+.nav-item.active .ni-trash .tr-b1{transform:translateY(.6px)}
+.nav-item.active .ni-trash .tr-b2{transform:translateY(.6px)}
