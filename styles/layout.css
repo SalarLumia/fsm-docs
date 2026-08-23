@@ -98,9 +98,13 @@
   .nav-anim>.nav-collapse-inner>.nav-children>.nav-cnode,
   .nav-anim>.nav-collapse-inner>.nav-projwrap>.nav-pleaf{animation:none}
 }
-/* بدنهٔ فرزندانِ ریشه (مشتری‌ها): تورفته + خطِ راهنمای عمودی پشت‌شان (RTL: سمت راست) — مثلِ رفرنس */
+/* بدنهٔ فرزندانِ ریشه (مشتری‌ها): تورفته + خطِ راهنمای عمودی پشت‌شان (RTL: سمت راست) — مثلِ رفرنس.
+   ⚠ خط دقیقاً از مرکزِ آیکونِ ردیفِ بالایی رد می‌شود:
+   .nav-item پدینگِ افقیِ 12px دارد و آیکون 17px است → مرکز = 12 + 17/2 = 20.5px.
+   خودِ خط 1.5px پهنا دارد، پس margin = 20.5 − 0.75 = 19.75px تا مرکزِ خط روی مرکزِ آیکون بنشیند.
+   پدینگ هم کم می‌شود تا تورفتگیِ نهاییِ محتوا دست‌نخورده بماند (19.75+1.5+ـ ≈ همانِ قبل). */
 .nav-children{display:flex;flex-direction:column;gap:1px;margin:4px 0 4px;
-  margin-inline-start:11px;border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:8px}
+  margin-inline-start:19.75px;border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:0}
 .nav-cnode{display:flex;flex-direction:column}
 /* برگ (دکمهٔ رفتن به مشتری) داخلِ سلول */
 .nav-leaf{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;
@@ -112,8 +116,12 @@
 .nav-ci-logo{width:20px;height:20px;border-radius:6px;flex-shrink:0;object-fit:contain;background:#fff}
 .nav-ci-ph{width:20px;height:20px;border-radius:6px;flex-shrink:0;display:grid;place-items:center;
   font-size:9px;font-weight:800;color:#fff;background:rgba(255,255,255,0.2);letter-spacing:.02em}
-/* سطحِ ۲: پروژه‌ها — یک پله تورفته‌تر از مشتری، با خطِ راهنمای عمودیِ خودشان (RTL: سمت راست) */
-.nav-projwrap{display:flex;flex-direction:column;gap:1px;margin:2px 0 5px;margin-inline-start:15px;
+/* سطحِ ۲: پروژه‌ها — یک پله تورفته‌تر از مشتری، با خطِ راهنمای عمودیِ خودشان (RTL: سمت راست).
+   ⚠ همان قاعده: خط از مرکزِ لوگویِ مشتری رد می‌شود.
+   .nav-leaf پدینگِ افقیِ 10px دارد و لوگو 20px است → مرکز = 10 + 20/2 = 20px
+   از لبهٔ محتوایِ .nav-children (همان جایی که .nav-cnode شروع می‌شود).
+   پس margin = 20 − 0.75 = 19.25px. */
+.nav-projwrap{display:flex;flex-direction:column;gap:1px;margin:2px 0 5px;margin-inline-start:19.25px;
   border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:3px}
 /* سطحِ ۲: پروژه‌ها — وزنِ ۳۰۰ (سبک‌ترین)، سفیدِ کامل؛ گرادیانِ وزن لایه‌لایه‌بودن را نشان می‌دهد */
 .nav-pleaf{font-size:12px;color:#fff;font-weight:300;padding:7px 10px;border-radius:8px;transition:.15s}
