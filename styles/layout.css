@@ -196,11 +196,16 @@ main{max-width:none;margin:0;padding:0}
    (ویجت‌ها). مقدارها از مختصاتِ واقعیِ هدف حساب شده‌اند (مرکزِ هر کاشی ثابت).
    ترتیبِ scale سپس translate مهم است: جابه‌جایی در فضایِ مقیاس‌شده اعمال می‌شود.
    ⚠ شکافِ بینِ کاشی‌ها ۳ واحد است، نه کمتر: خطوط ۱٫۸px ضخامت دارند و
-   هرکدام نیمی از آن را بیرون می‌ریزند؛ با شکافِ کمتر، خطوط به هم می‌چسبند. */
-.nav-item.active .ni-dash .q1{transform:scale(1.071,.714) translate(.23px,-1.4px)}
-.nav-item.active .ni-dash .q2{transform:scale(1.071,.714) translate(-.23px,-1.4px)}
-.nav-item.active .ni-dash .q3{transform:scale(1.071,1.429) translate(.23px,-1.05px)}
-.nav-item.active .ni-dash .q4{transform:scale(1.071,1.429) translate(-.23px,-1.05px)}
+   هرکدام نیمی از آن را بیرون می‌ریزند؛ با شکافِ کمتر، خطوط به هم می‌چسبند.
+   ⚠ scale ضخامتِ خط را هم می‌کشد، پس stroke-widthِ هر کاشی به همان نسبت
+   جبران می‌شود تا با بقیهٔ آیکون‌های منو یکسان دیده شود.
+   (non-scaling-stroke راهِ درستی نبود: ضخامت را بر‌حسبِ پیکسلِ صفحه قفل می‌کند،
+    در حالی که آیکون از viewBoxِ ۲۴ به ۱۷px کوچک می‌شود — ۱٫۴ برابر ضخیم‌تر می‌شد.) */
+.ni-dash .q{transition:transform .32s cubic-bezier(.34,1.3,.64,1),stroke-width .32s cubic-bezier(.34,1.3,.64,1)}
+.nav-item.active .ni-dash .q1{transform:scale(1.071,.714) translate(.23px,-1.4px);stroke-width:2.06}
+.nav-item.active .ni-dash .q2{transform:scale(1.071,.714) translate(-.23px,-1.4px);stroke-width:2.06}
+.nav-item.active .ni-dash .q3{transform:scale(1.071,1.429) translate(.23px,-1.05px);stroke-width:1.46}
+.nav-item.active .ni-dash .q4{transform:scale(1.071,1.429) translate(-.23px,-1.05px);stroke-width:1.46}
 /* کاشی‌های پایین کمی دیرتر جابه‌جا می‌شوند تا چیدمان پلکانی دیده شود */
 .ni-dash .q3,.ni-dash .q4{transition-delay:.05s}
 
