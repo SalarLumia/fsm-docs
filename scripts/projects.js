@@ -53,6 +53,36 @@ function navClientLogo(c){
 /* درخت را همیشه به‌طورِ کامل می‌سازد (همهٔ مشتری‌ها و همهٔ پروژه‌ها در DOM می‌مانند، فقط با کلاسِ open
    جمع/باز می‌شوند تا انیمیشنِ گرید 0fr↔1fr کار کند). فقط این تابع innerHTML را عوض می‌کند؛
    باز/بسته‌کردنِ کاربر از راهِ navToggle* فقط کلاس را جابه‌جا می‌کند (بدونِ بازسازی، تا نرم بماند). */
+/* فقط کلاسِ «موردِ جاری» را درجا عوض می‌کند، بدونِ بازساختِ DOM.
+   ⚠ چرا لازم است: renderNavTree با innerHTML کلِ درخت را از نو می‌سازد؛
+   ردیفِ تازه از همان اول در حالتِ نهایی متولد می‌شود، پس تغییری رخ نمی‌دهد که CSS
+   بتواند انیمیشنش کند و نوارِ لبه بی‌انیمیشن ظاهر/محو می‌شد. */
+function navSyncSelection(){
+  var host=document.getElementById("navTreeChildren"); if(!host||!_nav.built) return false;
+  var projActive=(typeof window!=="undefined" && window._activeTab==="project");
+  var rows=host.querySelectorAll(".nav-trow[data-cli]");
+  if(!rows.length) return false;
+  for(var i=0;i<rows.length;i++){
+    var code=rows[i].getAttribute("data-cli");
+    var isCur=(projActive && _cp.client===code && _projView.mode!=="detail");
+    var isPath=(projActive && _projView.mode==="detail" && _projView.c===code);
+    rows[i].classList.toggle("cur",isCur);
+    rows[i].classList.toggle("path",!isCur&&isPath);
+  }
+  var leaves=host.querySelectorAll(".nav-pleaf[data-prj]");
+  for(var j=0;j<leaves.length;j++){
+    var k=String(leaves[j].getAttribute("data-prj")).split("/");
+    var pCur=(projActive && _projView.mode==="detail" &&
+      _projView.c===k[0] && _projView.o===k[1] && _projView.pr===k[2]);
+    leaves[j].classList.toggle("cur",pCur);
+  }
+  return true;
+}
+/* اگر فقط انتخاب عوض شده (نه فهرستِ مشتری/پروژه)، درجا به‌روز کن تا انیمیشن بماند */
+function navRefreshSelection(){
+  if(navSyncSelection()) return;
+  renderNavTree();
+}
 function renderNavTree(){
   var host=document.getElementById("navTreeChildren"); if(!host) return;
   var exp=document.getElementById("navRootExp");
@@ -78,12 +108,12 @@ function renderNavTree(){
         ? projs.map(function(p){
             var o=pad2(p.orderNo), pr=pad2(p.projectNo);
             var pCur=(projActive&&_projView.mode==="detail"&&_projView.c===c.code&&_projView.o===o&&_projView.pr===pr);
-            return '<button class="nav-leaf nav-pleaf'+(pCur?' cur':'')+'" onclick="navGoProject(\''+esc(c.code)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')"><span class="nav-dot"></span><span class="nav-lb">'+esc(p.description||("پروژهٔ "+pr))+'</span></button>';
+            return '<button class="nav-leaf nav-pleaf'+(pCur?' cur':'')+'" data-prj="'+esc(c.code)+'/'+esc(o)+'/'+esc(pr)+'" onclick="navGoProject(\''+esc(c.code)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')"><span class="nav-dot"></span><span class="nav-lb">'+esc(p.description||("پروژهٔ "+pr))+'</span></button>';
           }).join("")
         : '<div class="nav-empty">پروژه‌ای نیست.</div>';
       // ظرفِ آکاردئونیِ پروژه‌ها (همیشه در DOM؛ open آن مستقل از ریشه است)
       var projCollapse='<div class="nav-collapse nav-projcollapse'+(cOpen?' open':'')+'" id="navc-'+esc(c.code)+'"><div class="nav-collapse-inner"><div class="nav-projwrap">'+projItems+'</div></div></div>';
-      return '<div class="nav-cnode"><div class="nav-trow'+cCls+'">'+
+      return '<div class="nav-cnode"><div class="nav-trow'+cCls+'" data-cli="'+esc(c.code)+'">'+
         '<button class="nav-leaf nav-cleaf" onclick="navGoClient(\''+esc(c.code)+'\')">'+navClientLogo(c)+'<span class="nav-lb">'+esc(c.name)+'</span></button>'+
         chev+
       '</div>'+projCollapse+'</div>';
@@ -129,7 +159,7 @@ function renderClientPanel(){
       railHTML(clients)+
       '<div class="cp-detail rv-group" id="cpDetail">'+clientDetailHTML()+'</div>'+
     '</div>';
-  renderNavTree();
+  navRefreshSelection();   // فقط انتخاب عوض شده؛ بازسازیِ درخت انیمیشنِ نوارِ لبه را از بین می‌برد
 }
 
 function railHTML(clients){
@@ -554,7 +584,7 @@ var SEC_IC_CLIENT='<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5
 function showProjectDetail(c,o,pr){
   c=String(c); o=pad2(o); pr=pad2(pr);
   _projView={mode:"detail",c:c,o:o,pr:pr}; _cp.client=c; _cp.order=o;
-  renderNavTree();
+  navRefreshSelection();   // همان دلیل: تغییرِ انتخاب، نه تغییرِ فهرست
   var p=findProject(c,o,pr);
   var host=document.getElementById("projectDetailView");
   document.getElementById("cpView").classList.add("hidden");

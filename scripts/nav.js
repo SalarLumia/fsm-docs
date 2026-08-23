@@ -56,6 +56,6 @@ function switchTab(name){
   if(name==="project") renderProjectTab();
   if(name==="trash" && typeof renderTrash==="function") renderTrash();
   // درختِ «مشتریان و پروژه‌ها» را تازه کن تا با ترکِ تبِ پروژه، نارنجیِ مشتری/پروژه پاک شود
-  if(name!=="project" && typeof renderNavTree==="function") renderNavTree();
+  if(name!=="project" && typeof navRefreshSelection==="function") navRefreshSelection();
   if(typeof playTabReveal==="function") playTabReveal(pane);   // ورودِ آبشاریِ بلوک‌های همان تب
 }
