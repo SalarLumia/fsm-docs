@@ -344,6 +344,9 @@ async function dmSelectVersion(num){
       if(window.customElements && customElements.get("model-viewer")){
         // قابِ پُر (بدونِ flex-centering که لبه را می‌بُرید) + همان تولباکسِ پنلِ پروژه
         host.classList.add("is-3d");
+        /* قاب بینِ پیش‌نمایش‌ها بازاستفاده می‌شود؛ اگر پیش‌نمایشِ قبلی (PDF/تصویر) اسکرول
+           خورده باشد، همان موقعیت می‌ماند و مدلِ تازه جابه‌جا دیده می‌شود. */
+        host.scrollLeft=0; host.scrollTop=0;
         host.innerHTML='<div class="mv-toolwrap">'+
           '<model-viewer id="dmMv" src="'+url+'" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="0.95" '+
             'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" alt="مدلِ سه‌بعدی" style="background:#f4f4f2"><button slot="ar-button" class="mv-ar"></button></model-viewer>'+

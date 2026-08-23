@@ -55,9 +55,17 @@
 .dp-frame img{object-fit:contain}
 /* پیش‌نمایشِ سه‌بعدی: قاب به‌جای flex-centering به حالتِ «پُر» می‌رود تا لبهٔ مدل بریده نشود؛
    ظرفِ .mv-toolwrap دقیقاً قاب را پر می‌کند و ویوئر + تولباکس درونش می‌نشینند (مثلِ پنلِ پروژه). */
-.dp-frame.is-3d{display:block;overflow:hidden;padding:0;min-height:60vh}
-.mv-toolwrap{position:absolute;inset:0}
-.mv-toolwrap model-viewer{position:absolute;inset:0;width:100%;height:100%;--poster-color:transparent}
+.dp-frame.is-3d{display:block;overflow:hidden;padding:0;min-height:60vh;
+  /* ⚠ جهت در حالتِ سه‌بعدی به ltr قفل می‌شود: قاب از فلکسِ rtl به block می‌رود و مبدأِ
+     محورِ افقی عوض می‌شود؛ همین باعث می‌شد ویوئر گاهی به راست/چپ بلغزد.
+     محتوای سه‌بعدی جهت‌پذیر نیست، پس قفلِ ltr بی‌ضرر و پایدار است. */
+  direction:ltr}
+/* همان الگویِ ویوئرِ پنلِ پروژه (.mv-shell) که هیچ‌وقت نلغزیده:
+   ظرف flex است و خودِ مدل با width/height پر می‌شود — بدونِ absolute/inset.
+   دلیل: inset ویژگیِ منطقی است و مبدأش با جهتِ متن عوض می‌شود؛ در قابی که
+   بینِ rtl و تغییرِ display جابه‌جا می‌شد، همین لغزشِ افقی را می‌ساخت. */
+.mv-toolwrap{position:relative;width:100%;height:100%;display:flex;overflow:hidden}
+.mv-toolwrap model-viewer{width:100%;height:100%;background:transparent;--poster-color:transparent}
 .dm-loading{display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--muted);font-size:12.5px}
 /* دکمه‌های اکشن، زیرِ پیش‌نمایش (ارسال/بارگذاری + دانلود) */
 .dp-actions{display:flex;gap:10px;padding:12px 16px;border-top:1px solid var(--line);background:#fff}
