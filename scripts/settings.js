@@ -132,7 +132,13 @@ async function savePart(){
   var r=await api("savePart",payload);
   if(r.ok){
     var pno=r.partNo;
-    localUpsert(DB.parts,function(x){return pad2(x.partNo)===pad2(pno);},{partNo:pno,name:name,nameFa:nameFa,allowedTypes:"",active:true});
+    /* localUpsert جایگزینِ کامل است؛ پس هنگامِ ویرایش باید از نسخهٔ قبلی شروع کنیم،
+       وگرنه allowedTypes (انواعِ سندِ مجازِ این قطعه) در نسخهٔ داخلِ مرورگر پاک می‌شود. */
+    var prevPart=(DB.parts||[]).filter(function(x){ return pad2(x.partNo)===pad2(pno); })[0];
+    var nextPart={}; if(prevPart){ for(var k in prevPart){ if(prevPart.hasOwnProperty(k)) nextPart[k]=prevPart[k]; } }
+    nextPart.partNo=pno; nextPart.name=name; nextPart.nameFa=nameFa; nextPart.active=true;
+    if(!prevPart) nextPart.allowedTypes="";
+    localUpsert(DB.parts,function(x){return pad2(x.partNo)===pad2(pno);},nextPart);
     closeModal(); localRefresh(); toast("قطعه "+pno+(wasEdit?" به‌روزرسانی شد":" افزوده شد"));
   } else toast(r.message,true);
 }

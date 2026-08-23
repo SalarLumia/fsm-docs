@@ -365,9 +365,15 @@ async function cpSaveProject(){
   if(!r.ok){ toast(r.message||"ذخیره ناموفق",true); return; }
   var pn=r.projectNo;
   var prev=DB.projects.find(function(x){return x.clientCode===_cp.client&&pad2(x.orderNo)===pad2(orderNo)&&pad2(x.projectNo)===pad2(pn);});
-  localUpsert(DB.projects,function(x){return x.clientCode===_cp.client&&pad2(x.orderNo)===pad2(orderNo)&&pad2(x.projectNo)===pad2(pn);},
-    {clientCode:_cp.client,orderNo:orderNo,projectNo:pn,description:desc,createdBy:ME.username,
-     enabledTypes:(prev?prev.enabledTypes||"":""),projectParts:(prev?prev.projectParts||"":""),enabledSlots:(prev?prev.enabledSlots||"":"")});
+  /* ⚠ localUpsert جایگزینِ کامل است (arr[i]=newItem)، نه ادغام. پس اگر شیءِ تازه را از صفر
+     بسازیم هر فیلدی که در آن نیاوریم از نسخهٔ داخلِ مرورگر پاک می‌شود — از جمله specs که
+     همهٔ ماژول‌ها، قطعات و پارامترهای پروژه در آن است. بک‌اند دست‌نخورده می‌ماند (فقط
+     description فرستاده می‌شود)، ولی پنل تا رفرشِ بعدی خالی دیده می‌شد.
+     راه‌حل: از نسخهٔ قبلی شروع کن و فقط چیزی را که واقعاً عوض شده بنویس. */
+  var next={}; if(prev){ for(var k in prev){ if(prev.hasOwnProperty(k)) next[k]=prev[k]; } }
+  next.clientCode=_cp.client; next.orderNo=orderNo; next.projectNo=pn; next.description=desc;
+  if(!prev) next.createdBy=ME.username;   // فقط پروژهٔ تازه ثبت‌کننده می‌گیرد؛ ویرایش نباید ثبت‌کنندهٔ اصلی را عوض کند
+  localUpsert(DB.projects,function(x){return x.clientCode===_cp.client&&pad2(x.orderNo)===pad2(orderNo)&&pad2(x.projectNo)===pad2(pn);},next);
   _cp.editingProject=""; _cp.order=orderNo;
   closeModal(); localRefresh(); toast("پروژه "+pn+" ذخیره شد");
   if(newDocOpen()) syncNewDocAfterProject(orderNo,pn); // اگر از پنل ثبت‌سند آمده‌ایم، خودکار انتخاب کن
