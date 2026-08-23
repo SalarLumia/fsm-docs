@@ -46,7 +46,6 @@
    پس فقط باکسِ همین‌ها از سمتِ خط تورفته می‌شود تا تداخل نکند.
    ردیف‌هایِ اصلیِ منو خطی کنارشان نیست و دست‌نخورده می‌مانند. */
 .nav-children .nav-trow{margin-inline-start:var(--nav-pad)}
-.nav-children .nav-trow::before{inset-inline-start:calc(var(--nav-pad) * -1)}
 .nav-trow:hover{background:rgba(255,255,255,0.10)}
 /* موردِ جاری (سلولِ ریشه یا مشتریِ انتخابی): تینت + نوارِ لبهٔ ثابت — مثلِ قبل */
 .nav-trow.cur,.nav-trow:has(.nav-tmain.active){background:rgba(247,148,31,0.14)}
