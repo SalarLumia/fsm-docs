@@ -202,9 +202,16 @@ main{max-width:none;margin:0;padding:0}
 .ni-folder .fd-lid{transform-origin:50% 0;transform:scaleY(.55);opacity:0}
 .nav-item.active .ni-folder .fd-lid{opacity:1;transform:scaleY(1) rotate(-4deg)}
 
-/* آرشیو: ذره‌بین کمی بزرگ‌نمایی می‌کند و دسته بیرون‌تر می‌رود */
-.nav-item.active .ni-search .sr-glass{transform:scale(1.06) translate(-.3px,-.3px)}
-.nav-item.active .ni-search .sr-handle{transform:translate(1.1px,1.1px)}
+/* آرشیو: ذره‌بین کمی می‌چرخد و جمع می‌شود و دو سطرِ سند داخلِ شیشه
+   پدیدار می‌شود — یعنی از «جست‌وجو» به «پیدا شد». خطوط از مرکز باز می‌شوند. */
+/* ⚠ قاعدهٔ کلی بالا fill-box می‌دهد؛ اینجا مختصاتِ viewBox لازم است
+   تا همه حولِ مرکزِ شیشه (11,11) بچرخند، نه حولِ کادرِ خودشان. */
+.ni-search .sr-lens{transform-box:view-box;transform-origin:11px 11px}
+.nav-item.active .ni-search .sr-lens{transform:rotate(-18deg)}
+.ni-search .sr-hit line{transform-box:view-box;transform-origin:11px 11px;transform:scaleX(0);opacity:0;
+  transition:transform .3s cubic-bezier(.34,1.3,.64,1),opacity .2s ease}
+.nav-item.active .ni-search .sr-hit line{transform:scaleX(1);opacity:1}
+.nav-item.active .ni-search .sr-hit line:last-child{transition-delay:.06s}
 
 /* سطل زباله: درب بلند می‌شود و زاویه می‌گیرد (لولا روی گوشهٔ راست) */
 .ni-trash .tr-lid{transform-origin:88% 90%}
