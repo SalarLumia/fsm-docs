@@ -18,24 +18,17 @@
 .sb-dev-mail{font-size:10px;color:rgba(255,255,255,0.8);direction:ltr;text-decoration:none;transition:.15s}
 .sb-dev-mail:hover{color:var(--brand)}
 .sb-bottom{padding:10px 8px 14px;border-top:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;gap:1px}
-/* باکسِ هایلایت از دو طرف تورفته می‌شود (margin) و همان مقدار از پدینگ
-   کم می‌شود؛ پس مرکزِ آیکون دقیقاً سرِ جایِ خودش می‌ماند و خطِ درخت هم‌تراز می‌ماند. */
-.nav-item{display:flex;align-items:center;gap:10px;
-  padding:10px calc(12px - var(--nav-pad));margin-inline:var(--nav-pad);
-  border:none;background:none;
-  color:#ffffff;border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer;
-  width:calc(100% - var(--nav-pad)*2);
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:none;
+  color:#ffffff;border-radius:9px;font-size:13px;font-family:inherit;cursor:pointer;width:100%;
   text-align:right;transition:.15s;font-weight:500;position:relative}
 .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8}
 .nav-item:hover{background:rgba(255,255,255,0.11);color:#ffffff}
 /* حالتِ انتخاب‌شده: تینتِ ملایم + نوارِ لبهٔ ثابت؛ متن و آیکون هر دو نارنجی می‌شوند (currentColor). */
-/* نارنجی روی زمینهٔ تیره کنتراستِ کمتری از سفید دارد، پس همان وزن نازک‌تر دیده
-   می‌شود. یک پله وزنِ بیشتر این را جبران می‌کند تا ضخامتِ دیده‌شده ثابت بماند. */
-.nav-item.active{background:rgba(247,148,31,0.14);color:var(--brand);font-weight:600}
+.nav-item.active{background:rgba(247,148,31,0.14);color:var(--brand)}
 .nav-item.active:hover{background:rgba(247,148,31,0.22)}
 /* نشانگرِ لبه — همیشه موجود ولی پنهان (scaleY 0 + کمی بیرونِ لبه)؛ هنگامِ active با انیمیشن
    از لبهٔ راست بیرون/چپ می‌آید و هم‌زمان به بالا و پایین کشیده می‌شود (مثلِ نشانگرِ ردیفِ آرشیو) */
-.nav-item::before{content:"";position:absolute;top:50%;inset-inline-start:var(--nav-ind);pointer-events:none;
+.nav-item::before{content:"";position:absolute;top:50%;inset-inline-start:0;pointer-events:none;
   width:3px;height:18px;border-radius:3px;background:var(--brand);
   transform:translateY(-50%) translateX(6px) scaleY(0);
   transition:transform .28s cubic-bezier(.2,0,0,1)}
@@ -48,25 +41,25 @@
 .nav-tree{display:flex;flex-direction:column}
 /* هر ردیف یک «سلولِ یکپارچه» است: پس‌زمینه/گردی و حالت‌ها روی خودِ ردیف‌اند، نه دکمه‌های داخلش؛
    نام و فلش هر دو داخلِ همین سلول‌اند (فلش بخشی از سلول). */
-.nav-trow{display:flex;align-items:stretch;border-radius:9px;margin:1px var(--nav-pad);position:relative;transition:background .15s,box-shadow .15s}
+.nav-trow{display:flex;align-items:stretch;border-radius:9px;margin:1px 0;position:relative;transition:background .15s,box-shadow .15s}
+/* فقط ردیف‌هایِ داخلِ درخت (مشتری‌ها) کنارِ خطِ راهنما قرار می‌گیرند؛
+   پس فقط باکسِ همین‌ها از سمتِ خط تورفته می‌شود تا تداخل نکند.
+   ردیف‌هایِ اصلیِ منو خطی کنارشان نیست و دست‌نخورده می‌مانند. */
+.nav-children .nav-trow{margin-inline-start:var(--nav-pad)}
+.nav-children .nav-trow::before{inset-inline-start:calc(var(--nav-pad) * -1)}
 .nav-trow:hover{background:rgba(255,255,255,0.10)}
 /* موردِ جاری (سلولِ ریشه یا مشتریِ انتخابی): تینت + نوارِ لبهٔ ثابت — مثلِ قبل */
 .nav-trow.cur,.nav-trow:has(.nav-tmain.active){background:rgba(247,148,31,0.14)}
 .nav-trow.cur:hover,.nav-trow:has(.nav-tmain.active):hover{background:rgba(247,148,31,0.22)}
 /* نشانگرِ لبه — همیشه موجود ولی پنهان؛ هنگامِ cur/active با همان انیمیشنِ بیرون‌آمدن+کشیده‌شدن آشکار می‌شود */
-.nav-trow::before{content:"";position:absolute;top:50%;inset-inline-start:var(--nav-ind);z-index:1;pointer-events:none;
+.nav-trow::before{content:"";position:absolute;top:50%;inset-inline-start:0;z-index:1;pointer-events:none;
   width:3px;height:18px;border-radius:3px;background:var(--brand);
   transform:translateY(-50%) translateX(6px) scaleY(0);
   transition:transform .28s cubic-bezier(.2,0,0,1)}
 .nav-trow.cur::before,.nav-trow:has(.nav-tmain.active)::before{transform:translateY(-50%) translateX(0) scaleY(1)}
 @media(prefers-reduced-motion:reduce){.nav-item::before,.nav-trow::before{transition:none}}
 /* دکمه‌های داخلِ سلول شفاف‌اند و پس‌زمینه/گردیِ مستقل ندارند */
-/* داخلِ درخت، تورفتگی روی خودِ .nav-trow اعمال شده؛ پس دکمهٔ داخلی
-   نباید دوباره حاشیه بگیرد — وگرنه آیکون دو برابر تو می‌رود و از خطِ درخت جدا می‌افتد. */
-.nav-trow .nav-item,.nav-trow .nav-leaf{background:none!important;box-shadow:none!important;border-radius:0;
-  margin-inline:0;width:100%}
-.nav-trow .nav-item{padding-inline:12px}
-.nav-trow .nav-leaf{padding-inline:10px}
+.nav-trow .nav-item,.nav-trow .nav-leaf{background:none!important;box-shadow:none!important;border-radius:0}
 .nav-trow:hover .nav-item,.nav-trow:hover .nav-leaf,.nav-trow:hover .nav-exp{color:#ffffff}
 /* متن، آیکون و چِورونِ موردِ جاری همگی نارنجی می‌شوند (currentColor).
    والدِ روی مسیر (.path) نارنجی نمی‌شود — فقط عمیق‌ترین موردِ انتخابی نارنجی است. */
@@ -120,12 +113,12 @@
    خودِ خط 1.5px پهنا دارد، پس margin = 20.5 − 0.75 = 19.75px تا مرکزِ خط روی مرکزِ آیکون بنشیند.
    پدینگ هم کم می‌شود تا تورفتگیِ نهاییِ محتوا دست‌نخورده بماند (19.75+1.5+ـ ≈ همانِ قبل). */
 .nav-children{display:flex;flex-direction:column;gap:1px;margin:4px 0 4px;
-  margin-inline-start:calc(19.75px + var(--nav-pad));border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:0}
+  margin-inline-start:19.75px;border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:0}
 .nav-cnode{display:flex;flex-direction:column}
 /* برگ (دکمهٔ رفتن به مشتری) داخلِ سلول */
 .nav-leaf{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;
   font-family:inherit;color:#fff;text-align:right;
-  padding:8px calc(10px - var(--nav-pad)) 8px 10px;transition:color .15s}
+  padding:8px 10px;transition:color .15s}
 .nav-leaf .nav-lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-leaf:focus-visible{outline:none;box-shadow:0 0 0 3px #f7941f55;border-radius:8px}
 /* سطحِ ۱: مشتری‌ها (لوگوی کوچک + نام) — وزنِ ۴۰۰: یک پله سبک‌تر از آیتم‌های بالا (۵۰۰) */
@@ -138,7 +131,10 @@
    .nav-leaf پدینگِ افقیِ 10px دارد و لوگو 20px است → مرکز = 10 + 20/2 = 20px
    از لبهٔ محتوایِ .nav-children (همان جایی که .nav-cnode شروع می‌شود).
    پس margin = 20 − 0.75 = 19.25px. */
-.nav-projwrap{display:flex;flex-direction:column;gap:1px;margin:2px 0 5px;margin-inline-start:19.25px;
+.nav-projwrap{display:flex;flex-direction:column;gap:1px;margin:2px 0 5px;
+  /* ردیفِ مشتری خودش --nav-pad تورفته شده، پس لوگویش هم همان‌قدر جابه‌جا شده؛
+     خطِ سطحِ ۲ باید همان جابه‌جایی را بگیرد تا روی مرکزِ لوگو بماند. */
+  margin-inline-start:calc(19.25px + var(--nav-pad));
   border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:3px}
 /* سطحِ ۲: پروژه‌ها — وزنِ ۳۰۰ (سبک‌ترین)، سفیدِ کامل؛ گرادیانِ وزن لایه‌لایه‌بودن را نشان می‌دهد */
 .nav-pleaf{font-size:12px;color:#fff;font-weight:300;padding:7px 10px;border-radius:8px;transition:.15s}
@@ -146,10 +142,7 @@
 .nav-pleaf .nav-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.8);flex-shrink:0;transition:.15s}
 .nav-pleaf:hover .nav-dot{background:var(--brand)}
 /* پروژهٔ جاری: تینت + متنِ نارنجی + نقطهٔ نارنجی (بدونِ نوار — نقطه نشانگر است) */
-/* جبرانِ وزن: نارنجی روی زمینهٔ تیره نازک‌تر دیده می‌شود؛
-   یک پله بالاتر از وزنِ عادیِ همان سطح، ضخامتِ دیده‌شده را ثابت نگه می‌دارد. */
-.nav-trow.cur .nav-cleaf{font-weight:500}
-.nav-pleaf.cur{background:rgba(247,148,31,0.14);color:var(--brand);font-weight:400}
+.nav-pleaf.cur{background:rgba(247,148,31,0.14);color:var(--brand)}
 .nav-pleaf.cur:hover{background:rgba(247,148,31,0.22);color:var(--brand)}
 .nav-pleaf.cur .nav-dot{background:var(--brand)}
 .nav-empty{font-size:11px;color:rgba(255,255,255,0.45);padding:5px 11px}
@@ -213,6 +206,6 @@ main{max-width:none;margin:0;padding:0}
 
 /* سطل زباله: درب بلند می‌شود و زاویه می‌گیرد (لولا روی گوشهٔ راست) */
 .ni-trash .tr-lid{transform-origin:88% 90%}
-.nav-item.active .ni-trash .tr-lid{transform:rotate(-18deg) translate(-.6px,-1.4px)}
+.nav-item.active .ni-trash .tr-lid{transform:rotate(-18deg) translate(-.6px,-3.2px)}
 .nav-item.active .ni-trash .tr-b1{transform:translateY(.6px)}
 .nav-item.active .ni-trash .tr-b2{transform:translateY(.6px)}
