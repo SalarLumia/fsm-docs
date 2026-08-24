@@ -329,6 +329,19 @@ function latestDocOfType(pdocs, typeCode){
   list.sort(function(a,b){ return (b.timestamp||"").localeCompare(a.timestamp||""); });
   return list[0];
 }
+/* ===== رنگِ هر قطعه در نمودارها =====
+   از پالتِ موجودِ سایت گرفته شده‌اند. قطعهٔ ۰۰ (اسنادِ سطحِ پروژه) همیشه
+   رنگِ ثابتِ خودش را دارد؛ بقیه به ترتیبِ شمارهٔ قطعه از پالت می‌گیرند،
+   پس رنگِ هر قطعه در همهٔ نماها یکسان می‌ماند.
+   ⚠ زرد/کهربایی عمداً در این فهرست نیست: مخصوصِ «در انتظارِ بازبینی» است. */
+var PART_COLORS=["#16a34a","#2563eb","#0891b2","#7c3aed","#db2777","#65a30d","#0d9488","#c2410c"];
+var PROJ_LEVEL_COLOR="#4a4a4a";   // ذغالیِ برند — اسنادِ سطحِ پروژه
+function partColor(partNo){
+  var pn=pad2(partNo);
+  if(pn==="00") return PROJ_LEVEL_COLOR;
+  var n=numOf(pn); if(!n||n<1) n=1;
+  return PART_COLORS[(n-1)%PART_COLORS.length];
+}
 /* تکمیل بر پایهٔ ماژول‌ها: مجموع ماژول‌های روشن (سطح‌پروژه + اسلات‌های قطعه)؛
    هر ماژولی که حداقل یک سند دارد = پوشش‌داده‌شده. */
 function projectStats(p){
@@ -369,6 +382,23 @@ function projectStats(p){
   var partBreak=Object.keys(byPart).map(function(k){ var b=byPart[k];
     b.name=(k==="00")?"مستندات پروژه":partNameFa(k); return b; })
     .sort(function(a,b){ return (a.part==="00"?-1:b.part==="00"?1:numOf(a.part)-numOf(b.part)); });
+
+  /* ===== سگمنت‌های نوارِ پیشرفت =====
+     هر قطعه رنگِ خودش را دارد و سهمِ اسنادِ تأییدشدهٔ همان قطعه را پر می‌کند؛
+     سپس یک سگمنتِ کهربایی برای کلِ اسنادِ در انتظارِ بازبینی (همهٔ قطعات با هم)،
+     و باقیِ نوار خالی می‌ماند = ماژول‌هایی که هیچ سندی ندارند. */
+  var aprByPart={};
+  aprMods.forEach(function(m){ aprByPart[m.part]=(aprByPart[m.part]||0)+1; });
+  var segs=[];
+  Object.keys(aprByPart).sort(function(a,b){
+    return (a==="00"?-1:b==="00"?1:numOf(a)-numOf(b)); }).forEach(function(pn){
+    segs.push({ part:pn, n:aprByPart[pn], kind:"apr",
+      name:(pn==="00")?"مستندات پروژه":partNameFa(pn),
+      color:partColor(pn),
+      pct: total>0 ? (aprByPart[pn]/total*100) : 0 });
+  });
+  if(inRev>0) segs.push({ part:"", n:inRev, kind:"rev", name:"در انتظار بازبینی",
+    color:"var(--warn)", pct: total>0 ? (inRev/total*100) : 0 });
   var st = (total>0 && apr>=total) ? {cls:"badge-approved",label:"کامل",bar:"var(--ok)"}
          : reg>0                   ? {cls:"badge-pending", label:"در حال تکمیل",bar:"var(--warn)"}
          :                           {cls:"badge-draft",   label:"شروع‌نشده",bar:"#d4d3ce"};
@@ -376,7 +406,7 @@ function projectStats(p){
           miss:pendingMods.length,            // باقی‌مانده = هنوز تأییدنشده (نه‌فقط بی‌سند)
           noDoc:missingMods.length,           // زیرمجموعه: اصلاً سندی ندارند
           inRev:inRev,                        // زیرمجموعه: سند دارند ولی تأیید نشده
-          missingLabels:missingLabels,pendingLabels:pendingLabels,partBreak:partBreak,
+          missingLabels:missingLabels,pendingLabels:pendingLabels,partBreak:partBreak,segs:segs,
           modules:modules,last:last,status:st,docCount:pdocs.length,
           name:p.description||"پروژهٔ بدون نام",client:clientName(p.clientCode),
           c:p.clientCode,o:pad2(p.orderNo),pr:pad2(p.projectNo),proj:p};

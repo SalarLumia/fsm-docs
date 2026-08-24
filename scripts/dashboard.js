@@ -131,6 +131,21 @@ function renderProjectCards(animate){
   // اگر کلیدِ بازِ فعلی دیگر در فهرست نیست (یا هنوز چیزی انتخاب نشده)، پیش‌فرض روی اولین ردیف بیفتد
   var openIdx = rows.findIndex(function(r){ return projKey(r)===_projOpenKey; });
   if(openIdx<0){ openIdx = rows.length?0:-1; if(rows.length) _projOpenKey=projKey(rows[0]); }
+/* نوارِ پیشرفتِ سگمنتی: هر قطعه با رنگِ خودش سهمِ اسنادِ تأییدشده‌اش را پر
+   می‌کند، سپس یک سگمنتِ کهربایی برای کلِ اسنادِ در انتظارِ بازبینی؛
+   باقیِ نوار (پس‌زمینهٔ خاکستری) = ماژول‌هایِ بدونِ سند.
+   ⚠ سگمنت‌ها کنارِ هم (flex) می‌نشینند نه روی هم؛ با position:absolute باید
+   آفستِ تجمعی حساب می‌شد که با انیمیشنِ عرض دردسرساز است. */
+function projBarHTML(r,doAnim){
+  var segs=r.segs||[];
+  if(!segs.length) return '<div class="proj-bar-bg"></div>';
+  return '<div class="proj-bar-bg">'+segs.map(function(g){
+    var w=doAnim?0:g.pct;
+    return '<span class="pbar-seg'+(g.kind==="rev"?" rev":"")+'" data-w="'+g.pct+'"'+
+      ' style="width:'+w+'%;background:'+esc(g.color)+'"'+
+      ' title="'+esc(g.name)+': '+faN(g.n)+' سند"></span>';
+  }).join("")+'</div>';
+}
   host.innerHTML='<div class="proj-list">'+rows.map(function(r,i){
     /* به‌جای فهرستِ نامِ ماژول‌ها (که کارت را شلوغ و بلند می‌کرد)، برای هر
        قطعه فقط دو عدد: چند سند ثبت‌نشده و چند سند در انتظارِ بازبینی. */
@@ -144,7 +159,7 @@ function renderProjectCards(animate){
       : (r.total?'<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
                 :'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
     // حالتِ اولیهٔ انیمیشن: نوار خالی و عددِ درصد صفر؛ مقدارهای واقعی روی data-* برای مرحلهٔ پرشدن
-    var pctText=doAnim?"0":r.pct, regW=doAnim?0:r.regPct, solW=doAnim?0:r.pct;
+    var pctText=doAnim?"0":r.pct;
     var openCls=(i===openIdx)?" open":"";
     return '<div class="proj-card'+openCls+'" data-pct="'+r.pct+'" data-regpct="'+r.regPct+'" data-bar="'+esc(r.status.bar)+'" data-i="'+i+'" data-key="'+esc(projKey(r))+'">'+
       '<div class="proj-card-head">'+
@@ -154,13 +169,13 @@ function renderProjectCards(animate){
         '<div class="proj-card-row"><span class="proj-card-meta">'+esc(r.client)+'</span></div>'+
         '<div class="proj-prog">'+
           '<span class="pp-big pp-pct">'+pctText+'٪</span>'+
-          '<div class="proj-bar-bg"><div class="proj-bar-fill faint" style="width:'+regW+'%"></div>'+
-            '<div class="proj-bar-fill solid" style="width:'+solW+'%;background:'+esc(r.status.bar)+'"></div></div>'+
+          projBarHTML(r,doAnim)+
         '</div>'+
       '</div>'+
       '<div class="proj-card-detail"><div class="pcd-inner"><div class="pcd-body">'+
         '<div class="detail-stats"><span>کل اسناد الزامی: <b>'+faN(r.total)+' سند</b></span><span>ثبت‌شده: <b>'+faN(r.reg)+' سند</b></span>'+
-          '<span>تأییدشده: <b>'+faN(r.apr)+' سند</b></span><span>بارگذاری نشده: <b>'+faN(r.miss)+' سند</b></span></div>'+
+          '<span>بارگذاری نشده: <b>'+faN(r.noDoc)+' سند</b></span>'+
+          '<span>در انتظار بازبینی: <b>'+faN(r.inRev)+' سند</b></span></div>'+
         '<div class="pcd-foot">'+msg+
           '<button class="btn sm proj-open-btn" onclick="openProject(\''+esc(r.c)+'\',\''+esc(r.o)+'\',\''+esc(r.pr)+'\')">مشاهدهٔ پروژه'+IC_OPEN+'</button>'+
         '</div>'+
@@ -175,13 +190,13 @@ function playProjBarsIn(){
   [].forEach.call(cards, function(card){
     var i=parseInt(card.getAttribute("data-i"),10)||0;
     var pct=parseInt(card.getAttribute("data-pct"),10)||0;
-    var regPct=parseInt(card.getAttribute("data-regpct"),10)||0;
     var bar=card.getAttribute("data-bar")||"";
     var delay=180+i*70;   // پس از پایانِ ورودِ خودِ کارت (rv-in) شروع شود، با تأخیرِ پلکانیِ سبک بینِ کارت‌ها
     setTimeout(function(){
-      var faint=card.querySelector(".proj-bar-fill.faint"), solid=card.querySelector(".proj-bar-fill.solid");
-      if(faint) faint.style.width=regPct+"%";
-      if(solid) solid.style.width=pct+"%";
+      /* نوار حالا سگمنتی است؛ هر سگمنت عرضِ خودش را از data-w می‌گیرد */
+      var segEls=card.querySelectorAll(".pbar-seg");
+      [].forEach.call(segEls, function(el){
+        el.style.width=(parseFloat(el.getAttribute("data-w"))||0)+"%"; });
       var numEl=card.querySelector(".pp-pct");
       if(numEl) countUpPercent(numEl, pct);
     }, delay);

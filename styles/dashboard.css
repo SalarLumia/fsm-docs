@@ -39,13 +39,14 @@
    پروژه‌های فعال=نارنجی، اسناد ثبت‌شده=خاکستری، اسناد تأییدشده=سبز، در انتظار بازبینی=زرد */
 .kpi-dot{position:relative;width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--muted)}
 .kpi-dot::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;
+  box-sizing:border-box;   /* وگرنه حاشیهٔ 2px به اندازه اضافه می‌شود و پالس از مرکزِ نقطه خارج می‌شود */
   border:2px solid currentColor;opacity:.55;transform:translate(-50%,-50%) scale(.4);
   pointer-events:none;animation:kpiPing 1.7s cubic-bezier(0,0,.2,1) infinite}
 @keyframes kpiPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.55}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
 .kf-brand .kpi-dot{background:var(--brand);color:var(--brand)}
 .kf-gray  .kpi-dot{background:var(--charcoal);color:var(--charcoal)}
 .kf-ok    .kpi-dot{background:var(--ok);color:var(--ok)}
-.kf-warn  .kpi-dot{background:#d97706;color:#d97706}
+.kf-warn  .kpi-dot{background:#eab308;color:#eab308}   /* زرد — نه کهربایی، تا با نارنجیِ برند اشتباه نشود */
 @media(prefers-reduced-motion:reduce){.kpi-dot::after{animation:none;opacity:0}}
 
 /* ===== ورودِ آبشاریِ عمومیِ صفحات ===== */
@@ -110,6 +111,14 @@
    نوار می‌آید از لبهٔ بصریِ واقعیِ آن شروع شود و فاصله‌گذاری‌های بعدی قابلِ‌پیش‌بینی بمانند. */
 .proj-prog .proj-bar-bg{width:82%;min-width:120px;max-width:420px;top:-20px;margin-bottom:-20px}   /* ~۵۰٪ بلندتر، از سمتِ راست؛ ۲۰px بالاتر */
 .proj-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:4px;transition:width .6s cubic-bezier(0,0,.2,1)}
+/* نوارِ سگمنتی: سگمنت‌ها کنارِ هم می‌نشینند و هرکدام سهمِ خودش را پر
+   می‌کند؛ جایِ خالیِ انتها همان پس‌زمینهٔ خاکستری = ماژول‌هایِ بدونِ سند. */
+.proj-bar-bg{display:flex;align-items:stretch}
+.pbar-seg{display:block;height:100%;min-width:0;transition:width .6s cubic-bezier(0,0,.2,1)}
+.pbar-seg:first-child{border-radius:4px 0 0 4px}
+.pbar-seg:last-child{border-radius:0 4px 4px 0}
+.pbar-seg:only-child{border-radius:4px}
+@media(prefers-reduced-motion:reduce){.pbar-seg{transition:none}}
 .proj-bar-fill.faint{background:var(--brand);opacity:.26}
 /* فلش = تنها دکمهٔ باز/بستنِ کارت؛ در حالتِ باز نارنجی می‌شود (هم‌رفتارِ فلش‌های آرشیو و جدول‌ها) */
 .proj-chevron{width:26px;height:26px;flex-shrink:0;display:inline-grid;place-items:center;
