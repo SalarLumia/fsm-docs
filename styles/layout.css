@@ -191,19 +191,17 @@ main{max-width:none;margin:0;padding:0}
 .nav-item .ni *{transform-box:fill-box;transform-origin:50% 50%}
 @media(prefers-reduced-motion:reduce){.nav-item .ni *{transition:none}}
 
-/* داشبورد: کاشی‌ها پلکانی و با مکثِ کوتاه زنده می‌شوند: کاشیِ اول
-   بزرگ‌تر می‌شود (کارتِ شاخص) و بقیه کمی جمع می‌شوند.
-   ⚠ مقیاس در هر دو محور یکسان است؛ مقیاسِ نامتناسب مربع‌ها را کشیده و
-   گوشه‌های گرد را بیضی می‌کرد — همان دفرمه‌شدن. ضخامتِ خط هم به همان
-   نسبت جبران می‌شود تا با بقیهٔ آیکون‌ها یکسان دیده شود. */
-.ni-dash .q{transition:transform .34s cubic-bezier(.34,1.3,.64,1),stroke-width .34s ease}
-.nav-item.active .ni-dash .q2{transform:scale(1.214) translate(-.62px,.62px);stroke-width:1.48}
-.nav-item.active .ni-dash .q1{transform:scale(.857) translate(.83px,.83px);stroke-width:2.1}
-.nav-item.active .ni-dash .q3{transform:scale(.857) translate(.83px,-.83px);stroke-width:2.1}
-.nav-item.active .ni-dash .q4{transform:scale(.857) translate(-.83px,-.83px);stroke-width:2.1}
-.ni-dash .q1{transition-delay:.04s}
-.ni-dash .q3{transition-delay:.08s}
-.ni-dash .q4{transition-delay:.12s}
+/* داشبورد — مینیمال: دو کاشیِ پایین از هم فاصله می‌گیرند و به دو
+   نوارِ عمودیِ باریک جمع می‌شوند؛ دو کاشیِ بالا دست‌نخورده می‌مانند.
+   حرکت فقط در یک محور است و روی شکلِ باریک اعمال می‌شود، پس دفرمه‌شدنِ
+   گوشه‌ها دیده نمی‌شود. ضخامتِ خط هم جبران می‌شود تا ۱٫۸ بماند. */
+.ni-dash .q{transition:transform .3s cubic-bezier(.4,0,.2,1),stroke-width .3s ease,rx .3s ease}
+/* rx هم کوچک می‌شود: در عرضِ کم یک شعاعِ ۱٫۵ پهنای نوار را می‌بلعد
+   و لبه‌ها فشرده دیده می‌شوند. */
+.nav-item.active .ni-dash .q3,.nav-item.active .ni-dash .q4{rx:2.6}
+.nav-item.active .ni-dash .q3{transform:scaleX(.3) translateX(-6.8px);stroke-width:3.29}
+.nav-item.active .ni-dash .q4{transform:scaleX(.3) translateX(6.8px);stroke-width:3.29}
+.ni-dash .q4{transition-delay:.05s}
 
 /* پوشه: پنلِ جلویی در حالتِ عادی نامرئی است؛ در حالتِ فعال
    محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالاییِ خودِ پنل است. */
@@ -240,13 +238,13 @@ main{max-width:none;margin:0;padding:0}
 .nav-item.active .ni-gear .gr-teeth{animation:gearSpin .72s cubic-bezier(.35,0,.15,1) both}
 
 /* راهنما: حلقه یک ضربان می‌گیرد و علامتِ سؤال کمی بالا/پایین می‌رود (اشارهٔ «بپرس») */
-.ni-help .hp-ring{transform-box:view-box;transform-origin:12px 12px}
-.ni-help .hp-mark{transform-box:view-box;transform-origin:12px 12px}
-@keyframes helpRing{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
-@keyframes helpMark{0%{transform:translateY(0)}30%{transform:translateY(-1.6px)}
-  60%{transform:translateY(.5px)}100%{transform:translateY(0)}}
-.nav-item.active .ni-help .hp-ring{animation:helpRing .6s cubic-bezier(.34,1.4,.64,1) both}
-.nav-item.active .ni-help .hp-mark{animation:helpMark .6s cubic-bezier(.34,1.4,.64,1) both}
+/* حلقه و علامتِ سؤال یک‌جا حرکت می‌کنند (یک کی‌فریم روی هر دو،
+   با همان مبدأ) تا آیکون یکپارچه دیده شود نه دو لایهٔ جدا. */
+.ni-help .hp-ring,.ni-help .hp-mark{transform-box:view-box;transform-origin:12px 12px}
+@keyframes helpPop{0%{transform:scale(1)}40%{transform:scale(1.14)}
+  70%{transform:scale(.97)}100%{transform:scale(1)}}
+.nav-item.active .ni-help .hp-ring,
+.nav-item.active .ni-help .hp-mark{animation:helpPop .55s cubic-bezier(.34,1.4,.64,1) both}
 
 /* خروج: فلش از راست بیرون می‌رود و بلافاصله از چپ وارد می‌شود و سرِ جایش می‌ایستد.
    opacity در لحظهٔ پرش صفر می‌شود تا «برگشتن» دیده نشود و حرکت یک‌طرفه بماند. */
@@ -257,10 +255,10 @@ main{max-width:none;margin:0;padding:0}
   41%{transform:translateX(-9px);opacity:0}
   100%{transform:translateX(0);opacity:1}
 }
-.nav-item.nav-logout:hover .ni-out .lo-arrow{animation:outSlide .62s cubic-bezier(.5,0,.2,1) both}
+.nav-item.nav-logout.lo-go .ni-out .lo-arrow{animation:outSlide .62s cubic-bezier(.5,0,.2,1) both}
 @media(prefers-reduced-motion:reduce){
   .nav-item.active .ni-gear .gr-teeth,
   .nav-item.active .ni-help .hp-ring,
   .nav-item.active .ni-help .hp-mark,
-  .nav-item.nav-logout:hover .ni-out .lo-arrow{animation:none}
+  .nav-item.nav-logout.lo-go .ni-out .lo-arrow{animation:none}
 }

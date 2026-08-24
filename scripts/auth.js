@@ -286,6 +286,12 @@ async function doLogin(trusted){
    ⚠ عمداً جدا از logout() است — خروجِ خودکار (نشستِ منقضی یا نشستِ نامعتبر)
    نباید منتظرِ تأییدِ کاربر بماند و باید فوراً انجام شود. */
 async function confirmLogout(){
+  /* انیمیشنِ فلش روی کلیک اجرا می‌شود، نه هوور: دکمهٔ خروج حالتِ «فعال»
+     ندارد چون پنجرهٔ تأیید باز می‌کند؛ پس کلاس را دستی می‌گذاریم و پس از
+     پایانِ انیمیشن برمی‌داریم تا دفعهٔ بعد دوباره قابلِ اجرا باشد. */
+  var lo=document.querySelector(".nav-item.nav-logout");
+  if(lo){ lo.classList.remove("lo-go"); void lo.offsetWidth; lo.classList.add("lo-go");
+    setTimeout(function(){ lo.classList.remove("lo-go"); },700); }
   var ok=await uiConfirm("از حساب کاربری خود خارج می‌شوید؟",
     { title:"خروج از سامانه", okLabel:"خروج", cancelLabel:"انصراف", danger:true });
   if(ok) logout();
