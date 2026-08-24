@@ -196,9 +196,14 @@ main{max-width:none;margin:0;padding:0}
    طرف باز می‌شود. دو کاشیِ بالا دست‌نخورده می‌مانند.
    ⚠ مستطیل یک شکلِ جداست (نه حاصلِ کشیدنِ یکی از مربع‌ها)، وگرنه
    نمی‌شد هم‌زمان هم از وسط باز شود و هم مربع‌ها مستقل خارج شوند. */
-.ni-dash .q,.ni-dash .q-bar{transition:transform .34s cubic-bezier(.4,0,.2,1),opacity .22s ease}
-/* مستطیل در حالتِ عادی جمع‌شده در مرکز و نامرئی است */
-.ni-dash .q-bar{transform-box:view-box;transform-origin:12px 17.5px;transform:scaleX(0);opacity:0}
+.ni-dash .q,.ni-dash .q-bar{transition:transform .34s cubic-bezier(.4,0,.2,1),opacity .22s ease,visibility .34s}
+/* مستطیل در حالتِ عادی کاملاً نامرئی است.
+   ⚠ scaleX(0) به‌تنهایی کافی نیست: گوشهٔ گرد در عرضِ صفر باز هم
+   یک باریکه رسم می‌کند و آیکونِ غیرفعال را عوض می‌کرد؛
+   visibility آن را قطعی از رسم خارج می‌کند (و قابلِ انیمیشن هم هست). */
+.ni-dash .q-bar{transform-box:view-box;transform-origin:12px 17.5px;
+  transform:scaleX(0);opacity:0;visibility:hidden}
+.nav-item.active .ni-dash .q-bar{visibility:visible}
 .nav-item.active .ni-dash .q-bar{transform:scaleX(1);opacity:1}
 /* مربع‌ها قرینه به دو طرف می‌روند و محو می‌شوند */
 .nav-item.active .ni-dash .q3{transform:translateX(-13px);opacity:0}
