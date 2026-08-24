@@ -160,7 +160,7 @@ function renderProjectCards(animate){
       '</div>'+
       '<div class="proj-card-detail"><div class="pcd-inner"><div class="pcd-body">'+
         '<div class="detail-stats"><span>کل اسناد الزامی: <b>'+faN(r.total)+' سند</b></span><span>ثبت‌شده: <b>'+faN(r.reg)+' سند</b></span>'+
-          '<span>تأییدشده: <b>'+faN(r.apr)+' سند</b></span><span>باقی‌مانده: <b>'+faN(r.miss)+' سند</b></span></div>'+
+          '<span>تأییدشده: <b>'+faN(r.apr)+' سند</b></span><span>بارگذاری نشده: <b>'+faN(r.miss)+' سند</b></span></div>'+
         '<div class="pcd-foot">'+msg+
           '<button class="btn sm proj-open-btn" onclick="openProject(\''+esc(r.c)+'\',\''+esc(r.o)+'\',\''+esc(r.pr)+'\')">مشاهدهٔ پروژه'+IC_OPEN+'</button>'+
         '</div>'+
