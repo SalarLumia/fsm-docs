@@ -191,17 +191,16 @@ main{max-width:none;margin:0;padding:0}
 .nav-item .ni *{transform-box:fill-box;transform-origin:50% 50%}
 @media(prefers-reduced-motion:reduce){.nav-item .ni *{transition:none}}
 
-/* داشبورد — مینیمال: دو کاشیِ پایین از هم فاصله می‌گیرند و به دو
-   نوارِ عمودیِ باریک جمع می‌شوند؛ دو کاشیِ بالا دست‌نخورده می‌مانند.
-   حرکت فقط در یک محور است و روی شکلِ باریک اعمال می‌شود، پس دفرمه‌شدنِ
-   گوشه‌ها دیده نمی‌شود. ضخامتِ خط هم جبران می‌شود تا ۱٫۸ بماند. */
-.ni-dash .q{transition:transform .3s cubic-bezier(.4,0,.2,1),stroke-width .3s ease,rx .3s ease}
-/* rx هم کوچک می‌شود: در عرضِ کم یک شعاعِ ۱٫۵ پهنای نوار را می‌بلعد
-   و لبه‌ها فشرده دیده می‌شوند. */
-.nav-item.active .ni-dash .q3,.nav-item.active .ni-dash .q4{rx:2.6}
-.nav-item.active .ni-dash .q3{transform:scaleX(.3) translateX(-6.8px);stroke-width:3.29}
-.nav-item.active .ni-dash .q4{transform:scaleX(.3) translateX(6.8px);stroke-width:3.29}
-.ni-dash .q4{transition-delay:.05s}
+/* داشبورد — دو کاشیِ پایین در حالتِ فعال به یک مستطیلِ تو‌پُرِ نارنجی
+   هم‌عرضِ هر دو تبدیل می‌شوند: q3 تا عرضِ کامل کشیده و پر می‌شود و
+   q4 محو. دو کاشیِ بالا دست‌نخورده می‌مانند.
+   ⚠ چون شکل تو‌پُر می‌شود، خطِ دورش صفر می‌شود تا کشیده‌شدنِ ضخامتِ خط
+   دیده نشود — همین مشکلِ دفرمه‌شدن را از ریشه حذف می‌کند. */
+.ni-dash .q{transition:transform .3s cubic-bezier(.4,0,.2,1),
+  fill .25s ease,stroke-width .25s ease,opacity .2s ease,rx .3s ease}
+.nav-item.active .ni-dash .q3{transform:scaleX(2.571) translateX(2.14px);
+  fill:currentColor;stroke-width:0;rx:.6}
+.nav-item.active .ni-dash .q4{opacity:0}
 
 /* پوشه: پنلِ جلویی در حالتِ عادی نامرئی است؛ در حالتِ فعال
    محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالاییِ خودِ پنل است. */
