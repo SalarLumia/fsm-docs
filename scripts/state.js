@@ -264,7 +264,17 @@ function projTypeCodes(){ return DB.docTypes.filter(function(t){return t.scope==
 /* انواع سطح‌پروژهٔ «روشن» = ذخیره‌شده (فیلترشده به سطح‌پروژه) ∪ دارای سند سطح‌پروژه */
 function projectProjTypes(p){
   var codes=projTypeCodes(), set={};
-  csv(p.enabledTypes||"").forEach(function(t){ var u=String(t).toUpperCase(); if(codes.indexOf(u)>=0) set[u]=1; });
+  /* ⚠ مثلِ projectPartSlots: منبعِ اصلی specs.projDocTypes است — همانی که
+     بندِ «مستندات پروژه» از روی آن رسم می‌شود. enabledTypes ذخیرهٔ قدیمی است
+     و فقط وقتی به کار می‌آید که ساختارِ تازه وجود نداشته باشد. */
+  var fromSpecs=(function(){
+    try{
+      var r=(typeof specsRoot==="function")?specsRoot(p):null;
+      return (r&&r.projDocTypes)?r.projDocTypes:null;
+    }catch(e){ return null; }
+  })();
+  if(fromSpecs){ fromSpecs.forEach(function(t){ var u=String(t).toUpperCase(); if(u) set[u]=1; }); }
+  else { csv(p.enabledTypes||"").forEach(function(t){ var u=String(t).toUpperCase(); if(codes.indexOf(u)>=0) set[u]=1; }); }
   projectDocs(p).forEach(function(d){ if(pad2(d.partNo)==="00"){ set[String(d.typeCode).toUpperCase()]=1; } });
   return Object.keys(set);
 }
@@ -286,7 +296,29 @@ function parseSlot(s){
 /* اسلات‌های سطح‌قطعهٔ «روشن» = ذخیره‌شده ∪ دارای سند. خروجی: آرایهٔ {part,type}. */
 function projectPartSlots(p){
   var map={};
-  csv(p.enabledSlots||"").forEach(function(s){ var m=parseSlot(s); if(m) map[m.part+"-"+m.type]=m; });
+  /* ⚠ منبعِ درست: ساختارِ per-part در specs.partDocsByPart — همانی که پنلِ
+     «قطعات پروژه» از روی آن رسم می‌شود. پیش‌تر فقط enabledSlots (ذخیرهٔ قدیمیِ
+     سطحِ پروژه) خوانده می‌شد؛ پس ماژول‌هایی که از پنلِ ویرایشِ قطعه
+     تعریف شده بودند در شمارش نمی‌آمدند و درصد اشتباه بالا می‌رفت. */
+  var perPart=(function(){
+    try{
+      var r=(typeof specsRoot==="function")?specsRoot(p):null;
+      return (r&&r.partDocsByPart)?r.partDocsByPart:null;
+    }catch(e){ return null; }
+  })();
+  if(perPart){
+    projectPartsList(p).forEach(function(pn){
+      var arr=perPart[pn];
+      if(arr && arr.length){ arr.forEach(function(T){
+        T=String(T).toUpperCase(); if(T) map[pn+"-"+T]={part:pn,type:T}; }); }
+      else { /* قطعه‌ای که هنوز پیکربندیِ per-part ندارد → fallbackِ سطحِ پروژه */
+        csv(p.enabledSlots||"").forEach(function(sl){ var m=parseSlot(sl);
+          if(m && m.part===pn) map[m.part+"-"+m.type]=m; }); }
+    });
+  } else {
+    csv(p.enabledSlots||"").forEach(function(sl){ var m=parseSlot(sl); if(m) map[m.part+"-"+m.type]=m; });
+  }
+  // هر سندِ موجود هم یک ماژولِ واقعی است، حتی اگر در پیکربندی نباشد
   projectDocs(p).forEach(function(d){ var pn=pad2(d.partNo); if(pn && pn!=="00"){ var t=String(d.typeCode).toUpperCase(); map[pn+"-"+t]={part:pn,type:t}; } });
   return Object.keys(map).map(function(k){ return map[k]; });
 }
