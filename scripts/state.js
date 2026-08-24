@@ -359,6 +359,16 @@ function projectStats(p){
   var pendingLabels=pendingMods.map(lbl);        // همهٔ آن‌هایی که هنوز تأیید نشده‌اند
   /* ماژول‌هایی که سند دارند ولی هنوز تأیید نشده‌اند (در بازبینی/پیش‌نویس/ردشده) */
   var inRev=pendingMods.length-missingMods.length;
+  /* تفکیک به تفکیکِ قطعه: به‌جای فهرستِ نامِ ماژول‌ها، فقط شمارش؛
+     برای هر قطعه: چند سند ثبت‌نشده و چند سند در انتظارِ بازبینی. */
+  var byPart={};
+  var bump=function(pn,key){ if(!byPart[pn]) byPart[pn]={part:pn,noDoc:0,inRev:0};
+    byPart[pn][key]++; };
+  missingMods.forEach(function(m){ bump(m.part,"noDoc"); });
+  pendingMods.forEach(function(m){ if(!hasDocFor(m)) return; bump(m.part,"inRev"); });
+  var partBreak=Object.keys(byPart).map(function(k){ var b=byPart[k];
+    b.name=(k==="00")?"مستندات پروژه":partNameFa(k); return b; })
+    .sort(function(a,b){ return (a.part==="00"?-1:b.part==="00"?1:numOf(a.part)-numOf(b.part)); });
   var st = (total>0 && apr>=total) ? {cls:"badge-approved",label:"کامل",bar:"var(--ok)"}
          : reg>0                   ? {cls:"badge-pending", label:"در حال تکمیل",bar:"var(--warn)"}
          :                           {cls:"badge-draft",   label:"شروع‌نشده",bar:"#d4d3ce"};
@@ -366,7 +376,7 @@ function projectStats(p){
           miss:pendingMods.length,            // باقی‌مانده = هنوز تأییدنشده (نه‌فقط بی‌سند)
           noDoc:missingMods.length,           // زیرمجموعه: اصلاً سندی ندارند
           inRev:inRev,                        // زیرمجموعه: سند دارند ولی تأیید نشده
-          missingLabels:missingLabels,pendingLabels:pendingLabels,
+          missingLabels:missingLabels,pendingLabels:pendingLabels,partBreak:partBreak,
           modules:modules,last:last,status:st,docCount:pdocs.length,
           name:p.description||"پروژهٔ بدون نام",client:clientName(p.clientCode),
           c:p.clientCode,o:pad2(p.orderNo),pr:pad2(p.projectNo),proj:p};

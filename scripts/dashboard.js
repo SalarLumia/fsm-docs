@@ -132,11 +132,15 @@ function renderProjectCards(animate){
   var openIdx = rows.findIndex(function(r){ return projKey(r)===_projOpenKey; });
   if(openIdx<0){ openIdx = rows.length?0:-1; if(rows.length) _projOpenKey=projKey(rows[0]); }
   host.innerHTML='<div class="proj-list">'+rows.map(function(r,i){
-    /* چیپ‌ها: هر ماژولی که هنوز تأیید نشده — چه بی‌سند و چه درِ بازبینی.
-       پیامِ سبز فقط وقتی می‌آید که واقعاً همه تأیید شده باشند، نه فقط بارگذاری. */
-    var msg=r.pendingLabels.length
-      ? '<div class="detail-msgs">'+
-          r.pendingLabels.map(function(lbl){return '<span class="status-chip warn">'+esc(lbl)+'</span>';}).join("")+'</div>'
+    /* به‌جای فهرستِ نامِ ماژول‌ها (که کارت را شلوغ و بلند می‌کرد)، برای هر
+       قطعه فقط دو عدد: چند سند ثبت‌نشده و چند سند در انتظارِ بازبینی. */
+    var brk=(r.partBreak||[]).filter(function(b){ return b.noDoc>0||b.inRev>0; });
+    var msg=brk.length
+      ? '<div class="detail-msgs">'+brk.map(function(b){
+          return '<span class="pb-chip"><span class="pb-name">'+esc(b.name)+'</span>'+
+            (b.noDoc>0?'<span class="pb-n pb-no">'+faN(b.noDoc)+' ثبت‌نشده</span>':'')+
+            (b.inRev>0?'<span class="pb-n pb-rev">'+faN(b.inRev)+' در انتظار بازبینی</span>':'')+
+          '</span>'; }).join("")+'</div>'
       : (r.total?'<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
                 :'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
     // حالتِ اولیهٔ انیمیشن: نوار خالی و عددِ درصد صفر؛ مقدارهای واقعی روی data-* برای مرحلهٔ پرشدن
@@ -150,9 +154,6 @@ function renderProjectCards(animate){
         '<div class="proj-card-row"><span class="proj-card-meta">'+esc(r.client)+'</span></div>'+
         '<div class="proj-prog">'+
           '<span class="pp-big pp-pct">'+pctText+'٪</span>'+
-          /* تعدادِ ماژول‌هایی که هنوز سندِ تأییدشده ندارند — در حالتِ
-             بستهٔ کارت هم دیده می‌شود، پس در یک نگاه معلوم است چقدر تا کامل مانده. */
-          (r.miss>0?'<span class="pp-miss" title="ماژول‌هایی که هنوز سندِ تأییدشده ندارند (بی‌سند یا در بازبینی)">'+faN(r.miss)+' سند باقی‌مانده</span>':'')+
           '<div class="proj-bar-bg"><div class="proj-bar-fill faint" style="width:'+regW+'%"></div>'+
             '<div class="proj-bar-fill solid" style="width:'+solW+'%;background:'+esc(r.status.bar)+'"></div></div>'+
         '</div>'+
