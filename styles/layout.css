@@ -191,16 +191,18 @@ main{max-width:none;margin:0;padding:0}
 .nav-item .ni *{transform-box:fill-box;transform-origin:50% 50%}
 @media(prefers-reduced-motion:reduce){.nav-item .ni *{transition:none}}
 
-/* داشبورد — دو کاشیِ پایین در حالتِ فعال به یک مستطیلِ تو‌پُرِ نارنجی
-   هم‌عرضِ هر دو تبدیل می‌شوند: q3 تا عرضِ کامل کشیده و پر می‌شود و
-   q4 محو. دو کاشیِ بالا دست‌نخورده می‌مانند.
-   ⚠ چون شکل تو‌پُر می‌شود، خطِ دورش صفر می‌شود تا کشیده‌شدنِ ضخامتِ خط
-   دیده نشود — همین مشکلِ دفرمه‌شدن را از ریشه حذف می‌کند. */
-.ni-dash .q{transition:transform .3s cubic-bezier(.4,0,.2,1),
-  fill .25s ease,stroke-width .25s ease,opacity .2s ease,rx .3s ease}
-.nav-item.active .ni-dash .q3{transform:scaleX(2.571) translateX(2.14px);
-  fill:currentColor;stroke-width:0;rx:.6}
-.nav-item.active .ni-dash .q4{opacity:0}
+/* داشبورد — حالتِ فعال: دو مربعِ توخالیِ سطرِ پایین قرینه به دو
+   طرف خارج می‌شوند و هم‌زمان یک مستطیلِ تو‌پُرِ نارنجی از وسط به دو
+   طرف باز می‌شود. دو کاشیِ بالا دست‌نخورده می‌مانند.
+   ⚠ مستطیل یک شکلِ جداست (نه حاصلِ کشیدنِ یکی از مربع‌ها)، وگرنه
+   نمی‌شد هم‌زمان هم از وسط باز شود و هم مربع‌ها مستقل خارج شوند. */
+.ni-dash .q,.ni-dash .q-bar{transition:transform .34s cubic-bezier(.4,0,.2,1),opacity .22s ease}
+/* مستطیل در حالتِ عادی جمع‌شده در مرکز و نامرئی است */
+.ni-dash .q-bar{transform-box:view-box;transform-origin:12px 17.5px;transform:scaleX(0);opacity:0}
+.nav-item.active .ni-dash .q-bar{transform:scaleX(1);opacity:1}
+/* مربع‌ها قرینه به دو طرف می‌روند و محو می‌شوند */
+.nav-item.active .ni-dash .q3{transform:translateX(-13px);opacity:0}
+.nav-item.active .ni-dash .q4{transform:translateX(13px);opacity:0}
 
 /* پوشه: پنلِ جلویی در حالتِ عادی نامرئی است؛ در حالتِ فعال
    محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالاییِ خودِ پنل است. */
