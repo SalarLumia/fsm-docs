@@ -191,23 +191,19 @@ main{max-width:none;margin:0;padding:0}
 .nav-item .ni *{transform-box:fill-box;transform-origin:50% 50%}
 @media(prefers-reduced-motion:reduce){.nav-item .ni *{transition:none}}
 
-/* داشبورد: چهار کاشیِ برابر به چیدمانِ واقعیِ داشبورد می‌روند:
-   دو کاشیِ بالا پهن و کوتاه می‌شوند (نوارِ سربرگ) و دو کاشیِ پایین بلندتر
-   (ویجت‌ها). مقدارها از مختصاتِ واقعیِ هدف حساب شده‌اند (مرکزِ هر کاشی ثابت).
-   ترتیبِ scale سپس translate مهم است: جابه‌جایی در فضایِ مقیاس‌شده اعمال می‌شود.
-   ⚠ شکافِ بینِ کاشی‌ها ۳ واحد است، نه کمتر: خطوط ۱٫۸px ضخامت دارند و
-   هرکدام نیمی از آن را بیرون می‌ریزند؛ با شکافِ کمتر، خطوط به هم می‌چسبند.
-   ⚠ scale ضخامتِ خط را هم می‌کشد، پس stroke-widthِ هر کاشی به همان نسبت
-   جبران می‌شود تا با بقیهٔ آیکون‌های منو یکسان دیده شود.
-   (non-scaling-stroke راهِ درستی نبود: ضخامت را بر‌حسبِ پیکسلِ صفحه قفل می‌کند،
-    در حالی که آیکون از viewBoxِ ۲۴ به ۱۷px کوچک می‌شود — ۱٫۴ برابر ضخیم‌تر می‌شد.) */
-.ni-dash .q{transition:transform .32s cubic-bezier(.34,1.3,.64,1),stroke-width .32s cubic-bezier(.34,1.3,.64,1)}
-.nav-item.active .ni-dash .q1{transform:scale(1.071,.714) translate(.23px,-1.4px);stroke-width:2.06}
-.nav-item.active .ni-dash .q2{transform:scale(1.071,.714) translate(-.23px,-1.4px);stroke-width:2.06}
-.nav-item.active .ni-dash .q3{transform:scale(1.071,1.429) translate(.23px,-1.05px);stroke-width:1.46}
-.nav-item.active .ni-dash .q4{transform:scale(1.071,1.429) translate(-.23px,-1.05px);stroke-width:1.46}
-/* کاشی‌های پایین کمی دیرتر جابه‌جا می‌شوند تا چیدمان پلکانی دیده شود */
-.ni-dash .q3,.ni-dash .q4{transition-delay:.05s}
+/* داشبورد: کاشی‌ها پلکانی و با مکثِ کوتاه زنده می‌شوند: کاشیِ اول
+   بزرگ‌تر می‌شود (کارتِ شاخص) و بقیه کمی جمع می‌شوند.
+   ⚠ مقیاس در هر دو محور یکسان است؛ مقیاسِ نامتناسب مربع‌ها را کشیده و
+   گوشه‌های گرد را بیضی می‌کرد — همان دفرمه‌شدن. ضخامتِ خط هم به همان
+   نسبت جبران می‌شود تا با بقیهٔ آیکون‌ها یکسان دیده شود. */
+.ni-dash .q{transition:transform .34s cubic-bezier(.34,1.3,.64,1),stroke-width .34s ease}
+.nav-item.active .ni-dash .q2{transform:scale(1.214) translate(-.62px,.62px);stroke-width:1.48}
+.nav-item.active .ni-dash .q1{transform:scale(.857) translate(.83px,.83px);stroke-width:2.1}
+.nav-item.active .ni-dash .q3{transform:scale(.857) translate(.83px,-.83px);stroke-width:2.1}
+.nav-item.active .ni-dash .q4{transform:scale(.857) translate(-.83px,-.83px);stroke-width:2.1}
+.ni-dash .q1{transition-delay:.04s}
+.ni-dash .q3{transition-delay:.08s}
+.ni-dash .q4{transition-delay:.12s}
 
 /* پوشه: پنلِ جلویی در حالتِ عادی نامرئی است؛ در حالتِ فعال
    محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالاییِ خودِ پنل است. */
@@ -233,3 +229,38 @@ main{max-width:none;margin:0;padding:0}
 .nav-item.active .ni-trash .tr-lid{transform:rotate(-18deg) translate(-.6px,-4.2px)}
 .nav-item.active .ni-trash .tr-b1{transform:translateY(.6px)}
 .nav-item.active .ni-trash .tr-b2{transform:translateY(.6px)}
+
+/* ===== آیکون‌های پایینِ منو ===== */
+
+/* تنظیمات: چرخدنده یک دور کامل می‌چرخد و می‌ایستد. چون چرخش «رویداد» است نه
+   «حالت»، با keyframes اجرا می‌شود؛ transition فقط بینِ دو حالتِ ثابت کار می‌کند.
+   محورِ چرخش مرکزِ خودِ چرخدنده است (view-box)، وگرنه حولِ کادرِ هر جزء می‌چرخید. */
+.ni-gear .gr-teeth,.ni-gear .gr-hub{transform-box:view-box;transform-origin:12px 12px}
+@keyframes gearSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.nav-item.active .ni-gear .gr-teeth{animation:gearSpin .72s cubic-bezier(.35,0,.15,1) both}
+
+/* راهنما: حلقه یک ضربان می‌گیرد و علامتِ سؤال کمی بالا/پایین می‌رود (اشارهٔ «بپرس») */
+.ni-help .hp-ring{transform-box:view-box;transform-origin:12px 12px}
+.ni-help .hp-mark{transform-box:view-box;transform-origin:12px 12px}
+@keyframes helpRing{0%{transform:scale(1)}45%{transform:scale(1.12)}100%{transform:scale(1)}}
+@keyframes helpMark{0%{transform:translateY(0)}30%{transform:translateY(-1.6px)}
+  60%{transform:translateY(.5px)}100%{transform:translateY(0)}}
+.nav-item.active .ni-help .hp-ring{animation:helpRing .6s cubic-bezier(.34,1.4,.64,1) both}
+.nav-item.active .ni-help .hp-mark{animation:helpMark .6s cubic-bezier(.34,1.4,.64,1) both}
+
+/* خروج: فلش از راست بیرون می‌رود و بلافاصله از چپ وارد می‌شود و سرِ جایش می‌ایستد.
+   opacity در لحظهٔ پرش صفر می‌شود تا «برگشتن» دیده نشود و حرکت یک‌طرفه بماند. */
+.ni-out .lo-arrow{transform-box:view-box;transform-origin:12px 12px}
+@keyframes outSlide{
+  0%{transform:translateX(0);opacity:1}
+  40%{transform:translateX(9px);opacity:0}
+  41%{transform:translateX(-9px);opacity:0}
+  100%{transform:translateX(0);opacity:1}
+}
+.nav-item.nav-logout:hover .ni-out .lo-arrow{animation:outSlide .62s cubic-bezier(.5,0,.2,1) both}
+@media(prefers-reduced-motion:reduce){
+  .nav-item.active .ni-gear .gr-teeth,
+  .nav-item.active .ni-help .hp-ring,
+  .nav-item.active .ni-help .hp-mark,
+  .nav-item.nav-logout:hover .ni-out .lo-arrow{animation:none}
+}
