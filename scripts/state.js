@@ -329,18 +329,19 @@ function latestDocOfType(pdocs, typeCode){
   list.sort(function(a,b){ return (b.timestamp||"").localeCompare(a.timestamp||""); });
   return list[0];
 }
-/* ===== رنگِ هر قطعه در نمودارها =====
-   از پالتِ موجودِ سایت گرفته شده‌اند. قطعهٔ ۰۰ (اسنادِ سطحِ پروژه) همیشه
-   رنگِ ثابتِ خودش را دارد؛ بقیه به ترتیبِ شمارهٔ قطعه از پالت می‌گیرند،
-   پس رنگِ هر قطعه در همهٔ نماها یکسان می‌ماند.
+/* ===== رنگِ قطعات در نمودارها =====
+   رنگ به جایگاهِ قطعه درونِ پروژه بستگی دارد، نه به شمارهٔ قطعه:
+   قطعهٔ اولِ هر پروژه همیشه رنگِ اول، قطعهٔ دوم همیشه رنگِ دوم —
+   فارغ از اینکه آن قطعه شفت باشد یا غلطک. اسنادِ سطحِ پروژه (۰۰) رنگِ
+   ثابتِ جداگانه دارد و هرگز در این چرخش قرار نمی‌گیرد.
    ⚠ زرد/کهربایی عمداً در این فهرست نیست: مخصوصِ «در انتظارِ بازبینی» است. */
-var PART_COLORS=["#16a34a","#2563eb","#0891b2","#7c3aed","#db2777","#65a30d","#0d9488","#c2410c"];
+var PART_COLORS=["#f7941f","#2563eb","#16a34a","#7c3aed","#db2777","#0891b2","#65a30d","#0d9488"];
 var PROJ_LEVEL_COLOR="#4a4a4a";   // ذغالیِ برند — اسنادِ سطحِ پروژه
-function partColor(partNo){
-  var pn=pad2(partNo);
-  if(pn==="00") return PROJ_LEVEL_COLOR;
-  var n=numOf(pn); if(!n||n<1) n=1;
-  return PART_COLORS[(n-1)%PART_COLORS.length];
+/* idx = جایگاهِ قطعه در فهرستِ قطعاتِ همین پروژه (از صفر) */
+function partColor(partNo, idx){
+  if(pad2(partNo)==="00") return PROJ_LEVEL_COLOR;
+  var i=(typeof idx==="number" && idx>=0)?idx:0;
+  return PART_COLORS[i%PART_COLORS.length];
 }
 /* تکمیل بر پایهٔ ماژول‌ها: مجموع ماژول‌های روشن (سطح‌پروژه + اسلات‌های قطعه)؛
    هر ماژولی که حداقل یک سند دارد = پوشش‌داده‌شده. */
@@ -389,12 +390,15 @@ function projectStats(p){
      و باقیِ نوار خالی می‌ماند = ماژول‌هایی که هیچ سندی ندارند. */
   var aprByPart={};
   aprMods.forEach(function(m){ aprByPart[m.part]=(aprByPart[m.part]||0)+1; });
+  /* جایگاهِ هر قطعه در همین پروژه → مبنای رنگ */
+  var orderList=projectPartsList(p);
+  var idxOf=function(pn){ var i=orderList.indexOf(pn); return i<0?0:i; };
   var segs=[];
   Object.keys(aprByPart).sort(function(a,b){
     return (a==="00"?-1:b==="00"?1:numOf(a)-numOf(b)); }).forEach(function(pn){
     segs.push({ part:pn, n:aprByPart[pn], kind:"apr",
       name:(pn==="00")?"مستندات پروژه":partNameFa(pn),
-      color:partColor(pn),
+      color:partColor(pn, idxOf(pn)),
       pct: total>0 ? (aprByPart[pn]/total*100) : 0 });
   });
   if(inRev>0) segs.push({ part:"", n:inRev, kind:"rev", name:"در انتظار بازبینی",
