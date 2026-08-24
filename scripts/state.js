@@ -311,16 +311,30 @@ function projectStats(p){
   // درصدِ «تکمیل» بر پایهٔ اسنادِ «تأییدشده» است (نه ثبت‌شده)، تا در همهٔ نماها (پنل مشتری، داشبورد،
   // صفحهٔ جزئیات) و با تگِ «کامل» یکدست باشد. reg/total همچنان شمارشِ «ثبت‌شده» را نگه می‌دارد.
   var isApp=function(d){ var s=String(d.status||"").toLowerCase(); return s==="approved"||s==="active"; };
-  var apr=modules.filter(function(m){ return pdocs.some(function(d){
-    return pad2(d.partNo)===m.part && String(d.typeCode).toUpperCase()===m.type && isApp(d); }); }).length;
+  var hasAprFor=function(m){ return pdocs.some(function(d){
+    return pad2(d.partNo)===m.part && String(d.typeCode).toUpperCase()===m.type && isApp(d); }); };
+  var aprMods=modules.filter(hasAprFor);
+  var apr=aprMods.length;
+  /* «باقی‌مانده» = هر ماژولی که هنوز سندِ تأییدشده ندارد — چه اصلاً سندی برایش
+     بارگذاری نشده باشد، چه سندش هنوز در مرحلهٔ بازبینی باشد. این همان عددی است
+     که در جریانِ کارِ واقعی معنی دارد: چقدر تا کاملِ واقعی مانده. */
+  var pendingMods=modules.filter(function(m){ return !hasAprFor(m); });
   var pct=total>0?Math.min(100,Math.round(apr/total*100)):0;   // درصدِ تکمیل = تأییدشده ÷ کل
   var regPct=total>0?Math.min(100,Math.round(reg/total*100)):0; // سطحِ «ثبت‌شده» (وجودِ سند، هر وضعیتی)
   var last=pdocs.reduce(function(m,d){return (d.timestamp||"")>m?(d.timestamp||""):m;},"");
-  var missingLabels=missingMods.map(function(m){ return typeName(m.type)+(m.part!=="00"?(" — "+partNameFa(m.part)):""); });
+  var lbl=function(m){ return typeName(m.type)+(m.part!=="00"?(" — "+partNameFa(m.part)):""); };
+  var missingLabels=missingMods.map(lbl);        // فقط آن‌هایی که هیچ سندی ندارند
+  var pendingLabels=pendingMods.map(lbl);        // همهٔ آن‌هایی که هنوز تأیید نشده‌اند
+  /* ماژول‌هایی که سند دارند ولی هنوز تأیید نشده‌اند (در بازبینی/پیش‌نویس/ردشده) */
+  var inRev=pendingMods.length-missingMods.length;
   var st = (total>0 && apr>=total) ? {cls:"badge-approved",label:"کامل",bar:"var(--ok)"}
          : reg>0                   ? {cls:"badge-pending", label:"در حال تکمیل",bar:"var(--warn)"}
          :                           {cls:"badge-draft",   label:"شروع‌نشده",bar:"#d4d3ce"};
-  return {pct:pct,regPct:regPct,reg:reg,total:total,apr:apr,miss:missingMods.length,missingLabels:missingLabels,
+  return {pct:pct,regPct:regPct,reg:reg,total:total,apr:apr,
+          miss:pendingMods.length,            // باقی‌مانده = هنوز تأییدنشده (نه‌فقط بی‌سند)
+          noDoc:missingMods.length,           // زیرمجموعه: اصلاً سندی ندارند
+          inRev:inRev,                        // زیرمجموعه: سند دارند ولی تأیید نشده
+          missingLabels:missingLabels,pendingLabels:pendingLabels,
           modules:modules,last:last,status:st,docCount:pdocs.length,
           name:p.description||"پروژهٔ بدون نام",client:clientName(p.clientCode),
           c:p.clientCode,o:pad2(p.orderNo),pr:pad2(p.projectNo),proj:p};
