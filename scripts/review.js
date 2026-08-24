@@ -72,8 +72,19 @@ function openReviewAllModal(){
   var inner = pend.length
     ? '<div class="rq-list">'+pend.map(function(d){ return reviewItemHTML(d,canAct,true); }).join("")+'</div>'
     : emptyState("موردی برای بازبینی نیست","همهٔ اسناد بررسی شده‌اند.");
-  showModal("کارتابل بازبینی", '<div class="seeall-body">'+inner+'</div>', "seeall-box");
+  showModal("کارتابل بازبینی", '<div class="seeall-body" id="reviewAllBody">'+inner+'</div>', "seeall-box");
   if(typeof revealCascade==="function") revealCascade(document.querySelector("#modalHost .rq-list"));   // ورودِ آبشاریِ ردیف‌ها، هم‌سبک با سایت
+}
+/* اگر پنجرهٔ کاملِ کارتابل باز است، فهرستش را با دادهٔ تازه دوباره بساز.
+   ⚠ بدونِ این، پس از تأیید/رد، فقط کارتابلِ داخلِ داشبورد (از راهِ renderDashboard)
+   تازه می‌شد و این پنجره رکوردِ رسیدگی‌شده را همچنان نشان می‌داد. */
+function reviewAllRefresh(){
+  var body=document.getElementById("reviewAllBody"); if(!body) return;
+  var pend=pendingDocs();
+  var canAct=(ME.role==="admin"||ME.role==="reviewer");
+  body.innerHTML = pend.length
+    ? '<div class="rq-list">'+pend.map(function(d){ return reviewItemHTML(d,canAct,true); }).join("")+'</div>'
+    : emptyState("موردی برای بازبینی نیست","همهٔ اسناد بررسی شده‌اند.");
 }
 
 /* ================= بارگذاریِ نسخهٔ جدید هنگامی که سند هنوز در حالِ بازبینی است =================

@@ -126,8 +126,10 @@ function dlRender(){
   var doneN =_dlJobs.filter(function(j){ return j.status==="done"; }).length;
   var title = activeN ? ("در حال انتقال ("+faN(activeN)+")") : "انتقال‌ها";
   host.className="dl-center"+(_dlOpen?" open":"");
+  /* تازه‌ترین رکورد بالاترین ردیف باشد. کارها با push اضافه می‌شوند، پس فقط
+     هنگامِ رسم معکوس می‌شود (نه خودِ آرایه، تا ترتیبِ داخلی دست‌نخورده بماند). */
   var listHTML = _dlJobs.length
-    ? '<div class="dl-list">'+_dlJobs.map(dlItemHTML).join("")+'</div>'
+    ? '<div class="dl-list">'+_dlJobs.slice().reverse().map(dlItemHTML).join("")+'</div>'
     : '<div class="dl-empty">'+DL_IC.center+'<span>انتقالی وجود ندارد</span></div>';
   host.innerHTML=
     '<div class="dl-head">'+

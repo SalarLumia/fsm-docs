@@ -646,4 +646,7 @@ async function refreshDocuments(){
   /* اگر مودالِ جزئیاتِ سند زیرِ پنجرهٔ بسته‌شده باز مانده، با دادهٔ تازه دوباره رسم
      شود — وگرنه پس از تأیید/رد/افزودنِ فرمت، وضعیتِ کهنه را نشان می‌دهد. */
   if(typeof dmRefreshOpen==="function") dmRefreshOpen();
+  /* همین منطق برای پنجرهٔ کاملِ کارتابلِ بازبینی: داشبورد از راهِ renderDashboard
+     تازه می‌شد ولی این پنجره دست‌نخورده می‌ماند و رکوردِ رسیدگی‌شده را نگه می‌داشت. */
+  if(typeof reviewAllRefresh==="function") reviewAllRefresh();
 }
