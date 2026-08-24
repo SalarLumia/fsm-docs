@@ -38,11 +38,14 @@
 /* نقطهٔ هر کارت با انیمیشنِ پالس (هم‌الگوی نقطهٔ فعالیتِ اخیرِ داشبورد)، رنگش بسته به کارت شخصی‌سازی می‌شود:
    پروژه‌های فعال=نارنجی، اسناد ثبت‌شده=خاکستری، اسناد تأییدشده=سبز، در انتظار بازبینی=زرد */
 .kpi-dot{position:relative;width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--muted)}
-.kpi-dot::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;
-  box-sizing:border-box;   /* وگرنه حاشیهٔ 2px به اندازه اضافه می‌شود و پالس از مرکزِ نقطه خارج می‌شود */
-  border:2px solid currentColor;opacity:.55;transform:translate(-50%,-50%) scale(.4);
+.kpi-dot::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:11px;border-radius:50%;
+  /* ⚠ box-sizing:border-box لازم است تا حاشیه به اندازه اضافه نشود؛
+     وگرنه translate(-50%) روی عرضِ واقعی حساب نمی‌شود و پالس از مرکز خارج می‌زند.
+     عرض هم 11px می‌ماند (نه 7) تا ضخامتِ دیده‌شدهٔ حلقه مثلِ قبل پررنگ باشد. */
+  box-sizing:border-box;
+  border:2px solid currentColor;opacity:.7;transform:translate(-50%,-50%) scale(.4);
   pointer-events:none;animation:kpiPing 1.7s cubic-bezier(0,0,.2,1) infinite}
-@keyframes kpiPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.55}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
+@keyframes kpiPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.7}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
 .kf-brand .kpi-dot{background:var(--brand);color:var(--brand)}
 .kf-gray  .kpi-dot{background:var(--charcoal);color:var(--charcoal)}
 .kf-ok    .kpi-dot{background:var(--ok);color:var(--ok)}
