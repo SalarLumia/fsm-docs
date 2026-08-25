@@ -29,6 +29,10 @@ function lgBusy(on){
   var b=document.getElementById("lgBtn"); if(!b) return;
   b.disabled=!!on;
   b.classList.toggle("loading", !!on);
+  /* فیلدها هم همراهِ دکمه غیرفعال می‌شوند؛ وگرنه کاربر در حینِ ورود
+     می‌تواند مقدارها را عوض کند در حالی که درخواست با مقدارِ قبلی رفته است. */
+  ["lgUser","lgPass","lgRemember"].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.disabled=!!on; });
   var l=b.querySelector(".lg-lbl");
   // نقطه‌ها با CSS متحرک می‌شوند (۱ تا ۴ و تکرار)، پس متن بدونِ نقطه نوشته می‌شود
   if(l) l.textContent = on ? "در حال ورود" : "ورود";
