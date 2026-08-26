@@ -93,7 +93,11 @@
      همهٔ عناصر نسبت به هم دست‌نخورده می‌ماند و سلسله‌مراتبِ بصری حفظ می‌شود. */
   --k:1;
   --f-title:calc(13.5px * var(--k));
-  --f-meta:calc(11.5px * var(--k));
+  /* متنِ ثانویه (نامِ مشتری) نیم‌پله می‌گیرد نه یک پلهٔ کامل.
+     این خودش اصلِ مقیاسِ تایپ‌گرافی است: عنصرِ فرعی نباید هم‌پای عنصرِ
+     اصلی رشد کند، وگرنه فاصلهٔ سلسله‌مراتبیِ تیتر و زیرنویس کم می‌شود. */
+  --k2:calc(1 + (var(--k) - 1) * 0.45);
+  --f-meta:calc(11.5px * var(--k2));
   --f-pct:calc(18px * var(--k));
   --bar-h:calc(7px * var(--k));
   --tick-w:calc(2px * var(--k));
@@ -231,7 +235,8 @@
 .pcd-body{padding:8px 15px 13px}   /* بدونِ خطِ جداکننده؛ فاصلهٔ بالا ۸px؛ کفِ کارت ۱۰px کوتاه‌تر (۲۳→۱۳) */
 @media(prefers-reduced-motion:reduce){.proj-card-detail{transition:none}.proj-bar-fill{transition:none}.proj-card-head{transition:none}.proj-chevron svg{transition:none}}
 /* هم‌کلاسِ متنیِ proj-card-meta (نامِ مشتری): ۱۱٫۵px، وزنِ ۵۰۰، رنگِ muted. */
-.detail-stats{display:flex;gap:16px;padding:0;font-size:11.5px;font-weight:500;color:var(--muted);flex-wrap:wrap}
+.detail-stats{display:flex;gap:16px;padding:0;font-size:11.5px;font-weight:500;color:var(--muted);flex-wrap:wrap;
+  margin-top:10px}   /* فاصلهٔ بیشتر از نوارِ پیشرفتِ بالایش */
 .detail-stats b{color:var(--txt);font-weight:700}
 /* پیام‌های وضعیت — سبز و قرمز هم‌شکل و هم‌اندازه (چیپ)؛ فاصلهٔ ۶px از ردیفِ بالا از .pcd-foot می‌آید */
 .detail-msgs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0}
