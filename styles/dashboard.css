@@ -93,6 +93,9 @@
      همهٔ عناصر نسبت به هم دست‌نخورده می‌ماند و سلسله‌مراتبِ بصری حفظ می‌شود. */
   --k:1;
   --f-title:calc(13.5px * var(--k));
+  /* در حالتِ باز، تیتر و خطِ نارنجی دقیقاً برابرِ سربرگِ صفحهٔ
+     پروژه (.pp-head h1) می‌شوند: 19px/700 و خطِ 3×20 با شعاعِ 2px. */
+  --lh-title:20px;
   /* متنِ ثانویه (نامِ مشتری) نیم‌پله می‌گیرد نه یک پلهٔ کامل.
      این خودش اصلِ مقیاسِ تایپ‌گرافی است: عنصرِ فرعی نباید هم‌پای عنصرِ
      اصلی رشد کند، وگرنه فاصلهٔ سلسله‌مراتبیِ تیتر و زیرنویس کم می‌شود. */
@@ -100,9 +103,12 @@
   --f-meta:calc(11.5px * var(--k2));
   --f-pct:calc(18px * var(--k));
   --bar-h:calc(7px * var(--k));
-  --tick-w:calc(2px * var(--k));
-  --tick-h:calc(17px * var(--k))}
-.proj-card.open{--k:1.25}
+  --tick-w:2px;
+  --tick-h:17px}
+.proj-card.open{--k:1.25;
+  --f-title:19px;      /* عیناً .pp-head h1 */
+  --lh-title:23px;     /* 19 × 1.2 — همان line-heightِ سربرگِ پروژه */
+  --tick-w:3px; --tick-h:20px; --tick-pad:13px}
 /* کارتِ باز باید روی کارت‌های بعدی بنشیند تا تولتیپش زیرِ آن‌ها نرود */
 .proj-card.open{position:relative;z-index:2}
 .proj-card:hover{border-color:#d8d6d0;box-shadow:0 3px 10px #0000000d}
@@ -121,8 +127,9 @@
   /* ⚠ ارتفاعِ خط به پیکسلِ ثابت قفل می‌شود (نه ضریب)، پس با بزرگ‌شدنِ
      فونت، کادرِ خط تغییر نمی‌کند و لبهٔ بالا ثابت می‌ماند.
      از flex استفاده نمی‌کنیم چون ellipsis را می‌شکند و مرکزِ خطِ نارنجی را هم. */
-  line-height:20px;
-  padding:0 10px 0 0;transition:color .12s,font-size .22s cubic-bezier(0,0,.2,1)}
+  line-height:var(--lh-title);
+  padding:0 var(--tick-pad,10px) 0 0;
+  transition:color .12s,font-size .22s cubic-bezier(0,0,.2,1),line-height .22s cubic-bezier(0,0,.2,1)}
 @media(prefers-reduced-motion:reduce){.proj-card-name{transition:color .12s}}
 .proj-card-name::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
   width:var(--tick-w);height:var(--tick-h);border-radius:2px;background:var(--brand);
