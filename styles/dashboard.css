@@ -118,6 +118,10 @@
    می‌کند؛ جایِ خالیِ انتها همان پس‌زمینهٔ خاکستری = ماژول‌هایِ بدونِ سند. */
 .proj-bar-bg{display:flex;align-items:stretch}
 .pbar-seg{display:block;height:100%;min-width:0;transition:width .6s cubic-bezier(0,0,.2,1)}
+/* سگمنتِ «در انتظار بازبینی» زردِ بسیار کم‌رنگ است و با پس‌زمینهٔ
+   خاکستریِ نوار (ماژول‌های بی‌سند) تقریباً یکی دیده می‌شود؛ یک خطِ داخلیِ
+   نازک مرزشان را معلوم می‌کند بدونِ عوض‌کردنِ خودِ رنگ. */
+.pbar-seg.rev{box-shadow:inset 0 0 0 1px #f5d98a}
 .pbar-seg:first-child{border-radius:4px 0 0 4px}
 .pbar-seg:last-child{border-radius:0 4px 4px 0}
 .pbar-seg:only-child{border-radius:4px}

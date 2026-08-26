@@ -405,7 +405,7 @@ function projectStats(p){
       pct: total>0 ? (aprByPart[pn]/total*100) : 0 });
   });
   if(inRev>0) segs.push({ part:"", n:inRev, kind:"rev", name:"در انتظار بازبینی",
-    color:"var(--warn)", pct: total>0 ? (inRev/total*100) : 0 });
+    color:"#fef3c7", pct: total>0 ? (inRev/total*100) : 0 });
   var st = (total>0 && apr>=total) ? {cls:"badge-approved",label:"کامل",bar:"var(--ok)"}
          : reg>0                   ? {cls:"badge-pending", label:"در حال تکمیل",bar:"var(--warn)"}
          :                           {cls:"badge-draft",   label:"شروع‌نشده",bar:"#d4d3ce"};
