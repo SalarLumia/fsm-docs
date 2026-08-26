@@ -151,13 +151,16 @@ function projLegendHTML(r){
    ⚠ سگمنت‌ها کنارِ هم (flex) می‌نشینند نه روی هم؛ با position:absolute باید
    آفستِ تجمعی حساب می‌شد که با انیمیشنِ عرض دردسرساز است. */
 function projBarHTML(r,doAnim){
-  var segs=(r.segs||[]).filter(function(g){ return g.kind!=="none"; });   // بخشِ خالی = پس‌زمینهٔ نوار، رسم نمی‌شود
+  /* بخشِ خالی (بارگذاری‌نشده) هم رسم می‌شود — با همان رنگِ پس‌زمینه،
+     پس دیده نمی‌شود ولی تولتیپِ خودش را دارد. */
+  var segs=(r.segs||[]);
   if(!segs.length) return '<div class="proj-bar-bg"></div>';
   return '<div class="proj-bar-bg">'+segs.map(function(g){
     var w=doAnim?0:g.pct;
     /* متنِ تولتیپ: نامِ تکه + تعداد + سهمِ درصدیِ همان تکه از کل */
     var tip=g.name+' — '+faN(g.n)+' سند ('+faN(Math.round(g.pct))+'٪)';
-    return '<span class="pbar-seg'+(g.kind==="rev"?" rev":"")+'" data-w="'+g.pct+'"'+
+    var kc=(g.kind==="rev")?" rev":((g.kind==="none")?" none":"");
+    return '<span class="pbar-seg'+kc+'" data-w="'+g.pct+'"'+
       ' style="width:'+w+'%;background:'+esc(g.color)+'"'+
       ' data-tip="'+esc(tip)+'"></span>';
   }).join("")+'</div>';
@@ -165,17 +168,18 @@ function projBarHTML(r,doAnim){
   host.innerHTML='<div class="proj-list">'+rows.map(function(r,i){
     /* به‌جای فهرستِ نامِ ماژول‌ها (که کارت را شلوغ و بلند می‌کرد)، برای هر
        قطعه فقط دو عدد: چند سند ثبت‌نشده و چند سند در انتظارِ بازبینی. */
-    /* ردیفِ دوم فقط «کمبود» را به تفکیکِ قطعه می‌گوید — همان چیزی که راهنمای
-       بالا جمعِ کلش را نشان می‌دهد. همان زبانِ بصری: سواختِ رنگ + برچسب + عدد. */
-    var brk=(r.partBreak||[]).filter(function(b){ return b.noDoc>0||b.inRev>0; });
+    /* ردیفِ دوم فقط یک چیزِ تازه می‌گوید: اینکه اسنادِ بارگذاری‌نشده
+       مالِ کدام قطعه‌اند. راهنمای بالا همان را یکجا می‌گوید، اینجا تفکیکِ آن.
+       ⚠ عنوانِ صریح لازم است: بدونِ آن، دو ردیف با برچسبِ یکسان ولی
+       عددِ متفاوت دیده می‌شوند و متناقض به نظر می‌رسند. */
+    var brk=(r.partBreak||[]).filter(function(b){ return b.noDoc>0; });
     var msg=brk.length
-      ? '<div class="pb-legend pb-gaps">'+brk.map(function(b){
+      ? '<div class="pb-gaps"><span class="pb-gaps-t">بارگذاری‌نشده در:</span>'+
+        '<span class="pb-legend">'+brk.map(function(b){
           return '<span class="pb-item">'+
             '<i class="pb-sw" style="background:'+esc(b.color||"#f0efeb")+'"></i>'+
             '<span class="pb-lb">'+esc(b.name)+'</span>'+
-            (b.noDoc>0?'<b class="pb-num">'+faN(b.noDoc)+'</b>':'')+
-            (b.inRev>0?'<b class="pb-num pb-num-rev" title="در انتظار بازبینی">'+faN(b.inRev)+'</b>':'')+
-          '</span>'; }).join("")+'</div>'
+            '<b class="pb-num">'+faN(b.noDoc)+'</b></span>'; }).join("")+'</span></div>'
       : (r.total?'<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
                 :'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
     // حالتِ اولیهٔ انیمیشن: نوار خالی و عددِ درصد صفر؛ مقدارهای واقعی روی data-* برای مرحلهٔ پرشدن
