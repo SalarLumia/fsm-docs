@@ -384,7 +384,9 @@ function projectStats(p){
   missingMods.forEach(function(m){ bump(m.part,"noDoc"); });
   pendingMods.forEach(function(m){ if(!hasDocFor(m)) return; bump(m.part,"inRev"); });
   var partBreak=Object.keys(byPart).map(function(k){ var b=byPart[k];
-    b.name=(k==="00")?"مستندات پروژه":partNameFa(k); return b; })
+    b.name=(k==="00")?"مستندات پروژه":partNameFa(k);
+    b.color=partColor(k, projectPartsList(p).indexOf(k));   // همان رنگِ قطعه در نوار
+    return b; })
     .sort(function(a,b){ return (a.part==="00"?-1:b.part==="00"?1:numOf(a.part)-numOf(b.part)); });
 
   /* ===== سگمنت‌های نوارِ پیشرفت =====
@@ -406,6 +408,11 @@ function projectStats(p){
   });
   if(inRev>0) segs.push({ part:"", n:inRev, kind:"rev", name:"در انتظار بازبینی",
     color:"#fef3c7", pct: total>0 ? (inRev/total*100) : 0 });
+  /* بخشِ خالیِ نوار هم یک سگمنتِ معنادار است؛ در راهنما می‌آید ولی
+     خودش رسم نمی‌شود (همان پس‌زمینهٔ نوار است). */
+  if(missingMods.length>0) segs.push({ part:"", n:missingMods.length, kind:"none",
+    name:"بارگذاری نشده", color:"#f0efeb",
+    pct: total>0 ? (missingMods.length/total*100) : 0 });
   var st = (total>0 && apr>=total) ? {cls:"badge-approved",label:"کامل",bar:"var(--ok)"}
          : reg>0                   ? {cls:"badge-pending", label:"در حال تکمیل",bar:"var(--warn)"}
          :                           {cls:"badge-draft",   label:"شروع‌نشده",bar:"#d4d3ce"};

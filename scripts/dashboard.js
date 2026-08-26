@@ -131,30 +131,50 @@ function renderProjectCards(animate){
   // اگر کلیدِ بازِ فعلی دیگر در فهرست نیست (یا هنوز چیزی انتخاب نشده)، پیش‌فرض روی اولین ردیف بیفتد
   var openIdx = rows.findIndex(function(r){ return projKey(r)===_projOpenKey; });
   if(openIdx<0){ openIdx = rows.length?0:-1; if(rows.length) _projOpenKey=projKey(rows[0]); }
+/* راهنمای نوار: دقیقاً همان سگمنت‌ها، به همان ترتیب و با همان رنگ.
+   هر سطرِ راهنما یک تکه از نوار را توضیح می‌دهد، پس عددها و نوار به
+   هم وصل‌اند و دیگر شمارشگرِ معلق نداریم. «ثبت‌شده» حذف شد چون
+   جمعِ بقیه است و اطلاعِ تازه‌ای نمی‌داد. */
+function projLegendHTML(r){
+  var segs=r.segs||[];
+  if(!segs.length) return '';
+  return '<div class="pb-legend">'+segs.map(function(g){
+    return '<span class="pb-item">'+
+      '<i class="pb-sw" style="background:'+esc(g.color)+'"></i>'+
+      '<span class="pb-lb">'+esc(g.name)+'</span>'+
+      '<b class="pb-num">'+faN(g.n)+'</b></span>';
+  }).join("")+'</div>';
+}
 /* نوارِ پیشرفتِ سگمنتی: هر قطعه با رنگِ خودش سهمِ اسنادِ تأییدشده‌اش را پر
    می‌کند، سپس یک سگمنتِ کهربایی برای کلِ اسنادِ در انتظارِ بازبینی؛
    باقیِ نوار (پس‌زمینهٔ خاکستری) = ماژول‌هایِ بدونِ سند.
    ⚠ سگمنت‌ها کنارِ هم (flex) می‌نشینند نه روی هم؛ با position:absolute باید
    آفستِ تجمعی حساب می‌شد که با انیمیشنِ عرض دردسرساز است. */
 function projBarHTML(r,doAnim){
-  var segs=r.segs||[];
+  var segs=(r.segs||[]).filter(function(g){ return g.kind!=="none"; });   // بخشِ خالی = پس‌زمینهٔ نوار، رسم نمی‌شود
   if(!segs.length) return '<div class="proj-bar-bg"></div>';
   return '<div class="proj-bar-bg">'+segs.map(function(g){
     var w=doAnim?0:g.pct;
+    /* متنِ تولتیپ: نامِ تکه + تعداد + سهمِ درصدیِ همان تکه از کل */
+    var tip=g.name+' — '+faN(g.n)+' سند ('+faN(Math.round(g.pct))+'٪)';
     return '<span class="pbar-seg'+(g.kind==="rev"?" rev":"")+'" data-w="'+g.pct+'"'+
       ' style="width:'+w+'%;background:'+esc(g.color)+'"'+
-      ' title="'+esc(g.name)+': '+faN(g.n)+' سند"></span>';
+      ' data-tip="'+esc(tip)+'"></span>';
   }).join("")+'</div>';
 }
   host.innerHTML='<div class="proj-list">'+rows.map(function(r,i){
     /* به‌جای فهرستِ نامِ ماژول‌ها (که کارت را شلوغ و بلند می‌کرد)، برای هر
        قطعه فقط دو عدد: چند سند ثبت‌نشده و چند سند در انتظارِ بازبینی. */
+    /* ردیفِ دوم فقط «کمبود» را به تفکیکِ قطعه می‌گوید — همان چیزی که راهنمای
+       بالا جمعِ کلش را نشان می‌دهد. همان زبانِ بصری: سواختِ رنگ + برچسب + عدد. */
     var brk=(r.partBreak||[]).filter(function(b){ return b.noDoc>0||b.inRev>0; });
     var msg=brk.length
-      ? '<div class="detail-msgs">'+brk.map(function(b){
-          return '<span class="pb-chip"><span class="pb-name">'+esc(b.name)+'</span>'+
-            (b.noDoc>0?'<span class="pb-n pb-no">'+faN(b.noDoc)+' ثبت‌نشده</span>':'')+
-            (b.inRev>0?'<span class="pb-n pb-rev">'+faN(b.inRev)+' در انتظار بازبینی</span>':'')+
+      ? '<div class="pb-legend pb-gaps">'+brk.map(function(b){
+          return '<span class="pb-item">'+
+            '<i class="pb-sw" style="background:'+esc(b.color||"#f0efeb")+'"></i>'+
+            '<span class="pb-lb">'+esc(b.name)+'</span>'+
+            (b.noDoc>0?'<b class="pb-num">'+faN(b.noDoc)+'</b>':'')+
+            (b.inRev>0?'<b class="pb-num pb-num-rev" title="در انتظار بازبینی">'+faN(b.inRev)+'</b>':'')+
           '</span>'; }).join("")+'</div>'
       : (r.total?'<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
                 :'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
@@ -173,9 +193,7 @@ function projBarHTML(r,doAnim){
         '</div>'+
       '</div>'+
       '<div class="proj-card-detail"><div class="pcd-inner"><div class="pcd-body">'+
-        '<div class="detail-stats"><span>ثبت‌شده: <b>'+faN(r.reg)+' سند</b></span>'+
-          '<span>تأییدشده: <b>'+faN(r.apr)+' سند</b></span>'+
-          '<span>در انتظار بازبینی: <b>'+faN(r.inRev)+' سند</b></span></div>'+
+        projLegendHTML(r)+
         '<div class="pcd-foot">'+msg+
           '<button class="btn sm proj-open-btn" onclick="openProject(\''+esc(r.c)+'\',\''+esc(r.o)+'\',\''+esc(r.pr)+'\')">مشاهدهٔ پروژه'+IC_OPEN+'</button>'+
         '</div>'+

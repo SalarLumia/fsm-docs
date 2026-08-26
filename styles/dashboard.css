@@ -116,12 +116,37 @@
 .proj-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:4px;transition:width .6s cubic-bezier(0,0,.2,1)}
 /* نوارِ سگمنتی: سگمنت‌ها کنارِ هم می‌نشینند و هرکدام سهمِ خودش را پر
    می‌کند؛ جایِ خالیِ انتها همان پس‌زمینهٔ خاکستری = ماژول‌هایِ بدونِ سند. */
-.proj-bar-bg{display:flex;align-items:stretch}
+.proj-prog .proj-bar-bg{display:flex;align-items:stretch}
 .pbar-seg{display:block;height:100%;min-width:0;transition:width .6s cubic-bezier(0,0,.2,1)}
 /* سگمنتِ «در انتظار بازبینی» زردِ بسیار کم‌رنگ است و با پس‌زمینهٔ
    خاکستریِ نوار (ماژول‌های بی‌سند) تقریباً یکی دیده می‌شود؛ یک خطِ داخلیِ
    نازک مرزشان را معلوم می‌کند بدونِ عوض‌کردنِ خودِ رنگ. */
 .pbar-seg.rev{box-shadow:inset 0 0 0 1px #f5d98a}
+/* ===== تولتیپِ نوار (سبکِ داشبوردهای تحلیلی) =====
+   متنِ هر تکه روی خودِ سگمنت ذخیره می‌شود (data-tip) و با ::after نشان
+   داده می‌شود؛ بدونِ جاوااسکریپت و بدونِ عنصرِ اضافه در DOM.
+   ⚠ نوار پیش‌تر overflow:hidden داشت تا سگمنت‌ها از گوشهٔ گرد بیرون نزنند؛
+   ولی همان overflow تولتیپ را هم می‌برید. راه‌حل: overflow برداشته می‌شود و
+   گردیِ دو سرِ نوار روی خودِ سگمنت‌های اول و آخر اعمال می‌شود. */
+.proj-prog .proj-bar-bg{overflow:visible}
+.pbar-seg{position:relative}
+.pbar-seg:first-child{border-radius:4px 0 0 4px}
+.pbar-seg:last-child{border-radius:0 4px 4px 0}
+.pbar-seg:only-child{border-radius:4px}
+.pbar-seg:hover{filter:brightness(.94)}
+.pbar-seg::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);
+  left:50%;transform:translateX(-50%) translateY(3px);
+  background:var(--charcoal);color:#fff;font-size:11px;font-weight:600;line-height:1.7;
+  padding:5px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;
+  opacity:0;visibility:hidden;transition:opacity .15s,transform .15s,visibility .15s;
+  box-shadow:0 6px 18px #00000026;z-index:5;direction:rtl}
+.pbar-seg::before{content:"";position:absolute;bottom:calc(100% + 4px);left:50%;
+  transform:translateX(-50%) translateY(3px);border:5px solid transparent;
+  border-top-color:var(--charcoal);pointer-events:none;
+  opacity:0;visibility:hidden;transition:opacity .15s,transform .15s,visibility .15s;z-index:5}
+.pbar-seg:hover::after,.pbar-seg:hover::before{opacity:1;visibility:visible;
+  transform:translateX(-50%) translateY(0)}
+@media(prefers-reduced-motion:reduce){.pbar-seg::after,.pbar-seg::before{transition:none}}
 .pbar-seg:first-child{border-radius:4px 0 0 4px}
 .pbar-seg:last-child{border-radius:0 4px 4px 0}
 .pbar-seg:only-child{border-radius:4px}
@@ -151,15 +176,21 @@
 .status-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
   padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#f7f7f5;color:var(--muted)}
 .status-chip.warn{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
-/* تفکیکِ قطعه‌محور: نامِ قطعه + دو عدد؛ فهرستِ نامِ ماژول‌ها نیست،
-   پس هرچقدر هم ماژول ناقص باشد ارتفاعِ کارت ثابت می‌ماند. */
-.pb-chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
-  padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#f7f7f5}
-.pb-name{color:var(--txt);font-weight:700}
-.pb-n{display:inline-flex;align-items:center;gap:4px;font-weight:600;white-space:nowrap}
-.pb-n::before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0}
-.pb-no{color:var(--muted)}
-.pb-rev{color:var(--warn)}
+/* ===== زبانِ مشترکِ راهنما =====
+   هر دو ردیف (راهنمای نوار و تفکیکِ کمبود) یک الگو دارند:
+   سواختِ رنگ + برچسب + عدد. رنگِ سواخت همانِ سگمنتِ نوار است،
+   پس چشم بی‌واسطه عدد را به تکهٔ نوار وصل می‌کند. */
+.pb-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.pb-item{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
+  padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#f7f7f5;
+  color:var(--muted);white-space:nowrap}
+.pb-sw{width:8px;height:8px;border-radius:50%;flex-shrink:0;
+  box-shadow:inset 0 0 0 1px #00000014}   /* حلقهٔ محو تا رنگ‌های روشن روی زمینهٔ روشن گم نشوند */
+.pb-lb{color:var(--txt);font-weight:600}
+.pb-num{color:var(--txt);font-weight:800;font-variant-numeric:tabular-nums}
+.pb-num-rev{color:var(--warn)}
+/* ردیفِ کمبود: همان الگو، فقط کمی کم‌جلوه‌تر تا ردیفِ اول متنِ اصلی بماند */
+.pb-gaps .pb-item{background:#fff}
 /* پیامِ خنثی/تکمیل — مثلِ یادداشتِ خاکستریِ «۳ قطعه انتخاب شده» (بدونِ کادرِ رنگی) */
 .msg-note{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:var(--muted)}
 .msg-note svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
