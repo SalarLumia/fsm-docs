@@ -83,7 +83,12 @@
 .proj-more{display:block;width:100%;margin-top:10px;padding:9px 12px;background:none;border:1px dashed var(--line);
   border-radius:10px;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:.12s}
 .proj-more:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
-.proj-card{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden;transition:.15s;box-shadow:0 1px 3px #00000006}
+/* ⚠ overflow:hidden برای آن بود که محتوای بازشونده از گوشهٔ گرد بیرون نزند؛
+   ولی همان تولتیپِ نوار را هم می‌برید. حالا بریدن روی .pcd-inner انجام
+   می‌شود (همان جایی که واقعاً لازم است) و خودِ کارت آزاد می‌ماند. */
+.proj-card{border:1px solid var(--line);border-radius:12px;background:#fff;transition:.15s;box-shadow:0 1px 3px #00000006}
+/* کارتِ باز باید روی کارت‌های بعدی بنشیند تا تولتیپش زیرِ آن‌ها نرود */
+.proj-card.open{position:relative;z-index:2}
 .proj-card:hover{border-color:#d8d6d0;box-shadow:0 3px 10px #0000000d}
 .proj-card-head{padding:13px 15px 13px;display:flex;flex-direction:column;gap:8px;
   transition:padding-bottom .28s cubic-bezier(0,0,.2,1)}   /* هم‌زمان با انیمیشنِ باز/بستنِ proj-card-detail */
@@ -148,18 +153,18 @@
    دارد. در حالتِ عادی پنهان است و فقط با هاورِ کارتِ باز دیده می‌شود. */
 .sgt{position:absolute;bottom:calc(100% + 10px);left:50%;
   transform:translateX(-50%) translateY(4px);
-  min-width:186px;background:#fff;border:1px solid var(--line);border-radius:10px;
-  padding:9px 11px;box-shadow:0 10px 30px #00000024;z-index:6;
+  min-width:158px;background:#fff;border:1px solid var(--line);border-radius:9px;
+  padding:7px 9px;box-shadow:0 10px 30px #00000024;z-index:6;
   direction:rtl;text-align:right;pointer-events:none;
   opacity:0;visibility:hidden;transition:opacity .16s,transform .16s,visibility .16s}
 .proj-card.open .pbar-seg:hover .sgt{opacity:1;visibility:visible;
   transform:translateX(-50%) translateY(0)}
-.sgt-h{display:flex;align-items:center;gap:7px;padding-bottom:7px;margin-bottom:6px;
+.sgt-h{display:flex;align-items:center;gap:6px;padding-bottom:5px;margin-bottom:4px;
   border-bottom:1px solid var(--line)}
-.sgt-sw{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px #00000014}
-.sgt-t{font-size:12px;font-weight:800;color:var(--txt);white-space:nowrap}
-.sgt-r{display:flex;align-items:center;justify-content:space-between;gap:14px;
-  font-size:11px;font-weight:500;color:var(--muted);line-height:2}
+.sgt-sw{width:8px;height:8px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px #00000014}
+.sgt-t{font-size:11px;font-weight:800;color:var(--txt);white-space:nowrap}
+.sgt-r{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  font-size:10.5px;font-weight:500;color:var(--muted);line-height:1.75}
 .sgt-r b{color:var(--txt);font-weight:800;font-variant-numeric:tabular-nums}
 /* جلوگیری از بریده‌شدن در لبهٔ کارت: تولتیپِ تکهٔ اول/آخر به‌جای
    وسط‌چینی، از همان لبه تراز می‌شود تا درونِ کادر بماند. */
@@ -167,6 +172,14 @@
 .proj-card.open .pbar-seg:first-child:hover .sgt{transform:translateX(0) translateY(0)}
 .pbar-seg:last-child .sgt{left:auto;right:0;transform:translateX(0) translateY(4px)}
 .proj-card.open .pbar-seg:last-child:hover .sgt{transform:translateX(0) translateY(0)}
+/* کارتِ اولِ فهرست بالایِ خود جایی ندارد (سربرگِ پنل آنجاست)؛
+   تولتیپِ آن به‌جای بالا، زیرِ نوار باز می‌شود. */
+.proj-card.tip-down .sgt{bottom:auto;top:calc(100% + 10px);transform:translateX(-50%) translateY(-4px)}
+.proj-card.tip-down.open .pbar-seg:hover .sgt{transform:translateX(-50%) translateY(0)}
+.proj-card.tip-down .pbar-seg:first-child .sgt{transform:translateX(0) translateY(-4px)}
+.proj-card.tip-down.open .pbar-seg:first-child:hover .sgt{transform:translateX(0) translateY(0)}
+.proj-card.tip-down .pbar-seg:last-child .sgt{transform:translateX(0) translateY(-4px)}
+.proj-card.tip-down.open .pbar-seg:last-child:hover .sgt{transform:translateX(0) translateY(0)}
 @media(prefers-reduced-motion:reduce){
   .sgt{transition:none}.proj-prog .proj-bar-bg{transition:none}}
 @media(prefers-reduced-motion:reduce){

@@ -180,13 +180,17 @@ function projBarHTML(r,doAnim){
     /* تفکیکِ قطعه‌محور حذف شد: تعدادِ تگ‌ها با تعدادِ قطعات بالا می‌رفت
        و در پروژهٔ چندقطعه‌ای جایی در کارت نمی‌ماند. تفکیک فقط در تولتیپِ
        نوار و در صفحهٔ خودِ پروژه در دسترس است. */
+    /* ⚠ ظرفِ پیام همیشه رسم می‌شود (حتی خالی)؛ .pcd-foot از
+       space-between استفاده می‌کند و بدونِ همسایه، دکمهٔ مشاهده جابه‌جا می‌شود. */
     var msg=(r.total && r.miss===0)
       ? '<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
-      : (r.total?'':'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
+      : (r.total?'<div class="detail-msgs"></div>'
+                :'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
     // حالتِ اولیهٔ انیمیشن: نوار خالی و عددِ درصد صفر؛ مقدارهای واقعی روی data-* برای مرحلهٔ پرشدن
     var pctText=doAnim?"0":r.pct;
     var openCls=(i===openIdx)?" open":"";
-    return '<div class="proj-card'+openCls+'" data-pct="'+r.pct+'" data-regpct="'+r.regPct+'" data-bar="'+esc(r.status.bar)+'" data-i="'+i+'" data-key="'+esc(projKey(r))+'">'+
+    var tipDown=(i===0)?" tip-down":"";   // کارتِ اول بالایِ خود جایی ندارد؛ تولتیپ به پایین باز می‌شود
+    return '<div class="proj-card'+openCls+tipDown+'" data-pct="'+r.pct+'" data-regpct="'+r.regPct+'" data-bar="'+esc(r.status.bar)+'" data-i="'+i+'" data-key="'+esc(projKey(r))+'">'+
       '<div class="proj-card-head">'+
         '<div class="proj-card-row">'+
           '<button type="button" class="proj-card-name" onclick="openProject(\''+esc(r.c)+'\',\''+esc(r.o)+'\',\''+esc(r.pr)+'\')" title="مشاهدهٔ پروژه">پروژه تولید '+esc(r.name)+'</button>'+
