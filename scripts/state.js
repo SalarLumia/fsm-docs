@@ -398,12 +398,20 @@ function projectStats(p){
   /* جایگاهِ هر قطعه در همین پروژه → مبنای رنگ */
   var orderList=projectPartsList(p);
   var idxOf=function(pn){ var i=orderList.indexOf(pn); return i<0?0:i; };
+  /* آمارِ کاملِ هر قطعه — برای تولتیپِ نوار (الزامی/ثبت‌شده/تأییدشده/در بازبینی) */
+  var statOf=function(pn){
+    var mods=modules.filter(function(m){ return m.part===pn; });
+    var reg=mods.filter(hasDocFor).length;
+    var ap=mods.filter(hasAprFor).length;
+    return { total:mods.length, reg:reg, apr:ap, inRev:reg-ap, noDoc:mods.length-reg };
+  };
   var segs=[];
   Object.keys(aprByPart).sort(function(a,b){
     return (a==="00"?-1:b==="00"?1:numOf(a)-numOf(b)); }).forEach(function(pn){
     segs.push({ part:pn, n:aprByPart[pn], kind:"apr",
       name:(pn==="00")?"مستندات پروژه":partNameFa(pn),
       color:partColor(pn, idxOf(pn)),
+      stat:statOf(pn),
       pct: total>0 ? (aprByPart[pn]/total*100) : 0 });
   });
   if(inRev>0) segs.push({ part:"", n:inRev, kind:"rev", name:"در انتظار بازبینی",

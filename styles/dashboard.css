@@ -125,39 +125,50 @@
 /* سگمنتِ «بارگذاری‌نشده» هم‌رنگِ پس‌زمینه است (دیده نمی‌شود)
    ولی وجود دارد تا هاور و تولتیپ داشته باشد. */
 .pbar-seg.none{background:transparent!important}
-/* ===== تولتیپِ نوار (سبکِ داشبوردهای تحلیلی) =====
-   متنِ هر تکه روی خودِ سگمنت ذخیره می‌شود (data-tip) و با ::after نشان
-   داده می‌شود؛ بدونِ جاوااسکریپت و بدونِ عنصرِ اضافه در DOM.
-   ⚠ نوار پیش‌تر overflow:hidden داشت تا سگمنت‌ها از گوشهٔ گرد بیرون نزنند؛
-   ولی همان overflow تولتیپ را هم می‌برید. راه‌حل: overflow برداشته می‌شود و
-   گردیِ دو سرِ نوار روی خودِ سگمنت‌های اول و آخر اعمال می‌شود. */
-.proj-prog .proj-bar-bg{overflow:visible}
+/* ===== نوار در کارتِ باز =====
+   کارتِ باز یعنی کاربر دارد همین پروژه را می‌خواند؛ پس نوار ضخیم‌تر
+   می‌شود و تکه‌هایش قابلِ هدف‌گیری می‌شوند. */
+.proj-prog .proj-bar-bg{overflow:visible;transition:height .22s cubic-bezier(0,0,.2,1)}
+.proj-card.open .proj-prog .proj-bar-bg{height:13px;border-radius:7px}
 .pbar-seg{position:relative}
 .pbar-seg:first-child{border-radius:4px 0 0 4px}
 .pbar-seg:last-child{border-radius:0 4px 4px 0}
 .pbar-seg:only-child{border-radius:4px}
-/* تولتیپ فقط در کارتِ باز کار می‌کند: در کارتِ بسته راهنمایی دیده
-   نمی‌شود که تولتیپ میانبرش باشد، و روی کارتِ بالایی می‌افتد. */
-.proj-card.open .pbar-seg:hover{filter:brightness(.94)}
-.proj-card.open .pbar-seg::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 9px);
-  left:50%;transform:translateX(-50%) translateY(3px);
-  background:var(--charcoal);color:#fff;font-size:11px;font-weight:600;line-height:1.7;
-  padding:5px 10px;border-radius:8px;white-space:nowrap;pointer-events:none;
-  opacity:0;visibility:hidden;transition:opacity .15s,transform .15s,visibility .15s;
-  box-shadow:0 6px 18px #00000026;z-index:5;direction:rtl}
-.proj-card.open .pbar-seg::before{content:"";position:absolute;bottom:calc(100% + 4px);left:50%;
-  transform:translateX(-50%) translateY(3px);border:5px solid transparent;
-  border-top-color:var(--charcoal);pointer-events:none;
-  opacity:0;visibility:hidden;transition:opacity .15s,transform .15s,visibility .15s;z-index:5}
-.proj-card.open .pbar-seg:hover::after,
-.proj-card.open .pbar-seg:hover::before{opacity:1;visibility:visible;
+.proj-card.open .pbar-seg:first-child{border-radius:7px 0 0 7px}
+.proj-card.open .pbar-seg:last-child{border-radius:0 7px 7px 0}
+.proj-card.open .pbar-seg:only-child{border-radius:7px}
+/* فقط در کارتِ باز تعاملی است: نشانگرِ دست + روشن‌شدنِ تکهٔ زیرِ موس */
+.proj-card.open .pbar-seg{cursor:pointer}
+.proj-card.open .pbar-seg:hover{filter:brightness(.93)}
+/* تکهٔ شفاف با brightness واکنشی نشان نمی‌دهد؛ برایش پس‌زمینهٔ محو می‌گذاریم */
+.proj-card.open .pbar-seg.none:hover{background:#e4e2dd!important}
+
+/* ===== تولتیپِ تفصیلیِ هر تکه =====
+   یک جعبهٔ سفیدِ واقعی داخلِ سگمنت (نه ::after)، چون چند سطر آمار
+   دارد. در حالتِ عادی پنهان است و فقط با هاورِ کارتِ باز دیده می‌شود. */
+.sgt{position:absolute;bottom:calc(100% + 10px);left:50%;
+  transform:translateX(-50%) translateY(4px);
+  min-width:186px;background:#fff;border:1px solid var(--line);border-radius:10px;
+  padding:9px 11px;box-shadow:0 10px 30px #00000024;z-index:6;
+  direction:rtl;text-align:right;pointer-events:none;
+  opacity:0;visibility:hidden;transition:opacity .16s,transform .16s,visibility .16s}
+.proj-card.open .pbar-seg:hover .sgt{opacity:1;visibility:visible;
   transform:translateX(-50%) translateY(0)}
-/* جلوگیری از بریده‌شدن در لبهٔ کارت: تولتیپِ سگمنتِ اول/آخر به‌جای
+.sgt-h{display:flex;align-items:center;gap:7px;padding-bottom:7px;margin-bottom:6px;
+  border-bottom:1px solid var(--line)}
+.sgt-sw{width:9px;height:9px;border-radius:50%;flex-shrink:0;box-shadow:inset 0 0 0 1px #00000014}
+.sgt-t{font-size:12px;font-weight:800;color:var(--txt);white-space:nowrap}
+.sgt-r{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  font-size:11px;font-weight:500;color:var(--muted);line-height:2}
+.sgt-r b{color:var(--txt);font-weight:800;font-variant-numeric:tabular-nums}
+/* جلوگیری از بریده‌شدن در لبهٔ کارت: تولتیپِ تکهٔ اول/آخر به‌جای
    وسط‌چینی، از همان لبه تراز می‌شود تا درونِ کادر بماند. */
-.proj-card.open .pbar-seg:first-child::after{left:0;transform:translateX(0) translateY(3px)}
-.proj-card.open .pbar-seg:first-child:hover::after{transform:translateX(0) translateY(0)}
-.proj-card.open .pbar-seg:last-child::after{left:auto;right:0;transform:translateX(0) translateY(3px)}
-.proj-card.open .pbar-seg:last-child:hover::after{transform:translateX(0) translateY(0)}
+.pbar-seg:first-child .sgt{left:0;transform:translateX(0) translateY(4px)}
+.proj-card.open .pbar-seg:first-child:hover .sgt{transform:translateX(0) translateY(0)}
+.pbar-seg:last-child .sgt{left:auto;right:0;transform:translateX(0) translateY(4px)}
+.proj-card.open .pbar-seg:last-child:hover .sgt{transform:translateX(0) translateY(0)}
+@media(prefers-reduced-motion:reduce){
+  .sgt{transition:none}.proj-prog .proj-bar-bg{transition:none}}
 @media(prefers-reduced-motion:reduce){
   .proj-card.open .pbar-seg::after,.proj-card.open .pbar-seg::before{transition:none}}
 .pbar-seg:first-child{border-radius:4px 0 0 4px}
@@ -189,23 +200,6 @@
 .status-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
   padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#f7f7f5;color:var(--muted)}
 .status-chip.warn{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
-/* ===== زبانِ مشترکِ راهنما =====
-   هر دو ردیف (راهنمای نوار و تفکیکِ کمبود) یک الگو دارند:
-   سواختِ رنگ + برچسب + عدد. رنگِ سواخت همانِ سگمنتِ نوار است،
-   پس چشم بی‌واسطه عدد را به تکهٔ نوار وصل می‌کند. */
-.pb-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-.pb-item{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;
-  padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#f7f7f5;
-  color:var(--muted);white-space:nowrap}
-.pb-sw{width:8px;height:8px;border-radius:50%;flex-shrink:0;
-  box-shadow:inset 0 0 0 1px #00000014}   /* حلقهٔ محو تا رنگ‌های روشن روی زمینهٔ روشن گم نشوند */
-.pb-lb{color:var(--txt);font-weight:600}
-.pb-num{color:var(--txt);font-weight:800;font-variant-numeric:tabular-nums}
-.pb-num-rev{color:var(--warn)}
-/* ردیفِ کمبود: همان الگو، فقط کمی کم‌جلوه‌تر تا ردیفِ اول متنِ اصلی بماند */
-.pb-gaps{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
-.pb-gaps-t{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
-.pb-gaps .pb-item{background:#fff}
 /* پیامِ خنثی/تکمیل — مثلِ یادداشتِ خاکستریِ «۳ قطعه انتخاب شده» (بدونِ کادرِ رنگی) */
 .msg-note{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:var(--muted)}
 .msg-note svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}

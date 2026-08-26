@@ -133,17 +133,30 @@ function renderProjectCards(animate){
   if(openIdx<0){ openIdx = rows.length?0:-1; if(rows.length) _projOpenKey=projKey(rows[0]); }
 /* راهنمای نوار: دقیقاً همان سگمنت‌ها، به همان ترتیب و با همان رنگ.
    هر سطرِ راهنما یک تکه از نوار را توضیح می‌دهد، پس عددها و نوار به
-   هم وصل‌اند و دیگر شمارشگرِ معلق نداریم. «ثبت‌شده» حذف شد چون
-   جمعِ بقیه است و اطلاعِ تازه‌ای نمی‌داد. */
+   می‌ماند؛ تفکیکِ قطعه‌محور در تولتیپِ نوار دیده می‌شود. */
 function projLegendHTML(r){
-  var segs=r.segs||[];
-  if(!segs.length) return '';
-  return '<div class="pb-legend">'+segs.map(function(g){
-    return '<span class="pb-item">'+
-      '<i class="pb-sw" style="background:'+esc(g.color)+'"></i>'+
-      '<span class="pb-lb">'+esc(g.name)+'</span>'+
-      '<b class="pb-num">'+faN(g.n)+'</b></span>';
-  }).join("")+'</div>';
+  return '<div class="detail-stats">'+
+    '<span>اسناد الزامی: <b>'+faN(r.total)+' سند</b></span>'+
+    '<span>ثبت‌شده: <b>'+faN(r.reg)+' سند</b></span>'+
+    '<span>تأییدشده: <b>'+faN(r.apr)+' سند</b></span>'+
+    '<span>در انتظار بازبینی: <b>'+faN(r.inRev)+' سند</b></span></div>';
+}
+/* تولتیپِ هر تکه از نوار — یک جعبهٔ سفیدِ واقعی (نه ::after)، چون باید
+   چند سطر آمار داخلش جا شود. برای سگمنتِ قطعه، تفکیکِ کامل؛ برای
+   دو سگمنتِ عمومی (در بازبینی / بارگذاری‌نشده) فقط عنوان و تعداد. */
+function segTipHTML(g){
+  var head='<div class="sgt-h"><i class="sgt-sw" style="background:'+esc(g.color)+'"></i>'+
+    '<span class="sgt-t">'+esc(g.name)+'</span></div>';
+  var st=g.stat;
+  if(!st) return '<span class="sgt">'+head+
+    '<div class="sgt-r"><span>تعداد</span><b>'+faN(g.n)+' سند</b></div>'+
+    '<div class="sgt-r"><span>سهم از کل</span><b>'+faN(Math.round(g.pct))+'٪</b></div></span>';
+  return '<span class="sgt">'+head+
+    '<div class="sgt-r"><span>اسناد الزامی</span><b>'+faN(st.total)+'</b></div>'+
+    '<div class="sgt-r"><span>ثبت‌شده</span><b>'+faN(st.reg)+'</b></div>'+
+    '<div class="sgt-r"><span>تأییدشده</span><b>'+faN(st.apr)+'</b></div>'+
+    '<div class="sgt-r"><span>در انتظار بازبینی</span><b>'+faN(st.inRev)+'</b></div>'+
+    '<div class="sgt-r"><span>بارگذاری نشده</span><b>'+faN(st.noDoc)+'</b></div></span>';
 }
 /* نوارِ پیشرفتِ سگمنتی: هر قطعه با رنگِ خودش سهمِ اسنادِ تأییدشده‌اش را پر
    می‌کند، سپس یک سگمنتِ کهربایی برای کلِ اسنادِ در انتظارِ بازبینی؛
@@ -157,31 +170,19 @@ function projBarHTML(r,doAnim){
   if(!segs.length) return '<div class="proj-bar-bg"></div>';
   return '<div class="proj-bar-bg">'+segs.map(function(g){
     var w=doAnim?0:g.pct;
-    /* متنِ تولتیپ: نامِ تکه + تعداد + سهمِ درصدیِ همان تکه از کل */
-    var tip=g.name+' — '+faN(g.n)+' سند ('+faN(Math.round(g.pct))+'٪)';
     var kc=(g.kind==="rev")?" rev":((g.kind==="none")?" none":"");
     return '<span class="pbar-seg'+kc+'" data-w="'+g.pct+'"'+
-      ' style="width:'+w+'%;background:'+esc(g.color)+'"'+
-      ' data-tip="'+esc(tip)+'"></span>';
+      ' style="width:'+w+'%;background:'+esc(g.color)+'">'+
+      segTipHTML(g)+'</span>';
   }).join("")+'</div>';
 }
   host.innerHTML='<div class="proj-list">'+rows.map(function(r,i){
-    /* به‌جای فهرستِ نامِ ماژول‌ها (که کارت را شلوغ و بلند می‌کرد)، برای هر
-       قطعه فقط دو عدد: چند سند ثبت‌نشده و چند سند در انتظارِ بازبینی. */
-    /* ردیفِ دوم فقط یک چیزِ تازه می‌گوید: اینکه اسنادِ بارگذاری‌نشده
-       مالِ کدام قطعه‌اند. راهنمای بالا همان را یکجا می‌گوید، اینجا تفکیکِ آن.
-       ⚠ عنوانِ صریح لازم است: بدونِ آن، دو ردیف با برچسبِ یکسان ولی
-       عددِ متفاوت دیده می‌شوند و متناقض به نظر می‌رسند. */
-    var brk=(r.partBreak||[]).filter(function(b){ return b.noDoc>0; });
-    var msg=brk.length
-      ? '<div class="pb-gaps"><span class="pb-gaps-t">بارگذاری‌نشده در:</span>'+
-        '<span class="pb-legend">'+brk.map(function(b){
-          return '<span class="pb-item">'+
-            '<i class="pb-sw" style="background:'+esc(b.color||"#f0efeb")+'"></i>'+
-            '<span class="pb-lb">'+esc(b.name)+'</span>'+
-            '<b class="pb-num">'+faN(b.noDoc)+'</b></span>'; }).join("")+'</span></div>'
-      : (r.total?'<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
-                :'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
+    /* تفکیکِ قطعه‌محور حذف شد: تعدادِ تگ‌ها با تعدادِ قطعات بالا می‌رفت
+       و در پروژهٔ چندقطعه‌ای جایی در کارت نمی‌ماند. تفکیک فقط در تولتیپِ
+       نوار و در صفحهٔ خودِ پروژه در دسترس است. */
+    var msg=(r.total && r.miss===0)
+      ? '<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
+      : (r.total?'':'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
     // حالتِ اولیهٔ انیمیشن: نوار خالی و عددِ درصد صفر؛ مقدارهای واقعی روی data-* برای مرحلهٔ پرشدن
     var pctText=doAnim?"0":r.pct;
     var openCls=(i===openIdx)?" open":"";
