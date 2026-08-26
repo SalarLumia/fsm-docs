@@ -111,7 +111,11 @@
 /* پیشرفت (مثلِ حلقهٔ «مستندات پروژه»): درصدِ کلیِ بزرگ بالای نوارِ دو‌لایه؛ نوار کوتاه و از سمتِ چپ */
 .proj-prog{display:flex;flex-direction:column;align-items:flex-start;gap:6px;direction:ltr;margin-top:1px;padding-inline-start:12px}
 /* عددِ درصد ۱۵px بالاتر — با آفستِ نسبی، پس جای نوارِ پیشرفت یا هیچ عنصرِ دیگری جابه‌جا نمی‌شود */
-.pp-big{font-size:18px;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums;position:relative;top:-25px}
+.pp-big{font-size:18px;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums;position:relative;top:-25px;
+  transition:font-size .22s cubic-bezier(0,0,.2,1),top .22s cubic-bezier(0,0,.2,1)}
+/* کارتِ باز = تمرکزِ کاربر روی همین پروژه؛ درصد هم مثلِ نوار درشت‌تر می‌شود */
+.proj-card.open .pp-big{font-size:26px;top:-33px}
+@media(prefers-reduced-motion:reduce){.pp-big{transition:none}}
 /* نوار همیشه از چپ به راست پر می‌شود (مستقل از راست‌به‌چپ بودن صفحه) */
 .proj-bar-bg{position:relative;height:7px;background:#f0efeb;border-radius:4px;overflow:hidden;direction:ltr}
 /* top:-20px نوار را بصراً بالا می‌برد ولی فضای چیدمانش سرِ جای قبلی می‌ماند و یک فاصلهٔ خالیِ نامرئیِ
