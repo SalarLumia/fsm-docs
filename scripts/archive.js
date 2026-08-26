@@ -591,6 +591,23 @@ function showModal(title,innerHTML,boxClass){
   host.appendChild(layer);
   modalLock();
 }
+/* به‌روزرسانیِ درجایِ همین پنجره — بدونِ ساختنِ لایهٔ تازه.
+   ⚠ چرا لازم است: showModal عمداً appendChild می‌کند تا پنجرهٔ تودرتو
+   (مثلاً جزئیاتِ سند ← بارگذاریِ ریویژن) روی قبلی بنشیند و با بستن،
+   زیرین باقی بماند. ولی پنجره‌ای که خودش را دوباره رسم می‌کند (مثلِ
+   صفحه‌بندی) نباید لایهٔ تازه بسازد — وگرنه با هر کلیک یک پنجره روی
+   پنجره جمع می‌شود، پس‌زمینه تیره‌تر می‌شود و بستن باید چندبار تکرار شود. */
+function updateModal(title,innerHTML,boxClass){
+  var host=document.getElementById("modalHost");
+  var top=host?host.lastElementChild:null;
+  if(!top) return showModal(title,innerHTML,boxClass);   // پنجره‌ای باز نیست → بساز
+  var box=top.querySelector(".box");
+  if(!box) return showModal(title,innerHTML,boxClass);
+  if(boxClass) box.className="box "+boxClass;
+  var t=box.querySelector("header strong"); if(t) t.innerHTML=title;
+  var b=box.querySelector(".body"); if(b) b.innerHTML=innerHTML;
+  return;
+}
 /* بستنِ فقط بالاترین پنجره؛ اگر زیرش پنجره‌ای بود، همان دوباره دیده می‌شود. */
 function closeModal(){
   var host=document.getElementById("modalHost");

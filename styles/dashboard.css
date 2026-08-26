@@ -86,7 +86,19 @@
 /* ⚠ overflow:hidden برای آن بود که محتوای بازشونده از گوشهٔ گرد بیرون نزند؛
    ولی همان تولتیپِ نوار را هم می‌برید. حالا بریدن روی .pcd-inner انجام
    می‌شود (همان جایی که واقعاً لازم است) و خودِ کارت آزاد می‌ماند. */
-.proj-card{border:1px solid var(--line);border-radius:12px;background:#fff;transition:.15s;box-shadow:0 1px 3px #00000006}
+.proj-card{border:1px solid var(--line);border-radius:12px;background:#fff;transition:.15s;box-shadow:0 1px 3px #00000006;
+  /* ===== قاعدهٔ واحدِ بزرگ‌شدن در حالتِ باز =====
+     همهٔ ابعادِ سربرگِ کارت از همین یک ضریب مشتق می‌شوند، نه عددِ دستی.
+     ۱٫۲۵ یک پلهٔ استانداردِ مقیاسِ تایپ‌گرافی است (Major Second)؛ پس نسبتِ
+     همهٔ عناصر نسبت به هم دست‌نخورده می‌ماند و سلسله‌مراتبِ بصری حفظ می‌شود. */
+  --k:1;
+  --f-title:calc(13.5px * var(--k));
+  --f-meta:calc(11.5px * var(--k));
+  --f-pct:calc(18px * var(--k));
+  --bar-h:calc(7px * var(--k));
+  --tick-w:calc(2px * var(--k));
+  --tick-h:calc(17px * var(--k))}
+.proj-card.open{--k:1.25}
 /* کارتِ باز باید روی کارت‌های بعدی بنشیند تا تولتیپش زیرِ آن‌ها نرود */
 .proj-card.open{position:relative;z-index:2}
 .proj-card:hover{border-color:#d8d6d0;box-shadow:0 3px 10px #0000000d}
@@ -98,7 +110,7 @@
 /* خطِ عمودیِ نارنجی پیشِ تیتر، هم‌سبکِ عنوانِ صفحهٔ جزئیاتِ پروژه (.pp-head h1)؛ ارتفاعِ خط با ::before
    مستقل از line-heightِ متن و کوتاه‌تر از قدِ کامل، به‌طورِ مساوی از بالا/پایین وسط‌چین می‌شود */
 /* تیترِ پروژه = دکمهٔ رفتن به صفحهٔ پروژه (نه دکمهٔ باز/بستن) */
-.proj-card-name{position:relative;font-family:inherit;font-size:13.5px;font-weight:700;color:var(--txt);
+.proj-card-name{position:relative;font-family:inherit;font-size:var(--f-title);font-weight:700;color:var(--txt);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   flex:0 1 auto;min-width:0;margin-inline-end:auto;   /* فقط به‌اندازهٔ متن ← هوور از متن بیرون نمی‌زند */
   text-align:right;border:none;background:none;cursor:pointer;
@@ -107,24 +119,23 @@
      از flex استفاده نمی‌کنیم چون ellipsis را می‌شکند و مرکزِ خطِ نارنجی را هم. */
   line-height:20px;
   padding:0 10px 0 0;transition:color .12s,font-size .22s cubic-bezier(0,0,.2,1)}
-/* کارتِ باز: تیتر هم‌پای درصد درشت‌تر می‌شود. با line-heightِ ثابت، خط از
-   بالا جابه‌جا نمی‌شود و فقط از پایین رشد می‌کند. */
-.proj-card.open .proj-card-name{font-size:16px}
 @media(prefers-reduced-motion:reduce){.proj-card-name{transition:color .12s}}
 .proj-card-name::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
-  width:2px;height:17px;border-radius:2px;background:var(--brand)}
+  width:var(--tick-w);height:var(--tick-h);border-radius:2px;background:var(--brand);
+  transition:width .22s cubic-bezier(0,0,.2,1),height .22s cubic-bezier(0,0,.2,1)}
 .proj-card-name:hover{color:var(--brand)}
 .proj-card-name:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
-.proj-card-meta{font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap}
+.proj-card-meta{font-size:var(--f-meta);font-weight:500;color:var(--muted);white-space:nowrap;
+  transition:font-size .22s cubic-bezier(0,0,.2,1)}
 /* پیشرفت (مثلِ حلقهٔ «مستندات پروژه»): درصدِ کلیِ بزرگ بالای نوارِ دو‌لایه؛ نوار کوتاه و از سمتِ چپ */
 .proj-prog{display:flex;flex-direction:column;align-items:flex-start;gap:6px;direction:ltr;margin-top:1px;padding-inline-start:12px}
 /* عددِ درصد ۱۵px بالاتر — با آفستِ نسبی، پس جای نوارِ پیشرفت یا هیچ عنصرِ دیگری جابه‌جا نمی‌شود */
-.pp-big{font-size:18px;font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums;position:relative;top:-25px;
+.pp-big{font-size:var(--f-pct);font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums;position:relative;top:-25px;
   transition:font-size .22s cubic-bezier(0,0,.2,1)}
 /* کارتِ باز = تمرکزِ کاربر روی همین پروژه؛ درصد هم مثلِ نوار درشت‌تر می‌شود.
    top دست‌نخورده می‌ماند تا لبهٔ بالایِ عدد ثابت باشد و رو به پایین بزرگ شود
    (line-height:1 یعنی ارتفاعِ خط = اندازهٔ فونت، پس رشد فقط از پایین است). */
-.proj-card.open .pp-big{font-size:26px}
+
 @media(prefers-reduced-motion:reduce){.pp-big{transition:none}}
 /* نوار همیشه از چپ به راست پر می‌شود (مستقل از راست‌به‌چپ بودن صفحه) */
 .proj-bar-bg{position:relative;height:7px;background:#f0efeb;border-radius:4px;overflow:hidden;direction:ltr}
@@ -148,7 +159,7 @@
    کارتِ باز یعنی کاربر دارد همین پروژه را می‌خواند؛ پس نوار ضخیم‌تر
    می‌شود و تکه‌هایش قابلِ هدف‌گیری می‌شوند. */
 .proj-prog .proj-bar-bg{overflow:visible;transition:height .22s cubic-bezier(0,0,.2,1)}
-.proj-card.open .proj-prog .proj-bar-bg{height:13px;border-radius:7px}
+.proj-prog .proj-bar-bg{height:var(--bar-h);border-radius:calc(var(--bar-h)/2)}
 .pbar-seg{position:relative}
 .pbar-seg:first-child{border-radius:4px 0 0 4px}
 .pbar-seg:last-child{border-radius:0 4px 4px 0}

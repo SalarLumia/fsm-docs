@@ -421,7 +421,10 @@ function raRender(){
     ? '<div class="rq-list">'+pageRows.map(function(d){ return activityItemHTML(d, false, true); }).join("")+'</div>'
     : emptyState("فعالیتی ثبت نشده","با ثبت اولین سند، رویدادها اینجا نمایش داده می‌شوند.");
   var foot = total>RA_PER ? raPagerHTML(total,startI,endI,_raPage,pages) : '';
-  showModal("همهٔ فعالیت‌ها", '<div class="seeall-body">'+inner+foot+'</div>', "seeall-box");
+  /* ⚠ updateModal و نه showModal: این تابع با هر تغییرِ صفحه دوباره صدا زده
+     می‌شود؛ showModal لایهٔ تازه می‌ساخت و پنجره‌ها روی هم جمع می‌شدند. */
+  (typeof updateModal==="function" ? updateModal : showModal)(
+    "همهٔ فعالیت‌ها", '<div class="seeall-body">'+inner+foot+'</div>', "seeall-box");
   fixActivityLines(document.getElementById("modalHost"));   // همان قاعدهٔ دو‌خطی در پنجرهٔ «همهٔ فعالیت‌ها»
   if(typeof revealCascade==="function") revealCascade(document.querySelector("#modalHost .rq-list"));   // ورودِ آبشاریِ کارت‌ها، هم‌سبک با سایت
 }
@@ -432,6 +435,7 @@ function raPagerHTML(total,startI,endI,page,pages){
       '<span class="pg-nav">'+
         pgBtn("raFirst()",PG_IC.first,atFirst,"صفحهٔ اول")+
         pgBtn("raPrev()",PG_IC.prev,atFirst,"صفحهٔ قبلی")+
+        '<span class="pg-cur">'+faN(page)+' از '+faN(pages)+'</span>'+
         pgBtn("raNext()",PG_IC.next,atLast,"صفحهٔ بعدی")+
         pgBtn("raLast()",PG_IC.last,atLast,"صفحهٔ آخر")+
       '</span>'+
