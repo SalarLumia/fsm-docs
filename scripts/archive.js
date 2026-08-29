@@ -168,11 +168,17 @@ function filtPosition(anchor){
   _filtMenu.style.top=Math.max(8,top)+"px"; _filtMenu.style.left=left+"px";
 }
 function filtOutside(e){ if(_filtMenu && _filtMenu.contains(e.target)) return; filtCloseMenu(); }
+/* اسکرولِ صفحه منو را می‌بندد، اما اسکرول در خودِ منو نه (رویداد در فازِ capture می‌آید) */
+function filtOnScroll(e){
+  var t=e.target;
+  if(_filtMenu && t && t.nodeType===1 && (t===_filtMenu || _filtMenu.contains(t))) return;
+  filtCloseMenu();
+}
 function filtCloseMenu(){
   if(!_filtMenu) return;
   _filtMenu.remove(); _filtMenu=null;
   document.removeEventListener("click", filtOutside, false);
-  document.removeEventListener("scroll", filtCloseMenu, true);
+  document.removeEventListener("scroll", filtOnScroll, true);
   window.removeEventListener("resize", filtCloseMenu);
 }
 function filtToggleMenu(ev, anchorId){
@@ -186,7 +192,7 @@ function filtToggleMenu(ev, anchorId){
   document.body.appendChild(m); _filtMenu=m; filtPosition(anchor);
   setTimeout(function(){
     document.addEventListener("click", filtOutside, false);
-    document.addEventListener("scroll", filtCloseMenu, true);
+    document.addEventListener("scroll", filtOnScroll, true);
     window.addEventListener("resize", filtCloseMenu);
   },0);
 }
@@ -321,6 +327,7 @@ function archFootHTML(total,startI,endI,page,pages){
       '<span class="pg-nav">'+
         pgBtn("archFirst()",PG_IC.first,atFirst,"صفحهٔ اول")+
         pgBtn("archPrev()",PG_IC.prev,atFirst,"صفحهٔ قبلی")+
+        '<span class="pg-cur">'+faN(page)+' از '+faN(pages)+'</span>'+
         pgBtn("archNext()",PG_IC.next,atLast,"صفحهٔ بعدی")+
         pgBtn("archLast()",PG_IC.last,atLast,"صفحهٔ آخر")+
       '</span>'+

@@ -58,6 +58,16 @@
    مسیر را جابه‌جا می‌کنند. پس در این حالت اسکرولِ قاب خاموش می‌شود تا تنها یک
    اسکرولِ واقعی — اسکرولِ خودِ PDF — باقی بماند. */
 .dp-frame.is-frame{display:block;overflow:hidden;padding:0}
+/* ═══ حالتِ بارگذاریِ پیش‌نمایشِ سند ═══
+   هم‌ساختارِ لودینگِ ویوئرِ سه‌بعدی: اسپینر + عنوان + نامِ لاتین وسطِ کادر،
+   و نوارِ پیشرفت جدا از این ظرف، چسبیده به کفِ .dp-frame (که relative است). */
+.dp-load{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:0;text-align:center;padding:28px;width:100%;min-height:inherit;flex:1}
+/* نوارِ پیشرفتِ همین کادر: باریک و وسط‌چین، کمی بالاتر از کف.
+   ⚠ فقط اینجا — ویوئرِ سه‌بعدی همان نوارِ تمام‌عرضِ چسبیده‌به‌کف را نگه می‌دارد.
+   left/right با auto خنثی می‌شوند تا translateX وسط‌چینی را انجام دهد. */
+.dp-frame > .mv-load{left:50%;right:auto;transform:translateX(-50%);
+  width:min(300px,72%);bottom:44px}
 /* پیش‌نمایشِ سه‌بعدی: قاب به‌جای flex-centering به حالتِ «پُر» می‌رود تا لبهٔ مدل بریده نشود؛
    ظرفِ .mv-toolwrap دقیقاً قاب را پر می‌کند و ویوئر + تولباکس درونش می‌نشینند (مثلِ پنلِ پروژه). */
 .dp-frame.is-3d{display:block;overflow:hidden;padding:0;min-height:60vh;
@@ -875,11 +885,11 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 #tab-archive .arch-detail td.arch-actcol .arch-det-actcol{position:relative;right:calc(var(--arch-shift) - 16px)}
 @media(prefers-reduced-motion:reduce){.arch-det-wrap{transition:none}.arch-exp .chev{transition:none}.arch-detail>td:first-child::before{transition:none}}
 /* ===== فوترِ آرشیو: خروجی (راست) + صفحه‌بندی (چپ) ===== */
-.arch-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);
+.arch-foot{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);
   margin-top:12px;padding-top:12px;border-top:1px solid #f2f1ee;flex-wrap:wrap}
 /* دکمهٔ خروجی = همان .btn.sm استانداردِ سایت (مثلِ دکمه‌های متن‌دارِ ویرایش/حذف) */
 /* گروهِ صفحه‌بندی */
-.arch-pager{display:flex;align-items:center;gap:var(--sp-3)}
+.arch-pager{display:flex;align-items:center;justify-content:center;gap:var(--sp-3);flex-wrap:wrap}
 .pg-lbl{font-size:11.5px;color:var(--muted);font-weight:500}
 .pg-range{font-size:11.5px;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums;min-width:0}
 /* دراپ‌داونِ سفارشیِ «تعدادِ سطر» — هم‌سبکِ منوی سه‌نقطه‌ای، با گوشهٔ گرد و انیمیشنِ باز/بست */
@@ -959,7 +969,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .filt-fields,.filt-panel{display:flex;flex-direction:column;gap:2px;padding:6px;background:#fff;
   border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px #00000022}
 .filt-fields{min-width:150px}
-.filt-panel{width:320px;box-sizing:border-box;max-height:300px;overflow:auto}   /* عرضِ ثابت برای همهٔ پارامترها */
+.filt-panel{width:320px;box-sizing:border-box;max-height:300px;overflow:auto;overscroll-behavior:contain}   /* عرضِ ثابت برای همهٔ پارامترها */
 .filt-item{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;height:34px;flex:0 0 34px;
   padding:0 10px;border:none;background:none;border-radius:8px;font:inherit;font-size:12.5px;font-weight:500;
   color:var(--txt);cursor:pointer;text-align:start;transition:background .12s,color .12s}
