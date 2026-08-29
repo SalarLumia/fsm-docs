@@ -193,6 +193,30 @@ window.addEventListener("resize", function(){
   var w=document.getElementById("loginView");
   if(w && !w.classList.contains("open")) lgSyncGeom();   // فقط در مرحلهٔ ۱ اندازه‌ها معتبرند
 });
+/* ===== «مرا به خاطر بسپار» =====
+   ⚠ فقط نامِ کاربری و خودِ تیک ذخیره می‌شوند — هرگز رمز.
+   کلیدِ جدا از fsm_session است، چون باید پس از خروج هم باقی بماند؛
+   خروج، نشست را پاک می‌کند ولی انتخابِ کاربر نباید فراموش شود. */
+var LG_REMEMBER_KEY="fsm_remember";
+function lgLoadRemember(){
+  var box=document.getElementById("lgRemember");
+  var usr=document.getElementById("lgUser");
+  if(!box) return;
+  try{
+    var raw=localStorage.getItem(LG_REMEMBER_KEY);
+    if(!raw) return;
+    var d=JSON.parse(raw);
+    if(!d || d.on!==true) return;
+    box.checked=true;
+    if(usr && typeof d.u==="string" && d.u && !usr.value) usr.value=d.u;
+  }catch(e){ /* خواندنِ خراب نباید ورود را زمین بزند */ }
+}
+function lgSaveRemember(on, username){
+  try{
+    if(on) localStorage.setItem(LG_REMEMBER_KEY, JSON.stringify({on:true, u:String(username||"")}));
+    else   localStorage.removeItem(LG_REMEMBER_KEY);
+  }catch(e){}
+}
 function lgOpen(){
   var w=document.getElementById("loginView"); if(!w) return;
   if(w.classList.contains("open")) return;
@@ -203,7 +227,13 @@ function lgOpen(){
      لحظه‌ای است و اندازه‌گیری اشتباه می‌شود. */
   setTimeout(function(){ lgAlignBtn(); }, 600);
   // پس از پایانِ کاملِ کشو (۵۵۰ تأخیر + ۶۰۰ حرکت)، فوکوس روی نام کاربری
-  setTimeout(function(){ var u=document.getElementById("lgUser"); if(u) u.focus(); }, 1150);
+  lgLoadRemember();                 // تیک و نامِ کاربریِ دفعهٔ قبل بازگردانده شوند
+  /* اگر نامِ کاربری از پیش پر است، فوکوس روی رمز مفیدتر است تا نامِ کاربری */
+  setTimeout(function(){
+    var u=document.getElementById("lgUser"), pw=document.getElementById("lgPass");
+    var t=(u && u.value && pw) ? pw : u;
+    if(t) t.focus();
+  }, 1150);
 }
 /* بازگشت به مرحلهٔ ۱ — همهٔ انیمیشن‌ها روی کلاسِ .open سوارند، پس با برداشتنِ آن خودبه‌خود معکوس اجرا می‌شوند.
    مقادیرِ فیلدها عمداً پاک نمی‌شوند تا اگر کاربر دوباره باز کرد، نوشته‌اش سرِ جایش باشد. */
@@ -277,6 +307,7 @@ async function doLogin(trusted){
        پشتیبانِ بک‌اندِ قدیمی است و با «مرا به خاطر بسپار» هم‌خوان نیست. */
     ME.expiresAt = r.expiresAt || (Date.now() + (remember ? LG_TOKEN_TTL_REMEMBER : LG_TOKEN_TTL));
     localStorage.setItem("fsm_session", JSON.stringify(ME));
+    lgSaveRemember(remember, u);   // انتخابِ کاربر برای دفعهٔ بعد نگه داشته شود (بدونِ رمز)
     // رمز نباید پس از ورود در DOM بماند
     var pw=document.getElementById("lgPass");
     if(pw){ pw.value=""; pw.type="password"; }
