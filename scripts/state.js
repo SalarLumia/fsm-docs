@@ -33,6 +33,10 @@ function clientName(code){ var c=DB.clients.find(function(x){return x.code===cod
 /* نام لاتینِ مشتری برای قالبِ مشخصاتِ پروژه (LTR)؛ اگر ثبت نشده بود، به نامِ فارسی و سپس کد برمی‌گردد. */
 function clientNameEn(code){ var c=DB.clients.find(function(x){return x.code===code}); return (c&&c.nameEn)?c.nameEn:(c?c.name:code); }
 function typeName(code){ var t=DB.docTypes.find(function(x){return String(x.code).toUpperCase()===String(code).toUpperCase()}); return t?(t.nameFa||t.code):code; }
+/* نامِ انگلیسیِ نوعِ سند — برای خطِ دومِ لودینگ (مثلِ نامِ مدل در ویوئرِ سه‌بعدی).
+   اگر ثبت نشده باشد، خودِ کد برمی‌گردد که باز هم لاتین و خواناست. */
+function typeNameEn(code){ var t=DB.docTypes.find(function(x){return String(x.code).toUpperCase()===String(code).toUpperCase()});
+  return (t&&t.nameEn)?String(t.nameEn):String(code||""); }
 function typeScope(code){ var t=DB.docTypes.find(function(x){return String(x.code).toUpperCase()===String(code).toUpperCase()}); return t?t.scope:"part"; }
 function partName(no){ if(pad2(no)==="00")return"سند پروژه"; var p=DB.parts.find(function(x){return pad2(x.partNo)===pad2(no)}); return p?p.name:no; }
 function partRec(no){ return DB.parts.find(function(x){return pad2(x.partNo)===pad2(no);})||null; }

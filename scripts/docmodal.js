@@ -320,9 +320,20 @@ async function dmSelectVersion(num){
   }
   var is3D = String(d.typeCode).toUpperCase()==="3D";
   // نوارِ پیشرفتِ درون‌بخشی به‌جای اورلیِ تمام‌صفحه؛ فایل به‌صورتِ استریمی در همین بخش لود می‌شود و بقیهٔ سایت آزاد می‌ماند
+  /* هم‌سبکِ لودینگِ ویوئرِ سه‌بعدی: اسپینرِ لیساژو + عنوان + نامِ لاتینِ نوعِ سند،
+     و نوارِ پیشرفت زیرِ همه. نامِ لاتین خطِ جداگانه و LTR است، وگرنه در یک خطِ
+     فارسی ترتیبِ کلمات به‌هم می‌ریزد. */
+  var _dEn=(typeof typeNameEn==="function")?typeNameEn(d.typeCode):String(d.typeCode||"");
   host.innerHTML=(typeof loadBarHTML==="function")
-    ? loadBarHTML(true, true)
-    : '<div class="dm-loading"><div class="spinner" style="width:32px;height:32px;border-width:3px"></div><span>در حال بارگذاری…</span></div>';
+    ? '<div class="dp-load">'+
+        '<div class="mv-empty-ic mv-load-ic">'+((typeof MV_LOAD_IC!=="undefined")?MV_LOAD_IC:"")+'</div>'+
+        '<div class="mv-empty-t">در حال بارگذاری سند</div>'+
+        (_dEn?'<div class="mv-load-name">'+esc(_dEn)+'</div>':'')+
+      '</div>'+
+      /* نوار بیرونِ .dp-load و در حالتِ چسبیده‌به‌کف (نه inline) — عیناً مثلِ ویوئرِ
+         سه‌بعدی؛ مرجعِ position آن .dp-frame است که relative دارد. */
+      loadBarHTML(false, true)
+    : '<div class="dm-loading"><div class="spinner" style="width:32px;height:32px;border-width:3px"></div><span>در حال بارگذاری</span></div>';
   var getHost=function(){ return document.getElementById("docPreviewHost"); };
   var est=(typeof loadBarEstimate==="function")?loadBarEstimate(getHost, 94):null;   // پیشرفتِ نرم تا نوار روی صفر نماند
   _dpEst=est;
