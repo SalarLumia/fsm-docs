@@ -519,22 +519,52 @@ function backToClients(){
 }
 /* ================= نوارِ شاخص — عیناً پروتوتایپ ================= */
 /* دوناتِ دولایه: کمانِ کم‌رنگ = ثبت‌شده (زیر)، کمانِ پررنگ = تأییدشده (رو). عدد = تأییدشده٪ */
+/* حلقهٔ درصد — قوس مستقیم با دستورِ A رسم می‌شود، نه با stroke-dashoffset.
+   دلیل: با dashoffset، نقطهٔ شروعِ قوسِ مرئی به علامتِ offset و به transformِ
+   ظرف وابسته می‌شد و هر اصلاحِ جهت، شروع را از بالا جدا می‌کرد. اینجا مختصاتِ
+   شروع و پایان صریح نوشته می‌شوند، پس جهت و شروع هر دو قطعی‌اند:
+   شروع از بالا، حرکت پادساعت‌گرد. */
 function donutHTML(solidPct, regPct){
-  var R=24, C=2*Math.PI*R;
+  var CX=29, CY=29, R=24;
+  /* زاویه از بالا شروع می‌شود و پادساعت‌گرد مثبت است؛ y در SVG رو به پایین است
+     پس با منها اعمال می‌شود. */
+  var ptAt=function(deg){
+    var a=(90+deg)*Math.PI/180;
+    return [CX+R*Math.cos(a), CY-R*Math.sin(a)];
+  };
+  var arcPath=function(pct){
+    if(pct<=0) return "";
+    if(pct>=100){   // دایرهٔ کامل با یک قوس نمی‌شود؛ دو نیم‌دایره
+      return "M"+CX+","+(CY-R)+"A"+R+","+R+" 0 1 0 "+CX+","+(CY+R)+
+             "A"+R+","+R+" 0 1 0 "+CX+","+(CY-R);
+    }
+    var s=ptAt(0), e=ptAt(360*pct/100);
+    var large=pct>50?1:0;
+    /* sweep-flag=0 یعنی پادساعت‌گرد در دستگاهِ SVG (که y رو به پایین دارد) */
+    return "M"+s[0].toFixed(2)+","+s[1].toFixed(2)+
+           "A"+R+","+R+" 0 "+large+" 0 "+e[0].toFixed(2)+","+e[1].toFixed(2);
+  };
   var col = solidPct===100 ? "var(--ok)" : "var(--brand)";
-  var arc=function(pp,extra){ return '<circle class="d-fg" cx="29" cy="29" r="'+R+'" '+extra+
-    ' stroke-dasharray="'+C.toFixed(1)+'" stroke-dashoffset="'+(C*(1-pp/100)).toFixed(1)+'"/>'; };
+  var seg=function(pct,stroke,extra){
+    var d=arcPath(pct); if(!d) return "";
+    return '<path class="d-fg" d="'+d+'" stroke="'+stroke+'"'+(extra||"")+'/>';
+  };
   return '<div class="dwrap"><svg viewBox="0 0 58 58">'+
-    '<circle class="d-bg" cx="29" cy="29" r="'+R+'"/>'+
-    arc(regPct,'stroke="var(--brand)" stroke-opacity=".3"')+
-    arc(solidPct,'stroke="'+col+'"')+
+    '<circle class="d-bg" cx="'+CX+'" cy="'+CY+'" r="'+R+'"/>'+
+    seg(regPct,'var(--brand)',' stroke-opacity=".3"')+
+    seg(solidPct,col)+
     '</svg><span class="dtxt">'+solidPct+'٪</span></div>';
 }
-function cellDonut(label,appr,reg,total){
+/* unit (اختیاری): وقتی واحدِ شمارش سند نیست، راهنما به‌جای برچسبِ خالی، عدد
+   نشان می‌دهد («۰ از ۳ قطعه»). بدونِ آن، همان راهنمای متنیِ دو‌خطیِ قبلی. */
+function cellDonut(label,appr,reg,total,unit){
   var sp=total?Math.round(appr/total*100):0, rp=total?Math.round(reg/total*100):0;
+  var leg = unit
+    ? '<div class="mleg"><i></i>تکمیل‌شده <b>'+faN(appr)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>'+
+      '<div class="mleg faint"><i></i>شروع‌شده <b>'+faN(reg)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>'
+    : '<div class="mleg"><i></i>تأییدشده</div><div class="mleg faint"><i></i>ثبت‌شده</div>';
   return '<div class="mcell"><div class="mdonut">'+donutHTML(sp,rp)+
-      '<div class="mtext"><div class="mlabel">'+esc(label)+'</div>'+
-        '<div class="mleg"><i></i>تأییدشده</div><div class="mleg faint"><i></i>ثبت‌شده</div></div>'+
+      '<div class="mtext"><div class="mlabel">'+esc(label)+'</div>'+leg+'</div>'+
     '</div></div>';
 }
 /* نوارِ شاخصِ پروژه — از دادهٔ واقعی؛ ساختار عیناً پروتوتایپ:
@@ -550,7 +580,10 @@ function mbandHTML(p,s){
   var dTot=partMods.length, dReg=partMods.filter(hasDoc).length, dApp=partMods.filter(hasApp).length;
   var parts=projectPartsList(p);
   var modsOf=function(pn){ return partMods.filter(function(m){ return m.part===pn; }); };
-  var partsReg=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.every(hasDoc); }).length;
+  /* حلقهٔ کم‌رنگ = «کار شروع شده»: قطعه‌ای که دستِ‌کم یک سند دارد (some).
+     پیش‌تر every بود، یعنی همان شرطِ سخت‌گیرانهٔ حلقهٔ پررنگ؛ نتیجه این می‌شد
+     که هر دو حلقه با هم صفر می‌ماندند و کاربر هیچ حرکتی نمی‌دید. */
+  var partsReg=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.some(hasDoc); }).length;
   var partsApp=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.every(hasApp); }).length;
   var total=pTot+dTot, reg=pReg+dReg, apr=pApp+dApp;
   var regPct=total?Math.round(reg/total*100):0, aprPct=total?Math.round(apr/total*100):0;
@@ -566,7 +599,7 @@ function mbandHTML(p,s){
         '<div class="mleg faint"><i></i>بارگذاری‌نشده <b>'+faN(total-reg)+'</b></div></div>'+
     '</div></div>';
   return hero+
-    cellDonut("قطعات پروژه", partsApp, partsReg, parts.length)+
+    cellDonut("پیشرفتِ قطعات", partsApp, partsReg, parts.length, "قطعه")+
     cellDonut("نقشه‌های پروژه", dApp, dReg, dTot)+
     cellDonut("مدارک عمومی پروژه", pApp, pReg, pTot);
 }
@@ -1540,6 +1573,21 @@ async function savePartsPanel(){
    در Drive ذخیره می‌شود و ویوئر فایل را با همان api("getFile") می‌خواند. کتابخانهٔ
    نمایش به‌صورتِ محلی و فقط هنگامِ نیاز بارگذاری می‌شود (بدونِ منبعِ بیرونی). */
 var MODEL_IC='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+/* اسپینرِ بارگذاریِ مدلِ سه‌بعدی: سه داشِ پشتِ‌هم روی مسیرِ بی‌نهایت (∞) می‌دوند
+   و کلِ مسیر آرام می‌چرخد. جایگزینِ مکعبِ نفس‌کشِ قبلی — حرکتِ پیوسته حسِ
+   «در جریان بودن» می‌دهد، در حالی که مکعب ساکن به‌نظر می‌رسید.
+   ⚠ pathLength=100 روی هر سه داش: طولِ واقعیِ مسیر (~140) نادیده گرفته و
+   مقیاسِ ۰..۱۰۰ می‌شود، پس داش‌ها با اعدادِ ثابتِ CSS هم‌جا می‌مانند. */
+var MV_LOAD_IC=(function(){
+  /* منحنیِ لیساژوی ۳:۲ —  x=32+23·cos(3t) ، y=32+23·sin(2t)
+     شکلِ تودرتو که خودش را چند بار قطع می‌کند؛ همین تقاطع‌ها هستند که به آن
+     عمقِ سه‌بعدی می‌دهند. با منحنیِ بزیه بازسازی نمی‌شود: سرعتِ حرکت در طولِ
+     مسیر به‌شدت تغییر می‌کند و نقاطِ کنترل روی خطِ راست می‌افتند. */
+  var d="M55.00,32.00L54.94,33.11L54.76,34.22L54.46,35.32L54.04,36.42L53.51,37.50L52.86,38.58L52.10,39.63L51.24,40.67L50.28,41.69L49.22,42.69L48.07,43.66L46.83,44.60L45.52,45.52L44.14,46.40L42.69,47.25L41.19,48.07L39.63,48.84L38.04,49.58L36.42,50.28L34.77,50.93L33.11,51.54L31.44,52.10L29.78,52.62L28.13,53.09L26.50,53.51L24.89,53.87L23.33,54.19L21.81,54.46L20.34,54.67L18.93,54.83L17.60,54.94L16.34,54.99L15.16,54.99L14.07,54.94L13.07,54.83L12.17,54.67L11.38,54.46L10.70,54.19L10.13,53.87L9.67,53.51L9.33,53.09L9.11,52.62L9.01,52.10L9.03,51.54L9.17,50.93L9.43,50.28L9.81,49.58L10.30,48.84L10.91,48.07L11.63,47.25L12.46,46.40L13.39,45.52L14.42,44.60L15.54,43.66L16.75,42.69L18.04,41.69L19.40,40.67L20.82,39.63L22.31,38.58L23.84,37.50L25.42,36.42L27.04,35.32L28.68,34.22L30.33,33.11L32.00,32.00L33.67,30.89L35.32,29.78L36.96,28.68L38.58,27.58L40.16,26.50L41.69,25.42L43.18,24.37L44.60,23.33L45.96,22.31L47.25,21.31L48.46,20.34L49.58,19.40L50.61,18.48L51.54,17.60L52.37,16.75L53.09,15.93L53.70,15.16L54.19,14.42L54.57,13.72L54.83,13.07L54.97,12.46L54.99,11.90L54.89,11.38L54.67,10.91L54.33,10.49L53.87,10.13L53.30,9.81L52.62,9.54L51.83,9.33L50.93,9.17L49.93,9.06L48.84,9.01L47.66,9.01L46.40,9.06L45.07,9.17L43.66,9.33L42.19,9.54L40.67,9.81L39.11,10.13L37.50,10.49L35.87,10.91L34.22,11.38L32.56,11.90L30.89,12.46L29.23,13.07L27.58,13.72L25.96,14.42L24.37,15.16L22.81,15.93L21.31,16.75L19.86,17.60L18.48,18.48L17.17,19.40L15.93,20.34L14.78,21.31L13.72,22.31L12.76,23.33L11.90,24.37L11.14,25.42L10.49,26.50L9.96,27.58L9.54,28.68L9.24,29.78L9.06,30.89L9.00,32.00L9.06,33.11L9.24,34.22L9.54,35.32L9.96,36.42L10.49,37.50L11.14,38.58L11.90,39.63L12.76,40.67L13.72,41.69L14.78,42.69L15.93,43.66L17.17,44.60L18.48,45.52L19.86,46.40L21.31,47.25L22.81,48.07L24.37,48.84L25.96,49.58L27.58,50.28L29.23,50.93L30.89,51.54L32.56,52.10L34.22,52.62L35.87,53.09L37.50,53.51L39.11,53.87L40.67,54.19L42.19,54.46L43.66,54.67L45.07,54.83L46.40,54.94L47.66,54.99L48.84,54.99L49.93,54.94L50.93,54.83L51.83,54.67L52.62,54.46L53.30,54.19L53.87,53.87L54.33,53.51L54.67,53.09L54.89,52.62L54.99,52.10L54.97,51.54L54.83,50.93L54.57,50.28L54.19,49.58L53.70,48.84L53.09,48.07L52.37,47.25L51.54,46.40L50.61,45.52L49.58,44.60L48.46,43.66L47.25,42.69L45.96,41.69L44.60,40.67L43.18,39.63L41.69,38.58L40.16,37.50L38.58,36.42L36.96,35.32L35.32,34.22L33.67,33.11L32.00,32.00L30.33,30.89L28.68,29.78L27.04,28.68L25.42,27.58L23.84,26.50L22.31,25.42L20.82,24.37L19.40,23.33L18.04,22.31L16.75,21.31L15.54,20.34L14.42,19.40L13.39,18.48L12.46,17.60L11.63,16.75L10.91,15.93L10.30,15.16L9.81,14.42L9.43,13.72L9.17,13.07L9.03,12.46L9.01,11.90L9.11,11.38L9.33,10.91L9.67,10.49L10.13,10.13L10.70,9.81L11.38,9.54L12.17,9.33L13.07,9.17L14.07,9.06L15.16,9.01L16.34,9.01L17.60,9.06L18.93,9.17L20.34,9.33L21.81,9.54L23.33,9.81L24.89,10.13L26.50,10.49L28.13,10.91L29.78,11.38L31.44,11.90L33.11,12.46L34.77,13.07L36.42,13.72L38.04,14.42L39.63,15.16L41.19,15.93L42.69,16.75L44.14,17.60L45.52,18.48L46.83,19.40L48.07,20.34L49.22,21.31L50.28,22.31L51.24,23.33L52.10,24.37L52.86,25.42L53.51,26.50L54.04,27.58L54.46,28.68L54.76,29.78L54.94,30.89L55.00,32.00Z";
+  function seg(cls){ return '<path class="'+cls+'" d="'+d+'" pathLength="100"/>'; }
+  return '<svg class="lis" viewBox="0 0 64 64" role="img" aria-label="در حال بارگذاری">'+
+    '<g class="lis-rig">'+seg("lis-track")+seg("lis-tail")+seg("lis-mid")+seg("lis-head")+'</g></svg>';
+})();
 var MODEL_PLAY_IC='<svg viewBox="0 0 24 24" class="ic"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><polyline points="21 3 21 9 15 9"/></svg>';
 /* آیا نوعِ سندِ 3D در سیستم تعریف شده؟ (کاربر از «تنظیمات ◂ انواع اسناد» با scope=پروژه اضافه می‌کند) */
 function has3DType(){ return docTypesSorted().some(function(t){ return String(t.code).toUpperCase()==="3D"; }); }
@@ -1666,8 +1714,8 @@ async function mvLoadPart(fileId, part){
   var _mp=(_mvParts||[]).filter(function(x){ return pad2(x.part)===pad2(part); })[0];
   var _mnm=_mp?_mp.name:"";   // نامِ مدلِ در‌حالِ بارگذاری — تا کاربر بداند کدام قطعه دارد می‌آید
   shell.innerHTML=mvPickerHTML(_mvParts, part)+
-    '<div class="mv-ph" id="mvPh"><div class="mv-empty-ic">'+MODEL_IC+'</div>'+
-      '<div class="mv-empty-t">در حال بارگذاری مدل…</div>'+
+    '<div class="mv-ph" id="mvPh"><div class="mv-empty-ic mv-load-ic">'+MV_LOAD_IC+'</div>'+
+      '<div class="mv-empty-t">در حال بارگذاری مدل</div>'+
       /* نامِ لاتین خطِ جداگانه و LTR است؛ در یک خطِ فارسی ترتیبِ کلمات به‌هم می‌ریخت */
       (_mnm?'<div class="mv-load-name">'+esc(_mnm)+'</div>':'')+'</div>'+
     loadBarHTML(false, true);

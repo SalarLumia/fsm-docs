@@ -66,10 +66,14 @@
 .mdonut{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-direction:row-reverse}
 .mtext{min-width:0;display:flex;flex-direction:column;gap:var(--sp-1)}
 .dwrap{position:relative;width:84px;height:84px;flex-shrink:0}
-.dwrap svg{width:84px;height:84px;transform:rotate(-90deg)}
-.dwrap circle{fill:none;stroke-width:4.5;stroke-linecap:round}
+/* ⚠ بدونِ transform: جهت و نقطهٔ شروع در خودِ مسیرِ قوس (دستورِ A) تعیین می‌شوند.
+   چرخاندنِ ظرف با rotate/scaleX دوباره همان وابستگیِ قبلی را برمی‌گرداند. */
+.dwrap svg{width:84px;height:84px}
+.dwrap circle,.dwrap path{fill:none;stroke-width:4.5;stroke-linecap:round}
 .d-bg{stroke:#f0efeb}
-.d-fg{transition:stroke-dashoffset .7s}
+/* ویژگیِ d با transition در همهٔ مرورگرها انیمیت نمی‌شود؛ محوشدنِ نرمِ رنگ
+   جایگزینِ مطمئنِ آن است و هدفِ اصلی (نپریدنِ قوس) را برآورده می‌کند. */
+.d-fg{transition:stroke .7s,stroke-opacity .7s}
 .dtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:19px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
 
@@ -223,16 +227,19 @@ button.doc-ic:disabled{cursor:default}
 .mv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;
   padding:34px 24px;min-height:var(--view-min);background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius-sm)}
 .mv-empty-ic{width:56px;height:56px;display:grid;place-items:center}
-.mv-empty-ic svg{width:44px;height:44px;stroke:#c9c7c2;fill:none;stroke-width:1.4}
+.mv-empty-ic:not(.mv-load-ic) svg{width:44px;height:44px;stroke:#c9c7c2;fill:none;stroke-width:1.4}
+/* ⚠ :not(.mv-load-ic) لازم است: این قاعده ویژگیِ بیشتری از کلاس‌های .lis-* دارد
+   و بدونِ آن، رنگِ خاکستری و ضخامتِ ۱٫۴ روی هر سه داشِ اسپینر می‌نشست و
+   اثرِ دنباله‌دارش (سه ضخامت و سه شفافیتِ متفاوت) کاملاً از بین می‌رفت. */
 /* ═══ حالتِ بارگذاریِ آیکونِ سه‌بعدی ═══
    مکعب آرام نفس می‌کشد و خطوطِ داخلی‌اش پیاپی کشیده می‌شوند — حسِ «در حالِ
    ساخته‌شدن» می‌دهد به‌جای چرخشِ ساده. نوارِ درصد جداگانه پیشرفتِ واقعی را می‌گوید. */
-.mv-ph .mv-empty-ic svg{animation:mvCubeBreath 2.6s ease-in-out infinite;transform-origin:50% 50%}
+.mv-ph .mv-empty-ic:not(.mv-load-ic) svg{animation:mvCubeBreath 2.6s ease-in-out infinite;transform-origin:50% 50%}
 /* طولِ واقعیِ مسیرها حساب شده (۲۰٫۲ و ۱۰٫۱)؛ هرکدام داشِ خودش را دارد تا
    سرعتِ کشیده‌شدنِ هر دو یکسان دیده شود. */
-.mv-ph .mv-empty-ic svg polyline{stroke-dasharray:21;stroke-dashoffset:21;
+.mv-ph .mv-empty-ic:not(.mv-load-ic) svg polyline{stroke-dasharray:21;stroke-dashoffset:21;
   animation:mvDrawPoly 2.6s cubic-bezier(.4,0,.2,1) infinite}
-.mv-ph .mv-empty-ic svg line{stroke-dasharray:11;stroke-dashoffset:11;
+.mv-ph .mv-empty-ic:not(.mv-load-ic) svg line{stroke-dasharray:11;stroke-dashoffset:11;
   animation:mvDrawLine 2.6s cubic-bezier(.4,0,.2,1) infinite .32s}
 /* بدونِ rotate: مکعبِ ایزومتریک با چرخشِ جزئی کج به‌نظر می‌رسد، چون خطوطِ موربِ
    طراحی‌شده‌اش دیگر با محورِ قائم جور درنمی‌آید. فقط مقیاس و شفافیت نفس می‌کشند. */
@@ -245,9 +252,35 @@ button.doc-ic:disabled{cursor:default}
 @keyframes mvDrawLine{0%{stroke-dashoffset:11}40%{stroke-dashoffset:0}
   70%{stroke-dashoffset:0}100%{stroke-dashoffset:11}}
 @media(prefers-reduced-motion:reduce){
-  .mv-ph .mv-empty-ic svg,
-  .mv-ph .mv-empty-ic svg polyline,
-  .mv-ph .mv-empty-ic svg line{animation:none;stroke-dashoffset:0}
+  .mv-ph .mv-empty-ic:not(.mv-load-ic) svg,
+  .mv-ph .mv-empty-ic:not(.mv-load-ic) svg polyline,
+  .mv-ph .mv-empty-ic:not(.mv-load-ic) svg line{animation:none;stroke-dashoffset:0}
+}
+/* ═══ اسپینرِ بارگذاریِ مدلِ سه‌بعدی (مسیرِ ∞) ═══
+   سه داش پشتِ‌هم روی یک مسیرِ بسته می‌دوند و کلِ مسیر آرام می‌چرخد.
+   --lis-dur آهنگِ دویدنِ داش‌هاست؛ چرخشِ کلی عمداً ۵ برابر کندتر است تا
+   حرکتِ اصلی خوانده شود و چشم گیج نشود. */
+.mv-load-ic{width:64px;height:64px}
+.lis{width:100%;height:100%;color:var(--brand);--lis-dur:2.2s}
+/* مسیرِ لیساژو ~۳۵۲ واحد است (۲٫۵ برابرِ یک حلقهٔ ساده)؛ با ۳٫۲ ثانیه سر
+   کند دیده می‌شد، چون چرخشِ کلی هم بخشی از حرکتش را خنثی می‌کند. */
+.lis-rig{transform-box:view-box;transform-origin:center;
+  animation:lisDrift calc(var(--lis-dur) * 9) linear infinite}
+.lis-track,.lis-tail,.lis-mid,.lis-head{stroke:currentColor;stroke-linecap:round;fill:none}
+.lis-track{stroke-width:1;opacity:.16}
+.lis-tail,.lis-mid,.lis-head{animation-duration:var(--lis-dur);
+  animation-timing-function:linear;animation-iteration-count:infinite}
+/* سه داش انتها‌به‌انتها می‌نشینند: سر روی p، میانه p-9، دنباله p-29 */
+.lis-head{stroke-width:2.2;stroke-dasharray:3 97;stroke-dashoffset:0;animation-name:lisHead}
+.lis-mid{stroke-width:1.8;stroke-dasharray:9 91;stroke-dashoffset:9;opacity:.5;animation-name:lisMid}
+.lis-tail{stroke-width:1.3;stroke-dasharray:20 80;stroke-dashoffset:29;opacity:.22;animation-name:lisTail}
+@keyframes lisHead{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+@keyframes lisMid{from{stroke-dashoffset:9}to{stroke-dashoffset:-91}}
+@keyframes lisTail{from{stroke-dashoffset:29}to{stroke-dashoffset:-71}}
+@keyframes lisDrift{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+/* با کاهشِ حرکت، فقط مسیرِ کم‌رنگ و یک داشِ ساکن می‌ماند */
+@media(prefers-reduced-motion:reduce){
+  .lis-rig,.lis-head,.lis-mid,.lis-tail{animation:none}
 }
 /* نامِ مدلِ در‌حالِ بارگذاری — خطِ دوم، لاتین و LTR */
 .mv-load-name{margin-top:5px;font-size:12.5px;font-weight:600;color:var(--muted);
