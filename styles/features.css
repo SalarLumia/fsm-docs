@@ -883,8 +883,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
    می‌شد و ردیف را دو‌تکه نشان می‌داد. هنگامِ باز شدن بی‌درنگ حذف می‌شود
    (transition-delay صفر در قاعدهٔ .open). */
 .arch-row>td{white-space:nowrap;padding-block:8px;position:relative;
-  transition:padding-top .28s cubic-bezier(.2,0,0,1),padding-bottom .28s cubic-bezier(.2,0,0,1),
-             border-bottom-width 0s linear .28s}
+  transition:padding-top .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s),padding-bottom .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s),
+             border-bottom-width 0s linear var(--exp-end,0s)}
 /* ستونِ نوع (اول) باریک؛ ستونِ کنترل (آخر، چپ‌ترین) باریک با عرضِ ثابت تا فلش و دکمه‌ها هم‌راستا بمانند */
 .arch-table th:first-child,.arch-table td:first-child{width:52px}
 .arch-table th.arch-actcol,.arch-table td.arch-actcol{width:52px;padding-inline:0}   /* فلش وسط‌چینِ عمودی (پیش‌فرضِ جدول) */
@@ -892,7 +892,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .arch-table .el-badge svg{stroke-width:1}
 /* هنگامِ اکسپندِ ردیف: آیکونِ نوعِ سند به ۱٫۵ برابر بزرگ می‌شود؛ لبهٔ راست ثابت (۱۱px) و رشد به چپ.
    translateY(7px): با اندازه‌گیریِ واقعی، فاصلهٔ راست ۲۱px و بالا ۱۷px بود؛ ۴px پایین‌تر → بالا هم ۲۱px، برابرِ راست */
-.arch-table td:first-child .el-badge{transform:translateX(-5px) translateY(0) scale(1);transition:transform .28s cubic-bezier(.2,0,0,1);transform-origin:top right;position:relative;z-index:1}   /* بسته: ۵px چپ */
+.arch-table td:first-child .el-badge{transform:translateX(-5px) translateY(0) scale(1);transition:transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s);transform-origin:top right;position:relative;z-index:1}   /* بسته: ۵px چپ */
 .arch-row.open>td:first-child .el-badge{transform:translateX(-6.25px) translateY(8px) scale(1.5);z-index:3}   /* باز: جابه‌جاییِ افقیِ باز/بست باز هم نصف شد (۱٫۲۵px نسبت به حالتِ بسته) */
 @media(prefers-reduced-motion:reduce){.arch-table td:first-child .el-badge{transition:none}}
 /* تیترِ «نوع» ثابت ۵px به چپ (بدونِ انیمیشنِ جابه‌جایی هنگامِ باز/بست) تا بالای آیکون وسط بماند */
@@ -912,14 +912,14 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* شماره سند — عیناً سبکِ شمارهٔ سندِ پنلِ پروژه (.doc-num): ۱۲px/۵۰۰/ltr، هاور برند، کلیک‌پذیر */
 .arch-num{display:inline-block;font-weight:500;color:var(--txt);direction:ltr;
   font-variant-numeric:tabular-nums;letter-spacing:.5px;cursor:pointer;transform-origin:right;
-  transform:translateX(6px);transition:color .12s,transform .28s cubic-bezier(.2,0,0,1)}
+  transform:translateX(6px);transition:color .12s,transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
 .arch-row.open .arch-num:hover{color:var(--brand)}   /* هاورِ نارنجی فقط در حالتِ اکسپند */
 /* هنگامِ اکسپند: شمارهٔ سند بزرگ‌تر (و به‌همان‌نسبت ضخیم‌تر) می‌شود و کمی پایین می‌رود تا مرکزش با مرکزِ آیکونِ بزرگ‌شده هم‌ارتفاع بماند
    translateY: قبلاً ۱۰٫۵px بود؛ چون آیکون ۴px بیشتر پایین رفت، این هم +۴ = 14.5px تا مرکز‌به‌مرکز بماند */
 .arch-row.open .arch-num{transform:translateX(6px) scale(1.1)}
 /* بزرگ‌شدنِ همهٔ مقادیرِ سطرِ اول هنگام اکسپند = فقط scale(1.1) در جای خود (بدونِ جابه‌جاییِ عمودی)
    تا سطرِ اول بالا بماند و لبهٔ بالای متن هم‌ترازِ لبهٔ بالای آیکون شود */
-.arch-anim{display:inline-block;position:relative;z-index:5;transition:transform .28s cubic-bezier(.2,0,0,1)}
+.arch-anim{display:inline-block;position:relative;z-index:5;transition:transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
 .arch-row.open .arch-anim{transform:scale(1.1)}
 /* تگِ وضعیت (ستون ۸): نه بزرگ می‌شود نه پایین می‌آید — در خطِ اول ثابت می‌ماند (arch-anim نیست).
    تاریخ در خطِ دوم زیرِ تگ می‌آید و چون ستون وسط‌چین است و باکسِ زیرنویس به‌اندازهٔ متن جمع می‌شود، خودبه‌خود زیرِ تگ وسط می‌نشیند. */
@@ -927,76 +927,110 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .arch-stat{display:inline-block;position:relative}
 /* مقادیرِ سطرِ اول (مشتری/قطعه/سفارش/پروژه) — مطابقِ رفرنس مشکی و پررنگ: رنگِ --txt، وزن ۶۰۰ */
 .arch-client{display:inline-block;font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;
-  letter-spacing:.02em;cursor:pointer;transition:color .12s,transform .28s cubic-bezier(.2,0,0,1)}
+  letter-spacing:.02em;cursor:pointer;transition:color .12s,transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
 .arch-row.open .arch-client:hover{color:var(--brand)}   /* هاورِ نارنجی فقط در حالتِ اکسپند */
 .arch-row.open .arch-client.arch-anim{transform:scale(1.1)}
 /* سفارش/پروژه راست‌به‌چپ تا «سفارش ۰۱» درست نمایش داده شود (کلمه راست، عدد چپ) */
 .arch-code{font-size:11.5px;font-weight:500;color:var(--txt);direction:rtl;letter-spacing:.02em}
 .arch-cell{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;letter-spacing:.02em}
 /* سلولِ پروژه/قطعه هم مثلِ مشتری/شماره کلیک‌پذیر (فقط در حالتِ اکسپند ناوبری می‌کند) */
-.arch-lnk{transition:color .12s,transform .28s cubic-bezier(.2,0,0,1)}
+.arch-lnk{transition:color .12s,transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
 .arch-row.open .arch-lnk:hover{color:var(--brand)}   /* هاورِ نارنجی فقط در حالتِ اکسپند */
 /* تاریخ — عیناً برچسب‌های خاکستریِ پنلِ اکسپند (.adg-k): ۱۱٫۵px، وزن ۵۰۰، رنگِ --muted */
 .arch-date{font-size:11.5px;font-weight:500;color:var(--muted)}
 /* فلشِ اکسپندِ ردیف — بالای نوارِ کنترلِ چپ؛ هم‌سبکِ فلشِ جمع/بازِ جدول‌ها */
 .arch-exp{display:inline-grid;place-items:center;width:30px;height:30px;border:none;background:none;
-  cursor:pointer;color:var(--muted);border-radius:7px;transition:color .14s,transform .28s cubic-bezier(.2,0,0,1);padding:0}
+  cursor:pointer;color:var(--muted);border-radius:7px;transition:color .14s,transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s);padding:0}
 .arch-exp:hover{color:var(--brand)}
 /* ⚠ ۰٫۲۸ و همان منحنیِ بقیهٔ اجزای اکسپند: قبلاً ۰٫۲۲ با منحنیِ پیش‌فرض بود،
    پس فلش زودتر از ردیف می‌ایستاد و حرکت دو‌تکه دیده می‌شد. */
-.arch-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .28s cubic-bezier(.2,0,0,1)}
+.arch-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
 .arch-row.open .arch-exp{color:var(--brand);transform:translateY(-16px)}   /* اکسپند: فلش بیشتر به بالا می‌آید (انیمیشنِ بالا رفتن هم‌زمان با چرخشِ فلش) */
 .arch-row.open .arch-exp .chev{transform:rotate(180deg)}   /* باز = فلش رو به بالا */
 .arch-row{cursor:pointer}
+/* ═══ ترتیبِ باز/بسته‌شدن ═══
+   باز شدن: اول ارتفاع و کارت باز می‌شوند، بعد متنِ خطِ دوم می‌آید (تأخیرِ ۰٫۱).
+   بستن: دقیقاً برعکس — اول متنِ خطِ دوم محو می‌شود (۰٫۱۱ ثانیه)، بعد ارتفاع،
+   کارتِ نارنجی، بزرگ‌نماییِ خطِ اول و فلش شروع می‌کنند.
+   یک متغیرِ واحد این تأخیر را به همهٔ اجزا می‌دهد: در حالتِ بسته ۰٫۱۱ و در
+   حالتِ باز صفر. چون transition مقدارِ *حالتِ مقصد* را می‌خواند، همین یک
+   متغیر هر دو جهت را درست می‌کند.
+   ⚠ همه‌جا با fallback نوشته می‌شود؛ یک var تعریف‌نشده کلِ اعلانِ transition
+   را بی‌اعتبار می‌کند و انیمیشن بی‌صدا می‌میرد. */
+.arch-row,.arch-detail{--exp-delay:.11s;--exp-end:.39s}
+.arch-row.open,.arch-detail.open{--exp-delay:0s;--exp-end:0s}
+/* .closing همان تأخیرِ حالتِ بسته را دارد (از قاعدهٔ پایه) — اینجا فقط برای
+   خوانایی صریح نوشته می‌شود که این حالت وجود دارد. */
+.arch-row.closing,.arch-detail.closing{--exp-delay:.11s;--exp-end:.39s}
 /* ===== پس‌زمینهٔ رکوردِ باز = «کارتِ» نارنجیِ گوشه‌گردِ شناور، فرورفته از خطوطِ جداکننده (مثلِ گزینهٔ فعالِ دراپ‌داون) =====
    کارت با شبه‌المانِ ::after (z-index:-1، درونِ stacking contextِ tablewrap) کشیده می‌شود تا پشتِ محتوا بماند و آیکونِ بیرون‌زده رویش.
    خطوطِ جداکننده از border واقعیِ سلول‌ها می‌آید (صاف و تمام‌عرض). گوشه‌های بالا روی ردیفِ اصلی، پایین روی ردیفِ جزئیات. */
 #archiveBody tr:hover>td{background:transparent}
 /* هاورِ ردیفِ بسته: همان کارتِ نارنجیِ گوشه‌گردِ فرورفته (تک‌ردیف، هر چهار گوشه) — بدونِ انیمیشن؛ خطِ جداکننده (border سلول) دست‌نخورده می‌ماند */
-#archiveBody .arch-row.hov:not(.open)>td{background:transparent;position:relative}
-#archiveBody .arch-row.hov:not(.open)>td::after{content:"";position:absolute;z-index:-1;background:#fff3e6;
+/* ⚠ :not(.closing) — وگرنه چون هنگامِ کلیک موس روی ردیف است، کارتِ هاور در
+   همان لحظهٔ اولِ بسته‌شدن با شکلِ تک‌ردیفیِ خودش می‌پرید وسطِ انیمیشن. */
+#archiveBody .arch-row.hov:not(.open):not(.closing)>td{background:transparent;position:relative}
+#archiveBody .arch-row.hov:not(.open):not(.closing)>td::after{content:"";position:absolute;z-index:-1;background:#fff3e6;
   top:5px;right:0;bottom:5px;left:0;pointer-events:none;opacity:1;transition:none}
-#archiveBody .arch-row.hov:not(.open)>td:first-child::after{right:8px;border-top-right-radius:12px;border-bottom-right-radius:12px}
-#archiveBody .arch-row.hov:not(.open)>td.arch-actcol::after{left:8px;border-top-left-radius:12px;border-bottom-left-radius:12px}
+#archiveBody .arch-row.hov:not(.open):not(.closing)>td:first-child::after{right:8px;border-top-right-radius:12px;border-bottom-right-radius:12px}
+#archiveBody .arch-row.hov:not(.open):not(.closing)>td.arch-actcol::after{left:8px;border-top-left-radius:12px;border-bottom-left-radius:12px}
+/* بسته‌شدن روی ردیفی که موس رویش است: کارت محو نمی‌شود، بلکه *نرم* به همان
+   شکلِ کارتِ هاور می‌رسد — چون پس از پایانِ انیمیشن هم باید دیده شود. اگر
+   محو می‌شد، لحظهٔ برداشتنِ closing دوباره یک‌باره ظاهر می‌شد. */
+#archiveBody .arch-row.closing.hov>td::after{opacity:1;top:5px;bottom:5px}
+#archiveBody .arch-row.closing.hov>td:first-child::after{border-bottom-right-radius:12px}
+#archiveBody .arch-row.closing.hov>td.arch-actcol::after{border-bottom-left-radius:12px}
 /* tablewrap یک stacking context تا کارتِ z-index:-1 پشتِ .card پنهان نشود ولی آیکونِ بیرون‌زده رویش بماند */
 #tab-archive .tablewrap{position:relative;z-index:0}
 #tab-data .tablewrap{position:relative;z-index:0}   /* همان محافظِ stacking context برای کارتِ هاورِ ۴ جدولِ تنظیمات */
 /* پس‌زمینهٔ سلولِ باز شفاف؛ خطوطِ جداکننده از border سلول‌ها می‌آید = صاف و تمام‌عرض (بالا: border ردیفِ قبلی؛ پایین: border ردیفِ جزئیات) */
-.arch-row.open>td{background:transparent;position:relative;padding-top:24px;padding-bottom:3px;border-bottom-width:0;transition-delay:0s,0s,0s}   /* ۱۲px گپ + ۱۲px حاشیهٔ نارنجیِ بالای خطِ اول ⟵ سلول بلندتر، اندازهٔ کارت مثلِ قبل */
-.arch-detail.open>td{background:transparent;position:relative;border-bottom-width:1px;transition-delay:0s}
+.arch-row.open>td{background:transparent;position:relative;padding-top:24px;padding-bottom:3px;border-bottom-width:0}   /* ۱۲px گپ + ۱۲px حاشیهٔ نارنجیِ بالای خطِ اول ⟵ سلول بلندتر، اندازهٔ کارت مثلِ قبل */
+.arch-detail.open>td{background:transparent;position:relative;border-bottom-width:1px}
 /* بدنهٔ کارت (شبه‌المانِ شناور): فرورفتگیِ ۱۲px بالا/پایین و ۸px چپ/راست
    ⚠ کارت *همیشه* ساخته می‌شود و فقط شفافیتش گذار می‌کند. قبلاً content فقط
    زیرِ .open بود، پس در لحظهٔ بستن یک‌باره ناپدید می‌شد در حالی که ردیف هنوز
    ۲۸۰ میلی‌ثانیه در حالِ جمع‌شدن بود: نیمهٔ پایینیِ کارت می‌پرید و محتوای
    ردیفِ جزئیات لخت روی زمینهٔ سفید می‌ماند. حالا هم‌گام با ارتفاع محو می‌شود. */
+/* ⚠ کلِ هندسه (فرورفتگیِ چپ/راست و گوشه‌های گرد) روی قاعدهٔ *پایه* است، نه روی
+   .open — وگرنه لحظهٔ بستن، کارت ناگهان تمام‌عرض و گوشه‌تیز می‌شد و بعد تازه
+   شروع به جمع‌شدن می‌کرد. تنها چیزی که بینِ دو حالت عوض می‌شود شفافیت و
+   فرورفتگیِ بالا/پایین است، و هر دو گذار دارند. */
 .arch-row>td::after,.arch-detail>td::after{content:"";position:absolute;z-index:-1;background:#fff3e6;
   top:0;right:0;bottom:0;left:0;pointer-events:none;opacity:0;
-  transition:opacity .28s cubic-bezier(.2,0,0,1)}
+  transition:opacity .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s),
+             top .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s),
+             bottom .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s),
+             border-radius .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
+.arch-row>td:first-child::after,.arch-detail>td:first-child::after{right:8px}
+.arch-row>td.arch-actcol::after,.arch-detail>td.arch-actcol::after{left:8px}
+/* گوشه‌های گرد — بالا روی ردیفِ اصلی، پایین روی ردیفِ جزئیات */
+.arch-row>td:first-child::after{border-top-right-radius:12px}
+.arch-detail>td:first-child::after{border-bottom-right-radius:12px}
+.arch-row>td.arch-actcol::after{border-top-left-radius:12px}
+.arch-detail>td.arch-actcol::after{border-bottom-left-radius:12px}
 .arch-row.open>td::after,.arch-detail.open>td::after{opacity:1}
+/* ⚠ فرورفتگیِ بالا/پایین هم گذار دارد و همین «پرشِ تکهٔ پایینی» را حل می‌کند:
+   با inset ثابتِ ۶px، به‌محضِ آنکه ارتفاعِ سلولِ جزئیات به زیرِ ۶px می‌رسید،
+   ارتفاعِ جعبه صفر می‌شد و تکهٔ پایینیِ کارت ۶px زودتر از بقیه ناپدید می‌شد.
+   حالا inset هم‌زمان با ارتفاع به صفر می‌رسد، پس کارت تا آخرین لحظه یک‌پارچه
+   و گوشه‌گرد می‌ماند. */
 .arch-row.open>td::after{top:6px}      /* کادرِ نارنجی ۶px بالاتر می‌رود (نزدیک‌تر به مرزِ بالایی سلول) — بدونِ تغییرِ ارتفاعِ سلول یا جای محتوا */
 .arch-detail.open>td::after{bottom:6px}   /* و ۶px پایین‌تر ⟵ نزدیک‌تر به مرزِ پایینی سلول */
-.arch-row.open>td:first-child::after,.arch-detail.open>td:first-child::after{right:8px}
-.arch-row.open>td.arch-actcol::after,.arch-detail.open>td.arch-actcol::after{left:8px}
-/* گوشه‌های گرد — بالا روی ردیفِ اصلی، پایین روی ردیفِ جزئیات */
-.arch-row.open>td:first-child::after{border-top-right-radius:12px}
-.arch-detail.open>td:first-child::after{border-bottom-right-radius:12px}
-.arch-row.open>td.arch-actcol::after{border-top-left-radius:12px}
-.arch-detail.open>td.arch-actcol::after{border-bottom-left-radius:12px}
 /* ردیفِ جزئیات: پایه بدونِ border/پس‌زمینه؛ vertical-align:top */
 /* خطِ جداکنندهٔ پایینِ گروه: هنگامِ بستن تا پایانِ جمع‌شدن سرِ جای خود می‌ماند و
    دقیقاً همان لحظه‌ای می‌رود که خطِ ردیفِ اصلی برمی‌گردد — پس در تمامِ مسیر
    دقیقاً یک خط دیده می‌شود، نه دو تا و نه هیچ.
    عرضِ صفر با استایلِ solid (نه border:none) تا عرض قابلِ گذار بماند. */
 .arch-detail>td{padding:0;border:0 solid #f2f1ee;background:transparent;vertical-align:top;position:relative;
-  transition:border-bottom-width 0s linear .28s}
+  transition:border-bottom-width 0s linear var(--exp-end,0s)}
 /* نشانگرِ نارنجیِ لبهٔ راست — کنارِ لبهٔ راستِ کارت (۸px تو رفته) */
 .arch-detail>td:first-child{position:relative}
 .arch-detail>td:first-child::before{content:"";position:absolute;inset-inline-start:8px;top:-28px;bottom:30px;z-index:4;   /* پایین ۱۰px بالاتر ⟵ نوار کوتاه‌تر و مرکزش هم‌ارتفاعِ مرکزِ آیکونِ سند */
   width:3px;border-radius:3px;background:var(--brand);pointer-events:none;transform-origin:center;
-  transform:scaleY(0);transition:transform .28s cubic-bezier(.2,0,0,1)}
+  transform:scaleY(0);transition:transform .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
 .arch-detail.open>td:first-child::before{transform:scaleY(1)}   /* فقط رشدِ عمودی در همان جای نهایی (بدونِ لغزشِ افقی از بیرونِ کادر) */
 /* اکسپندِ آکاردئونیِ هر سلول (grid 0fr→1fr، هم‌زمان) */
-.arch-det-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.2,0,0,1)}
+.arch-det-wrap{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.2,0,0,1) var(--exp-delay,0s)}
 .arch-detail.open .arch-det-wrap{grid-template-rows:1fr}
 .arch-det-in{min-height:0;overflow:hidden}
 /* سطر دوم: پدینگِ بالا کم تا فاصلهٔ کمِ سطر اول‑دوم؛ باکس زیرِ تیترِ همان ستون قرار می‌گیرد */
@@ -1055,7 +1089,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* ستونِ عملیات (فلش + دکمه‌های دانلود/حذف): ۱۶px به راستِ موقعیتِ فعلی (۹ چپ − ۱۶ = ۷ راست) بدونِ اثر روی ستون‌های دیگر */
 #tab-archive td:nth-child(9) .arch-exp{position:relative;right:calc(var(--arch-shift) - 16px)}
 #tab-archive .arch-detail td.arch-actcol .arch-det-actcol{position:relative;right:calc(var(--arch-shift) - 16px)}
-@media(prefers-reduced-motion:reduce){.arch-det-wrap{transition:none}.arch-exp .chev{transition:none}.arch-detail>td:first-child::before{transition:none}
+@media(prefers-reduced-motion:reduce){.arch-row,.arch-detail{--exp-delay:0s;--exp-end:0s}.arch-det-wrap{transition:none}.arch-exp .chev{transition:none}.arch-detail>td:first-child::before{transition:none}
   .arch-row>td::after,.arch-detail>td::after{transition:none}.arch-det-pad{transition:none}}
 /* ===== فوترِ آرشیو: خروجی (راست) + صفحه‌بندی (چپ) ===== */
 .arch-foot{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);

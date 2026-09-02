@@ -378,9 +378,23 @@ function archToggleRow(num){
   var willOpen=!det.classList.contains("open");
   var body=document.getElementById("archiveBody");
   var op=body.querySelectorAll(".arch-detail.open,.arch-row.open");
-  for(var i=0;i<op.length;i++) op[i].classList.remove("open");
+  for(var i=0;i<op.length;i++){
+    /* ⚠ کلاسِ موقتِ closing تا پایانِ انیمیشن (۰٫۱۱ تأخیر + ۰٫۲۸ گذار) روی ردیف
+       می‌ماند. بدونِ آن، چون هنگامِ کلیک موس روی ردیف است، همان لحظه کارتِ
+       *هاور* فعال می‌شد و وسطِ بسته‌شدن با شکل و گوشه‌های خودش می‌پرید وسط.
+       تایمر روی خودِ عنصر است تا کلیک‌های پشتِ‌سرِ‌هم آن را لغو کنند. */
+    var el=op[i];
+    el.classList.remove("open");
+    el.classList.add("closing");
+    (function(e){
+      if(e._closeT) clearTimeout(e._closeT);
+      e._closeT=setTimeout(function(){ e.classList.remove("closing"); e._closeT=null; }, 400);
+    })(el);
+  }
   var table=body.closest(".arch-table");                 // کلاسِ has-open روی جدول → جابه‌جاییِ تیترِ «نوع» هنگامِ اکسپند
   if(willOpen){
+    // اگر همین ردیف نیمهٔ راهِ بسته‌شدن بود، حالتِ بسته‌شدن لغو می‌شود
+    [row,det].forEach(function(e){ if(e._closeT){ clearTimeout(e._closeT); e._closeT=null; } e.classList.remove("closing"); });
     row.classList.add("open"); det.classList.add("open"); _arch.openNum=num; if(table) table.classList.add("has-open");
   }
   else { _arch.openNum=""; if(table) table.classList.remove("has-open"); }
