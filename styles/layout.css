@@ -238,14 +238,30 @@ main{max-width:none;margin:0;padding:0}
    switchTab روی آیتمی می‌گذارد که همین حالا فعال بود. */
 .nav-item.active .ni-search .sr-bob{animation:srBob .5s cubic-bezier(.33,0,.67,1)}
 .nav-item.active .ni-search .sr-mag{animation:srSwing .5s cubic-bezier(.33,0,.67,1)}
-.nav-item.leaving .ni-search .sr-bob{animation:srBob .5s cubic-bezier(.33,0,.67,1) reverse}
-.nav-item.leaving .ni-search .sr-mag{animation:srSwing .5s cubic-bezier(.33,0,.67,1) reverse}
+/* ⚠ نامِ انیمیشن باید *متفاوت* باشد، وگرنه هیچ اتفاقی نمی‌افتد: وقتی
+   animation-name عوض نشود، مرورگر انیمیشنِ در‌حالِ‌اجرا را ادامه می‌دهد و
+   دوباره از صفر شروعش نمی‌کند. انیمیشنِ ورود تمام شده بود، پس با همان نام و
+   direction:reverse فقط به فریمِ پایانیِ معکوس می‌پرید — یعنی ظاهراً هیچ
+   برگشتی دیده نمی‌شد. کی‌فریم‌ها عیناً همان‌اند، فقط نام فرق دارد. */
+.nav-item.leaving .ni-search .sr-bob{animation:srBobOut .5s cubic-bezier(.33,0,.67,1) reverse}
+.nav-item.leaving .ni-search .sr-mag{animation:srSwingOut .5s cubic-bezier(.33,0,.67,1) reverse}
 @keyframes srSwing{
   0%{transform:rotate(0)}
   33.33%{transform:rotate(-13deg)}
   66.67%{transform:rotate(6deg)}
   96.67%,100%{transform:rotate(0)}}
 @keyframes srBob{
+  0%{transform:translateY(0)}
+  26.67%{transform:translateY(1.2px)}
+  60%{transform:translateY(-.8px)}
+  90%,100%{transform:translateY(0)}}
+/* دوقلوهای برگشت — محتوا یکسان، فقط نام جدا تا مرورگر انیمیشنِ تازه بسازد */
+@keyframes srSwingOut{
+  0%{transform:rotate(0)}
+  33.33%{transform:rotate(-13deg)}
+  66.67%{transform:rotate(6deg)}
+  96.67%,100%{transform:rotate(0)}}
+@keyframes srBobOut{
   0%{transform:translateY(0)}
   26.67%{transform:translateY(1.2px)}
   60%{transform:translateY(-.8px)}
@@ -265,8 +281,9 @@ main{max-width:none;margin:0;padding:0}
    forwards روی حالتِ فعال لازم است تا نقطه بماند؛ این یک *حالت* است نه جلوه. */
 .ni-search .sr-dot{r:0px;stroke-width:0}
 .nav-item.active .ni-search .sr-dot{animation:srDot .32s cubic-bezier(.34,1.3,.64,1) forwards}
-.nav-item.leaving .ni-search .sr-dot{animation:srDot .32s cubic-bezier(.34,1.3,.64,1) reverse}
+.nav-item.leaving .ni-search .sr-dot{animation:srDotOut .32s cubic-bezier(.34,1.3,.64,1) reverse}
 @keyframes srDot{from{r:0px;stroke-width:0}to{r:2.65px;stroke-width:5.3}}
+@keyframes srDotOut{from{r:0px;stroke-width:0}to{r:2.65px;stroke-width:5.3}}
 /* کاهشِ حرکت: تکان‌ها خاموش، ولی نقطه می‌ماند — آن یک *حالت* است نه جلوه،
    و حذفش نشانهٔ تبِ فعال را از بین می‌برد. */
 @media(prefers-reduced-motion:reduce){

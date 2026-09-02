@@ -260,7 +260,7 @@ function renderArchive(){
   var html=pageRows.map(function(d){
     var si=statusInfo(d.status);
     var num=esc(d.drawingNumber);
-    var hov=' onmouseover="archHover(event,\''+num+'\',1)" onmouseout="archHover(event,\''+num+'\',0)"';
+    var hov='';   // هاور کاملاً با CSS اداره می‌شود؛ توضیحش پایین‌تر، جای تابعِ حذف‌شده
     // ---- ردیفِ اصلی (فشرده، کدمحور) — کلیک روی هر جای ردیف = اکسپند. آخرین ستونِ چپ = نوارِ کنترل (فلش) ----
     var main="<tr class=\"arch-row\" id=\"arow-"+num+"\" onclick=\"archToggleRow('"+num+"')\""+hov+">"+
       '<td><span class="el-badge" title="'+esc(typeName(d.typeCode))+'">'+docTypeIconInner({code:d.typeCode})+'</span></td>'+
@@ -364,13 +364,14 @@ function archNext(){ archGoPage(_arch.page+1); }
 function archLast(){ archGoPage(_arch.pages||1); }
 
 /* هاورِ یکتا روی کلِ رکورد (سر + جزئیات به‌صورتِ یک تکه) — با guardِ relatedTarget تا جابه‌جایی درونِ رکورد فلیکر نکند */
-function archHover(ev, num, on){
-  var r=document.getElementById("arow-"+num), d=document.getElementById("adet-"+num);
-  if(!on){ var rt=ev&&ev.relatedTarget;
-    if(rt && ((r&&r.contains(rt))||(d&&d.contains(rt)))) return; }   // موس هنوز داخلِ همان رکورد است
-  if(r) r.classList.toggle("hov", !!on);
-  if(d) d.classList.toggle("hov", !!on);
-}
+/* ⚠ هاور دیگر با جاوااسکریپت اداره نمی‌شود.
+   نسخهٔ قبلی با mouseover/mouseout کلاسِ hov را می‌گذاشت و برمی‌داشت، ولی این
+   دو رویداد هنگامِ حرکتِ سریعِ موس (یا خروج از پنجره، یا رندرِ دوبارهٔ جدول
+   وسطِ حرکت) گاهی جفت نمی‌شدند و کلاس روی چند ردیف جا می‌ماند — همان چند
+   ردیفِ رنگی که هم‌زمان دیده می‌شد.
+   حالا فقط :hover در CSS است: مرورگر خودش تضمین می‌کند که هیچ‌وقت روی دو
+   عنصر هم‌زمان نماند. ردیفِ جزئیات در حالتِ بسته ارتفاعِ صفر دارد، پس نیازی
+   به هماهنگ‌کردنِ دستیِ دو ردیف نیست. */
 /* اکسپندِ آکاردئونیِ یک ردیف — هر لحظه فقط یکی باز می‌ماند */
 function archToggleRow(num){
   var row=document.getElementById("arow-"+num), det=document.getElementById("adet-"+num);
@@ -388,7 +389,7 @@ function archToggleRow(num){
     el.classList.add("closing");
     (function(e){
       if(e._closeT) clearTimeout(e._closeT);
-      e._closeT=setTimeout(function(){ e.classList.remove("closing"); e._closeT=null; }, 400);
+      e._closeT=setTimeout(function(){ e.classList.remove("closing"); e._closeT=null; }, 300);
     })(el);
   }
   var table=body.closest(".arch-table");                 // کلاسِ has-open روی جدول → جابه‌جاییِ تیترِ «نوع» هنگامِ اکسپند
