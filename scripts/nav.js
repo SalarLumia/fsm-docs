@@ -55,6 +55,7 @@ function switchTab(name){
   if(name==="dashboard") renderDashboard(true);   // آرگومان true → شمارشِ عددیِ کارت‌های شاخص
   if(name==="project") renderProjectTab();
   if(name==="trash" && typeof renderTrash==="function") renderTrash();
+  if(name==="help" && typeof renderHelp==="function") renderHelp();
   // درختِ «مشتریان و پروژه‌ها» را تازه کن تا با ترکِ تبِ پروژه، نارنجیِ مشتری/پروژه پاک شود
   if(name!=="project" && typeof navRefreshSelection==="function") navRefreshSelection();
   if(typeof playTabReveal==="function") playTabReveal(pane);   // ورودِ آبشاریِ بلوک‌های همان تب

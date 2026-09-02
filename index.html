@@ -20,6 +20,7 @@
 <link rel="stylesheet" href="styles/dashboard.css">
 <link rel="stylesheet" href="styles/features.css">
 <link rel="stylesheet" href="styles/project.css">
+<link rel="stylesheet" href="styles/help.css">
 <link rel="stylesheet" href="styles/login.css">
 <script>
 /* ⚠ پیش از رندرِ صفحه اجرا می‌شود (عمداً در head و بدونِ defer).
@@ -358,12 +359,18 @@
 
     <!-- ---------- راهنما ---------- -->
     <section id="tab-help" class="tabpane hidden">
-      <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.9 9.3a3.2 3.2 0 1 1 4.5 2.95c-.85.42-1.4 1.05-1.4 1.95v.55"/><circle cx="12" cy="17.4" r="1.05" fill="currentColor" stroke="none"/></svg>راهنمای سایت</h3>
-        <div class="help-empty">
-          <div class="help-badge"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.9 9.3a3.2 3.2 0 1 1 4.5 2.95c-.85.42-1.4 1.05-1.4 1.95v.55"/><circle cx="12" cy="17.4" r="1.05" fill="currentColor" stroke="none"/></svg></div>
-          <h4>راهنمای سامانه به‌زودی</h4>
-          <p>این بخش با تکمیلِ سامانه به راهنمای گام‌به‌گامِ کار با اسناد، پروژه‌ها و گردشِ تأیید تجهیز می‌شود.</p>
+      <div class="card help-card">
+        <div class="help-hd">
+          <div class="help-hd-t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8.9 9.3a3.2 3.2 0 1 1 4.5 2.95c-.85.42-1.4 1.05-1.4 1.95v.55"/><circle cx="12" cy="17.4" r="1.05" fill="currentColor" stroke="none"/></svg>راهنمای سامانه</div>
+          <div class="help-sbox">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input id="helpSearch" type="text" autocomplete="off" placeholder="در راهنما بگردید — مثلاً: ثبت سند، تایید، ذره‌بین" oninput="hpOnSearch(this.value)">
+            <button class="help-clear" id="helpClear" style="display:none" onclick="hpClearSearch()" aria-label="پاک‌کردنِ جست‌وجو"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          </div>
+        </div>
+        <div class="help-body">
+          <aside class="help-rail" id="helpRail"></aside>
+          <div class="help-main" id="helpMain"></div>
         </div>
       </div>
     </section>
@@ -443,6 +450,7 @@
 <script src="scripts/docmodal.js"></script>
 <script src="scripts/review.js"></script>
 <script src="scripts/projects.js"></script>
+<script src="scripts/help.js"></script>
 <script src="scripts/settings.js"></script>
 <script src="scripts/app.js"></script>
 </body>
