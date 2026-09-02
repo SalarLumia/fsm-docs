@@ -549,6 +549,15 @@ function renderHelp(){
   else if(_hpArt){ main.innerHTML=hpArticleHTML(hpById(_hpArt)); }
   else { main.innerHTML=hpHomeHTML(); }
   main.scrollTop=0;
+
+  /* اگر مقاله از بیرون باز شده باشد (دکمهٔ راهنمای یک بخش)، سلولِ متناظر در
+     ریل ممکن است پایین‌ترِ ناحیهٔ دید باشد؛ فقط در همین حالت اسکرول می‌کنیم
+     تا کاربر جای خودش را در فهرست ببیند. */
+  var sel=rail.querySelector(".hp-item.sel");
+  if(sel){
+    var rr=rail.getBoundingClientRect(), sr=sel.getBoundingClientRect();
+    if(sr.top<rr.top || sr.bottom>rr.bottom) rail.scrollTop += (sr.top-rr.top) - (rr.height-sr.height)/2;
+  }
 }
 
 function hpHomeHTML(){
@@ -628,8 +637,13 @@ function hpClearBtn(){
   var x=document.getElementById("helpClear"); if(x) x.style.display=_hpQ?"":"none";
 }
 /* میان‌برِ بیرونی: از هر جای سامانه می‌توان کاربر را مستقیم به یک مقاله برد.
-   مبنای «راهنمای در بستر» — دکمهٔ پرسش کنارِ هر بخش، همین را صدا می‌زند. */
+   مبنای «راهنمای در بستر» — دکمهٔ پرسش کنارِ هر بخش، همین را صدا می‌زند.
+   ⚠ وضعیت پیش از switchTab ست می‌شود، چون خودِ switchTab یک‌بار renderHelp را
+   صدا می‌زند؛ با ترتیبِ برعکس، یک لحظه صفحهٔ نخست دیده می‌شد و بعد مقاله. */
 function openHelp(id){
+  _hpArt = id || null; _hpQ = "";
+  var box=document.getElementById("helpSearch"); if(box) box.value="";
+  hpClearBtn();
   if(typeof switchTab==="function") switchTab("help");
-  if(id) hpOpen(id); else hpHome();
+  else renderHelp();
 }
