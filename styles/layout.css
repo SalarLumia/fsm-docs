@@ -214,16 +214,50 @@ main{max-width:none;margin:0;padding:0}
 .ni-folder .fd-lid{transform-origin:50% 0;transform:scaleY(.55);opacity:0}
 .nav-item.active .ni-folder .fd-lid{opacity:1;transform:scaleY(1) rotate(-4deg)}
 
-/* آرشیو: ذره‌بین کمی می‌چرخد و جمع می‌شود و دو سطرِ سند داخلِ شیشه
-   پدیدار می‌شود — یعنی از «جست‌وجو» به «پیدا شد». خطوط از مرکز باز می‌شوند. */
-/* ⚠ قاعدهٔ کلی بالا fill-box می‌دهد؛ اینجا مختصاتِ viewBox لازم است
-   تا همه حولِ مرکزِ شیشه (11,11) بچرخند، نه حولِ کادرِ خودشان. */
-.ni-search .sr-lens{transform-box:view-box;transform-origin:11px 11px}
-.nav-item.active .ni-search .sr-lens{transform:rotate(-18deg)}
-.ni-search .sr-hit line{transform-box:view-box;transform-origin:11px 11px;transform:scaleX(0);opacity:0;
-  transition:transform .3s cubic-bezier(.34,1.3,.64,1),opacity .2s ease}
-.nav-item.active .ni-search .sr-hit line{transform:scaleX(1);opacity:1}
-.nav-item.active .ni-search .sr-hit line:last-child{transition-delay:.06s}
+/* آرشیو: ذره‌بین دو بار «می‌گردد» — پایین می‌رود، به چپ کج می‌شود، به راست
+   برمی‌گردد و صاف می‌ایستد — و هم‌زمان نقطه‌ای داخلِ شیشه باز می‌شود، می‌ماند
+   و بعد به‌صورتِ حلقه‌ای به بیرون می‌ترکد و محو می‌شود («پیدا شد»).
+
+   کوریوگرافی و زمان‌بندی عیناً از یک انیمیشنِ Lottie برداشته شده (۶۰ فریم روی
+   ۶۰fps = یک ثانیه) ولی با CSS بازسازی شد، نه با پخش‌کنندهٔ Lottie: کتابخانه‌اش
+   ~۲۵۰KB است برای یک آیکون، رنگش داخلِ فایل قفل است و با فعال‌شدن نارنجی
+   نمی‌شود، و کنترلِ حالت جاوااسکریپت می‌خواست. هندسه و ضخامتِ ۱٫۸ همان آیکونِ
+   قبلی ماند تا در کنارِ پنج آیکونِ دیگر یکدست بماند.
+
+   ⚠ قاعدهٔ کلی بالا fill-box می‌دهد؛ اینجا مختصاتِ viewBox لازم است تا چرخش
+   حولِ نقطه‌ای روی دسته باشد، نه حولِ کادرِ خودِ شکل. */
+.ni-search .sr-bob,.ni-search .sr-mag{transform-box:view-box;transform-origin:11px 11px}
+/* مبدأ چرخش روی دسته است، نه مرکزِ شیشه: نسبتِ ۰٫۷۳ از مرکز تا نوکِ دسته —
+   همان نسبتی که در فایلِ اصلی بود. حسِ «گرفتنِ دسته و گرداندنِ ذره‌بین». */
+.ni-search .sr-mag{transform-origin:18.3px 18.3px}
+.nav-item.active .ni-search .sr-bob{animation:srBob 1s cubic-bezier(.33,0,.67,1) forwards}
+.nav-item.active .ni-search .sr-mag{animation:srSwing 1s cubic-bezier(.33,0,.67,1) forwards}
+@keyframes srSwing{
+  0%{transform:rotate(0)}      16.67%{transform:rotate(-13deg)}
+  33.33%{transform:rotate(6deg)} 48.33%,50%{transform:rotate(0)}
+  66.67%{transform:rotate(-13deg)}
+  83.33%{transform:rotate(6deg)} 98.33%,100%{transform:rotate(0)}}
+@keyframes srBob{
+  0%{transform:translateY(0)}   13.33%{transform:translateY(1.2px)}
+  30%{transform:translateY(-.8px)} 45%,50%{transform:translateY(0)}
+  63.33%{transform:translateY(1.2px)}
+  80%{transform:translateY(-.8px)} 95%,100%{transform:translateY(0)}}
+/* نقطه با یک دایرهٔ *خط‌دار* ساخته می‌شود نه تو‌پُر: با r و stroke-width می‌توان
+   هم‌زمان شعاعِ بیرونی و درونی را کنترل کرد، پس همان قرص که بعداً از وسط
+   سوراخ می‌شود با یک المان درمی‌آید (در فایلِ اصلی این کار با track matte
+   انجام شده بود که در SVG معادلِ ساده ندارد).
+   قرصِ تو‌پُرِ شعاعِ R  ⟵  r = R/2 و stroke-width = R */
+.ni-search .sr-dot{transition:none;r:0px;stroke-width:0}
+.nav-item.active .ni-search .sr-dot{animation:srPing 1s cubic-bezier(.33,0,.67,1) forwards}
+@keyframes srPing{
+  0%{r:0px;stroke-width:0;opacity:1}
+  23%{r:2.65px;stroke-width:5.3}
+  50%{r:2.65px;stroke-width:5.3;opacity:1}
+  80%{r:6.5px;stroke-width:5}
+  100%{r:8.9px;stroke-width:1.4;opacity:0}}
+@media(prefers-reduced-motion:reduce){
+  .nav-item.active .ni-search .sr-bob,.nav-item.active .ni-search .sr-mag,
+  .nav-item.active .ni-search .sr-dot{animation:none}}
 
 /* سطل زباله: درب بلند می‌شود و زاویه می‌گیرد (لولا روی گوشهٔ راست) */
 /* ⚠ svg به‌طورِ پیش‌فرض overflow:hidden دارد، پس دربِ بلندشده از لبهٔ viewBox
