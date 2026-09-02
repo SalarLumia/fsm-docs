@@ -48,7 +48,19 @@ function switchTab(name){
   // ترکِ نمای فعلی: مدلِ سه‌بعدیِ بارگذاری‌شده (اگر بود) و URLِ بلابش آزاد می‌شود تا حافظه نشت نکند
   if(typeof releaseBlobUrl==="function") releaseBlobUrl("mvModel");
   window._activeTab=name;   // تبِ فعالِ جاری؛ درختِ سایدبار حالتِ نارنجی را فقط برای همین تب نشان می‌دهد
-  document.querySelectorAll(".nav-item[data-tab]").forEach(function(b){ b.classList.toggle("active", b.dataset.tab===name); });
+  /* CSS نمی‌تواند «کلاس برداشته شد» را تشخیص دهد، پس آیتمی که همین حالا فعال
+     بود یک کلاسِ موقتِ leaving می‌گیرد تا آیکونش انیمیشنِ خروج (همان انیمیشنِ
+     ورود، برعکس) را اجرا کند. تایمر روی خودِ عنصر نگه داشته می‌شود تا سوئیچِ
+     پشتِ‌سرِ‌همِ تب‌ها تایمرِ قبلی را لغو کند و کلاس جا نماند. */
+  document.querySelectorAll(".nav-item[data-tab]").forEach(function(b){
+    var on = b.dataset.tab===name;
+    if(!on && b.classList.contains("active")){
+      if(b._leaveT) clearTimeout(b._leaveT);
+      b.classList.add("leaving");
+      b._leaveT=setTimeout(function(){ b.classList.remove("leaving"); b._leaveT=null; }, 520);
+    }
+    b.classList.toggle("active", on);
+  });
   document.querySelectorAll(".tabpane").forEach(function(p){ p.classList.add("hidden"); });
   var pane=document.getElementById("tab-"+name);
   pane.classList.remove("hidden");

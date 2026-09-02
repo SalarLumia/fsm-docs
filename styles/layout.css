@@ -232,9 +232,14 @@ main{max-width:none;margin:0;padding:0}
 .ni-search .sr-mag{transform-origin:18.3px 18.3px}
 /* «گشتنِ» ذره‌بین هنگامِ انتخاب — یک دور، نه دو دور: فایلِ اصلی چون لوپ بود دو
    دور داشت، ولی اینجا واکنش به یک کلیک است و باید هم‌ریتمِ بقیهٔ گذارهای سایت
-   (~۰٫۳ ثانیه) باشد. این تنها بخشِ یک‌طرفه است؛ نقطه در هر دو جهت می‌رود و می‌آید. */
+   (~۰٫۳ ثانیه) باشد.
+   خروج = عیناً همین انیمیشن با direction:reverse — هم کی‌فریم‌ها و هم منحنیِ
+   زمان برعکس می‌شوند، پس مسیرِ رفت و برگشت دقیقاً یکی است. کلاسِ leaving را
+   switchTab روی آیتمی می‌گذارد که همین حالا فعال بود. */
 .nav-item.active .ni-search .sr-bob{animation:srBob .5s cubic-bezier(.33,0,.67,1)}
 .nav-item.active .ni-search .sr-mag{animation:srSwing .5s cubic-bezier(.33,0,.67,1)}
+.nav-item.leaving .ni-search .sr-bob{animation:srBob .5s cubic-bezier(.33,0,.67,1) reverse}
+.nav-item.leaving .ni-search .sr-mag{animation:srSwing .5s cubic-bezier(.33,0,.67,1) reverse}
 @keyframes srSwing{
   0%{transform:rotate(0)}
   33.33%{transform:rotate(-13deg)}
@@ -253,14 +258,22 @@ main{max-width:none;margin:0;padding:0}
    دایرهٔ خط‌دار به‌جای تو‌پُر: قرصِ تو‌پُرِ شعاعِ R ⟵ r = R/2 و stroke-width = R.
    شعاعِ ۵٫۳ از نسبتِ ۰٫۷۵ برابرِ شعاعِ داخلیِ شیشه (۷٫۱) درآمده — همان نسبتِ
    فایلِ اصلی. منحنی همان cubic-bezier نوارِ کناری است (با کمی سرریز). */
-.ni-search .sr-dot{r:0px;stroke-width:0;
-  transition:r .32s cubic-bezier(.34,1.3,.64,1),stroke-width .32s cubic-bezier(.34,1.3,.64,1)}
-.nav-item.active .ni-search .sr-dot{r:2.65px;stroke-width:5.3}
+/* ⚠ animation و نه transition: با transition، منحنیِ سرریزدار در مسیرِ برگشت
+   باعث می‌شد شعاع زیرِ صفر برود و مرورگر آن را کلمپ کند — برگشت ناقص و بریده
+   دیده می‌شد. با animation + direction:reverse مسیرِ برگشت دقیقاً آینهٔ رفت
+   است و سرریز به‌جای فرورفتگی، یک «خیزِ» کوچک پیش از جمع‌شدن می‌سازد.
+   forwards روی حالتِ فعال لازم است تا نقطه بماند؛ این یک *حالت* است نه جلوه. */
+.ni-search .sr-dot{r:0px;stroke-width:0}
+.nav-item.active .ni-search .sr-dot{animation:srDot .32s cubic-bezier(.34,1.3,.64,1) forwards}
+.nav-item.leaving .ni-search .sr-dot{animation:srDot .32s cubic-bezier(.34,1.3,.64,1) reverse}
+@keyframes srDot{from{r:0px;stroke-width:0}to{r:2.65px;stroke-width:5.3}}
 /* کاهشِ حرکت: تکان‌ها خاموش، ولی نقطه می‌ماند — آن یک *حالت* است نه جلوه،
    و حذفش نشانهٔ تبِ فعال را از بین می‌برد. */
 @media(prefers-reduced-motion:reduce){
-  .nav-item.active .ni-search .sr-bob,.nav-item.active .ni-search .sr-mag{animation:none}
-  .ni-search .sr-dot{transition:none}}
+  .nav-item.active .ni-search .sr-bob,.nav-item.active .ni-search .sr-mag,
+  .nav-item.leaving .ni-search .sr-bob,.nav-item.leaving .ni-search .sr-mag,
+  .nav-item.leaving .ni-search .sr-dot{animation:none}
+  .nav-item.active .ni-search .sr-dot{animation:none;r:2.65px;stroke-width:5.3}}
 
 /* سطل زباله: درب بلند می‌شود و زاویه می‌گیرد (لولا روی گوشهٔ راست) */
 /* ⚠ svg به‌طورِ پیش‌فرض overflow:hidden دارد، پس دربِ بلندشده از لبهٔ viewBox

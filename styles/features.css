@@ -878,8 +878,13 @@ button.nd-chip:hover{border-color:var(--charcoal)}
    تا هنگام اسکرول، بَجِ سفیدِ بدنه از زیرش رد نشود و پس‌زمینهٔ طوسیِ تیتر بریده/سفید نشود */
 .arch-table thead th{z-index:6}
 /* ردیف کمی جمع‌تر (پدینگِ عمودیِ ۸px)؛ با بَجِ ۳۰px ارتفاعِ ردیف ۴۶px می‌شود و فلشِ وسط‌چین دقیقاً ۸px بالای دکمهٔ دانلود می‌نشیند */
+/* ⚠ خطِ جداکنندهٔ پایینِ ردیفِ اصلی هنگامِ بستن با تأخیرِ ۰٫۲۸ ثانیه (یعنی در
+   پایانِ جمع‌شدن) برمی‌گردد، وگرنه از همان لحظهٔ اول وسطِ کارتِ نارنجی ظاهر
+   می‌شد و ردیف را دو‌تکه نشان می‌داد. هنگامِ باز شدن بی‌درنگ حذف می‌شود
+   (transition-delay صفر در قاعدهٔ .open). */
 .arch-row>td{white-space:nowrap;padding-block:8px;position:relative;
-  transition:padding-top .28s cubic-bezier(.2,0,0,1),padding-bottom .28s cubic-bezier(.2,0,0,1)}
+  transition:padding-top .28s cubic-bezier(.2,0,0,1),padding-bottom .28s cubic-bezier(.2,0,0,1),
+             border-bottom-width 0s linear .28s}
 /* ستونِ نوع (اول) باریک؛ ستونِ کنترل (آخر، چپ‌ترین) باریک با عرضِ ثابت تا فلش و دکمه‌ها هم‌راستا بمانند */
 .arch-table th:first-child,.arch-table td:first-child{width:52px}
 .arch-table th.arch-actcol,.arch-table td.arch-actcol{width:52px;padding-inline:0}   /* فلش وسط‌چینِ عمودی (پیش‌فرضِ جدول) */
@@ -957,8 +962,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 #tab-archive .tablewrap{position:relative;z-index:0}
 #tab-data .tablewrap{position:relative;z-index:0}   /* همان محافظِ stacking context برای کارتِ هاورِ ۴ جدولِ تنظیمات */
 /* پس‌زمینهٔ سلولِ باز شفاف؛ خطوطِ جداکننده از border سلول‌ها می‌آید = صاف و تمام‌عرض (بالا: border ردیفِ قبلی؛ پایین: border ردیفِ جزئیات) */
-.arch-row.open>td{background:transparent;position:relative;padding-top:24px;padding-bottom:3px;border-bottom-width:0}   /* ۱۲px گپ + ۱۲px حاشیهٔ نارنجیِ بالای خطِ اول ⟵ سلول بلندتر، اندازهٔ کارت مثلِ قبل */
-.arch-detail.open>td{background:transparent;position:relative;border-bottom:1px solid #f2f1ee}
+.arch-row.open>td{background:transparent;position:relative;padding-top:24px;padding-bottom:3px;border-bottom-width:0;transition-delay:0s,0s,0s}   /* ۱۲px گپ + ۱۲px حاشیهٔ نارنجیِ بالای خطِ اول ⟵ سلول بلندتر، اندازهٔ کارت مثلِ قبل */
+.arch-detail.open>td{background:transparent;position:relative;border-bottom-width:1px;transition-delay:0s}
 /* بدنهٔ کارت (شبه‌المانِ شناور): فرورفتگیِ ۱۲px بالا/پایین و ۸px چپ/راست
    ⚠ کارت *همیشه* ساخته می‌شود و فقط شفافیتش گذار می‌کند. قبلاً content فقط
    زیرِ .open بود، پس در لحظهٔ بستن یک‌باره ناپدید می‌شد در حالی که ردیف هنوز
@@ -978,7 +983,12 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .arch-row.open>td.arch-actcol::after{border-top-left-radius:12px}
 .arch-detail.open>td.arch-actcol::after{border-bottom-left-radius:12px}
 /* ردیفِ جزئیات: پایه بدونِ border/پس‌زمینه؛ vertical-align:top */
-.arch-detail>td{padding:0;border:none;background:transparent;vertical-align:top;position:relative}
+/* خطِ جداکنندهٔ پایینِ گروه: هنگامِ بستن تا پایانِ جمع‌شدن سرِ جای خود می‌ماند و
+   دقیقاً همان لحظه‌ای می‌رود که خطِ ردیفِ اصلی برمی‌گردد — پس در تمامِ مسیر
+   دقیقاً یک خط دیده می‌شود، نه دو تا و نه هیچ.
+   عرضِ صفر با استایلِ solid (نه border:none) تا عرض قابلِ گذار بماند. */
+.arch-detail>td{padding:0;border:0 solid #f2f1ee;background:transparent;vertical-align:top;position:relative;
+  transition:border-bottom-width 0s linear .28s}
 /* نشانگرِ نارنجیِ لبهٔ راست — کنارِ لبهٔ راستِ کارت (۸px تو رفته) */
 .arch-detail>td:first-child{position:relative}
 .arch-detail>td:first-child::before{content:"";position:absolute;inset-inline-start:8px;top:-28px;bottom:30px;z-index:4;   /* پایین ۱۰px بالاتر ⟵ نوار کوتاه‌تر و مرکزش هم‌ارتفاعِ مرکزِ آیکونِ سند */
@@ -990,7 +1000,12 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .arch-detail.open .arch-det-wrap{grid-template-rows:1fr}
 .arch-det-in{min-height:0;overflow:hidden}
 /* سطر دوم: پدینگِ بالا کم تا فاصلهٔ کمِ سطر اول‑دوم؛ باکس زیرِ تیترِ همان ستون قرار می‌گیرد */
-.arch-det-pad{padding:0 0 20px}   /* ۱۲px گپ + ۸px حاشیهٔ نارنجیِ زیرِ خطِ دوم ⟵ سلول بلندتر، کارت مثلِ قبل */
+/* ⚠ کلِ محتوای ردیفِ جزئیات محو می‌شود، نه فقط دکمه‌ها. جمع‌شدنِ ارتفاع، متن
+   را از پایین *می‌بُرد*، پس وسطِ بسته‌شدن یک نوارِ باریک از نیمهٔ بالای حروف
+   دیده می‌شد. با محوِ سریع، هیچ خطِ نیم‌بریده‌ای دیده نمی‌شود.
+   نامتقارن: بستن ۰٫۱۱ ثانیه بی‌تأخیر، باز شدن ۰٫۱ ثانیه تأخیر تا اول جا باز شود. */
+.arch-det-pad{padding:0 0 20px;opacity:0;transition:opacity .11s ease}   /* ۱۲px گپ + ۸px حاشیهٔ نارنجیِ زیرِ خطِ دوم ⟵ سلول بلندتر، کارت مثلِ قبل */
+.arch-detail.open .arch-det-pad{opacity:1;transition:opacity .18s ease .1s}
 /* متنِ فارسیِ زیرِ هر ستون از کلاسِ موجودِ .arch-date (خاکستری ۱۱٫۵px/۵۰۰) می‌آید؛ اینجا فقط چیدمان.
    راست‌نویس، با محدودیتِ عرض (max-width)؛ اگر بیشتر شد به خط بعد می‌رود. باکس زیرِ تیترِ ستون تراز می‌شود */
 .arch-det-pad .arch-date{display:inline-block;vertical-align:top;text-align:right;white-space:normal;line-height:1.35}   /* top به‌جای baseline تا خطِ اولِ زیرنویسِ یک‌خطی و دوخطی هم‌تراز شوند */
@@ -1014,8 +1029,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
    ▸ باز شدن: ۰٫۱ ثانیه تأخیر، تا اول جا باز شود بعد دکمه‌ها بیایند
    گذارِ margin-top حذف شد: این مقدار هیچ‌وقت بینِ دو حالت عوض نمی‌شد. */
 .arch-det-actcol{display:flex;flex-direction:column;align-items:center;gap:var(--sp-1);margin-top:-21px;
-  opacity:0;pointer-events:none;transition:opacity .11s ease}
-.arch-detail.open .arch-det-actcol{opacity:1;pointer-events:auto;transition:opacity .18s ease .1s}
+  pointer-events:none}
+.arch-detail.open .arch-det-actcol{pointer-events:auto}
 /* ===== جابه‌جاییِ ۵ ستونِ چپ (پروژه/قطعه/تاریخ/وضعیت/عملیات) به سمتِ چپ برای پرکردنِ فضای آزادشده از حذفِ اسکرول‌بار.
    فقط محتوای سلول (نه خودِ سلول) با position:relative جابه‌جا می‌شود تا پس‌زمینهٔ نارنجی پیوسته بماند و انیمیشن‌ها نخورند.
    یک مقدارِ واحد (--arch-shift) برای همه ⟵ فاصله‌ها ثابت می‌ماند. */
@@ -1041,7 +1056,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 #tab-archive td:nth-child(9) .arch-exp{position:relative;right:calc(var(--arch-shift) - 16px)}
 #tab-archive .arch-detail td.arch-actcol .arch-det-actcol{position:relative;right:calc(var(--arch-shift) - 16px)}
 @media(prefers-reduced-motion:reduce){.arch-det-wrap{transition:none}.arch-exp .chev{transition:none}.arch-detail>td:first-child::before{transition:none}
-  .arch-row>td::after,.arch-detail>td::after{transition:none}.arch-det-actcol{transition:none}}
+  .arch-row>td::after,.arch-detail>td::after{transition:none}.arch-det-pad{transition:none}}
 /* ===== فوترِ آرشیو: خروجی (راست) + صفحه‌بندی (چپ) ===== */
 .arch-foot{display:flex;align-items:center;justify-content:center;gap:var(--sp-4);
   margin-top:12px;padding-top:12px;border-top:1px solid #f2f1ee;flex-wrap:wrap}
