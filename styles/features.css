@@ -50,14 +50,41 @@
 .doc-modal{display:grid;grid-template-columns:1.5fr 1fr;min-height:60vh;direction:ltr}
 @media(max-width:820px){.doc-modal{grid-template-columns:1fr}}
 .doc-preview{direction:rtl;background:#f4f4f2;display:flex;flex-direction:column;min-height:320px;border-right:1px solid var(--line)}
-.dp-frame{flex:1;display:flex;align-items:center;justify-content:center;min-height:300px;overflow:auto;position:relative}
-.dp-frame iframe,.dp-frame img{width:100%;height:78vh;border:0;background:#fff;display:block}
-.dp-frame img{object-fit:contain}
+.dp-frame{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;overflow:auto;position:relative}
+/* ⚠ ارتفاعِ تصویر به قاب گره خورده، نه به vh. پیش‌تر 78vh بود: تصویر با
+   ارتفاعِ *صفحه* رشد می‌کرد ولی قاب سقفِ ثابت داشت، پس در هر نمایشگری تصویر
+   از قاب بزرگ‌تر می‌شد و اسکرولِ همیشگی می‌آمد. */
+.dp-frame iframe{width:100%;height:78vh;border:0;background:#fff;display:block}
+/* min-height:0 لازم است چون .dp-frame یک آیتمِ فلکس است و بدونِ آن کوچک‌تر از
+   محتوایش نمی‌شود؛ همین باعث می‌شد قاب از سلولِ گرید بزند بیرون. */
+.dp-frame img{width:auto;height:auto;max-width:100%;max-height:100%;
+  border:0;background:#fff;display:block;object-fit:contain}
 /* PDF و هر فایلی که در iframe می‌رود، ویوئرِ داخلیِ خودش را دارد و خودش اسکرول می‌کند.
    اگر قاب هم اسکرول داشته باشد دو اسکرول‌بار هم‌زمان پیدا می‌شود که هرکدام بخشی از
    مسیر را جابه‌جا می‌کنند. پس در این حالت اسکرولِ قاب خاموش می‌شود تا تنها یک
    اسکرولِ واقعی — اسکرولِ خودِ PDF — باقی بماند. */
 .dp-frame.is-frame{display:block;overflow:hidden;padding:0}
+/* ═══ ویوئرِ PDF روی canvas (pdf.js) ═══
+   برخلافِ iframe، اینجا خودِ قاب اسکرول می‌کند و پیکسل‌ها در دسترسِ ما هستند —
+   همین است که ذره‌بین را ممکن می‌کند. */
+/* flex + margin:auto روی .pdfv تنها راهِ وسط‌چینی است که با اسکرول نمی‌جنگد:
+   justify-content:center وقتی محتوا از قاب بزرگ‌تر شود سرِ آن را می‌بُرد و
+   دسترس‌ناپذیر می‌کند، ولی margin:auto در آن حالت خودبه‌خود بی‌اثر می‌شود. */
+.dp-frame.is-pdf{display:flex;overflow:auto;padding:0;background:#f4f4f2}
+.pdfv{margin:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:10px}
+.pdf-page{display:block;max-width:100%;background:#fff;
+  box-shadow:0 1px 6px #00000018;border-radius:2px}
+/* ═══ ذره‌بین ═══
+   با کلیک روی سند روشن می‌شود و همراهِ موس حرکت می‌کند. روی body سوار است
+   (نه داخلِ قاب) تا با overflow قاب بریده نشود. */
+.dp-frame.lens-ready img,.dp-frame.lens-ready .pdf-page{cursor:zoom-in}
+.dm-lens{position:fixed;z-index:9999;pointer-events:none;overflow:hidden;
+  border-radius:50%;border:2px solid var(--brand);background:#fff;
+  box-shadow:0 6px 22px #00000033,0 0 0 1px #ffffff88}
+/* ⚠ کلون باید همان object-fit اصل را داشته باشد؛ بدونِ آن، تصویر کشیده
+   می‌شود و ناحیهٔ زیرِ ذره‌بین با آنچه کاربر می‌بیند جور درنمی‌آید. */
+.dm-lens-src{position:absolute;max-width:none;object-fit:contain;image-rendering:auto}
+@media(prefers-reduced-motion:reduce){.dm-lens{box-shadow:0 2px 8px #00000022}}
 /* ═══ حالتِ بارگذاریِ پیش‌نمایشِ سند ═══
    هم‌ساختارِ لودینگِ ویوئرِ سه‌بعدی: اسپینر + عنوان + نامِ لاتین وسطِ کادر،
    و نوارِ پیشرفت جدا از این ظرف، چسبیده به کفِ .dp-frame (که relative است). */
@@ -117,11 +144,23 @@
 .dm-dl-opt-t{display:flex;flex-direction:column;gap:1px;min-width:0}
 .dm-dl-opt-l{font-size:12.5px;font-weight:600;color:var(--txt)}
 .dm-dl-opt-s{font-size:10.5px;color:var(--muted)}
-.doc-side{direction:rtl;padding:18px 18px;overflow:auto;max-height:80vh}
+/* ⚠ ظرف عمداً ltr است تا نوارِ اسکرول سمتِ راستِ سکشن بنشیند (لبهٔ بیرونیِ
+   پنجره) نه سمتِ چپ که مرزِ پیش‌نمایش است؛ در RTL مرورگر نوار را سمتِ چپ
+   می‌گذارد. جهتِ متن با .doc-side-in به rtl برمی‌گردد.
+   scrollbar-gutter:stable جای نوار را همیشه رزرو می‌کند، پس با ظاهر/ناپدیدشدنِ
+   اسکرول (اکسپندِ ریویژن یا زیادشدنِ رکوردها) عرضِ کارت‌ها تکان نمی‌خورد. */
+.doc-side{direction:ltr;overflow:auto;max-height:80vh;scrollbar-gutter:stable}
+/* نوارِ اسکرول هم‌سبکِ بقیهٔ فهرست‌های سایت (.ed-scroll / .nd-list) */
+.doc-side::-webkit-scrollbar{width:8px}
+.doc-side::-webkit-scrollbar-thumb{background:#d9d8d4;border-radius:6px}
+.doc-side::-webkit-scrollbar-thumb:hover{background:#c4c2bd}
+.doc-side::-webkit-scrollbar-track{background:transparent}
+.doc-side-in{direction:rtl;padding:18px}
 /* پنجرهٔ جزئیاتِ سند: ارتفاعِ ثابت تا با باز/بسته‌شدنِ یک ریویژن یا زیادشدنِ رکوردها اندازهٔ پنجره تغییر نکند؛
    فقط ستونِ سمت‌راست (اطلاعات) داخلِ خودش اسکرول می‌شود. روی موبایل، چیدمانِ یک‌ستونه و اسکرولِ کلی می‌ماند. */
 @media(min-width:821px){
-  .modal .box.doc-box{height:min(88vh,820px)}
+  /* سقف از ۸۲۰ به ۹۲۰ رفت تا نقشهٔ A4 افقی (نسبتِ ۱٫۴۱) با فضای راحت جا شود */
+  .modal .box.doc-box{height:min(92vh,920px)}
   .doc-box .body{overflow:hidden}
   .doc-box .doc-modal{height:100%;min-height:0}
   .doc-box .doc-preview{min-height:0}
@@ -175,60 +214,163 @@
 .es-retry{margin-top:14px}   /* دکمهٔ «تلاش مجدد» زیرِ پیامِ خطای پیش‌نمایش */
 
 /* ردیف‌های تاریخچهٔ نسخه‌ها */
-.ver-list{display:flex;flex-direction:column;gap:8px}
-/* ردیفِ ریویژن دقیقاً مثلِ سلولِ پارامترِ پنلِ ثبتِ سند رفتار می‌کند:
-   حالتِ پیش‌فرض (انتخاب‌نشده) = سفید با کادرِ ۱px طوسی؛ هاور = کادرِ ذغالی (مثلِ .nd-chip). */
-.ver-row{border:1px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;
-  transition:border-color .25s,background .25s;background:#fff}
-.ver-row:hover{border-color:var(--charcoal)}
-/* ریویژنِ در حال پیش‌نمایش = سلولِ «تنظیم‌شده»: کادرِ ۱px نارنجی + پس‌زمینهٔ نارنجیِ کم‌رنگ (#fff8f0)، هاورِ نارنجی */
-.ver-row.sel{border-color:var(--brand);background:#fff8f0}
-.ver-row.sel:hover{border-color:var(--brand)}
+/* ═══════════ تاریخچهٔ سند ═══════════
+   هم‌سبکِ فهرست‌های استانداردِ سایت (.doc-row / .spec-row / .ed-doc-row):
+   سطرهای پیوسته با جداکنندهٔ نازک، بدونِ کادرِ دورِ هر آیتم.
+   ⚠ پیش‌تر هر ریویژن یک کارتِ کادردار بود و ریویژنِ انتخاب‌شده کادرِ نارنجی
+   می‌گرفت؛ چنین الگویی جای دیگری در سایت نداریم. حالا «انتخاب‌شده» با نوارِ
+   نارنجیِ کناری نشان داده می‌شود — همان نشانگرِ فعالِ سایدبار و تیترها. */
+/* حاشیهٔ منفیِ متقارن: فهرست از padding افقیِ .dm-sec (۱۶px) بیرون می‌زند تا
+   کادرِ نارنجیِ هر سلول پهن‌تر شود و فاصله‌اش از لبهٔ سکشن به ۱۰px برسد.
+   روی خودِ .dm-sec دست نمی‌زنیم چون همان کلاس برای «مشخصات سند» و «کد QR» هم
+   استفاده می‌شود و پدینگشان باید دست‌نخورده بماند. */
+/* gap عیناً .sb-nav سایدبار. حاشیهٔ منفیِ پایین فاصلهٔ کادرِ آخر تا کفِ سکشن
+   را از ۱۳ به ۷px می‌رساند؛ روی خودِ .dm-sec دست نمی‌زنیم چون همان کلاس
+   برای «مشخصات سند» و «کد QR» هم استفاده می‌شود. */
+.ver-list{display:flex;flex-direction:column;gap:2px;margin-inline:-6px;margin-bottom:-6px}
+/* ابعاد عیناً از .nav-item سایدبار گرفته شده‌اند: پدینگِ ۱۰/۱۲، گوشهٔ ۹،
+   و نوارِ ۳×۱۸ با گوشهٔ ۳. تنها تفاوت، رنگِ تینت است چون اینجا زمینه روشن است. */
+.ver-row{position:relative;z-index:0;cursor:pointer;padding:10px 12px}
+/* هم‌منطقِ .nav-item سایدبار: هاور خاکستریِ خنثی، انتخاب نارنجی.
+   ⚠ تمام‌عرض (right/left:0) تا نوارِ نارنجی دقیقاً روی لبهٔ راستِ همین کادر بنشیند. */
+.ver-row:hover::before,.ver-row.sel::before{content:"";position:absolute;z-index:-1;
+  top:0;bottom:0;right:0;left:0;border-radius:9px;pointer-events:none;
+  background:var(--panel)}
+/* سلولِ انتخاب‌شده هاورِ جداگانه ندارد: نارنجی در هر حالتی ثابت می‌ماند، وگرنه
+   تغییرِ تُن هنگامِ هاور مثلِ دو لایهٔ روی هم دیده می‌شود. */
+.ver-row.sel::before,.ver-row.sel:hover::before{background:#fff3e6}
+/* نوارِ عمودی روی لبهٔ راستِ کادرِ نارنجی — عیناً .nav-item::before */
+/* ⚠ ارتفاع با inset تعیین می‌شود نه عددِ ثابت: در حالتِ اکسپند خودِ نوار
+   کشیده می‌شود و تا اندازهٔ سلول می‌رسد، به‌جای اینکه وسطِ سلولِ بلند شناور بماند.
+   انیمیشن روی scaleY است تا ظاهرشدنش نرم باشد. */
+/* ⚠ inset ثابتِ متقارن، نه درصد: لبهٔ بالای نوار همیشه ۱۱px زیرِ سقفِ سلول
+   می‌ماند و با اکسپند فقط از پایین دراز می‌شود. با درصد، لبهٔ بالا هم‌پای
+   ارتفاعِ سلول پایین می‌رفت (در حالتِ باز تا ۷۶px) و نوار از تیتر جدا می‌افتاد.
+   تقارنِ بالا/پایین همان حسِ وسط‌چینی را می‌دهد. */
+/* min-height محافظِ کوتاه‌ترین سلول است (ریویژنِ بدونِ توضیح، ~۳۴px): با inset
+   ۱۴ نوار به ۶px می‌رسید و عملاً محو می‌شد. */
+.ver-row.sel::after{content:"";position:absolute;right:0;top:14px;bottom:14px;width:2px;min-height:12px;
+  background:var(--brand);border-radius:2px;transform:scaleY(0);transform-origin:center;
+  animation:verSelIn .22s cubic-bezier(.2,0,0,1) forwards}
+@keyframes verSelIn{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+/* بدونِ پدینگِ اضافه: تنها فاصله، پدینگِ خودِ سلول (۱۲px) است تا شروعِ متن و
+   پایانش (تاریخِ گردش‌کار در لبهٔ چپ) متقارن باشند. پدینگِ قبلی از زمانی
+   مانده بود که نوارِ نارنجی ضخیم‌تر بود و متن باید از آن فاصله می‌گرفت. */
 .ver-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.ver-rev{font-size:12.5px;font-weight:700;color:var(--txt)}
+/* توضیحِ ریویژن در حالتِ بسته — هم‌ترازِ شمارهٔ ریویژن، هم‌اندازهٔ توضیحِ
+   گردش‌کار (.wf-note). دو خط بیشتر نمی‌شود تا سلول‌ها هم‌قد بمانند. */
+/* عیناً توضیحِ بخشِ «کدِ QR سند» (.dm-qr-note): 11.5px / وزن 500 / خطِ 1.8 */
+/* سطرِ توضیح + اکشن‌ها: متن در راست (فضای باقیمانده) و دکمه‌ها در چپ، هم‌ستون
+   با فلشِ اکسپندِ سطرِ بالا. */
+/* ⚠ min-height برابرِ ارتفاعِ .icon-btn.sm (26px): سطر در حالتِ بسته هم همان
+   ارتفاع را می‌گیرد، پس با ظاهرشدنِ دکمه‌ها هنگامِ اکسپند، متن ۵px بالا/پایین
+   نمی‌پرد. */
+.ver-descrow{display:flex;align-items:center;gap:10px;margin-top:4px;min-height:26px}
+/* سندِ بدونِ توضیح در حالتِ بسته سطرِ خالی نمی‌گیرد: ارتفاعِ رزروشده فقط برای
+   جلوگیری از پرشِ *متن* بود، و وقتی متنی نیست پرشی هم در کار نیست.
+   با اکسپند، دکمه‌ها خودشان ارتفاع را باز می‌کنند. */
+/* گذار هم‌آهنگ با .ver-wf (همان 0.5s و همان منحنی): بدونِ آن، سطر ناگهان
+   ۳۰px کوتاه می‌شد در حالی که بخشِ گردش‌کار نرم جمع می‌شد → پرشِ لحظهٔ بستن. */
+/* ⚠ height (نه min-height): دکمه‌ها با opacity محو می‌شوند ولی جای‌شان در
+   چیدمان می‌ماند، پس min-height:0 سطر را جمع نمی‌کرد و سلولِ بدونِ توضیح در
+   حالتِ بسته یک سطرِ خالیِ ۲۶px داشت. height:0 + overflow:hidden آن را واقعاً
+   جمع می‌کند و چون مقصد ثابت است (۲۶px = ارتفاعِ .icon-btn.sm) گذار هم روان
+   می‌ماند — همان ۰٫۵ ثانیه و همان منحنیِ .ver-wf تا هم‌گام باز/بسته شوند. */
+.ver-descrow.no-desc{height:0;min-height:0;margin-top:0;overflow:hidden;
+  transition:height .5s cubic-bezier(.2,0,0,1),margin-top .5s cubic-bezier(.2,0,0,1)}
+.ver-row.open .ver-descrow.no-desc{height:26px;margin-top:4px}
+/* ⚠ فقط یک خط: با دو خط، بیشترِ توضیح‌ها کامل دیده می‌شدند و اکسپند بی‌فایده
+   می‌شد. حالا متنِ بلند با «…» بریده می‌شود و متنِ کامل زیرِ مرحلهٔ «ایجاد سند»
+   در گردش‌کارِ اکسپندشده است. */
+.ver-desc{flex:1;min-width:0;padding-inline-start:8px;font-size:11.5px;font-weight:500;
+  color:var(--muted);line-height:1.8;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* اکشن‌ها فقط در حالتِ باز — تا حذف در فهرستِ بسته در دسترسِ یک کلیکِ اتفاقی نباشد */
+/* ⚠ به‌جای display (که انیمیت نمی‌شود) از opacity استفاده می‌شود تا دکمه‌ها
+   هم‌زمان با باز/بسته‌شدنِ سطر محو شوند. visibility جلوی کلیک در حالتِ بسته
+   را می‌گیرد. */
+.ver-descrow .ver-acts{display:flex;flex-shrink:0;opacity:0;visibility:hidden;
+  transition:opacity .28s,visibility .28s}
+.ver-row.open .ver-descrow .ver-acts{opacity:1;visibility:visible}
+/* عیناً نامِ مشتری در «مشخصات سند» (.dm-row + .dm-v): ۱۱٫۵px با وزنِ ۵۰۰ */
+/* المانِ ریویژن: همان .el-badge سایت، کمی کوچک‌تر چون سلولِ تاریخچه فشرده‌تر
+   از ردیفِ جدول‌هاست. رنگ با انتخابِ سلول نارنجی می‌شود. */
+.ver-el{width:26px;height:26px;flex-shrink:0}
+.ver-el svg{width:18px;height:18px}
+
+.ver-rev{font-size:12px;font-weight:700;color:var(--txt)}
+/* رنگِ تیتر و المان در حالتِ فعال عوض نمی‌شود؛ کادرِ نارنجی و نوارِ کناری
+   خودشان انتخاب را به‌اندازهٔ کافی نشان می‌دهند. */
 .ver-latest{font-size:10px;background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line);
   padding:1px 8px;border-radius:20px;font-weight:700}
 .ver-meta{font-size:11.5px;color:var(--muted)}
 .ver-acts{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
-
-/* ردیف ریویژن: سرِ آکاردئونی + زیرسطرِ متادیتا/اکشن + گردش‌کارِ اکسپند‌شونده */
-/* گروهِ انتهایِ سر (اکشن‌ها + فلش) به سمتِ چپ رانده می‌شود؛ حذف/تأیید/رد و فلش در یک خط با شماره */
+/* نوارِ وضعیت + اکشن‌ها، داخلِ بخشِ بازشونده: وضعیت راست، دکمه‌ها چپ */
+.ver-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ver-bar .ver-acts{margin-inline-start:auto}
+/* گروهِ انتهایِ سر (اکشن‌ها + فلش) به سمتِ چپ رانده می‌شود */
 .ver-head-end{display:flex;align-items:center;gap:8px;margin-inline-start:auto;flex-shrink:0}
-.ver-chev{display:inline-flex;flex-shrink:0}
-.ver-chev svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
-.ver-chev{color:var(--muted);transition:color .18s}
+/* عرضِ ۲۶px تا دقیقاً هم‌عرضِ .icon-btn.sm باشد و دکمهٔ حذفِ سطرِ زیر،
+   هم‌مرکز با فلش بنشیند. بدونِ این، فلش ۱۴px بود و مرکزها ۶px اختلاف داشتند. */
+.ver-chev{display:inline-flex;align-items:center;justify-content:center;width:26px;flex-shrink:0;color:var(--muted);transition:color .18s}
+.ver-chev svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
 .ver-row.open .ver-chev{color:var(--brand)}   /* باز = فلشِ نارنجی، هم‌رفتارِ بقیهٔ آکاردئون‌ها */
 .ver-row.open .ver-chev svg{transform:rotate(180deg)}
 /* گردش‌کار: باز/بسته‌شدنِ روان (grid 0fr→1fr) هم‌سبکِ آکاردئون‌های سایت */
 .ver-wf{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s cubic-bezier(.2,0,0,1)}
 .ver-row.open .ver-wf{grid-template-rows:1fr}
 .ver-wf-in{min-height:0;overflow:hidden}
-.ver-wf-sep{height:1px;background:var(--line);margin:12px 0}   /* خطِ جداکنندهٔ پیوسته (نه خط‌چین) هم‌سبکِ زیرِ تیتر */
-.ver-note{font-size:12px;color:var(--txt);background:#faf9f7;border:1px solid var(--line);border-radius:8px;
-  padding:7px 10px;margin-bottom:10px;line-height:1.7}
-.ver-note b{color:var(--txt)}
+.ver-wf-sep{height:1px;background:#f2f1ee;margin:10px 0}
 
 /* تایم‌لاین گردش‌کار: خط عمودیِ تیره + دایره‌های حلقه‌دار
    (انجام‌شده = پُرِ رنگی، مرحلهٔ بعدی = پُرِ خاکستری)، مطابق رفرنس. */
 .wf-timeline{display:flex;flex-direction:column;padding:4px 2px 0}
 .wf-step{display:flex;align-items:stretch;gap:10px}
 .wf-rail{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px}
-.wf-ring{position:relative;width:11px;height:11px;border-radius:50%;border:2px solid #d3d1cc;background:#ececea;
-  box-sizing:border-box;flex-shrink:0;margin-top:4px;z-index:1}
+/* ۸px تا با دایرهٔ *دیده‌شدهٔ* .tl-dot داشبورد یکی شود (آن ۱۲px است ولی ۲px
+   حاشیهٔ سفید دارد که در پس‌زمینه محو می‌شود، پس ۸px دیده می‌شود). */
+.wf-ring{position:relative;width:8px;height:8px;border-radius:50%;border:2px solid #d3d1cc;background:#ececea;
+  box-sizing:border-box;flex-shrink:0;margin-top:5px;z-index:1}
 .wf-step.done .wf-ring{background:var(--wf,var(--brand));border-color:var(--wf,var(--brand))}
 /* مرحلهٔ فعلی: حلقهٔ شعاعیِ متحرک، دقیقاً مثلِ نقطهٔ فعالیتِ اخیرِ داشبورد (.tl-dot) */
-.wf-step.active .wf-ring::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:50%;
+.wf-step.active .wf-ring::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;
   border:2px solid var(--wf,var(--brand));transform:translate(-50%,-50%) scale(.4);opacity:.6;pointer-events:none;
   animation:wfPing 1.7s cubic-bezier(0,0,.2,1) infinite}
 @keyframes wfPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
 @media(prefers-reduced-motion:reduce){.wf-step.active .wf-ring::after{animation:none;opacity:0}}
 /* فاصلهٔ برابرِ خطِ عمودی بین دو نقطهٔ متوالی: بالای خط ۶px، پایینِ خط ۲px + ۴px margin-topِ نقطهٔ بعدی = ۶px */
-.wf-line{flex:1;width:2px;background:var(--line);min-height:20px;margin:6px 0 2px;border-radius:1px}
+/* حاشیهٔ پایین برابرِ padding-bottom ِ .wf-body است، پس خط دقیقاً همان‌جا تمام
+   می‌شود که متنِ همان مرحله تمام شده و وارد فاصلهٔ زیرش نمی‌شود. */
+.wf-line{flex:1;width:2px;background:var(--line);min-height:10px;margin:5px 0 16px;border-radius:1px}
 .wf-body{flex:1;min-width:0;padding-bottom:16px}
-.wf-label{font-size:13px;font-weight:700;color:var(--txt)}
-.wf-step.todo .wf-label{color:var(--muted);font-weight:600}
-.wf-meta{font-size:11.5px;color:var(--muted);margin-top:3px;word-break:break-word;line-height:1.6}
-.wf-date{font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;padding-top:3px}
+/* ⚠ آخرین مرحله پدینگِ پایین نمی‌گیرد: آن ۱۶px فاصلهٔ بینِ دو مرحله است و
+   وقتی مرحله‌ای بعدش نیست، فقط فضای خالی زیرِ گردش‌کار می‌سازد. */
+.wf-step:last-child .wf-body{padding-bottom:0}
+/* تایپوگرافیِ گردش‌کار عیناً از سکشنِ «مشخصات سند» گرفته شده تا دو بلوکِ
+   هم‌جوار یک زبان داشته باشند:
+   تیتر = .dm-v (11.5/500/--txt) ، توضیح = .dm-k (11.5/500/--muted) */
+/* وزنِ ۷۰۰ (نه اندازهٔ بزرگ‌تر): تیترِ مرحله را از توضیح و تاریخِ زیرش جدا
+   می‌کند، ولی نیم‌پیکسل کوچک‌تر از نامِ ریویژن (12/700) می‌ماند تا سلسله‌مراتب
+   نشکند و پلهٔ تازه‌ای هم به مقیاسِ سکشن اضافه نشود. */
+.wf-label{font-size:11.5px;font-weight:700;color:var(--txt)}
+.wf-step.todo .wf-label{color:var(--muted);font-weight:700}
+/* ═══ بلوکِ توضیح + نام ═══ هم‌قاعدهٔ «فعالیت‌های اخیر» (.act-lines):
+   ▸ حالتِ ۱ (کلاسِ .one از JS) — توضیح یک‌خطی بوده، پس بلوکی می‌شود و نام به
+     خطِ دومِ مستقل می‌رود؛ جداکننده لازم نیست.
+   ▸ حالتِ ۲ — توضیح به خطِ دوم رسیده، نام در ادامهٔ همان خط پشتِ جداکننده. */
+.wf-lines{margin-top:3px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.6;word-break:break-word}
+.wf-note{font-size:11px;font-weight:500;color:var(--muted)}
+.wf-lines.one .wf-note{display:block}
+.wf-lines.one .wf-sep{display:none}
+/* اگر توضیحی نبود، نام از همان خطِ اول شروع می‌شود */
+.wf-lines.no-note .wf-sep{display:none}
+.wf-sep{display:inline-block;width:1px;height:9px;margin:0 6px;vertical-align:-1px;
+  background:var(--line);opacity:.75}
+.wf-who{font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap}
+/* ⚠ هم‌ترازیِ خطِ اولِ تاریخ با تیترِ مرحله: به‌جای padding دستی، جعبهٔ خط با
+   تیتر یکی می‌شود (11.5×1.6=18.4px). با padding قبلی تاریخ ۲٫۶px پایین‌تر
+   می‌نشست، چون هم padding داشت و هم فونتِ کوچک‌ترش جعبهٔ کوتاه‌تری می‌ساخت. */
+.wf-date{font-size:11px;font-weight:500;color:var(--muted);line-height:18.4px;white-space:nowrap;flex-shrink:0}
 
 /* پنل فشردهٔ بارگذاری ریویژن/نسخهٔ جدید */
 .rv-up{padding:18px 20px;display:flex;flex-direction:column;gap:4px;max-width:520px;margin:0 auto}
@@ -443,7 +585,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
   background:var(--brand);border-radius:2px;transform:translateY(-50%) scaleY(0);transform-origin:center;
   animation:cliSelIn .22s cubic-bezier(.2,0,0,1) forwards}
 @keyframes cliSelIn{from{transform:translateY(-50%) scaleY(0)}to{transform:translateY(-50%) scaleY(1)}}
-@media(prefers-reduced-motion:reduce){.cp-client-item.sel::after{animation:none;transform:translateY(-50%) scaleY(1)}}
+@media(prefers-reduced-motion:reduce){.cp-client-item.sel::after{animation:none;transform:translateY(-50%) scaleY(1)}
+  .ver-row.sel::after{animation:none;transform:scaleY(1)}}
 .cp-ci-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .cp-ci-name{font-size:13px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cp-ci-meta{font-size:11px;color:var(--muted)}

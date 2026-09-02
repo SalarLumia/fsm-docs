@@ -1,7 +1,7 @@
 /* ============================================================
-   نمای جزئیاتِ پروژه — عیناً پروتوتایپ (prototype-project-panel.html)
-   قابِ واحدِ .ppanel + نوارِ شاخصِ .mband + کارت‌های .spec-card.
-   کلاس‌ها و مقادیر خط‌به‌خط با پروتوتایپ یکی‌اند.
+   نمای جزئیاتِ پروژه — قابِ واحدِ .ppanel + نوارِ شاخصِ .mband + کارت‌های .spec-card.
+   (طرحِ اولیه روی یک پروتوتایپِ جدا ساخته شد؛ آن فایل حذف شده چون پیاده‌سازی
+   از آن جلو زده بود. مرجعِ معتبرِ رنگ/فونت/توکن: _dev/design-system.html)
    ============================================================ */
 
 /* عرض‌ها و فاصله‌های مشترک — عیناً پروتوتایپ.
@@ -71,9 +71,10 @@
 .dwrap svg{width:84px;height:84px}
 .dwrap circle,.dwrap path{fill:none;stroke-width:4.5;stroke-linecap:round}
 .d-bg{stroke:#f0efeb}
-/* ویژگیِ d با transition در همهٔ مرورگرها انیمیت نمی‌شود؛ محوشدنِ نرمِ رنگ
-   جایگزینِ مطمئنِ آن است و هدفِ اصلی (نپریدنِ قوس) را برآورده می‌کند. */
-.d-fg{transition:stroke .7s,stroke-opacity .7s}
+/* پرشدنِ نرمِ حلقه: مسیر همیشه کامل است و فقط dasharray عوض می‌شود — این
+   ویژگی برخلافِ d در همهٔ مرورگرها انیمیت می‌شود. */
+.d-fg{transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1),stroke .5s,stroke-opacity .5s}
+@media(prefers-reduced-motion:reduce){.d-fg{transition:stroke .3s}}
 .dtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:19px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
 

@@ -83,16 +83,19 @@ async function openDocDetail(num){
         '<div class="dp-frame" id="docPreviewHost"></div>'+
         '<div class="dp-actions">'+actionBtn+dmAddFormatBtnHTML(cur,is3DType)+dlBtnHTML+'</div>'+
       '</div>'+
-      '<div class="doc-side">'+
+      /* ظرفِ داخلی: خودِ .doc-side جهتِ ltr دارد تا نوارِ اسکرول سمتِ راست
+         بیفتد؛ جهتِ محتوا اینجا به rtl برمی‌گردد. */
+      '<div class="doc-side"><div class="doc-side-in">'+
         newerBanner+
         '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>مشخصات سند</div>'+metaHTML+'</div>'+
         rejBanner+
         '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><polyline points="12 7 12 12 15 15"/></svg>تاریخچهٔ سند</div>'+
           '<div class="ver-list">'+revHTML+'</div></div>'+
         dmQrSectionHTML(d)+
-      '</div>'+
+      '</div></div>'+
     '</div>';
   showModal(esc(docPhrase(d)), body, "doc-box");
+  wfFixLines(document.getElementById("modalHost"));   // چیدمانِ دو‌خطیِ توضیح/نام در گردش‌کار
 
   /* ریویژن جاری را به‌صورت پیش‌فرض در پیش‌نمایش بارگذاری کن (بدون باز کردن گردش‌کار) */
   dmSelectVersion(num);
@@ -232,11 +235,168 @@ function dmDownloadQr(num){
 }
 
 /* یک ردیف ریویژن در تاریخچه: سرِ فشرده + اکشن‌های کارت (فقط حذف/رد/تأیید) + گردش‌کارِ اکسپند‌شونده */
+/* ═══════════════ رندرِ PDF روی canvas (pdf.js) ═══════════════
+   ⚠ کتابخانه تنبل بارگذاری می‌شود — ۳۱۳KB + ۱MB وُرکر که فقط برای کاربری که
+   واقعاً PDF باز می‌کند دانلود می‌شود، نه در بارگذاریِ اولِ سایت.
+   نسخهٔ 3.11 عمداً انتخاب شد: آخرین نسخه‌ای که UMD می‌دهد. نسخهٔ ۴ به بالا
+   فقط ES module است و با اسکریپت‌های کلاسیکِ این پروژه کار نمی‌کند. */
+var _pdfLibPromise=null;
+function ensurePdfLib(){
+  if(window.pdfjsLib) return Promise.resolve(true);
+  if(_pdfLibPromise) return _pdfLibPromise;
+  _pdfLibPromise=new Promise(function(resolve){
+    var sc=document.createElement("script"); sc.src="vendor/pdf.min.js";
+    sc.onload=function(){
+      if(window.pdfjsLib) window.pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdf.worker.min.js";
+      resolve(!!window.pdfjsLib);
+    };
+    sc.onerror=function(){ resolve(false); };
+    document.head.appendChild(sc);
+  });
+  return _pdfLibPromise;
+}
+/* همهٔ صفحات پشتِ سرِ هم رندر می‌شوند؛ قاب خودش اسکرول می‌کند.
+   token برای این است که اگر کاربر وسطِ رندر ریویژنِ دیگری انتخاب کرد،
+   صفحاتِ نیمه‌کارهٔ قبلی روی نمای جدید نریزند. */
+async function dmRenderPdf(host, blob, token){
+  var ok=await ensurePdfLib();
+  if(token!==_dpSeq) return;
+  if(!ok){   // کتابخانه نیامد → همان ویوئرِ مرورگر، بدونِ ذره‌بین
+    host.classList.remove("is-pdf"); host.classList.add("is-frame");
+    host.innerHTML='<iframe src="'+previewBlobUrl("docPreview", blob)+'"></iframe>';
+    return;
+  }
+  try{
+    var buf=await blob.arrayBuffer();
+    if(token!==_dpSeq) return;
+    var pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    if(token!==_dpSeq) return;
+    host.innerHTML='<div class="pdfv" id="pdfv"></div>';
+    var wrap=host.querySelector(".pdfv");
+    /* اندازهٔ نمایش: صفحه کامل داخلِ قاب جا می‌شود (contain) — همان
+       قاعدهٔ پیش‌نمایشِ عکس، تا یک برگِ A4 بدونِ اسکرول دیده شود.
+       PAD = پدینگِ ۱۰px دو طرفِ .pdfv + جایی برای اسکرول‌بارِ احتمالی. */
+    var PAD=28;
+    var boxW=Math.max(120,(host.clientWidth||600)-PAD);
+    var boxH=Math.max(120,(host.clientHeight||600)-PAD);
+    /* ⚠ رندر با سوپرسمپلینگ (بوم چند برابرِ اندازهٔ نمایش پیکسل می‌گیرد).
+       ریشهٔ تاری: قبلاً مقیاس فقط dpr بود، پس روی نمایشگرِ معمولی (dpr=1)
+       نقشهٔ A4 در همان ~۸۰۰px رندر می‌شد ≈ ۳ پیکسل بر میلی‌متر؛ متنِ
+       ۲میلی‌متری نقشه ۶ پیکسل می‌شد و تار دیده می‌شد. ذره‌بین هم چیزی
+       اضافه نمی‌کرد چون پیکسلِ بیشتری وجود نداشت. حالا به‌اندازهٔ بزرگ‌نماییِ
+       ذره‌بین پیکسلِ ذخیره رندر می‌شود. سقفِ مگاپیکسل جلوی پرشدنِ حافظه
+       در PDFهای چندصفحه‌ای را می‌گیرد. */
+    var dpr=Math.min(window.devicePixelRatio||1, 2);
+    var ss=(typeof LENS_ZOOM==="number"?LENS_ZOOM:2);
+    /* بودجهٔ کلِ ۱۶ مگاپیکسل بینِ صفحه‌ها تقسیم می‌شود (کفِ ۲ و سقفِ ۱۲)،
+       تا یک نقشهٔ تک‌برگی بیشترین وضوح را بگیرد ولی PDFِ چندصفحه‌ای حافظه را نبلعد. */
+    var MAXPX=Math.min(12e6, Math.max(2e6, 16e6/pdf.numPages));
+    for(var i=1;i<=pdf.numPages;i++){
+      var page=await pdf.getPage(i);
+      if(token!==_dpSeq) return;
+      var v1=page.getViewport({scale:1});
+      var fit=Math.min(boxW/v1.width, boxH/v1.height);
+      var cssW=Math.max(1,Math.round(v1.width*fit)), cssH=Math.max(1,Math.round(v1.height*fit));
+      var q=dpr*ss, px=cssW*q*cssH*q;
+      if(px>MAXPX) q*=Math.sqrt(MAXPX/px);
+      var vp=page.getViewport({scale:fit*q});
+      var cv=document.createElement("canvas");
+      cv.width=Math.max(1,Math.floor(vp.width)); cv.height=Math.max(1,Math.floor(vp.height));
+      cv.style.width=cssW+"px"; cv.style.height=cssH+"px";
+      cv.className="pdf-page";
+      wrap.appendChild(cv);
+      await page.render({canvasContext:cv.getContext("2d"), viewport:vp}).promise;
+      if(token!==_dpSeq) return;
+    }
+  }catch(e){
+    host.classList.remove("is-pdf"); host.classList.add("is-frame");
+    host.innerHTML='<iframe src="'+previewBlobUrl("docPreview", blob)+'"></iframe>';
+  }
+}
+
+/* ═══════════════ ذره‌بین ═══════════════
+   با کلیک روشن/خاموش می‌شود و تا وقتی روشن است، پنجرهٔ گردی همراهِ موس حرکت
+   می‌کند و همان ناحیه را با بزرگ‌نماییِ دوبرابر نشان می‌دهد.
+   روش: به‌جای کپیِ پیکسل، همان عنصر (img یا canvas) با transform: scale
+   داخلِ یک قابِ گرد کشیده می‌شود و مبدأش طوری جابه‌جا می‌شود که نقطهٔ زیرِ
+   نشانگر وسطِ ذره‌بین بیفتد. این هم برای عکس کار می‌کند هم برای canvasِ PDF. */
+var LENS_ZOOM=2, LENS_SIZE=190;
+function dmLensAttach(host){
+  if(!host || host._lensOn) return;
+  host._lensOn=true;
+  host.classList.add("lens-ready");
+  var lens=null, srcEl=null;
+
+  function targetAt(x,y){
+    var els=host.querySelectorAll("img, canvas.pdf-page");
+    for(var i=0;i<els.length;i++){
+      var r=els[i].getBoundingClientRect();
+      if(x>=r.left && x<=r.right && y>=r.top && y<=r.bottom) return els[i];
+    }
+    return null;
+  }
+  function build(el){
+    kill();
+    srcEl=el;
+    lens=document.createElement("div");
+    lens.className="dm-lens";
+    lens.style.width=LENS_SIZE+"px"; lens.style.height=LENS_SIZE+"px";
+    var clone=el.cloneNode(true);         // canvas: cloneNode محتوا را نمی‌آورد → دستی می‌کشیم
+    if(el.tagName==="CANVAS"){
+      clone.width=el.width; clone.height=el.height;
+      clone.getContext("2d").drawImage(el,0,0);
+    }
+    clone.className="dm-lens-src";
+    clone.removeAttribute("style");
+    lens.appendChild(clone);
+    document.body.appendChild(lens);
+  }
+  function place(x,y){
+    if(!lens||!srcEl) return;
+    var r=srcEl.getBoundingClientRect();
+    var w=r.width*LENS_ZOOM, h=r.height*LENS_ZOOM;
+    var c=lens.firstChild;
+    c.style.width=w+"px"; c.style.height=h+"px";
+    // نقطهٔ زیرِ نشانگر باید وسطِ ذره‌بین بیفتد
+    c.style.left=(LENS_SIZE/2 - (x-r.left)*LENS_ZOOM)+"px";
+    c.style.top =(LENS_SIZE/2 - (y-r.top )*LENS_ZOOM)+"px";
+    lens.style.left=(x-LENS_SIZE/2)+"px";
+    lens.style.top =(y-LENS_SIZE/2)+"px";
+  }
+  function kill(){
+    if(lens&&lens.parentNode) lens.parentNode.removeChild(lens);
+    lens=null; srcEl=null;
+  }
+  host.addEventListener("click", function(e){
+    if(lens){ kill(); return; }                 // کلیکِ دوم = خاموش
+    var el=targetAt(e.clientX,e.clientY); if(!el) return;
+    build(el); place(e.clientX,e.clientY);
+  });
+  host.addEventListener("mousemove", function(e){
+    if(!lens) return;
+    var el=targetAt(e.clientX,e.clientY);
+    if(!el){ kill(); return; }                  // از روی سند بیرون رفت
+    if(el!==srcEl){ build(el); }                // صفحهٔ دیگرِ PDF
+    place(e.clientX,e.clientY);
+  });
+  host.addEventListener("mouseleave", kill);
+  /* اسکرول یا بستنِ مودال، ذره‌بین را می‌بندد تا روی جای اشتباه نماند */
+  host.addEventListener("scroll", kill, true);
+  window.addEventListener("scroll", kill, true);
+}
+/* نمادِ سند با شمارهٔ ریویژن در مرکز — هم‌ساختارِ docTypeIconInner در projects.js
+   (همان مسیرِ SVG و همان قاعدهٔ متنِ داخلی) تا زبانِ بصریِ «المان» یکدست بماند. */
+function revIconInner(rev){
+  return '<svg class="el-doc" viewBox="0 0 24 24">'+
+    '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'+
+    '<polyline points="14 2 14 8 20 8"/>'+
+    '<text x="12" y="16.5" text-anchor="middle" fill="currentColor" stroke="none" font-size="8">'+esc(rev)+'</text>'+
+  '</svg>';
+}
 function versionRowHTML(rv){
   var admin=ME.role==="admin", canReview=(admin||ME.role==="reviewer");
   var st=String(rv.status||"").toLowerCase();
   var isCur=String(rv.isLatest).toLowerCase()==="true";
-  var rsi=statusInfo(rv.status);
   var acts=[];
   if(canReview && st==="pending"){
     acts.push(approveIconBtn("event.stopPropagation();approveDoc('"+esc(rv.drawingNumber)+"')"));
@@ -244,44 +404,101 @@ function versionRowHTML(rv){
   }
   if(admin) acts.push(delIconBtn("event.stopPropagation();dmDeleteVersion('"+esc(rv.drawingNumber)+"')"));
 
-  // سرِ فشرده: شماره + وضعیت در راست؛ اکشن‌ها (تأیید/رد/حذف) + فلشِ اکسپند در چپ، همه در یک خط.
-  // تاریخ/نام دیگر زیرِ نام نمی‌آید (در گردش‌کارِ اکسپند‌شونده هست) تا سلول جمع‌وجور بماند.
+  /* سرِ سطر عمداً کم‌جزئیات است: فقط شمارهٔ ریویژن و فلشِ اکسپند.
+     «بدون فایل» و اکشن‌ها (تأیید/رد/حذف) داخلِ بخشِ بازشونده رفتند تا فهرست در
+     حالتِ بسته آرام بماند و اکشنِ حذف هم پشتِ یک کلیکِ آگاهانه باشد. */
   return '<div class="ver-row'+(isCur?" cur":"")+'" id="ver-'+esc(rv.drawingNumber)+'" onclick="dmToggleRev(\''+esc(rv.drawingNumber)+'\')">'+
     '<div class="ver-head">'+
+      /* المانِ ریویژن: همان نمادِ سندِ کددارِ سایت (docTypeIconInner)، ولی به‌جای
+         کدِ نوعِ سند، شمارهٔ دو‌رقمیِ ریویژن داخلش می‌نشیند. */
+      '<span class="el-badge ver-el">'+revIconInner(pad2(revFmt(rv.rev)))+'</span>'+
       '<span class="ver-rev mono">ریویژن '+esc(pad2(revFmt(rv.rev)))+'</span>'+   // شمارهٔ دو‌رقمی (۰۰/۰۱/…)
-      badgeHTML(rsi.cls, rsi.label)+
-      (rv.fileId?'':'<span class="muted" style="font-size:11px">بدون فایل</span>')+
       '<div class="ver-head-end">'+
-        (acts.length?'<div class="ver-acts">'+acts.join("")+'</div>':'')+
         '<span class="ver-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>'+
       '</div>'+
     '</div>'+
+    /* سطرِ توضیح: متن در راست و اکشن‌ها (تأیید/رد/حذف) در چپ — دقیقاً زیرِ فلشِ
+       اکسپند. اکشن‌ها فقط در حالتِ باز دیده می‌شوند (CSS)، پس حذف همچنان پشتِ
+       یک کلیکِ آگاهانه می‌ماند. توضیح در هر دو حالت دیده می‌شود. */
+    ((rv.title||acts.length)
+      ? '<div class="ver-descrow'+(rv.title?'':' no-desc')+'">'+
+          (rv.title?'<div class="ver-desc" title="'+esc(rv.title)+'">'+esc(rv.title)+'</div>':'<span class="ver-desc"></span>')+
+          (acts.length?'<div class="ver-acts">'+acts.join("")+'</div>':'')+
+        '</div>'
+      : '')+
     '<div class="ver-wf"><div class="ver-wf-in">'+                                  // wrapper برای انیمیشنِ باز/بسته‌شدن (grid 0fr→1fr)
       '<div class="ver-wf-sep"></div>'+                                            // خطِ جداکنندهٔ پیوسته زیرِ سرِ ریویژن
-      (rv.title?'<div class="ver-note"><b>یادداشت:</b> '+esc(rv.title)+'</div>':'')+
+      /* ⚠ تگِ وضعیت کلاً حذف شد: تایم‌لاینِ گردش‌کار پایینِ همین بخش، وضعیت را
+         دقیق‌تر می‌گوید — مرحلهٔ انجام‌شده با رنگ و مرحلهٔ فعلی با حلقهٔ متحرک.
+         برای سندِ در انتظار هم مرحلهٔ «ارسال برای بازبینی» انجام‌شده و «تأیید
+         توسط بازبین» به‌عنوانِ مرحلهٔ آینده دیده می‌شود، پس تگ چیزی اضافه نمی‌کرد. */
+      (rv.fileId?'':'<div class="ver-bar"><span class="muted" style="font-size:11px">بدون فایل</span></div>')+
+      /* ⚠ یادداشتِ جداگانه حذف شد: همان متن هنگامِ ثبت به‌عنوانِ comment در
+         گردش‌کار ذخیره می‌شود (Code.gs ▸ addWorkflow) و زیرِ مرحلهٔ خودش
+         دیده می‌شود. تأیید و رد هم comment خودشان را دارند، پس همهٔ
+         توضیحات یک‌جا و کنارِ رویدادِ مربوطشان نمایش داده می‌شوند. */
       workflowStepsHTML(rv.drawingNumber)+
     '</div></div>'+
   '</div>';
 }
 
 /* تایم‌لاین گردش‌کارِ یک ریویژن: رویدادهای انجام‌شده (حلقهٔ پر) + مراحلِ آیندهٔ استاندارد (حلقهٔ توخالی) */
+/* همان قاعدهٔ «فعالیت‌های اخیر» (fixActivityLines) برای گردش‌کار:
+   ▸ اگر توضیح در یک خط جا شود  → نام به خطِ دومِ مستقل می‌رود (کلاسِ .one)
+   ▸ اگر توضیح به خطِ دوم برسد → نام در ادامهٔ همان خط، پشتِ جداکنندهٔ نازک
+   تفاوت با مرجع: اینجا متن بریده نمی‌شود. در فهرستِ فعالیت‌ها همهٔ رکوردها باید
+   دقیقاً دو‌خطی بمانند تا فهرست یکدست باشد، ولی گردش‌کار سقفِ ارتفاع ندارد و
+   کوتاه‌کردنِ توضیحِ فنیِ سند (که تنها جای دیدنش همین‌جاست) ضرر دارد. */
+function wfFixLines(root){
+  if(!root) return;
+  var lines=root.querySelectorAll(".wf-lines");
+  for(var i=0;i<lines.length;i++){
+    var el=lines[i];
+    var note=el.querySelector(".wf-note");
+    if(!note){ el.classList.remove("one"); continue; }   // بدونِ توضیح: نام از همان خطِ اول
+    el.classList.remove("one");                          // پاک‌سازی تا اندازه‌گیری تمیز باشد
+    var tail=el.querySelectorAll(".wf-sep,.wf-who");
+    var j;
+    var lh=parseFloat(getComputedStyle(el).lineHeight)||17.6;
+    // نام موقتاً پنهان می‌شود تا ارتفاعِ خودِ توضیح سنجیده شود
+    for(j=0;j<tail.length;j++) tail[j].style.display="none";
+    var oneLine = note.getBoundingClientRect().height < (lh*1.5);
+    for(j=0;j<tail.length;j++) tail[j].style.display="";
+    if(oneLine) el.classList.add("one");
+  }
+}
 function workflowStepsHTML(num){
   var d=docByNumber(num); if(!d) return '';
   var status=String(d.status||"").toLowerCase();
   var steps=workflowOf(num).map(function(w){
+    /* توضیح و نامِ کاربر جدا نگه داشته می‌شوند تا در دو خط بیایند:
+       اول توضیح، بعد نامِ ثبت‌کننده. */
     return {label:workflowActionLabel(w.action), color:wfDotColor(w.action), done:true,
-            meta:(userName(w.user)||"")+(w.comment?(" · "+w.comment):""), date:fmtDate(w.timestamp)};
+            note:String(w.comment||""), who:(userName(w.user)||""), date:fmtDate(w.timestamp)};
   });
   wfFutureSteps(status).forEach(function(a){ steps.push({label:wfFutureLabel(a), done:false, meta:"", date:""}); });
   if(!steps.length) return '<p class="muted" style="padding:6px 2px">رویدادی ثبت نشده.</p>';
   // آخرین مرحلهٔ انجام‌شده = «مرحلهٔ فعلی» → حلقهٔ شعاعیِ متحرک (مثلِ رکوردهای فعالیتِ اخیرِ داشبورد)
   var lastDone=-1; steps.forEach(function(s,i){ if(s.done) lastDone=i; }); if(lastDone>=0) steps[lastDone].active=true;
+  /* ⚠ معکوس‌کردن بعد از تعیینِ «مرحلهٔ فعلی» انجام می‌شود، وگرنه lastDone به
+     عنصرِ اشتباه اشاره می‌کرد. جدیدترین رویداد بالا می‌آید — همان ترتیبی که
+     فهرستِ ریویژن‌ها دارد (revisionsOf هم نزولی مرتب می‌کند). */
+  steps.reverse();
   return '<div class="wf-timeline">'+steps.map(function(s,i){
     var last=(i===steps.length-1);
     return '<div class="wf-step '+(s.done?"done":"todo")+(s.active?" active":"")+'">'+
       '<div class="wf-rail"><span class="wf-ring"'+((s.done&&s.color)?(' style="--wf:'+s.color+'"'):'')+'></span>'+(last?'':'<span class="wf-line"></span>')+'</div>'+
+      /* ساختارِ دو‌خطیِ «فعالیت‌های اخیر»: توضیح و نام در یک ظرفِ واحد می‌آیند و
+         wfFixLines پس از رندر تصمیم می‌گیرد نام به خطِ دومِ مستقل برود (توضیحِ
+         یک‌خطی) یا در ادامهٔ خطِ دوم پشتِ جداکننده بنشیند (توضیحِ دو‌خطی). */
       '<div class="wf-body"><div class="wf-label">'+esc(s.label)+'</div>'+
-        (s.meta?'<div class="wf-meta">'+esc(s.meta)+'</div>':'')+'</div>'+
+        ((s.note||s.who)
+          ? '<div class="wf-lines'+(s.note?'':' no-note')+'">'+
+              (s.note?'<span class="wf-note" title="'+esc(s.note)+'">'+esc(s.note)+'</span>':'')+
+              (s.who?'<span class="wf-sep" aria-hidden="true"></span><span class="wf-who">'+esc(s.who)+'</span>':'')+
+            '</div>'
+          : '')+
+      '</div>'+
       (s.date?'<div class="wf-date">'+esc(s.date)+'</div>':'')+
     '</div>';
   }).join("")+'</div>';
@@ -295,6 +512,9 @@ function dmToggleRev(num){
   var willOpen=!row.classList.contains("open");
   var list=document.querySelectorAll(".ver-row"); for(var i=0;i<list.length;i++) list[i].classList.remove("open");
   if(willOpen) row.classList.add("open");
+  /* ⚠ سطرِ بسته ارتفاعِ صفر دارد (grid-template-rows:0fr)، پس اندازه‌گیریِ اولیه
+     رویش بی‌معناست. پس از باز شدن دوباره سنجیده می‌شود. */
+  if(willOpen) wfFixLines(row);
   if(num!==_dm.selNum) dmSelectVersion(num);
 }
 
@@ -368,11 +588,22 @@ async function dmSelectVersion(num){
         host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><div class="es-title">نمایشِ سه‌بعدی در دسترس نیست</div><div class="es-desc">فایلِ کتابخانهٔ model-viewer در پوشهٔ vendor موجود نیست.</div></div>';
       }
     } else {
+      var isPdf = /pdf/i.test(r.mimeType||"") || /\.pdf$/i.test(r.name||"");
       if(r.mimeType.indexOf("image/")===0){
         host.innerHTML='<img src="'+url+'">';
+        dmLensAttach(host);                       // ذره‌بینِ چسبیده به موس
+      }else if(isPdf){
+        /* PDF با pdf.js روی canvas رندر می‌شود، نه در iframe.
+           دلیل: محتوای iframe به‌خاطرِ سیاستِ امنیتیِ مرورگر خواندنی نیست، پس
+           ذره‌بین روی آن ممکن نبود. با canvas، پیکسل‌ها در اختیارِ ماست. */
+        host.classList.add("is-pdf");
+        host.scrollLeft=0; host.scrollTop=0;
+        await dmRenderPdf(host, blob, myToken);
+        if(myToken!==_dpSeq) return;
+        dmLensAttach(host);
       }else{
-        /* PDF (و هر چیزی که در iframe می‌رود) ویوئرِ داخلیِ خودش را دارد و خودش اسکرول می‌کند؛
-           پس اسکرولِ قاب خاموش می‌شود تا دو اسکرول‌بارِ هم‌زمان پیدا نشود. */
+        /* هر چیزِ دیگری (غیرِ عکس و PDF) همان ویوئرِ داخلیِ مرورگر را می‌گیرد؛
+           اسکرولِ قاب خاموش می‌شود تا دو اسکرول‌بارِ هم‌زمان پیدا نشود. */
         host.classList.add("is-frame");
         host.scrollLeft=0; host.scrollTop=0;
         host.innerHTML='<iframe src="'+url+'"></iframe>';

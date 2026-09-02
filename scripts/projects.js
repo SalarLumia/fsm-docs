@@ -524,30 +524,32 @@ function backToClients(){
    ظرف وابسته می‌شد و هر اصلاحِ جهت، شروع را از بالا جدا می‌کرد. اینجا مختصاتِ
    شروع و پایان صریح نوشته می‌شوند، پس جهت و شروع هر دو قطعی‌اند:
    شروع از بالا، حرکت پادساعت‌گرد. */
+/* حلقهٔ درصد — مسیرِ کاملِ دایره یک‌بار رسم می‌شود و مقدارِ نمایش با
+   stroke-dasharray کنترل می‌شود، نه با تغییرِ خودِ مسیر.
+   دو دلیل:
+   ۱) ویژگیِ d با transition در همهٔ مرورگرها انیمیت نمی‌شود، ولی dasharray
+      همه‌جا می‌شود؛ پس پرشدنِ نرمِ حلقه برمی‌گردد.
+   ۲) جهت و نقطهٔ شروع در خودِ مسیر ثابت‌اند (شروع از بالا، پادساعت‌گرد با
+      sweep-flag=0)، پس هیچ transformی روی ظرف لازم نیست و آن باگِ قبلی که
+      شروعِ قوس را از بالا جدا می‌کرد برنمی‌گردد.
+   pathLength=100 مسیر را روی مقیاسِ ۰..۱۰۰ نرمال می‌کند، پس درصد مستقیم
+   در dasharray می‌نشیند و محاسبهٔ محیط لازم نیست. */
 function donutHTML(solidPct, regPct){
   var CX=29, CY=29, R=24;
-  /* زاویه از بالا شروع می‌شود و پادساعت‌گرد مثبت است؛ y در SVG رو به پایین است
-     پس با منها اعمال می‌شود. */
-  var ptAt=function(deg){
-    var a=(90+deg)*Math.PI/180;
-    return [CX+R*Math.cos(a), CY-R*Math.sin(a)];
-  };
-  var arcPath=function(pct){
-    if(pct<=0) return "";
-    if(pct>=100){   // دایرهٔ کامل با یک قوس نمی‌شود؛ دو نیم‌دایره
-      return "M"+CX+","+(CY-R)+"A"+R+","+R+" 0 1 0 "+CX+","+(CY+R)+
-             "A"+R+","+R+" 0 1 0 "+CX+","+(CY-R);
-    }
-    var s=ptAt(0), e=ptAt(360*pct/100);
-    var large=pct>50?1:0;
-    /* sweep-flag=0 یعنی پادساعت‌گرد در دستگاهِ SVG (که y رو به پایین دارد) */
-    return "M"+s[0].toFixed(2)+","+s[1].toFixed(2)+
-           "A"+R+","+R+" 0 "+large+" 0 "+e[0].toFixed(2)+","+e[1].toFixed(2);
-  };
+  /* دایرهٔ کامل با دو نیم‌قوس (یک قوسِ تنها نمی‌تواند دایره را ببندد).
+     شروع از بالا و sweep-flag=0 ⇒ پادساعت‌گرد. */
+  var FULL="M"+CX+","+(CY-R)+
+    "A"+R+","+R+" 0 1 0 "+CX+","+(CY+R)+
+    "A"+R+","+R+" 0 1 0 "+CX+","+(CY-R);
   var col = solidPct===100 ? "var(--ok)" : "var(--brand)";
+  /* ⚠ مقدارِ واقعی روی data-v می‌نشیند و dasharray از صفر شروع می‌شود؛
+     playDonutsIn پس از رندر آن را اعمال می‌کند تا گذارِ CSS اجرا شود.
+     بدونِ این، عنصرِ تازه‌ساخته‌شده با innerHTML در حالتِ نهایی متولد می‌شود
+     و هیچ انیمیشنی دیده نمی‌شود. */
   var seg=function(pct,stroke,extra){
-    var d=arcPath(pct); if(!d) return "";
-    return '<path class="d-fg" d="'+d+'" stroke="'+stroke+'"'+(extra||"")+'/>';
+    var v=Math.max(0,Math.min(100,pct));
+    return '<path class="d-fg" d="'+FULL+'" pathLength="100" stroke="'+stroke+'"'+
+      ' data-v="'+v+'" stroke-dasharray="0 100"'+(extra||"")+'/>';
   };
   return '<div class="dwrap"><svg viewBox="0 0 58 58">'+
     '<circle class="d-bg" cx="'+CX+'" cy="'+CY+'" r="'+R+'"/>'+
@@ -555,8 +557,35 @@ function donutHTML(solidPct, regPct){
     seg(solidPct,col)+
     '</svg><span class="dtxt">'+solidPct+'٪</span></div>';
 }
-/* unit (اختیاری): وقتی واحدِ شمارش سند نیست، راهنما به‌جای برچسبِ خالی، عدد
-   نشان می‌دهد («۰ از ۳ قطعه»). بدونِ آن، همان راهنمای متنیِ دو‌خطیِ قبلی. */
+
+/* پرشدنِ حلقه‌ها پس از رندر — مقدار از data-v خوانده و روی dasharray نشانده
+   می‌شود. یک فریم صبر می‌کنیم تا مرورگر حالتِ اولیه (صفر) را ثبت کند، وگرنه
+   هر دو مقدار در یک فریم اعمال می‌شوند و گذار اجرا نمی‌شود. */
+function playDonutsIn(root){
+  var sc=root||document;
+  var rings=sc.querySelectorAll(".d-fg[data-v]");
+  var bars=sc.querySelectorAll(".mhero-vis .bar>i[data-w]");
+  var pctEl=sc.querySelector(".mhero-pct[data-p]");
+  if(!rings.length && !bars.length && !pctEl) return;
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+    [].forEach.call(rings, function(el){
+      el.setAttribute("stroke-dasharray",(el.getAttribute("data-v")||0)+" 100");
+      el.removeAttribute("data-v");
+    });
+    // نوارِ «مستندات پروژه» — همان گذارِ .6s که در CSS تعریف شده
+    [].forEach.call(bars, function(el){
+      el.style.width=(parseFloat(el.getAttribute("data-w"))||0)+"%";
+      el.removeAttribute("data-w");
+    });
+    // شمارشِ عددِ درصد، هم‌آهنگ با پرشدنِ نوار
+    if(pctEl){
+      var t=parseInt(pctEl.getAttribute("data-p"),10)||0;
+      pctEl.removeAttribute("data-p");
+      if(typeof countUpPercent==="function") countUpPercent(pctEl,t);
+      else pctEl.textContent=t+"٪";
+    }
+  }); });
+}
 function cellDonut(label,appr,reg,total,unit){
   var sp=total?Math.round(appr/total*100):0, rp=total?Math.round(reg/total*100):0;
   var leg = unit
@@ -588,9 +617,12 @@ function mbandHTML(p,s){
   var total=pTot+dTot, reg=pReg+dReg, apr=pApp+dApp;
   var regPct=total?Math.round(reg/total*100):0, aprPct=total?Math.round(apr/total*100):0;
   var hero='<div class="mcell"><div class="mdonut">'+
-      '<div class="mhero-vis"><span class="mhero-pct">'+aprPct+'٪</span>'+
-        '<div class="bar"><i class="faint" style="width:'+regPct+'%;background:var(--brand)"></i>'+
-          '<i style="width:'+aprPct+'%;background:'+(aprPct===100?"var(--ok)":"var(--brand)")+'"></i></div>'+
+      /* ⚠ عرض از صفر شروع می‌شود و مقدارِ واقعی روی data-w می‌نشیند؛ playDonutsIn
+         پس از رندر اعمالش می‌کند. مثلِ حلقه‌ها: عنصرِ ساخته‌شده با innerHTML در
+         حالتِ نهایی متولد می‌شود و بدونِ این کار هیچ گذاری اجرا نمی‌شود. */
+      '<div class="mhero-vis"><span class="mhero-pct" data-p="'+aprPct+'">۰٪</span>'+
+        '<div class="bar"><i class="faint" data-w="'+regPct+'" style="width:0;background:var(--brand)"></i>'+
+          '<i data-w="'+aprPct+'" style="width:0;background:'+(aprPct===100?"var(--ok)":"var(--brand)")+'"></i></div>'+
       '</div>'+
       /* لایهٔ کم‌رنگِ نوار همچنان «ثبت‌شده» است (نوار باید پیشرفت را نشان دهد، نه کمبود)؛
          ولی راهنمای دوم به تعدادِ ماژول‌هایِ بدونِ سند تغییر کرد — همان عددی که می‌گوید چقدر کار مانده. */
@@ -665,6 +697,7 @@ function showProjectDetail(c,o,pr){
     '</section>';
   // ورودِ آبشاریِ بالا‌به‌پایین: هدر ← نوارِ شاخص ← کارتِ مشخصات ← کارتِ قطعات
   if(typeof revealCascade==="function") revealCascade(host.querySelector(".ppanel"));
+  playDonutsIn(host);   // حلقه‌ها، نوارِ «مستندات پروژه» و عددِ درصد از صفر پر می‌شوند
   /* اولین مدلِ فهرست (مونتاژ اگر باشد، وگرنه قطعهٔ اول) خودکار بار می‌شود تا پنل
      با ویوئرِ خالی باز نشود. پس از رندرِ DOM اجرا می‌شود چون mvLoadPart به #mvShell نیاز دارد. */
   var first=(_mvParts||[]).filter(function(x){ return x.fileId; })[0];
@@ -1170,6 +1203,7 @@ function openProjectSpecs(c,o,pr){
 }
 function drawProjectSpecsBody(c,o,pr){
   var host=document.getElementById("psedBody"); if(!host||!PSED) return;
+  var _sc=pedScrollSave(host);   // جای اسکرول پیش از بازسازیِ innerHTML
   var p=findProject(c,o,pr); if(!p) return;
   /* کارتِ ۱: فیلدهای قابلِ ویرایشِ کاربر — نامِ پروژه و دسته‌بندیِ محصول.
      (مشتری/کد/تاریخ‌ها/تعدادِ قطعات را سامانه خودکار می‌سازد؛ در ویرایش نمایش داده نمی‌شوند.) */
@@ -1188,6 +1222,7 @@ function drawProjectSpecsBody(c,o,pr){
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>برای بارگذاریِ فایلِ هر سند، در پنلِ مدیریتِ پروژه روی آیکونِ همان سند کلیک کنید.</div>'+
   '</div>';
   host.innerHTML=tplCard+docsCard;
+  pedScrollRestore(host,_sc);
 }
 function psedToggleDoc(i){ var x=PSED.projDocs[i]; if(x){ x.on=!x.on; drawProjectSpecsBody(PSED.c,PSED.o,PSED.pr); } }
 async function saveProjectSpecs(){
@@ -1413,9 +1448,28 @@ function pedDragRow(on,label,code,fn,extra,dis){
     edGripHTML()+
   '</div>';
 }
+/* موقعیتِ اسکرولِ ناحیه‌های فهرست را برمی‌دارد/برمی‌گرداند.
+   ⚠ لازم است چون drawPartsBody کلِ بدنه را با innerHTML از نو می‌سازد؛ بدونِ این،
+   با هر روشن/خاموش‌کردنِ ماژول فهرست به بالا می‌پرد و کاربر جای خودش را گم می‌کند.
+   کلید = مقدارِ data-reorder (یا اندیسِ ناحیه، برای فهرستِ قطعات که آن را ندارد). */
+function pedScrollSave(host){
+  var m={};
+  [].forEach.call(host.querySelectorAll(".ed-scroll"), function(el,i){
+    m[el.getAttribute("data-reorder")||("i"+i)]=el.scrollTop;
+  });
+  return m;
+}
+function pedScrollRestore(host,m){
+  if(!m) return;
+  [].forEach.call(host.querySelectorAll(".ed-scroll"), function(el,i){
+    var k=el.getAttribute("data-reorder")||("i"+i);
+    if(m[k]) el.scrollTop=m[k];
+  });
+}
 function drawPartsBody(){
   pedDDCloseAll();   // هر بار رندر، منوهای بازِ قبلی و لیسنرِ کلیکِ بیرون پاک می‌شوند
   var host=document.getElementById("pedBody"); if(!host) return;
+  var _sc=pedScrollSave(host);   // پیش از بازسازی، جای اسکرول نگه داشته شود
   var nPart=pedCountParts();
   var single=!!PED.single;   // حالتِ ویرایشِ یک قطعهٔ مشخص
   /* کارتِ ۱: قطعاتِ پروژه (روشن/خاموش) — فقط در پنجرهٔ افزودن؛ در ویرایشِ تک‌قطعه معنا ندارد */
@@ -1494,6 +1548,7 @@ function drawPartsBody(){
   }
   var sv=document.getElementById("pedSave"); if(sv) sv.disabled=(nPart<1);
   host.innerHTML=partsCard+perPart;
+  pedScrollRestore(host,_sc);   // همان جای قبلیِ اسکرول برگردد
 }
 async function savePartsPanel(){
   if(pedCountParts()<1){ toast("دست‌کم یک قطعه انتخاب کنید.",true); return; }
