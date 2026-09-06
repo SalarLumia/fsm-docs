@@ -1001,8 +1001,16 @@ button.nd-chip:hover{border-color:var(--charcoal)}
    .open — وگرنه لحظهٔ بستن، کارت ناگهان تمام‌عرض و گوشه‌تیز می‌شد و بعد تازه
    شروع به جمع‌شدن می‌کرد. تنها چیزی که بینِ دو حالت عوض می‌شود شفافیت و
    فرورفتگیِ بالا/پایین است، و هر دو گذار دارند. */
+/* ⚠ قاعدهٔ پایه هیچ گذاری ندارد. قبلاً گذارِ ۰٫۲۸ ثانیه‌ای اینجا بود و چون
+   منحنیِ حالتِ بسته ease-in است (شروعِ آرام)، رنگِ هاور پس از خروجِ موس تقریباً
+   تمامِ آن مدت سرِ جایش می‌ماند و تازه آخرِ کار محو می‌شد — با حرکتِ سریعِ موس،
+   چند ردیف هم‌زمان رنگی دیده می‌شدند.
+   گذار فقط در دو لحظه معنا دارد و به همان دو حالت منتقل شد: باز شدن (.open) و
+   بسته شدن (.closing). هاور در هر دو جهت آنی است، مثلِ بقیهٔ جدول‌های سایت. */
 .arch-row>td::after,.arch-detail>td::after{content:"";position:absolute;z-index:-1;background:var(--panel2);
-  top:0;right:0;bottom:0;left:0;pointer-events:none;opacity:0;
+  top:0;right:0;bottom:0;left:0;pointer-events:none;opacity:0;transition:none}
+/* بسته‌شدن: تنها جایی که کارت باید *نرم* برود */
+.arch-row.closing>td::after,.arch-detail.closing>td::after{
   transition:opacity .28s var(--exp-ease,cubic-bezier(.2,0,0,1)),
              background-color .28s var(--exp-ease,cubic-bezier(.2,0,0,1)),
              top .28s var(--exp-ease,cubic-bezier(.2,0,0,1)),
