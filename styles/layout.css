@@ -1,5 +1,10 @@
 /* ===== پوستهٔ برنامه و سایدبار (سمت راست، چیدمان راست‌به‌چپ) ===== */
-#appView{min-height:100vh}
+/* ظرفِ اسکرولِ اصلی — توضیحش در base.css. جهتش از html ارث می‌رسد (rtl)،
+   پس نوار سمتِ چپ می‌نشیند. سایدبار position:fixed است و بیرونِ این اسکرول
+   می‌ماند؛ هدرِ چسبان هم نسبت به همین ظرف می‌چسبد، نه پنجره. */
+#appView{height:100%;overflow:auto}
+/* قفلِ اسکرول هنگامِ باز بودنِ پنجره‌ها روی همین ظرف اعمال می‌شود، نه body */
+body.modal-open #appView{overflow:hidden}
 .sidebar{width:220px;transition:width .28s cubic-bezier(.4,0,.2,1);background:var(--charcoal);box-shadow:-2px 0 16px #00000028;display:flex;flex-direction:column;
   position:fixed;right:0;top:0;bottom:0;z-index:40;flex-shrink:0}
 .sb-brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.1);

@@ -345,6 +345,7 @@ function logout(){
   stopClock();
   document.getElementById("appView").classList.add("hidden");
   document.getElementById("loginView").classList.remove("hidden");
+  document.body.classList.remove("in-app");   // اسکرول به خودِ صفحه برمی‌گردد (صفحهٔ ورود)
   lgSetErr(""); lgBusy(false);            // صفحهٔ ورود تمیز برگردد (بدونِ خطا/اسپینرِ نشست قبلی)
   document.getElementById("loginView").classList.remove("open");   // بازگشت به مرحلهٔ ۱ (برندِ بزرگ)
   var pw=document.getElementById("lgPass");
@@ -373,6 +374,7 @@ async function startApp(){
     // هنوز چیزی نمایش داده نشده؛ حالا پوسته را بیاور تا خطا جایی برای دیده‌شدن داشته باشد
     document.getElementById("loginView").classList.add("hidden");
     document.getElementById("appView").classList.remove("hidden");
+    document.body.classList.add("in-app");   // اسکرولِ اصلی به ظرفِ برنامه می‌رود
     renderUserHeader(); applyRoleVisibility();
     var dashErr=document.getElementById("tab-dashboard");
     if(dashErr) dashErr.classList.remove("hidden");
@@ -409,6 +411,7 @@ async function startApp(){
      دیده می‌شوند و بعد دوباره در آبشار وارد می‌شوند. */
   document.getElementById("loginView").classList.add("hidden");
   document.getElementById("appView").classList.remove("hidden");
+  document.body.classList.add("in-app");   // اسکرولِ اصلی به ظرفِ برنامه می‌رود
   switchTab("dashboard");   // پنلِ داشبورد را نمایان می‌کند و آبشار را یک‌بار پخش می‌کند
   lgBusy(false);            // دکمهٔ ورود برای دفعهٔ بعد به حالتِ عادی برگردد
   // اگر کاربر با اسکنِ QR آمده، حالا که داده آماده است همان سند باز می‌شود

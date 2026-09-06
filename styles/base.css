@@ -11,8 +11,18 @@
 
 /* ===== پایه و تایپوگرافی ===== */
 *{box-sizing:border-box}
+/* ═══ جای نوارِ اسکرولِ اصلی ═══
+   سند راست‌به‌چپ است (dir="rtl" روی html) ولی مرورگر این جهت را برای نوارِ
+   اسکرولِ *پنجره* اعمال نمی‌کند و آن را سمتِ راست می‌گذارد. برای یک *عنصر*
+   اما همیشه اعمال می‌کند: ظرفی با direction:rtl نوارش را سمتِ چپ می‌آورد.
+   پس اسکرولِ اصلی از پنجره گرفته می‌شود و به ظرفِ برنامه (#appView) می‌رود.
+   ⚠ overflow:hidden فقط وقتی روی body می‌نشیند که واردِ برنامه شده باشیم
+   (کلاسِ in-app در auth.js). صفحهٔ ورود اسکرولِ خودش را نگه می‌دارد، وگرنه
+   روی پنجرهٔ کوتاه بخشی از فرم غیرقابلِ دسترس می‌شد. */
+html,body{height:100%}
 body{margin:0;background:var(--bg);color:var(--txt);
   font-family:'IRANSans',system-ui,'Segoe UI',Tahoma,sans-serif;font-size:14px;line-height:1.7}
+body.in-app{overflow:hidden}
 a{color:var(--brand);text-decoration:none}
 button{font-family:inherit;cursor:pointer}
 

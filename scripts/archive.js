@@ -608,10 +608,15 @@ function anyModalOpen(){
    (position:fixed روی body امتحان شد و غلط بود: ارتفاعِ صفحه جمع می‌شد،
    نوارِ اسکرول غیب می‌شد و هدر با topِ منفی بریده می‌شد.) */
 var _mlY=0, _mlOn=false;
+/* ⚠ اسکرولِ اصلی روی #appView است نه پنجره (تا نوارش سمتِ چپ بیفتد)، پس
+   خواندن و نوشتنِ موقعیت هم باید روی همان باشد؛ window.pageYOffset همیشه
+   صفر برمی‌گرداند. fallback به documentElement برای احتیاط است. */
+function appScroller(){ return document.getElementById("appView") || document.documentElement; }
 function modalLock(){
   if(_mlOn) return;
-  _mlY=window.pageYOffset||document.documentElement.scrollTop||0;
-  if(_mlY>0) window.scrollTo(0,0);   // هدر به بالای کادرِ دید بیاید
+  var sc=appScroller();
+  _mlY=sc.scrollTop||0;
+  if(_mlY>0) sc.scrollTop=0;   // هدر به بالای کادرِ دید بیاید
   document.body.classList.add("modal-open");
   _mlOn=true;
   // دکمهٔ انتقال با این کلاس fixed می‌شود؛ مختصاتش باید همین‌جا ست شود
@@ -620,7 +625,7 @@ function modalLock(){
 function modalUnlock(){
   if(!_mlOn) return;
   document.body.classList.remove("modal-open");
-  if(_mlY>0) window.scrollTo(0,_mlY);   // بازگشت به همان جای قبلی
+  if(_mlY>0) appScroller().scrollTop=_mlY;   // بازگشت به همان جای قبلی
   _mlOn=false;
   if(typeof xferPlaceBtn==="function") xferPlaceBtn();   // دکمه به جریانِ هدر برگردد
 }
