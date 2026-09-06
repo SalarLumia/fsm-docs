@@ -175,7 +175,10 @@ body.sb-wide .app-body{margin-right:308px}
 .tb-sep{align-self:center;width:1px;height:18px;background:var(--line);margin-inline:9px;flex-shrink:0}
 
 /* ===== محتوای اصلی ===== */
-.app-main{flex:1;padding:22px 24px 60px;background:var(--bg)}
+/* ⚠ پدینگِ پایین از ۶۰ به ۲۸ آمد. آن ۶۰ فضای ثابتی بود که «خالی» دیده می‌شد
+   ولی هیچ رشدی را جذب نمی‌کرد و بیشترِ ذخیرهٔ صفحه را می‌خورد؛ با کارت که
+   خودش ۲۰px حاشیهٔ پایین دارد، ۲۸ هم کافی است و ۳۲px ذخیره آزاد می‌کند. */
+.app-main{flex:1;padding:22px 24px 28px;background:var(--bg)}
 main{max-width:none;margin:0;padding:0}
 
 /* ===== فوتر مینیمال (نازک، فقط شعار) ===== */

@@ -236,9 +236,31 @@ function archOrderTitle(d){
   var o=(DB.orders||[]).find(function(x){ return x.clientCode===d.clientCode && pad2(x.orderNo)===pad2(d.orderNo); });
   return (o&&o.title)?o.title:("سفارش "+pad2(d.orderNo));
 }
+/* ═══ رزروِ ارتفاع ═══
+   مسئله: صفحه با min-height:100vh دقیقاً به قدِ پنجره میخ شده و جدولِ آرشیو
+   اسکرولِ داخلی ندارد، پس هر بار که ردیفی باز می‌شود ارتفاعِ *کلِ صفحه* زیاد
+   می‌شود و اسکرول‌بار می‌آید — با اینکه پایینِ صفحه خالی به نظر می‌رسد (آن
+   فضا پدینگ و حاشیهٔ ثابت است و چیزی را جذب نمی‌کند).
+   راه‌حل: همان‌قدر که باز شدنِ یک ردیف اضافه می‌کند، از قبل زیرِ کارت فضای
+   خالی رزرو می‌شود؛ با باز شدن، رزرو صفر می‌شود و جمع ثابت می‌ماند.
+   ⚠ عددِ ثابت جواب نمی‌دهد: ارتفاعِ ردیفِ جزئیات به تعدادِ دکمه‌های همان سند
+   بستگی دارد (سندِ در انتظارِ بازبینی سه دکمه دارد، تأییدشده یکی) و به تعدادِ
+   خط‌های متن. پس بلندترینِ ردیف‌های همین صفحه اندازه‌گیری می‌شود.
+   .arch-det-pad حتی وقتی کانتینرش جمع است ارتفاعِ طبیعیِ خودش را دارد
+   (گرید فقط ظرف را صفر می‌کند، نه محتوا را). */
+var ARCH_ROW_GROW = 11;   // رشدِ پدینگِ ردیفِ اصلی هنگامِ باز شدن: (24+3) − (8+8)
+function archSyncReserve(){
+  var pane=document.getElementById("tab-archive"); if(!pane) return;
+  var pads=document.querySelectorAll("#archiveBody .arch-det-pad"), h=0;
+  for(var i=0;i<pads.length;i++) h=Math.max(h, pads[i].offsetHeight);
+  pane.style.setProperty("--arch-reserve", (h ? h+ARCH_ROW_GROW : 0)+"px");
+}
 var ARCH_CHEV='<svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>';
 function renderArchive(){
   _arch.openNum="";                 // با هر رندر (مرتب‌سازی/فیلتر) اکسپندها بسته می‌شوند
+  /* نشانهٔ «یکی باز است» هم باید پاک شود، وگرنه رزرو صفر می‌ماند در حالی که
+     هیچ ردیفی باز نیست و صفحه ۶۰-۹۰ پیکسل کوتاه می‌آید. */
+  var _pn=document.getElementById("tab-archive"); if(_pn) _pn.classList.remove("has-open");
   populateArchiveOrders();
   populateArchiveProjects();
   buildArchChips();                 // ردیفِ چیپ‌های فیلترِ فعال
@@ -296,6 +318,7 @@ function renderArchive(){
   document.getElementById("archiveBody").innerHTML = html || '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">موردی با این فیلترها یافت نشد.</td></tr>';
   var endI=Math.min(startI+per, total);
   document.getElementById("archiveFoot").innerHTML = archFootHTML(total, startI, endI, _arch.page, pages);
+  archSyncReserve();   // فضای رزرو بر اساسِ بلندترین ردیفِ همین صفحه تنظیم می‌شود
 }
 
 /* ===== صفحه‌بندی (rows-per-page + بازه + ناوبری) و دکمهٔ خروجی ===== */
@@ -397,8 +420,12 @@ function archToggleRow(num){
     // اگر همین ردیف نیمهٔ راهِ بسته‌شدن بود، حالتِ بسته‌شدن لغو می‌شود
     [row,det].forEach(function(e){ if(e._closeT){ clearTimeout(e._closeT); e._closeT=null; } e.classList.remove("closing"); });
     row.classList.add("open"); det.classList.add("open"); _arch.openNum=num; if(table) table.classList.add("has-open");
+    var pane=document.getElementById("tab-archive"); if(pane) pane.classList.add("has-open");   // رزرو صفر می‌شود
   }
-  else { _arch.openNum=""; if(table) table.classList.remove("has-open"); }
+  else {
+    _arch.openNum=""; if(table) table.classList.remove("has-open");
+    var pane2=document.getElementById("tab-archive"); if(pane2) pane2.classList.remove("has-open");   // رزرو برمی‌گردد
+  }
 }
 
 /* کلیک روی سلول‌های لینک‌دار (شماره/مشتری/پروژه/قطعه): فقط وقتی ردیف اکسپند است ناوبری می‌کند؛

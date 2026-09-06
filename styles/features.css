@@ -1091,7 +1091,14 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* ===== جابه‌جاییِ ۵ ستونِ چپ (پروژه/قطعه/تاریخ/وضعیت/عملیات) به سمتِ چپ برای پرکردنِ فضای آزادشده از حذفِ اسکرول‌بار.
    فقط محتوای سلول (نه خودِ سلول) با position:relative جابه‌جا می‌شود تا پس‌زمینهٔ نارنجی پیوسته بماند و انیمیشن‌ها نخورند.
    یک مقدارِ واحد (--arch-shift) برای همه ⟵ فاصله‌ها ثابت می‌ماند. */
-#tab-archive{--arch-shift:9px}
+/* رزروِ ارتفاع — منطقش در archSyncReserve توضیح داده شده. مقدارش را همان تابع
+   از روی اندازه‌گیریِ واقعیِ ردیف‌های همین صفحه پر می‌کند.
+   فضای رزرو *بیرونِ* کارت است (زمینهٔ طوسی)، نه داخلش، تا دیده نشود. */
+#tab-archive{--arch-shift:9px;--arch-reserve:0px;
+  padding-bottom:var(--arch-reserve,0px);
+  transition:padding-bottom .28s cubic-bezier(.4,0,1,1)}
+#tab-archive.has-open{padding-bottom:0;transition:padding-bottom .28s cubic-bezier(.2,0,0,1)}
+@media(prefers-reduced-motion:reduce){#tab-archive,#tab-archive.has-open{transition:none}}
 /* سفارش(۴): ۳۰px چپ | پروژه(۵): ۴۵px چپ | قطعه(۶): ۶۹px چپ | تاریخ(۷)/وضعیت(۸): بدونِ تغییر.
    زیرنویسِ خط دوم روی .arch-det-wrap (بیرونِ overflow:hidden) جابه‌جا می‌شود، نه روی .arch-date، تا متنِ کامل بریده نشود. */
 /* تیترها */

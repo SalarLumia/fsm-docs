@@ -68,6 +68,9 @@ function switchTab(name){
   if(name==="project") renderProjectTab();
   if(name==="trash" && typeof renderTrash==="function") renderTrash();
   if(name==="help" && typeof renderHelp==="function") renderHelp();
+  /* رزروِ ارتفاعِ آرشیو با اندازه‌گیریِ واقعی حساب می‌شود و اندازه‌گیری روی تبِ
+     پنهان صفر برمی‌گرداند؛ پس با ورود به تب یک‌بار دوباره حساب می‌شود. */
+  if(name==="archive" && typeof archSyncReserve==="function") archSyncReserve();
   // درختِ «مشتریان و پروژه‌ها» را تازه کن تا با ترکِ تبِ پروژه، نارنجیِ مشتری/پروژه پاک شود
   if(name!=="project" && typeof navRefreshSelection==="function") navRefreshSelection();
   if(typeof playTabReveal==="function") playTabReveal(pane);   // ورودِ آبشاریِ بلوک‌های همان تب
