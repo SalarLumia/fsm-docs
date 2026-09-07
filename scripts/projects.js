@@ -1039,7 +1039,18 @@ function partDocMaster(){
 function partDocTypesForPart(p,part){
   var pn=pad2(part), r=specsRoot(p), bp=r.partDocsByPart||{}, set={};
   if(bp[pn]){ bp[pn].forEach(function(T){ set[String(T).toUpperCase()]=1; }); }
-  else { partDocTypesOf(p).forEach(function(T){ set[String(T).toUpperCase()]=1; }); }   // fallbackِ پروژه‌ای
+  else {
+    /* قطعه‌ای که هنوز پیکربندی نشده: «نقشهٔ رفرنس» پیش‌فرض و *اولین* ماژول است — در
+       لحظه‌ای که قطعه تعریف می‌شود تنها سندِ موجود همان نقشهٔ مشتری است، پس نباید
+       یادِ کاربر برود دستی اضافه‌اش کند. اول درج می‌شود تا در ترتیبِ نمایش هم اول
+       بیاید (کلیدهای رشته‌ایِ شیء به ترتیبِ درج برمی‌گردند).
+       ⚠ فقط برای قطعهٔ پیکربندی‌نشده: اگر کاربر قبلاً برای این قطعه انتخابی ذخیره
+       کرده (bp[pn])، همان مقدم است — وگرنه خاموش‌کردنِ این ماژول در پنل بی‌اثر
+       می‌شد و قطعاتی مثل پروژه‌های داخلی/آزمایشگاهی که اصلاً نقشهٔ مشتری ندارند
+       برای همیشه یک سندِ الزامیِ برآورده‌نشدنی می‌گرفتند. */
+    if(rdTypeReady()) set[RD_CODE]=1;
+    partDocTypesOf(p).forEach(function(T){ set[String(T).toUpperCase()]=1; });   // fallbackِ پروژه‌ای
+  }
   projectDocs(p).forEach(function(d){ if(pad2(d.partNo)===pn) set[String(d.typeCode).toUpperCase()]=1; });
   return Object.keys(set);
 }

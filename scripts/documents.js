@@ -403,7 +403,11 @@ function ndFinalHTML(){
       '<div class="nd-final-inner">'+
         '<div id="nRevBanner" class="nd-revnote" hidden></div>'+
         '<div class="nd-fstack">'+
-          '<div class="ndoc-note"><textarea id="nTitle" class="ndoc-note-ta" placeholder="تغییرات و یادداشت‌های مربوط به این نسخه ریویژن را بنویسید."></textarea></div>'+
+          /* نوتِ زیرِ فیلد (نه فقط placeholder): متنِ داخلِ فیلد به‌محضِ شروعِ تایپ محو
+             می‌شود — یعنی دقیقاً همان لحظه‌ای که قالبِ نوشتن اهمیت پیدا می‌کند. متنش را
+             updateRevMode بر اساسِ نوعِ سند پر می‌کند. */
+          '<div class="ndoc-note"><textarea id="nTitle" class="ndoc-note-ta" placeholder="تغییرات و یادداشت‌های مربوط به این نسخه ریویژن را بنویسید."></textarea>'+
+            '<div class="rv-3d-hint" id="nNoteHint" hidden></div></div>'+
           (is3D?nd3DUploadHTML():ndFileHTML())+
         '</div>'+
         '<div class="nd-actions">'+
@@ -449,7 +453,12 @@ function updateRevMode(){
   var titleInp=document.getElementById("nTitle");
   var submitBtn=document.getElementById("nSubmitBtn");
   var c=ndVal("nClient"),o=ndVal("nOrder"),pr=ndVal("nProject"),pt=ndVal("nPart"),ty=ndVal("nType");
-  if(titleInp) titleInp.placeholder="تغییرات و یادداشت‌های مربوط به این نسخه ریویژن را بنویسید.";
+  /* «نقشهٔ رفرنس»: راهنما عوض می‌شود و نوتِ ثابت زیرِ فیلد ظاهر می‌شود. این تنها
+     رفتارِ نوع‌محورِ تازه در این پنل است؛ بقیهٔ منطقِ ریویژن دست‌نخورده می‌ماند. */
+  var isRD = rdTypeReady() && String(ty).toUpperCase()===RD_CODE;
+  var hint = document.getElementById("nNoteHint");
+  if(titleInp) titleInp.placeholder = isRD ? RD_NOTE_PH : "تغییرات و یادداشت‌های مربوط به این نسخه ریویژن را بنویسید.";
+  if(hint){ hint.hidden = !isRD; hint.innerHTML = isRD ? (RD_INFO_IC+'<span>'+RD_NOTE_HINT+'</span>') : ""; }
   if(!(c&&o&&pr&&pt&&ty)){ if(note){ note.hidden=true; note.innerHTML=""; } if(submitBtn) submitBtn.disabled=false; _newDocBlocked=false; return; }
   var rs=revState(c,o,pr,pt,ty), msg="", cls="nd-revnote";
   if(rs.mode==="new"){          // هیچ نسخهٔ قبلی نیست → این نسخه Rev 00
@@ -520,6 +529,15 @@ async function submitDocument(){
   if(is3D){ var stpEl=document.getElementById("nFile3"), stpF=stpEl&&stpEl.files&&stpEl.files[0];
     if(!stpF){ toast("بارگذاریِ فایلِ STP الزامی است.",true); return; } }   // STP اجباری برای اسنادِ سه‌بعدی
   var noteEl=document.getElementById("nTitle");
+  /* توضیحات فقط برای «نقشهٔ رفرنس» اجباری است — جای ثبتِ شمارهٔ نقشهٔ خودِ مشتری.
+     ⚠ فقط «خالی نبودن» بررسی می‌شود، نه درستیِ قالب: شماره‌گذاریِ مشتری‌ها الگوی
+     واحدی ندارد و اعتبارسنجیِ قالب فقط جلوی ثبتِ درست را می‌گرفت. */
+  if(rdTypeReady() && String(ndVal("nType")).toUpperCase()===RD_CODE &&
+     !String((noteEl&&noteEl.value)||"").trim()){
+    toast("برای «نقشهٔ رفرنس»، نوشتنِ شمارهٔ نقشهٔ مشتری در توضیحات الزامی است.",true);
+    if(noteEl) noteEl.focus();
+    return;
+  }
   var payload={ clientCode:ndVal("nClient"), orderNo:ndVal("nOrder"), projectNo:ndVal("nProject"),
     partNo:ndVal("nPart"), typeCode:ndVal("nType"), rev:ndVal("nRev"), title:(noteEl?noteEl.value:"") };
   payload.fileBase64=await fileToBase64(f); payload.fileName=f.name; payload.mimeType=f.type;   // فایلِ اصلی (برای سه‌بعدی: GLB/GLTF)

@@ -512,6 +512,10 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* توضیحِ کوچکِ زیرِ دراپ‌زون‌های سه‌بعدی (بارگذاریِ نسخهٔ جدید): آیکونِ ریز + متنِ کم‌رنگ، هم‌سبکِ .nd-revnote */
 .rv-3d-hint{display:flex;align-items:flex-start;gap:7px;margin-top:10px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.8}
 .rv-3d-hint svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px}
+/* ⚠ لازم است: قاعدهٔ نویسنده با display:flex بر [hidden]ِ استایلِ پیش‌فرضِ مرورگر
+   غلبه می‌کند، پس عنصر با وجودِ صفتِ hidden دیده می‌شود. همان تمهیدی که برای
+   .arch-chips هم گرفته شده. (نوتِ زیرِ فیلدِ توضیحات با همین صفت خاموش می‌شود.) */
+.rv-3d-hint[hidden]{display:none}
 .nd-final-num{font-size:15px;font-weight:800;color:var(--brand);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.03em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 /* چیدمانِ عمودی: یادداشتِ افقی بالا، سپس ردیفِ باکس‌های آپلود */
 .nd-fstack{display:flex;flex-direction:column;gap:14px}
