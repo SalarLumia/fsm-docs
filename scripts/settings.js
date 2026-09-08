@@ -200,7 +200,7 @@ function partModEn(m){ return (m&&m.nameEn) ? String(m.nameEn) : ((m&&PARTMOD_EN
 /* واحدِ استانداردِ پارامترهای کمی (پارامترهای متنی مثلِ جنس/عملیاتِ حرارتی واحد ندارند). */
 var PARTMOD_UNIT={
   "وزن":"kg","سختی":"HB","ابعاد":"mm","اندازه":"mm","تلورانس":"mm","رواداری":"mm",
-  "زبری سطح":"μm","زبری":"μm","چگالی":"g/cm³","دمای ذوب":"°C","مدول":"GPa","تعداد":"عدد"
+  "زبری سطح":"μm","زبری":"μm","چگالی":"g/cm³","دمای ذوب":"°C","مدول":"GPa","تعداد":"pcs"
 };
 function partModUnit(m){ return (m&&m.unit!=null&&String(m.unit)!=="") ? String(m.unit) : ((m&&PARTMOD_UNIT[String(m.nameFa||"").trim()])||""); }
 /* واحدِ یک پارامتر بر اساسِ نامش (برای استفاده روی کارتِ قطعه در projects.js) */

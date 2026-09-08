@@ -171,6 +171,10 @@ function projBarHTML(r,doAnim){
   return '<div class="proj-bar-bg">'+segs.map(function(g){
     var w=doAnim?0:g.pct;
     var kc=(g.kind==="rev")?" rev":((g.kind==="none")?" none":"");
+    /* زردِ کم‌رنگ (رنگِ قطعهٔ سوم) کنارِ پس‌زمینهٔ نوار نسبتِ کنتراستِ ۱٫۰۳ دارد —
+       عملاً نامرئی. همان خطِ داخلیِ نازکی که قبلاً برای سگمنتِ «در انتظار بازبینی»
+       بود مرزش را معلوم می‌کند، بدونِ دست‌زدن به خودِ رنگ. */
+    if(String(g.color).toLowerCase()==="#fef3c7") kc+=" pale";
     return '<span class="pbar-seg'+kc+'" data-w="'+g.pct+'"'+
       ' style="width:'+w+'%;background:'+esc(g.color)+'">'+
       segTipHTML(g)+'</span>';
