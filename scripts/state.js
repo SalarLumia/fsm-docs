@@ -210,23 +210,40 @@ function badgeIcon(cls){
   if(/approved|active/.test(c)) return check;
   if(/pending/.test(c)) return clock;
   if(/review/.test(c)) return eye;
+  if(/purged/.test(c)) return ban;        // حذفِ همیشگی: نمادِ «ممنوع»، نه ضربدرِ رد‌شدن
   if(/rejected/.test(c)) return cross;
   return pencil;   // draft/archived و پیش‌فرض
 }
 /* رندرِ کاملِ یک بج: آیکونِ اختصاصی + برچسبِ کوتاه (همه‌جای سایت از این استفاده می‌کند) */
 function badgeHTML(cls,label){ return '<span class="badge '+cls+'">'+badgeIcon(cls)+esc(label)+'</span>'; }
 function workflowActionLabel(a){
+  /* ⚠ هر کنشی که addWorkflow ثبت می‌کند باید اینجا معادلِ فارسی داشته باشد؛ حالتِ
+     پیش‌فرض همان کلیدِ انگلیسی را چاپ می‌کند و در تایم‌لاین «deleted/purged» دیده
+     می‌شد. سه کنشِ سطلِ زباله جا افتاده بودند. */
   return { created:"ایجاد سند", revision:"ایجاد سند", submitted:"ارسال برای بازبینی",
            newversion:"بارگذاری نسخهٔ جدید", approved:"تأیید شد", rejected:"تأیید نشد",
-           addformat:"افزودن فرمت" }[a] || a;
+           addformat:"افزودن فرمت",
+           deleted:"حذف", restored:"بازیابی", purged:"حذف دائمی" }[a] || a;   // هم‌نامِ بجِ داشبورد
 }
 /* رنگ حلقهٔ هر رویداد در تایم‌لاین گردش‌کار.
    مراحل پیشروی همگی نارنجیِ برند‌اند (یک‌دست، بدون اختلاف سایه)؛
    فقط نتیجهٔ نهایی رنگ معنایی می‌گیرد: تأیید سبز، رد قرمز. */
 function wfDotColor(action){
-  return { created:"var(--brand)", revision:"var(--brand)", submitted:"var(--brand)",
-           newversion:"var(--brand)", approved:"var(--ok)", rejected:"var(--err)",
-           addformat:"var(--brand)" }[action] || "var(--muted)";
+  /* نقطه‌ها دایرهٔ *توپُرِ* ۸ پیکسلی‌اند (.wf-ring)، پس رنگ باید جرم داشته باشد.
+     ⚠ «ارسال برای بازبینی» زردِ #ca8a04 است نه --warn: فامِ --warn برابرِ ۳۲ است،
+     یعنی عملاً همان فامِ نارنجیِ برند (۳۳) و کنارِ «ایجاد سند» زرد دیده نمی‌شد.
+     #deb327 (انتخابِ کاربر) فامِ ۴۵ دارد و از نارنجی جدا دیده می‌شود.
+     بازیابی آبی است نه سبز: سبز در کلِ سایت یعنی «تأییدشده» و بازیابی تأیید نیست —
+     سند به همان وضعیتی برمی‌گردد که پیش از حذف داشت. آبیِ --review تا اینجا در هیچ
+     وضعیتی به کار نرفته بود، پس با چیزی قاطی نمی‌شود.
+     حذف قرمز است و حذفِ دائمی قرمزِ تیره‌تر — برگشت‌ناپذیر، پس سنگین‌تر. خاکستری
+     امتحان و کنار گذاشته شد: خاکستری همان رنگِ *پیش‌فرضِ* کنشِ ناشناخته در همین
+     تابع است و معنیِ ویژه‌ای منتقل نمی‌کرد. */
+  return { created:"var(--brand)", revision:"var(--brand)", submitted:"#deb327",
+           newversion:"var(--brand)", approved:"var(--ok)", rejected:"#fca5a5",
+           addformat:"var(--brand)",
+           deleted:"var(--err)", restored:"var(--review)", purged:"var(--err2)"
+         }[action] || "var(--muted)";
 }
 /* برچسب مراحلِ هنوز‌انجام‌نشده (حلقه‌های توخالیِ آینده) */
 function wfFutureLabel(a){
@@ -414,8 +431,13 @@ function projectStats(p){
     return { total:mods.length, reg:reg, apr:ap, inRev:reg-ap, noDoc:mods.length-reg };
   };
   var segs=[];
+  /* ترتیبِ چپ‌به‌راستِ نوار (ظرفش direction:ltr است، پس اولین سگمنت سمتِ چپ):
+     قطعات به ترتیبِ شماره ← «مستندات پروژه» (۰۰) ← در انتظارِ بازبینی ← خالی.
+     یعنی ۰۰ در *انتها*ی گروهِ تأییدشده‌ها می‌نشیند نه ابتدای آن.
+     ⚠ رنگ‌ها از این ترتیب تأثیر نمی‌گیرند: idxOf از projectPartsList می‌خواند،
+     نه از این مرتب‌سازی — پس رنگِ هر قطعه ثابت می‌ماند. */
   Object.keys(aprByPart).sort(function(a,b){
-    return (a==="00"?-1:b==="00"?1:numOf(a)-numOf(b)); }).forEach(function(pn){
+    return (a==="00"?1:b==="00"?-1:numOf(a)-numOf(b)); }).forEach(function(pn){
     segs.push({ part:pn, n:aprByPart[pn], kind:"apr",
       name:(pn==="00")?"مستندات پروژه":partNameFa(pn),
       color:partColor(pn, idxOf(pn)),
@@ -423,9 +445,13 @@ function projectStats(p){
       pct: total>0 ? (aprByPart[pn]/total*100) : 0 });
   });
   if(inRev>0) segs.push({ part:"", n:inRev, kind:"rev", name:"در انتظار بازبینی",
-    /* طوسیِ سایدبار (var(--charcoal)) — عمداً بی‌طرف و بیرون از خانوادهٔ رنگیِ
-       قطعات، تا «در انتظارِ بازبینی» با هیچ قطعه‌ای اشتباه نشود. */
-    color:"#4a4a4a", pct: total>0 ? (inRev/total*100) : 0 });
+    /* خاکستریِ برند — عمداً بی‌طرف و بیرون از خانوادهٔ رنگیِ قطعات، تا
+       «در انتظارِ بازبینی» با هیچ قطعه‌ای اشتباه نشود.
+       ⚠ اول ذغالیِ سایدبار (#4a4a4a) بود و زیادی تیره دیده می‌شد. #848484
+       نسبتِ کنتراستِ ۳٫۲۵ با زمینهٔ نوار دارد که هنوز بالای آستانهٔ ۳:۱ برای
+       عناصرِ غیرمتنی است؛ روشن‌تر از این (مثلاً #9a9a9a با ۲٫۴۵) از آستانه
+       می‌افتد و لبهٔ سگمنت گم می‌شود. */
+    color:"#848484", pct: total>0 ? (inRev/total*100) : 0 });
   /* بخشِ خالیِ نوار هم یک سگمنتِ معنادار است؛ در راهنما می‌آید ولی
      خودش رسم نمی‌شود (همان پس‌زمینهٔ نوار است). */
   if(missingMods.length>0) segs.push({ part:"", n:missingMods.length, kind:"none",

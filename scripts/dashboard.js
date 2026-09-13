@@ -277,12 +277,14 @@ function wfActionBadge(action){
   var map={ approved:{cls:"badge-approved",label:"تأیید"},
             rejected:{cls:"badge-rejected",label:"عدم تایید"},
             submitted:{cls:"badge-pending",label:"بازبینی"},
-            newversion:{cls:"badge-draft",label:"نسخهٔ جدید"},
-            created:{cls:"badge-draft",label:"ایجاد"},
-            revision:{cls:"badge-draft",label:"ایجاد"},
+            // خانوادهٔ «کارِ سازنده» همگی نارنجیِ برند‌اند — هم‌رنگِ نقطهٔ همین رویدادها در گردشِ کار
+            newversion:{cls:"badge-brand",label:"نسخهٔ جدید"},
+            addformat:{cls:"badge-brand",label:"افزودن فرمت"},
+            created:{cls:"badge-brand",label:"ایجاد"},
+            revision:{cls:"badge-brand",label:"ایجاد"},
             deleted:{cls:"badge-rejected",label:"حذف"},          // حذفِ نرم (به سطلِ زباله، قابلِ بازیابی)
             restored:{cls:"badge-approved",label:"بازیابی"},      // بازگردانده‌شده از سطلِ زباله
-            purged:{cls:"badge-rejected",label:"حذف دائمی"} };    // حذفِ همیشگی (معمولاً توسطِ «سامانه»)
+            purged:{cls:"badge-purged",label:"حذف دائمی"} };      // حذفِ همیشگی — قرمزِ تیره‌ترِ اختصاصی
   return map[a] || { cls:"badge-draft", label:workflowActionLabel(a) };
 }
 /* یک ردیفِ فعالیت = یک رویدادِ گردش‌کار (ثبت/ارسال/تأیید/رد/بارگذاریِ نسخه) */
@@ -389,13 +391,49 @@ function sortedActivity(){
     .sort(function(a,b){ return String(b.timestamp||"").localeCompare(String(a.timestamp||"")); });
 }
 
-/* فعالیت اخیر — تایم‌لاین، حداکثر ۳ مورد + «مشاهدهٔ همه» */
+/* ═══ ادغامِ «ارسال برای بازبینی»ِ خودکار (فقط در کارتِ داشبورد) ═══
+   پس از هر ثبتِ سند، سامانه خودش بلافاصله آن را برای بازبینی می‌فرستد
+   (submitDocument → submitForReview، یک رفت‌وبرگشت فاصله). پس هر بارگذاری *دو*
+   رویداد می‌سازد و کارتِ پنج‌ردیفی با دو بار بارگذاری پر می‌شود؛ رویدادهای
+   کم‌تکرار مثلِ حذف و بازیابی زیرِ همین نویز دفن می‌شدند و کاربر فکر می‌کرد
+   اصلاً ثبت نمی‌شوند.
+   فقط ارسالِ *خودکار* پنهان می‌شود: ارسالی که فاصله‌اش تا ثبت/نسخهٔ جدیدِ همان
+   سند کمتر از ACT_AUTO_GAP باشد. ارسالِ دستی (پیش‌نویسی که روزها بعد فرستاده
+   می‌شود) فاصلهٔ بیشتری دارد و سرِ جایش می‌ماند.
+   ⚠ همهٔ زمان‌های ثبت‌شدهٔ یک سند نگه داشته می‌شوند، نه فقط آخری: سندی که ثبت →
+   ارسال → رد → نسخهٔ جدید → ارسال شده، دو ارسالِ خودکار دارد و با نگه‌داشتنِ
+   فقط آخرین زمان، ارسالِ اول اشتباهاً باقی می‌ماند.
+   ⚠ این فیلتر عمداً فقط روی کارتِ داشبورد است؛ پنجرهٔ «مشاهدهٔ همه» همه‌چیز را
+   بدونِ کم‌وکاست نشان می‌دهد. */
+var ACT_AUTO_GAP = 120000;   // ۲ دقیقه — سخاوتمندانه برای آپلودِ کند، کوتاه‌تر از هر ارسالِ دستی
+function collapseAutoSubmit(list){
+  var made = {};
+  list.forEach(function(ev){
+    var a = String(ev.action||"").toLowerCase();
+    if(a!=="created" && a!=="revision" && a!=="newversion") return;
+    var t = Date.parse(ev.timestamp||""); if(isNaN(t)) return;
+    var k = String(ev.drawingNumber||"");
+    (made[k] || (made[k]=[])).push(t);
+  });
+  return list.filter(function(ev){
+    if(String(ev.action||"").toLowerCase()!=="submitted") return true;
+    var arr = made[String(ev.drawingNumber||"")]; if(!arr) return true;
+    var t = Date.parse(ev.timestamp||""); if(isNaN(t)) return true;
+    for(var i=0;i<arr.length;i++){ var g = t - arr[i]; if(g>=0 && g<=ACT_AUTO_GAP) return false; }
+    return true;
+  });
+}
+
+/* فعالیت اخیر — تایم‌لاین، حداکثر ۵ مورد + «مشاهدهٔ همه» */
 function renderRecentActivity(){
   var host=document.getElementById("recentDocsList");
-  var all=sortedActivity();
+  var full=sortedActivity();
+  var all=collapseAutoSubmit(full);
   var SHOW=5;   // رکوردهای بیشتر تا سلولِ فعالیت هم‌ارتفاعِ سلولِ پیشرفتِ پروژه‌ها پر شود
   var seeAll=document.getElementById("recentSeeAll");
-  if(seeAll) seeAll.hidden = all.length<=SHOW;   // دکمه فقط وقتی موردِ نهفته هست
+  /* مبنا فهرستِ *کامل* است نه ادغام‌شده: اگر ادغام تعداد را به زیرِ پنج برساند،
+     باز هم چیزی برای دیدن در پنجرهٔ کامل هست و دکمه باید بماند. */
+  if(seeAll) seeAll.hidden = full.length<=SHOW;
   if(!all.length){
     host.innerHTML=emptyState("فعالیتی ثبت نشده","با ثبت اولین سند، رویدادها اینجا به‌صورت تایم‌لاین نمایش داده می‌شوند.");
     return;

@@ -546,7 +546,10 @@ async function rbRestore(num){
 async function rbPurge(num){
   if(!(await uiConfirm("سندِ «"+num+"» برای همیشه حذف می‌شود و دیگر قابلِ بازیابی نیست. مطمئنید؟",{danger:true,okLabel:"حذف برای همیشه"}))) return;
   var r=await api("purgeDocument",{drawingNumber:num});
-  if(r&&r.ok){ toast("برای همیشه حذف شد"); await rbRefresh(); }
+  /* ⚠ refreshDocuments لازم است: حذفِ دائم یک رویدادِ 'purged' در گردشِ کار ثبت
+     می‌کند و بدونِ این، DB.workflow به‌روز نمی‌شد و آن رویداد تا رفرشِ کاملِ صفحه
+     در «فعالیت‌های اخیر» دیده نمی‌شد. حذفِ نرم و بازیابی این را از قبل داشتند. */
+  if(r&&r.ok){ toast("برای همیشه حذف شد"); await rbRefresh(); refreshDocuments(); }
   else toast((r&&r.message)||"حذف ناموفق",true);
 }
 /* خالی‌کردنِ کاملِ سطلِ زباله — همهٔ رکوردها برای همیشه حذف می‌شوند */
@@ -558,6 +561,7 @@ async function rbPurgeAll(){
   for(var i=0;i<nums.length;i++){ await api("purgeDocument",{drawingNumber:nums[i]},{silent:true,quiet:true}); }
   toast("سطلِ زباله خالی شد");
   await rbRefresh();
+  refreshDocuments();   // همان دلیلِ rbPurge: رویدادهای 'purged' باید به DB.workflow برسند
 }
 
 /* ================= پیش‌نمایش / دانلود فایل ================= */

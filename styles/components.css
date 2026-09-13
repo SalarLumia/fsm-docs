@@ -148,10 +148,17 @@ th.sortable.active{color:var(--brand)}
 .badge-pending{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-line)}
 .badge-review{background:var(--review-bg);color:var(--review);border-color:var(--review-line)}
 .badge-rejected{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
+/* «حذف دائمی» — قرمزِ تیره‌تر و سنگین‌تر از حذفِ معمولی، چون برگشت‌ناپذیر است.
+   تهِ‌رنگِ زمینه هم یک پله پررنگ‌تر است تا در یک نگاه از .badge-rejected جدا شود
+   (کنتراستِ متن ۶٫۹ در برابرِ ۳٫۹ آن). */
+.badge-purged{background:#fecaca;color:#7f1d1d;border-color:#f87171}
 .badge-archived{background:#eef2ff;color:#4f46e5;border-color:#c7d2fe}
 /* وضعیتِ خنثیِ «ثبت‌شده» (ایجاد / نسخهٔ جدید / شروع‌نشده) — ذغالیِ برند،
    همان رنگی که در کارتِ شاخصِ «اسناد ثبت‌شده» به کار می‌رود. */
 .badge-draft{background:#eeedeb;color:var(--charcoal);border-color:#d9d7d2}
+/* بجِ نارنجیِ برند — رویدادِ «ایجاد» در فعالیت‌های اخیر. زمینه همان #fff3e6ِ کارتِ
+   بازِ آرشیو و خطش طلاییِ یکدستِ سایت، تا نارنجیِ تازه‌ای وارد پالت نشود. */
+.badge-brand{background:#fff3e6;color:var(--brand);border-color:var(--gold1)}
 
 /* ===== حالت خالی ===== */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;

@@ -358,7 +358,11 @@
    ▸ حالتِ ۱ (کلاسِ .one از JS) — توضیح یک‌خطی بوده، پس بلوکی می‌شود و نام به
      خطِ دومِ مستقل می‌رود؛ جداکننده لازم نیست.
    ▸ حالتِ ۲ — توضیح به خطِ دوم رسیده، نام در ادامهٔ همان خط پشتِ جداکننده. */
-.wf-lines{margin-top:3px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.6;word-break:break-word}
+/* متنِ توضیحات دوسرچین می‌شود تا لبهٔ پایانیِ همهٔ خط‌ها روی یک خط بیفتد.
+   text-align-last دست‌نخورده می‌ماند (auto)، پس خطِ آخر کشیده نمی‌شود و
+   طبیعی در جهتِ متن می‌نشیند. */
+.wf-lines{margin-top:3px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.6;word-break:break-word;
+  text-align:justify}
 .wf-note{font-size:11px;font-weight:500;color:var(--muted)}
 .wf-lines.one .wf-note{display:block}
 .wf-lines.one .wf-sep{display:none}
@@ -366,11 +370,13 @@
 .wf-lines.no-note .wf-sep{display:none}
 .wf-sep{display:inline-block;width:1px;height:9px;margin:0 6px;vertical-align:-1px;
   background:var(--line);opacity:.75}
-.wf-who{font-size:11px;font-weight:500;color:var(--muted);white-space:nowrap}
+/* نام پررنگ‌تر از متنِ توضیحات (که ۵۰۰ است) تا مثلِ «فعالیت‌های اخیر» از آن جدا
+   دیده شود؛ آنجا همین جدایی با اختلافِ ۴۰۰/۵۰۰ بینِ برچسب و نام ساخته شده بود. */
+.wf-who{font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap}
 /* ⚠ هم‌ترازیِ خطِ اولِ تاریخ با تیترِ مرحله: به‌جای padding دستی، جعبهٔ خط با
    تیتر یکی می‌شود (11.5×1.6=18.4px). با padding قبلی تاریخ ۲٫۶px پایین‌تر
    می‌نشست، چون هم padding داشت و هم فونتِ کوچک‌ترش جعبهٔ کوتاه‌تری می‌ساخت. */
-.wf-date{font-size:11px;font-weight:500;color:var(--muted);line-height:18.4px;white-space:nowrap;flex-shrink:0}
+.wf-date{font-size:11px;font-weight:700;color:var(--muted);line-height:18.4px;white-space:nowrap;flex-shrink:0}
 
 /* پنل فشردهٔ بارگذاری ریویژن/نسخهٔ جدید */
 .rv-up{padding:18px 20px;display:flex;flex-direction:column;gap:4px;max-width:520px;margin:0 auto}
