@@ -1,5 +1,8 @@
 /* ================= حالت برنامه ================= */
-var DB = { clients:[], orders:[], projects:[], parts:[], docTypes:[], documents:[], users:[], templates:[], workflow:[], partMods:[], trashedDocs:[] };
+var DB = { clients:[], orders:[], projects:[], parts:[], docTypes:[], documents:[], users:[], templates:[], workflow:[], partMods:[], trashedDocs:[],
+  /* ردیابیِ قطعاتِ تولیدی: instances فقط با بازکردنِ بخشِ ردیابی گرفته می‌شود (سنگین است)،
+     ولی instanceCounts در بوت‌استرپ می‌آید تا کارتِ هر قطعه بی‌درنگ «۱ از ۲ تأییدشده» را نشان دهد. */
+  suppliers:[], rawTypes:[], instances:[], instanceCounts:{}, instancesLoaded:false };
 var ME = { token:null, role:null, name:null, username:null, gender:null, position:null, avatar:null };
 
 /* مجموعهٔ آواتارهای قابل‌انتخاب (خودبسنده، بدون منبع بیرونی) */
@@ -114,6 +117,42 @@ function docTypesSorted(){ return DB.docTypes.slice().sort(byCode); }
 function partModsSorted(){ return (DB.partMods||[]).filter(function(m){ return String(m.active).toLowerCase()!=="false" && String(m.nameFa||"").trim()!==""; })
   .slice().sort(function(a,b){ var d=(Number(a.order)||0)-(Number(b.order)||0); return d!==0?d:String(a.nameFa).localeCompare(String(b.nameFa),"fa"); }); }
 function partsSorted(){ return DB.parts.slice().sort(function(a,b){ return numOf(a.partNo)-numOf(b.partNo); }); }
+/* ═══ ردیابیِ قطعاتِ تولیدی ═══ */
+function namedMasterSorted(arr){
+  return (arr||[]).filter(function(m){ return String(m.active).toLowerCase()!=="false" && String(m.nameFa||"").trim()!==""; })
+    .slice().sort(function(a,b){ var d=(Number(a.order)||0)-(Number(b.order)||0);
+      return d!==0?d:String(a.nameFa).localeCompare(String(b.nameFa),"fa"); });
+}
+function suppliersSorted(){ return namedMasterSorted(DB.suppliers); }
+function rawTypesSorted(){ return namedMasterSorted(DB.rawTypes); }
+/* کلیدِ قطعهٔ پروژه در شمارشِ قطعاتِ تولیدی — دقیقاً هم‌شکلِ instKey در بک‌اند */
+function instPartKey(c,o,pr,pn){ return String(c||"").toUpperCase()+"|"+pad2(o)+"|"+pad2(pr)+"|"+pad2(pn); }
+function instCountsOf(c,o,pr,pn){
+  var z={producing:0,approved:0,rejected:0};
+  if(DB.instancesLoaded){   // پس از بارگذاریِ کامل، شمارش از خودِ رکوردها (تازه‌تر از بوت‌استرپ)
+    DB.instances.forEach(function(r){
+      if(instPartKey(r.clientCode,r.orderNo,r.projectNo,r.partNo)!==instPartKey(c,o,pr,pn)) return;
+      var st=String(r.status||"producing"); if(z[st]===undefined) st="producing"; z[st]++;
+    });
+    return z;
+  }
+  var m=DB.instanceCounts&&DB.instanceCounts[instPartKey(c,o,pr,pn)];
+  return m?{producing:Number(m.producing)||0,approved:Number(m.approved)||0,rejected:Number(m.rejected)||0}:z;
+}
+/* کدِ خوانای قطعهٔ تولیدی: FSM-MNK-02-01-02-INST02 (هم‌الگوی شمارهٔ سند، با پیشوندِ شرکت) */
+function instanceCode(r){
+  if(!r) return "";
+  return [FSM_CODE, String(r.clientCode||"").toUpperCase(), pad2(r.orderNo), pad2(r.projectNo), pad2(r.partNo), "INST"+pad2(r.seq)].join("-");
+}
+var FSM_CODE="FSM";   // پیشوندِ ثابتِ شرکت، مثلِ شمارهٔ اسناد
+var INST_STATUS_FA={ producing:"در حال تولید", approved:"تأیید شده", rejected:"ریجکت شده" };
+function instStatusInfo(st){
+  st=String(st||"producing").toLowerCase();
+  /* همان بج‌های وضعیتِ اسناد تا زبانِ رنگیِ سایت یکی بماند */
+  if(st==="approved") return {cls:"badge-approved", label:INST_STATUS_FA.approved};
+  if(st==="rejected") return {cls:"badge-rejected", label:INST_STATUS_FA.rejected};
+  return {cls:"badge-pending", label:INST_STATUS_FA.producing};
+}
 function ordersOf(clientCode){ return DB.orders.filter(function(o){ return o.clientCode===clientCode; })
   .sort(function(a,b){ return numOf(a.orderNo)-numOf(b.orderNo); }); }
 function projectsOf(clientCode, orderNo){
@@ -504,3 +543,61 @@ function pendingDocs(){
     .sort(function(a,b){ return (b.timestamp||"").localeCompare(a.timestamp||""); });
 }
 function approvedDocs(){ return DB.documents.filter(function(d){ var s=String(d.status||"").toLowerCase(); return s==="approved"||s==="active"; }); }
+
+/* ═══════════════ کراس‌فیدِ انتخاب — زیرساختِ مشترک ═══════════════
+   دو مشکل که هر کنترلِ «انتخاب‌شدنی» با آن روبه‌روست:
+   ۱) خروج از انتخاب: گذارِ CSS مقدارِ حالتِ *مقصد* را می‌خواند. اگر گذار فقط روی
+      .on/.sel باشد، برداشتنِ کلاس آنی است؛ اگر روی قاعدهٔ پایه باشد، هاور هم هنگامِ
+      خروجِ موس کند می‌شود. پس هنگامِ برداشتنِ کلاس، یک کلاسِ موقتِ .xf-out گذاشته
+      می‌شود و گذارِ خروج فقط روی همان تعریف می‌شود (مثلِ .leaving در نوارِ کناری).
+   ۲) بازسازی با innerHTML: عنصرِ تازه مستقیم در حالتِ نهایی متولد می‌شود و هیچ
+      گذاری اجرا نمی‌شود. xfSnap حالت‌ها را پیش از بازسازی برمی‌دارد و xfPlay پس از
+      آن، فقط برای عناصری که حالتشان واقعاً عوض شده، گذار را بازپخش می‌کند.
+      کلیدِ هر عنصر: data-xf، یا data-code، یا خودِ onclick. */
+var XF_OUT_MS = 420;   // کمی بلندتر از --xf-t (۰٫۳ ثانیه) تا گذارِ خروج نیمه‌کاره قطع نشود
+function xfOut(el){
+  el.classList.add("xf-out");
+  if(el._xfT) clearTimeout(el._xfT);
+  el._xfT=setTimeout(function(){ el.classList.remove("xf-out"); el._xfT=null; }, XF_OUT_MS);
+}
+/* جایگزینِ classList.toggle(cls,on) برای کنترل‌هایی که بازسازی نمی‌شوند */
+function xfSet(el, cls, on){
+  if(!el) return; on=!!on;
+  if(el.classList.contains(cls)===on) return;
+  if(!on) xfOut(el);
+  el.classList.toggle(cls, on);
+}
+/* عناصرِ تازه‌ساخته را یک لحظه به حالتِ قبل برمی‌گرداند و بعد به حالتِ فعلی می‌برد.
+   ⚠ برگشتِ لحظه‌ای زیرِ .xf-snap (بدونِ گذار) انجام می‌شود و همهٔ عناصر یک‌جا: اگر
+   مرورگر عنصر را پیش‌تر در حالتِ نهایی محاسبه کرده باشد (هر خواندنِ اندازه پس از
+   innerHTML) و کنترل گذارِ پایه داشته باشد، خودِ برگشت یک گذار راه می‌انداخت و
+   رفتنِ دوباره به حالتِ نهایی آن را لغو می‌کرد — در فهرست فقط اولین عنصر انیمیشن می‌گرفت. */
+/* ⚠ x.hov: عنصرِ قبلی زیرِ موس بود (همان که کلیک شد). عنصرِ تازه‌ساخته هنوز :hover
+   نگرفته، پس «حالتِ قبل» بی‌هاور محاسبه می‌شد و مثلاً تهِ‌رنگِ هاورِ مشتری یک لحظه
+   ناپدید و دوباره ظاهر می‌شد (چشمک). .xf-hov همان ظاهرِ هاور را برای آن یک لحظه
+   شبیه‌سازی می‌کند و در CSS کنارِ قاعدهٔ :hover هر کنترلِ بازسازی‌شونده آمده است. */
+function xfReplayAll(list){
+  if(!list.length) return;
+  list.forEach(function(x){ x.on=x.el.classList.contains(x.cls); x.el.classList.add("xf-snap"); if(x.hov) x.el.classList.add("xf-hov"); x.el.classList.toggle(x.cls, !x.on); });
+  void document.body.offsetWidth;       // یک reflow تا مرورگر حالتِ قبل را بی‌گذار ثبت کند
+  list.forEach(function(x){ x.el.classList.remove("xf-snap","xf-hov"); if(!x.on) xfOut(x.el); x.el.classList.toggle(x.cls, x.on); });
+}
+function xfReplay(el, cls){ if(el) xfReplayAll([{el:el, cls:cls}]); }
+function xfKey(el){ return el.getAttribute("data-xf")||el.getAttribute("data-code")||el.getAttribute("onclick")||""; }
+/* prefix زمینهٔ کلید است (مثلاً قطعهٔ انتخاب‌شده): با عوض شدنِ زمینه هیچ گذاری پخش نمی‌شود */
+function xfSnap(root, sel, cls, prefix){
+  var m={}; if(!root) return m;
+  [].forEach.call(root.querySelectorAll(sel), function(el){
+    var k=xfKey(el); if(k) m[(prefix||"")+"\u0001"+k]={on:el.classList.contains(cls), hov:el.matches(":hover")};
+  });
+  return m;
+}
+function xfPlay(root, sel, cls, snap, prefix){
+  if(!root||!snap) return;
+  var list=[];
+  [].forEach.call(root.querySelectorAll(sel), function(el){
+    var k=xfKey(el); if(!k) return; k=(prefix||"")+"\u0001"+k;
+    var o=snap[k]; if(o && o.on!==el.classList.contains(cls)) list.push({el:el, cls:cls, hov:o.hov});
+  });
+  xfReplayAll(list);
+}

@@ -100,6 +100,21 @@ input::placeholder{color:#b0afa9}
 .modal .box.seeall-box{width:min(560px,96vw)}   /* جمع‌وجور مثلِ پنل‌های سایت تا فهرست تنک/پخش دیده نشود */
 /* پنل‌های ویرایش (مشخصاتِ پروژه / قطعات): باریک‌تر تا سلول‌ها بی‌دلیل پهن نشوند */
 .modal .box.edit-box{width:min(600px,96vw)}
+/* ⚠ پنجره‌های ویرایش هرگز نوارِ اسکرولِ کلی نگیرند: ارتفاعِ پنجره تا نزدیکِ لبهٔ صفحه
+   باز می‌شود و اگر باز هم جا کم بود، فهرست‌های داخلی (.ed-scroll) — که خودشان اسکرول
+   دارند — کوتاه‌تر می‌شوند، نه اینکه کلِ بدنه اسکرول بخورد. min-height فهرست‌ها کفِ این
+   فشرده‌شدن است؛ فقط در صفحه‌های خیلی کوتاه اسکرولِ بدنه به‌عنوانِ آخرین راه می‌ماند.
+   کارت‌ها min-height خودکار دارند تا کارتِ بی‌فهرست (مثلِ فیلدهای مشخصات) له نشود. */
+.modal:has(>.box.edit-box){padding-block:16px}
+.modal .box.edit-box{max-height:calc(100vh - 32px)}
+.edit-box .body{display:flex;flex-direction:column}
+.edit-box .ed-body{flex:1 1 auto;min-height:0}
+.edit-box .ed-foot{flex-shrink:0}
+.edit-box .ed-card{display:flex;flex-direction:column;flex-shrink:0}
+/* فقط کارتِ دارای فهرست فشرده می‌شود؛ حداقلِ ارتفاعِ خودکارش از محتوای کاملِ فهرست حساب می‌شد و جلوی کوچک‌شدن را می‌گرفت */
+.edit-box .ed-card:has(>.ed-scroll){flex-shrink:1;min-height:0}
+.edit-box .ed-card>*{flex-shrink:0}
+.edit-box .ed-card>.ed-scroll{flex:0 1 auto;min-height:104px}
 /* بدنه ستونی و بدونِ اسکرول؛ ریل ثابت بالا، ناحیهٔ سکشن‌ها خودش اسکرول می‌شود */
 .newdoc-body{padding:0;background:#f4f4f2;height:100%;display:flex;flex-direction:column;overflow:hidden}
 .seeall-body{padding:16px 18px}

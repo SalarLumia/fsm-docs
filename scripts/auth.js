@@ -387,6 +387,9 @@ async function startApp(){
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
   DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسنادِ حذف‌شده، برای معنا‌دار ماندنِ رویدادهای گذشته
+  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[];
+  DB.instanceCounts=r.instanceCounts||{};
+  DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردنِ همان بخش گرفته می‌شوند
   if(!r.backendVersion){ toast("بک‌اندِ سرویس هنوز نسخهٔ قدیمی است. در Apps Script از Deploy ▸ Manage deployments، روی همان deployment «New version» را دیپلوی کنید.", true); }
   /* نقشِ معتبر همان است که بک‌اند اعلام می‌کند، نه آنچه در localStorage نوشته شده.
      بدونِ این خط، دست‌کاریِ fsm_session می‌توانست دکمه‌های مدیر را در رابط باز کند

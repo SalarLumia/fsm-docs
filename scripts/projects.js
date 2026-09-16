@@ -154,11 +154,14 @@ function renderClientPanel(){
   if(_cp.order && !orders.some(function(o){return pad2(o.orderNo)===pad2(_cp.order);})) _cp.order="";
   if(!_cp.order && orders.length) _cp.order=pad2(orders[0].orderNo);
 
+  var _xfC=xfSnap(cpView, ".cp-client-item", "sel"), _xfO=xfSnap(cpView, ".cp-order-card", "sel");
   cpView.innerHTML=''+
     '<div class="cp-grid rv-group">'+
       railHTML(clients)+
       '<div class="cp-detail rv-group" id="cpDetail">'+clientDetailHTML()+'</div>'+
     '</div>';
+  xfPlay(cpView, ".cp-client-item", "sel", _xfC);
+  xfPlay(cpView, ".cp-order-card", "sel", _xfO);
   navRefreshSelection();   // فقط انتخاب عوض شده؛ بازسازیِ درخت انیمیشنِ نوارِ لبه را از بین می‌برد
 }
 
@@ -267,7 +270,7 @@ function ordersSectionHTML(c,orders){
   var cards=orders.map(function(o){
     var np=projectsOf(c.code,pad2(o.orderNo)).length;
     var sel=pad2(o.orderNo)===pad2(_cp.order);
-    return '<div class="cp-order-card'+(sel?" sel":"")+'" tabindex="0" role="button" onclick="selectOrder(\''+esc(pad2(o.orderNo))+'\')">'+
+    return '<div class="cp-order-card'+(sel?" sel":"")+'" data-xf="'+esc(c.code+"|"+pad2(o.orderNo))+'" tabindex="0" role="button" onclick="selectOrder(\''+esc(pad2(o.orderNo))+'\')">'+
       '<div class="coc-top"><span class="coc-title">سفارش '+esc(pad2(o.orderNo))+'</span>'+
         (admin?'<span class="coc-acts">'+
           '<button class="icon-btn sm" title="ویرایش سفارش" onclick="event.stopPropagation();cpToggleOrderForm(\''+esc(pad2(o.orderNo))+'\')">'+ICON.edit+'</button>'+
@@ -277,8 +280,12 @@ function ordersSectionHTML(c,orders){
       '<div class="coc-meta"><bdi>'+faN(np)+' پروژه</bdi>'+(o.date?' · <bdi>'+fmtDate(o.date)+'</bdi>':'')+'</div>'+
     '</div>';
   }).join("");
-  var addCard=admin?'<button class="cp-order-add" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'<span>سفارش جدید</span></button>':'';
-  return '<div class="cp-section"><h3 class="spec-sec-t">'+SEC_IC_ORDERS+'سفارش‌ها</h3>'+
+  /* ردیفِ پُر (۵، ۱۰، ۱۵… سفارش): باکسِ «سفارش جدید» ردیفِ تازه‌ای با یک کارتِ تنها باز می‌کرد.
+     پس در این حالت باکس حذف و دکمهٔ + کنارِ تیتر می‌آید (هم‌الگوی بقیهٔ بخش‌ها)؛ با سفارشِ ششم باکس برمی‌گردد. */
+  var rowFull=orders.length>0 && orders.length%5===0;
+  var addCard=(admin&&!rowFull)?'<button class="cp-order-add" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'<span>سفارش جدید</span></button>':'';
+  var addHd=(admin&&rowFull)?'<span class="sec-act"><button class="icon-btn" title="سفارش جدید" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'</button></span>':'';
+  return '<div class="cp-section"><h3 class="spec-sec-t">'+SEC_IC_ORDERS+'سفارش‌ها'+addHd+'</h3>'+
     '<div class="cp-order-strip">'+cards+addCard+'</div></div>';
 }
 
@@ -756,20 +763,67 @@ function projectPartsDocsHTML(p){
   }
   return '<div class="spec-groups">'+groups+'</div>';
 }
-/* ردیف‌های اطلاعاتِ قطعه (وزن/جنس/…)؛ مقدار برای مدیر با کلیک قابلِ ویرایش است. */
+/* ═══ کدِ قطعه — ماژولِ اجباری و خودکارِ هر قطعه ═══
+   هم‌الگوی «کد پروژه» (MNK-01-01): همان کد + شمارهٔ قطعه ← MNK-01-01-03.
+   از داده ساخته می‌شود و ذخیره نمی‌شود، پس همیشه با مشتری/سفارش/پروژه/قطعه هم‌خوان است،
+   قابلِ خاموش‌کردن یا جابه‌جایی نیست و همیشه ردیفِ اول است. */
+var PART_CODE_LABEL="کد قطعه";
+function partCode(c,o,pr,pn){ return String(c||"").toUpperCase()+"-"+pad2(o)+"-"+pad2(pr)+"-"+pad2(pn); }
+/* ردیف‌های اطلاعاتِ قطعه (کدِ قطعه + وزن/جنس/…)؛ مقدارِ پارامترها برای مدیر با کلیک قابلِ ویرایش است. */
 function partSpecRowsHTML(p,pn,admin){
   var mods=partModsForPart(p,pn).filter(function(m){ return m.on && m.label; });   // فقط پارامترهای فعالِ همین قطعه
-  if(!mods.length) return '';
   var vals=partValsOf(p,pn), c=p.clientCode, o=pad2(p.orderNo), pr=pad2(p.projectNo);
-  return mods.map(function(m){
+  var codeRow=pdMetaRow(PART_CODE_LABEL, esc(partCode(c,o,pr,pn)));   // اولین ردیف، همیشه
+  var qtySeen=false;
+  var rows=mods.map(function(m){
     var v=String(vals[m.label]==null?"":vals[m.label]);
     var cls=v?pdValClass(v):'spec-val ltr empty';
     var unit=(typeof partModUnitOf==="function")?partModUnitOf(m.label):"";   // واحدِ خودکارِ این پارامتر
     var body=v?(esc(v)+(unit?' <span class="spec-unit">'+esc(unit)+'</span>':'')):'Not specified';
+    /* پارامترِ «تعداد» = سقفِ تولید، پس وضعیتِ قطعاتِ تولیدی در دنبالهٔ همین مقدار می‌آید:
+       «2 pcs (1 of 2 approved)». خودِ عدد مثلِ بقیهٔ پارامترها با کلیک ویرایش می‌شود و
+       فقط دنبالهٔ داخلِ پرانتز به بخشِ ردیابی می‌رود. */
+    if(m.label===PART_QTY_LABEL){ qtySeen=true; body+=partInstSuffix(c,o,pr,pn,v); }
     var edit=admin?' data-val="'+esc(v)+'" title="کلیک برای ویرایش" onclick="partSpecEdit(this,\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\',\''+esc(m.label)+'\')"':'';
     return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(m.label)+'</span></span>'+
       '<span class="'+cls+(admin?' editable':'')+'"'+edit+'>'+body+'</span></div>';
   }).join("");
+  /* اگر پارامترِ «تعداد» برای این قطعه خاموش باشد ولی قطعهٔ تولیدیِ ثبت‌شده داشته باشد، اطلاعات
+     نباید پنهان بماند: یک ردیفِ مستقل می‌آید تا مسیرِ ردیابی همچنان در دسترس باشد. */
+  return codeRow+rows+((!qtySeen && partInstTotal(c,o,pr,pn))?partInstRowHTML(p,c,o,pr,pn):"");
+}
+var PART_QTY_LABEL="تعداد";   // نامِ پارامترِ سقفِ تولید (هم‌نامِ QTY_LABEL در بک‌اند)
+function partInstTotal(c,o,pr,pn){
+  if(typeof instCountsOf!=="function") return 0;
+  var n=instCountsOf(c,o,pr,pn); return n.approved+n.producing+n.rejected;
+}
+/* دنبالهٔ وضعیتِ قطعاتِ تولیدی برای مقدارِ «تعداد»: «(1 of 2 approved)».
+   کلیک رویش به بخشِ ردیابیِ همان قطعه می‌رود و جلوی ویرایشِ درجای عدد را می‌گیرد. */
+function partInstSuffix(c,o,pr,pn,qtyRaw){
+  if(typeof instCountsOf!=="function") return "";
+  var n=instCountsOf(c,o,pr,pn);
+  var q=parseInt(String(qtyRaw||"").replace(/[^\d]/g,""),10); if(isNaN(q)) q=0;
+  var txt=q?(n.approved+" of "+q+" approved"):(n.approved+" approved");
+  var over=q && (n.approved+n.producing)>q;
+  return ' <button type="button" class="pi-chip'+(over?" warn":"")+'" title="مدیریتِ این قطعه در بخشِ ردیابی قطعات تولیدی"'+
+    ' onclick="event.stopPropagation();openPartInstances(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\')">('+esc(txt)+')</button>';
+}
+/* ردیفِ مستقلِ «قطعاتِ تولیدی» — فقط وقتی پارامترِ «تعداد» خاموش است (وگرنه در دنبالهٔ آن می‌آید). */
+function partInstRowHTML(p,c,o,pr,pn){
+  if(typeof instCountsOf!=="function") return "";
+  var n=instCountsOf(c,o,pr,pn), q=(typeof partQtyOf==="function")?partQtyOf(c,o,pr,pn):0;
+  var total=n.approved+n.producing+n.rejected;
+  var main=q?(faN(n.approved)+" از "+faN(q)+" تأییدشده"):(total?(faN(n.approved)+" تأییدشده"):"ثبت نشده");
+  var extra=[];
+  if(n.producing) extra.push(faN(n.producing)+" در حال تولید");
+  if(n.rejected)  extra.push(faN(n.rejected)+" ریجکت‌شده");
+  var warn=(q && (n.approved+n.producing)>q);
+  var val='<span class="pi-main'+(warn?" warn":"")+'">'+esc(main)+'</span>'+
+    (extra.length?'<span class="pi-extra">'+esc(extra.join(" · "))+'</span>':'');
+  return '<div class="spec-row pi-row" role="button" tabindex="0" title="مدیریتِ این قطعه در بخشِ ردیابی قطعات تولیدی" '+
+      'onclick="openPartInstances(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\')">'+
+    '<span class="spec-label"><span class="lbl-t">قطعاتِ تولیدی</span></span>'+
+    '<span class="spec-val pi-val">'+val+'</span></div>';
 }
 /* ردیف‌های سندِ قطعه — انواعِ فعالِ سراسری + هر نوعی که سند دارد؛ تمیز و بدونِ چیپ. */
 function partDocRowsHTML(p,pn,partTypes,latest,admin){
@@ -954,7 +1008,8 @@ async function removeProjectPart(c,o,pr,pn){
              partVals:{"03":{"وزن":"96",...}}, partDocTypes:["MC","AC",...] }
    سازگاریِ عقب‌رو: اگر p.specs یک آرایهٔ ساده بود، همان = ماژول‌های سطحِ پروژه. بدونِ تغییرِ بک‌اند. */
 function specsRoot(p){
-  var raw=p&&p.specs, root={project:[],partMods:null,partVals:{},partDocTypes:null,projDocTypes:null,projDocOrder:null,tpl:null,partModsByPart:null,partDocsByPart:null};
+  var raw=p&&p.specs, root={project:[],partMods:null,partVals:{},partDocTypes:null,projDocTypes:null,projDocOrder:null,tpl:null,partModsByPart:null,partDocsByPart:null,
+    ordProjDocs:null,ordPartDocs:null,ordPartMods:null};
   if(raw){ try{ var j=(typeof raw==="string")?JSON.parse(raw):raw;
     if(Array.isArray(j)){ root.project=j; }
     else if(j&&typeof j==="object"){
@@ -967,6 +1022,12 @@ function specsRoot(p){
       if(j.tpl&&typeof j.tpl==="object") root.tpl=j.tpl;
       if(j.partModsByPart&&typeof j.partModsByPart==="object") root.partModsByPart=j.partModsByPart;   // پارامترهای per-part: {"03":["وزن",...]}
       if(j.partDocsByPart&&typeof j.partDocsByPart==="object") root.partDocsByPart=j.partDocsByPart;   // انواعِ سندِ per-part: {"03":["MC",...]}
+      /* ترتیبِ اختصاصیِ همین پروژه — فقط وقتی کاربر در پنلِ پروژه واقعاً ردیفی را جابه‌جا کرده.
+         نبودنش یعنی «ترتیبِ پیش‌فرضِ تنظیمات». (projDocOrder و ترتیبِ درونِ partDocsByPart/partModsByPart
+         از نسخه‌های قبل‌اند و دیگر برای ترتیب خوانده نمی‌شوند: همهٔ پروژه‌های قبلی پیش‌فرض می‌گیرند.) */
+      if(Array.isArray(j.ordProjDocs)) root.ordProjDocs=j.ordProjDocs;
+      if(j.ordPartDocs&&typeof j.ordPartDocs==="object") root.ordPartDocs=j.ordPartDocs;
+      if(j.ordPartMods&&typeof j.ordPartMods==="object") root.ordPartMods=j.ordPartMods;
     }
   }catch(e){} }
   return root;
@@ -1014,26 +1075,26 @@ function partModMaster(p){
 }
 /* پارامترهای یک قطعهٔ خاص: [{label,on,legacy}] */
 function partModsForPart(p,part){
-  var pn=pad2(part), r=specsRoot(p), master=partModMaster(p), bp=r.partModsByPart||{};
-  /* ترتیبِ ذخیره‌شدهٔ همین قطعه مبناست: اول پارامترهای فعال به همان ترتیبی که کاربر
-     چیده، سپس بقیه به ترتیبِ فهرستِ اصلی. پیش از این همیشه از master.map ساخته می‌شد،
-     پس ترتیبِ دلخواه ذخیره می‌شد ولی هیچ‌جا دیده نمی‌شد. */
+  var pn=pad2(part), r=specsRoot(p), bp=r.partModsByPart||{};
+  /* ترتیب: اختصاصیِ همین قطعه (ordPartMods) وگرنه پیش‌فرضِ «تنظیمات ◂ پارامترها».
+     روشن/خاموش جداست: از partModsByPart، وگرنه fallbackِ سطحِ پروژه. */
+  var master=mergeOrder((r.ordPartMods||{})[pn], partModMaster(p), function(m){ return m.label; });
   if(bp[pn]){
     var on={}; bp[pn].forEach(function(l){ on[String(l)]=1; });
-    var by={}; master.forEach(function(m){ by[m.label]=m; });
-    var out=[], seen={};
-    bp[pn].forEach(function(l){ l=String(l); var m=by[l];
-      if(m&&!seen[l]){ out.push({label:m.label,on:true,legacy:m.legacy}); seen[l]=1; } });
-    master.forEach(function(m){ if(!seen[m.label]) out.push({label:m.label,on:!!on[m.label],legacy:m.legacy}); });
-    return out;
+    return master.map(function(m){ return {label:m.label,on:!!on[m.label],legacy:m.legacy}; });
   }
   var proj={}; (r.partMods||[]).forEach(function(x){ if(x.label) proj[String(x.label)]=(x.on!==false); });   // fallbackِ پروژه‌ای
   return master.map(function(m){ return {label:m.label,on: proj.hasOwnProperty(m.label)?proj[m.label]:true, legacy:m.legacy}; });
 }
 /* فهرستِ اصلیِ انواعِ سندِ سطحِ قطعه (از تنظیماتِ سراسری) */
 function partDocMaster(){
-  return docTypesSorted().filter(function(t){ return t.scope==="part"; })
+  return docTypesDefault("part")
     .map(function(t){ return {code:String(t.code).toUpperCase(), label:t.nameFa||String(t.code).toUpperCase()}; });
+}
+/* ترتیبِ مؤثرِ کدهای اسنادِ یک قطعه: اختصاصیِ همین پروژه/قطعه، وگرنه پیش‌فرض */
+function partDocOrderFor(p,pn){
+  var ord=((specsRoot(p).ordPartDocs||{})[pad2(pn)]||[]).map(function(cd){ return String(cd).toUpperCase(); });
+  return mergeOrder(ord, partDocMaster(), function(x){ return x.code; }).map(function(x){ return x.code; });
 }
 /* انواعِ سندِ فعالِ یک قطعهٔ خاص (کد)؛ نوعی که برای همان قطعه سند دارد همیشه فعال است */
 function partDocTypesForPart(p,part){
@@ -1052,7 +1113,12 @@ function partDocTypesForPart(p,part){
     partDocTypesOf(p).forEach(function(T){ set[String(T).toUpperCase()]=1; });   // fallbackِ پروژه‌ای
   }
   projectDocs(p).forEach(function(d){ if(pad2(d.partNo)===pn) set[String(d.typeCode).toUpperCase()]=1; });
-  return Object.keys(set);
+  /* ترتیبِ نمایش مستقل از ترتیبِ ذخیرهٔ مجموعه است: ترتیبِ مؤثرِ همین قطعه (اختصاصی یا پیش‌فرض) */
+  var rank={}; partDocOrderFor(p,pn).forEach(function(cd,i){ rank[cd]=i; });
+  var keys=Object.keys(set);
+  return keys.map(function(k,i){ return {k:k,i:i}; })
+    .sort(function(a,b){ var ra=rank.hasOwnProperty(a.k)?rank[a.k]:1e6, rb=rank.hasOwnProperty(b.k)?rank[b.k]:1e6; return ra!==rb?ra-rb:a.i-b.i; })
+    .map(function(x){ return x.k; });
 }
 /* انواعِ سندی که برای یک قطعه سندِ ثبت‌شده دارند (قابلِ قفل‌شدن در پنل) */
 function partDocLockedTypes(p,part){
@@ -1079,23 +1145,40 @@ async function saveSpecs(c,o,pr,root,extra){
 
 /* ترتیبِ ثابتِ اسنادِ سطحِ پروژه؛ انواعِ ناشناخته پس از این ترتیب می‌آیند (به ترتیبِ تنظیمات) */
 var PROJ_DOC_ORDER=["AS","PS","QP","MTC"];
-function orderedProjectTypes(){
-  var types=docTypesSorted().filter(function(t){ return t.scope==="project"; });
-  var rank=function(code){ var i=PROJ_DOC_ORDER.indexOf(String(code).toUpperCase()); return i<0?PROJ_DOC_ORDER.length:i; };
-  return types.map(function(t,i){ return {t:t,i:i,r:rank(t.code)}; })
-    .sort(function(a,b){ return a.r!==b.r ? a.r-b.r : a.i-b.i; })
+/* ═══ ترتیبِ پیش‌فرضِ انواعِ سند (از «تنظیمات ◂ انواع اسناد» با کشیدن) ═══
+   مبنا ستونِ order است. تا وقتی مدیر هنوز ترتیبی نچیده (order خالی)، ترتیبِ قدیمی حفظ می‌شود:
+   سطحِ پروژه → PROJ_DOC_ORDER؛ سطحِ قطعه → «نقشهٔ رفرنس» اول؛ سپس کد. */
+function docTypeOrderVal(t){ var v=t&&t.order; return (v===""||v==null||isNaN(Number(v)))?null:Number(v); }
+function docTypesDefault(scope){
+  var types=docTypesSorted().filter(function(t){ return (t.scope==="project")===(scope==="project"); });
+  var rank=function(t){ var cd=String(t.code).toUpperCase();
+    if(scope==="project"){ var i=PROJ_DOC_ORDER.indexOf(cd); return i<0?PROJ_DOC_ORDER.length:i; }
+    return cd===RD_CODE?0:1; };
+  return types.map(function(t,i){ return {t:t,i:i,o:docTypeOrderVal(t),r:rank(t)}; })
+    .sort(function(a,b){
+      if(a.o!==null&&b.o!==null&&a.o!==b.o) return a.o-b.o;
+      if((a.o===null)!==(b.o===null)) return a.o===null?1:-1;   // دارای order پیش از بی‌order
+      return a.r!==b.r ? a.r-b.r : a.i-b.i; })
     .map(function(x){ return x.t; });
 }
+function orderedProjectTypes(){ return docTypesDefault("project"); }
+/* ادغامِ یک ترتیبِ اختصاصی با فهرستِ پیش‌فرض: اول اقلامِ ترتیبِ اختصاصی (اگر هنوز وجود دارند)،
+   سپس هر قلمِ تازه به ترتیبِ پیش‌فرض. keyOf کلیدِ هر قلمِ پیش‌فرض را می‌دهد. */
+function mergeOrder(custom, base, keyOf){
+  if(!custom||!custom.length) return base.slice();
+  var by={}; base.forEach(function(x){ by[keyOf(x)]=x; });
+  var out=[], seen={};
+  custom.forEach(function(k){ k=String(k); if(by[k]&&!seen[k]){ out.push(by[k]); seen[k]=1; } });
+  base.forEach(function(x){ var k=keyOf(x); if(!seen[k]){ out.push(x); seen[k]=1; } });
+  return out;
+}
+/* آیا ترتیب همان پیش‌فرض است؟ (ترتیبِ اختصاصیِ برابر با پیش‌فرض ذخیره نمی‌شود) */
+function sameOrder(a, b){ if(a.length!==b.length) return false; for(var i=0;i<a.length;i++) if(String(a[i])!==String(b[i])) return false; return true; }
 /* همان فهرست، ولی با ترتیبِ دلخواهِ همین پروژه (specs.projDocOrder) اگر تعریف شده باشد؛
    نوع‌هایی که در ترتیبِ ذخیره‌شده نیستند (نوعِ تازه‌اضافه‌شده) پس از آن‌ها به ترتیبِ پیش‌فرض می‌آیند. */
 function orderedProjectTypesFor(p){
-  var base=orderedProjectTypes(), ord=specsRoot(p).projDocOrder;
-  if(!ord||!ord.length) return base;
-  var by={}; base.forEach(function(t){ by[String(t.code).toUpperCase()]=t; });
-  var out=[], seen={};
-  ord.forEach(function(cd){ cd=String(cd).toUpperCase(); if(by[cd]&&!seen[cd]){ out.push(by[cd]); seen[cd]=1; } });
-  base.forEach(function(t){ var cd=String(t.code).toUpperCase(); if(!seen[cd]){ out.push(t); seen[cd]=1; } });
-  return out;
+  var ord=(specsRoot(p).ordProjDocs||[]).map(function(cd){ return String(cd).toUpperCase(); });
+  return mergeOrder(ord, orderedProjectTypes(), function(t){ return String(t.code).toUpperCase(); });
 }
 /* انواعِ سندِ سطحِ پروژه که این پروژه فعال کرده؛ اگر تعریف نشده، همه فعال‌اند */
 function projDocTypesOf(p){
@@ -1202,8 +1285,11 @@ function openProjectSpecs(c,o,pr){
   var p=findProject(c,o,pr); if(!p) return;
   var on={}; projDocTypesOf(p).forEach(function(T){ on[T]=1; });
   PSED={ c:c,o:o,pr:pr, name:(p.description||""), category:projectCategory(p),
-    projDocs: orderedProjectTypesFor(p).map(function(t){ var T=String(t.code).toUpperCase(); return {code:T,label:t.nameFa||T,on:!!on[T]}; })
+    projDocs: orderedProjectTypesFor(p).map(function(t){ var T=String(t.code).toUpperCase(); return {code:T,label:t.nameFa||T,on:!!on[T]}; }),
+    customOrd: false
   };
+  // ترتیبِ اختصاصی دارد؟ = ترتیبِ فعلی با پیش‌فرض فرق دارد
+  PSED.customOrd=!sameOrder(PSED.projDocs.map(function(x){ return x.code; }), orderedProjectTypes().map(function(t){ return String(t.code).toUpperCase(); }));
   showModal("ویرایش مشخصات پروژه",
     '<div class="ed-body" id="psedBody"></div>'+
     '<div class="ed-foot"><div class="btn-row">'+
@@ -1227,7 +1313,8 @@ function drawProjectSpecsBody(c,o,pr){
   /* کارتِ ۲: اسناد پروژه — فقط روشن/خاموش؛ افزودنِ نوعِ جدید فقط در تنظیمات */
   var nOn=PSED.projDocs.filter(function(x){ return x.on; }).length;
   var docRows=PSED.projDocs.map(function(x,i){ return pedDragRow(x.on,x.label,x.code,"psedToggleDoc("+i+")"); }).join("");
-  var docsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'اسناد پروژه<span class="ed-count">'+faN(nOn)+' سند</span></h4>'+
+  var docsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'اسناد پروژه<span class="ed-count">'+faN(nOn)+' سند</span>'+
+      edResetBtn("psedResetOrder()", PSED.customOrd)+'</h4>'+
     (docRows?'<div class="ed-scroll" data-reorder="proj" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">نوعِ سندِ سطحِ پروژه‌ای تعریف نشده.</div>')+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودنِ نوعِ جدیدِ سند، به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
     '<div class="ed-req-note"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>برای بارگذاریِ فایلِ هر سند، در پنلِ مدیریتِ پروژه روی آیکونِ همان سند کلیک کنید.</div>'+
@@ -1236,13 +1323,26 @@ function drawProjectSpecsBody(c,o,pr){
   pedScrollRestore(host,_sc);
 }
 function psedToggleDoc(i){ var x=PSED.projDocs[i]; if(x){ x.on=!x.on; drawProjectSpecsBody(PSED.c,PSED.o,PSED.pr); } }
+/* بازگشت به ترتیبِ پیش‌فرض: روشن/خاموش‌ها دست نمی‌خورند، فقط ترتیب */
+function psedResetOrder(){
+  if(!PSED) return;
+  PSED.projDocs=mergeOrder(null, PSED.projDocs, function(x){ return x.code; });
+  var rank={}; orderedProjectTypes().forEach(function(t,i){ rank[String(t.code).toUpperCase()]=i; });
+  PSED.projDocs.sort(function(a,b){ return (rank.hasOwnProperty(a.code)?rank[a.code]:1e6)-(rank.hasOwnProperty(b.code)?rank[b.code]:1e6); });
+  PSED.customOrd=false;
+  drawProjectSpecsBody(PSED.c,PSED.o,PSED.pr);
+}
 async function saveProjectSpecs(){
   if(!PSED) return;
   var c=PSED.c,o=PSED.o,pr=PSED.pr, p=findProject(c,o,pr); if(!p) return;
   var root=specsRoot(p);
   root.tpl=root.tpl||{}; root.tpl.category=String(PSED.category||"").trim();
   root.projDocTypes=PSED.projDocs.filter(function(x){ return x.on; }).map(function(x){ return x.code; });
-  root.projDocOrder=PSED.projDocs.map(function(x){ return x.code; });   // ترتیبِ دلخواهِ نمایش (شاملِ خاموش‌ها)
+  /* ترتیبِ اختصاصی فقط اگر کاربر جابه‌جا کرده و با پیش‌فرض فرق دارد؛ وگرنه پروژه پیرو پیش‌فرض می‌ماند */
+  var _codes=PSED.projDocs.map(function(x){ return x.code; });
+  var _def=orderedProjectTypes().map(function(t){ return String(t.code).toUpperCase(); });
+  root.ordProjDocs=(PSED.customOrd && !sameOrder(_codes,_def))?_codes:null;
+  root.projDocOrder=null;   // کلیدِ قدیمی (پیش از ترتیبِ پیش‌فرض) پاک می‌شود
   root.project=[];   // قالبِ ثابت جایگزینِ ماژول‌های پویا شد
   var desc=String(PSED.name||"").trim();
   p.description=desc;                       // به‌روزرسانیِ محلی تا UI فوراً نامِ تازه را نشان دهد
@@ -1263,14 +1363,14 @@ function pedInitState(c,o,pr,p){
     // وضعیتِ per-part برای همهٔ قطعاتِ سیستم؛ اگر ذخیره‌شده باشد از آن، وگرنه از fallbackِ پروژه‌ای پر می‌شود
     docsByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
       var d={}; partDocTypesForPart(p,pn).forEach(function(T){ d[String(T).toUpperCase()]=true; }); out[pn]=d; }); return out; })(),
-    // ترتیبِ دلخواهِ نمایشِ انواعِ سند برای هر قطعه؛ از ترتیبِ ذخیره‌شده (partDocsByPart) پر می‌شود
-    docOrderByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
-      out[pn]=partDocTypesForPart(p,pn).map(function(T){ return String(T).toUpperCase(); }); }); return out; })(),
+    // ترتیبِ *اختصاصیِ* انواعِ سند برای هر قطعه (فقط اگر ذخیره شده)؛ نبودن = پیش‌فرض (ترتیبِ docMaster)
+    docOrderByPart: (function(){ var src=specsRoot(p).ordPartDocs||{}, out={};
+      Object.keys(src).forEach(function(k){ if(Array.isArray(src[k])) out[pad2(k)]=src[k].map(function(T){ return String(T).toUpperCase(); }); }); return out; })(),
     modsByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
       var m={}; partModsForPart(p,pn).forEach(function(x){ m[x.label]=x.on; }); out[pn]=m; }); return out; })(),
-    // ترتیبِ دلخواهِ نمایشِ پارامترها برای هر قطعه — هم‌الگوی docOrderByPart
-    modOrderByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
-      out[pn]=partModsForPart(p,pn).map(function(x){ return x.label; }); }); return out; })(),
+    // ترتیبِ *اختصاصیِ* پارامترها برای هر قطعه — هم‌الگوی docOrderByPart
+    modOrderByPart: (function(){ var src=specsRoot(p).ordPartMods||{}, out={};
+      Object.keys(src).forEach(function(k){ if(Array.isArray(src[k])) out[pad2(k)]=src[k].map(String); }); return out; })(),
     vals: (function(){ var src=specsRoot(p).partVals||{}, out={};
       Object.keys(src).forEach(function(k){ var r=src[k]||{}, kk=pad2(k); out[kk]={};
         Object.keys(r).forEach(function(l){ out[kk][l]=String(r[l]==null?"":r[l]); }); });
@@ -1375,7 +1475,7 @@ function edRowDragOver(e){
   edFlipRows(list,function(){ if(after===null) list.appendChild(dragging); else list.insertBefore(dragging,after); });
 }
 function edAfterRow(list,y){
-  var els=[].slice.call(list.querySelectorAll(".ed-doc-row:not(.ed-dragging)"));
+  var els=[].slice.call(list.querySelectorAll(".ed-doc-row:not(.ed-dragging):not(.ed-fixed)"));   // ردیفِ قفل‌شده هدفِ جابه‌جایی نیست
   var closest=null, closestOffset=-Infinity;
   els.forEach(function(el){ var b=el.getBoundingClientRect(); var off=y-(b.top+b.height/2);
     if(off<0 && off>closestOffset){ closestOffset=off; closest=el; } });
@@ -1408,6 +1508,8 @@ function edCommitProjOrder(codes){
   var next=[]; codes.forEach(function(cd){ if(by[cd]){ next.push(by[cd]); delete by[cd]; } });
   PSED.projDocs.forEach(function(x){ if(by[x.code]) next.push(x); });   // هر ردیفِ جامانده، ته
   PSED.projDocs=next;
+  var def=orderedProjectTypes().map(function(t){ return String(t.code).toUpperCase(); });
+  PSED.customOrd=!sameOrder(next.map(function(x){ return x.code; }), def);   // کشیدن و برگرداندن به همان جا = پیش‌فرض
   drawProjectSpecsBody(PSED.c,PSED.o,PSED.pr);
 }
 function edCommitPartOrder(codes){
@@ -1449,6 +1551,28 @@ function edCommitModOrder(labels){
   drawPartsBody();
 }
 
+/* ═══ بازگشت به ترتیبِ پیش‌فرض (کنارِ عنوانِ هر فهرستِ قابلِ جابه‌جایی) ═══
+   دکمهٔ آیکونیِ همیشه‌حاضر: تا ترتیب همان پیش‌فرض است خاکستری و بی‌اثر؛ با اولین جابه‌جایی
+   تیره و فعال می‌شود. ⚠ به‌جای صفتِ disabled از aria-disabled استفاده شده، چون برخی مرورگرها
+   روی دکمهٔ disabled تولتیپِ title («ترتیب پیش‌فرض») را نشان نمی‌دهند. */
+var ED_RESET_IC='<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
+function edResetBtn(fn, active){
+  return '<button type="button" class="ed-reset'+(active?' is-on':'')+'" title="ترتیب پیش‌فرض" aria-label="ترتیب پیش‌فرض"'+
+    (active?' onclick="'+fn+'"':' aria-disabled="true"')+'>'+ED_RESET_IC+'</button>';
+}
+function pedHasCustom(kind, pn){
+  if(!PED) return false;
+  var ord=(kind==="doc"?PED.docOrderByPart:PED.modOrderByPart)[pn]; if(!ord||!ord.length) return false;
+  var cur=(kind==="doc"?pedPartDocList(pn).map(function(x){ return x.code; }):pedPartModList(pn).map(function(x){ return x.label; }));
+  var def=(kind==="doc"?PED.docMaster.map(function(x){ return x.code; }):PED.paramMaster.map(function(x){ return x.label; }));
+  return !sameOrder(cur, def);
+}
+function pedResetOrder(kind){
+  if(!PED||!PED.selPart) return;
+  if(kind==="doc") delete PED.docOrderByPart[PED.selPart]; else delete PED.modOrderByPart[PED.selPart];
+  drawPartsBody();
+}
+
 /* ردیفِ چک‌لیستِ قابلِ کشیدن: دایرهٔ روشن/خاموش + نام + (اکسترا مثلِ قفل) + کد + دستهٔ ۶‌نقطه‌ای (سمتِ چپ) */
 function pedDragRow(on,label,code,fn,extra,dis){
   return '<div class="ed-doc-row ed-drag'+(on?'':' off')+'" draggable="true" data-code="'+esc(code)+'" ondragstart="edRowDragStart(event)" ondragend="edRowDragEnd(event)">'+
@@ -1481,6 +1605,9 @@ function drawPartsBody(){
   pedDDCloseAll();   // هر بار رندر، منوهای بازِ قبلی و لیسنرِ کلیکِ بیرون پاک می‌شوند
   var host=document.getElementById("pedBody"); if(!host) return;
   var _sc=pedScrollSave(host);   // پیش از بازسازی، جای اسکرول نگه داشته شود
+  /* کراس‌فیدِ دایره‌ها: کلید با قطعهٔ رسم‌شدهٔ قبلی پیشوند می‌خورد تا عوض‌کردنِ قطعه
+     (که همهٔ دایره‌ها را یک‌جا عوض می‌کند) انیمیشنِ دسته‌جمعی نسازد. */
+  var _xf=xfSnap(host, ".ed-check", "on", host._xfPart||"");
   var nPart=pedCountParts();
   var single=!!PED.single;   // حالتِ ویرایشِ یک قطعهٔ مشخص
   /* کارتِ ۱: قطعاتِ پروژه (روشن/خاموش) — فقط در پنجرهٔ افزودن؛ در ویرایشِ تک‌قطعه معنا ندارد */
@@ -1509,7 +1636,8 @@ function drawPartsBody(){
 
     /* ---- کارتِ انواعِ سندِ قطعه ---- */
     /* در حالتِ تک‌قطعه‌ای دراپ‌داون لازم نیست: قطعه از قبل مشخص است */
-    var docHead='<h4 class="ed-sec-t">'+SEC_IC_DOC+'انواعِ سندِ قطعه'+(single?'':pedPartDD('doc',onParts,sel))+'</h4>';
+    var docHead='<h4 class="ed-sec-t">'+SEC_IC_DOC+'انواعِ سندِ قطعه'+(single?'':pedPartDD('doc',onParts,sel))+
+      (sel?edResetBtn("pedResetOrder('doc')", pedHasCustom('doc',sel)):'')+'</h4>';
     var docsCard;
     if(!sel){
       docsCard='<div class="ed-card">'+docHead+promptNote+'</div>';
@@ -1531,7 +1659,8 @@ function drawPartsBody(){
     }
 
     /* ---- کارتِ پارامترهای قطعه ---- */
-    var modHead='<h4 class="ed-sec-t">'+SEC_IC_INFO+'پارامترهای قطعه'+(single?'':pedPartDD('mod',onParts,sel))+'</h4>';
+    var modHead='<h4 class="ed-sec-t">'+SEC_IC_INFO+'پارامترهای قطعه'+(single?'':pedPartDD('mod',onParts,sel))+
+      (sel?edResetBtn("pedResetOrder('mod')", pedHasCustom('mod',sel)):'')+'</h4>';
     var modsCard;
     if(!sel){
       modsCard='<div class="ed-card">'+modHead+promptNote+'</div>';
@@ -1550,8 +1679,17 @@ function drawPartsBody(){
           edGripHTML()+
         '</div>';
       }).join("");
+      /* «کد قطعه» ردیفِ اولِ قفل‌شده است: روشن، بی‌دستهٔ کشیدن، و .ed-fixed تا در جابه‌جایی
+         هیچ ردیفی بالای آن ننشیند (edAfterRow آن را نادیده می‌گیرد). */
+      var codeRow='<div class="ed-doc-row ed-fixed">'+
+          '<button type="button" class="ed-check on" disabled role="checkbox" aria-checked="true" aria-label="'+PART_CODE_LABEL+'"></button>'+
+          '<span class="ed-name"><span>'+PART_CODE_LABEL+'</span></span>'+
+          '<span class="ed-doc-code">'+esc(partCode(PED.c,PED.o,PED.pr,sel))+'</span>'+
+          '<span class="ed-lock-ic ed-fixed-lock" title="ماژولِ اجباری؛ خودکار از روی کدِ پروژه و شمارهٔ قطعه ساخته می‌شود">'+ED_LOCK_IC+'</span>'+
+        '</div>';
       modsCard='<div class="ed-card">'+modHead+
-        (modRows?'<div class="ed-scroll" data-reorder="mod" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+modRows+'</div>':'<div class="ed-req-note">پارامتری تعریف نشده.</div>')+
+        '<div class="ed-scroll" data-reorder="mod" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+codeRow+modRows+'</div>'+
+        (modRows?'':'<div class="ed-req-note">پارامترِ دیگری تعریف نشده.</div>')+
         '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>پارامترهای بالا مخصوصِ قطعهٔ انتخاب‌شده است؛ برای افزودن/ویرایشِ پارامتر به «تنظیمات ◂ انواع پارامتر های قطعات» بروید.</div></div>';
     }
 
@@ -1560,6 +1698,8 @@ function drawPartsBody(){
   var sv=document.getElementById("pedSave"); if(sv) sv.disabled=(nPart<1);
   host.innerHTML=partsCard+perPart;
   pedScrollRestore(host,_sc);   // همان جای قبلیِ اسکرول برگردد
+  host._xfPart=PED.selPart||"";
+  xfPlay(host, ".ed-check", "on", _xf, host._xfPart);
 }
 async function savePartsPanel(){
   if(pedCountParts()<1){ toast("دست‌کم یک قطعه انتخاب کنید.",true); return; }
@@ -1613,6 +1753,14 @@ async function savePartsPanel(){
   });
   var root=specsRoot(p);
   root.partDocsByPart=docsByPart; root.partModsByPart=modsByPart;
+  /* ترتیبِ اختصاصی فقط برای قطعه‌ای ذخیره می‌شود که ترتیبش با پیش‌فرض فرق دارد */
+  var ordD={}, ordM={};
+  parts.forEach(function(pnRaw){ var pn=pad2(pnRaw);
+    if(pedHasCustom('doc',pn)) ordD[pn]=pedPartDocList(pn).map(function(x){ return x.code; });
+    if(pedHasCustom('mod',pn)) ordM[pn]=pedPartModList(pn).map(function(x){ return x.label; });
+  });
+  root.ordPartDocs=Object.keys(ordD).length?ordD:null;
+  root.ordPartMods=Object.keys(ordM).length?ordM:null;
   /* union برای سازگاریِ عقب‌رو + حفظِ برچسب‌های قدیمی: قطعه‌ای که از بیرونِ پنل اضافه شود از این fallback پر می‌شود */
   var modUnion={}; Object.keys(modsByPart).forEach(function(pn){ modsByPart[pn].forEach(function(l){ modUnion[l]=1; }); });
   root.partMods=PED.paramMaster.map(function(x){ return {label:x.label,unit:"",on:!!modUnion[x.label]}; });
@@ -1779,12 +1927,14 @@ async function mvLoadPart(fileId, part){
   // به‌جای اورلیِ تمام‌صفحه، نوارِ لودینگِ درون‌ویوئری تا بقیهٔ سایت هم دیده شود
   var _mp=(_mvParts||[]).filter(function(x){ return pad2(x.part)===pad2(part); })[0];
   var _mnm=_mp?_mp.name:"";   // نامِ مدلِ در‌حالِ بارگذاری — تا کاربر بداند کدام قطعه دارد می‌آید
+  var _xf=xfSnap(shell, ".mv-pick", "on");   // کراس‌فیدِ مدلِ قبلی ← مدلِ تازه در منوی انتخاب
   shell.innerHTML=mvPickerHTML(_mvParts, part)+
     '<div class="mv-ph" id="mvPh"><div class="mv-empty-ic mv-load-ic">'+MV_LOAD_IC+'</div>'+
       '<div class="mv-empty-t">در حال بارگذاری مدل</div>'+
       /* نامِ لاتین خطِ جداگانه و LTR است؛ در یک خطِ فارسی ترتیبِ کلمات به‌هم می‌ریخت */
       (_mnm?'<div class="mv-load-name">'+esc(_mnm)+'</div>':'')+'</div>'+
     loadBarHTML(false, true);
+  xfPlay(shell, ".mv-pick", "on", _xf);
   await ensureModelViewer();
   if(myToken!==_mvLoadSeq) return;   // بارگذاریِ جدیدتری جای این را گرفت؛ به DOM دست نزن
   if(!(window.customElements && customElements.get("model-viewer"))){
@@ -1846,8 +1996,8 @@ function mvToolsToggle(btn){ var t=(btn&&btn.closest)?btn.closest(".mv-tools"):n
 function mvFull(btn){ var s=mvBoxOf(btn)||document.getElementById("mvShell");
   if(s&&s.requestFullscreen) try{ s.requestFullscreen(); }catch(e){} }
 function mvSpin(btn){ var m=mvViewerOf(btn); if(!m) return;
-  if(m.hasAttribute("auto-rotate")){ m.removeAttribute("auto-rotate"); if(btn) btn.classList.remove("on"); }
-  else { m.setAttribute("auto-rotate",""); if(btn) btn.classList.add("on"); } }
+  if(m.hasAttribute("auto-rotate")){ m.removeAttribute("auto-rotate"); xfSet(btn,"on",false); }
+  else { m.setAttribute("auto-rotate",""); xfSet(btn,"on",true); } }
 function mvReset(btn){ var m=mvViewerOf(btn); if(!m) return;
   try{ m.cameraOrbit="auto auto auto"; if(m.resetTurntableRotation) m.resetTurntableRotation(); if(m.jumpCameraToGoal) m.jumpCameraToGoal(); }catch(e){} }
 /* ============ واقعیتِ افزوده (AR) ============

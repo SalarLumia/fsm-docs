@@ -4,15 +4,19 @@ function renderDataTables(){
   document.getElementById("partsBody").innerHTML=partsSorted().map(function(p){
     return "<tr><td class='col-el'><span class='el-badge'>"+partIconInner(p)+"</span></td><td class='nm-fa'>"+esc(p.nameFa||"—")+"</td><td class='spec-en c-mid'><span class='en-shift'>"+esc(p.name)+"</span></td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModal('"+esc(pad2(p.partNo))+"')")+delIconBtn("del('deletePart',{partNo:'"+esc(pad2(p.partNo))+"'})")+"</div></td></tr>";
   }).join("")||emptyRow(4);
-  // doctypes (مرتب بر اساس کد)
-  document.getElementById("doctypesBody").innerHTML=docTypesSorted().map(function(t){
-    return "<tr><td class='col-el'><span class='el-badge'>"+docTypeIconInner(t)+"</span></td><td class='nm-fa'>"+esc(t.nameFa)+"</td><td class='spec-en c-mid'><span class='en-shift'>"+esc(t.nameEn)+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(t.code)+"</span></td><td class='c-mid'>"+(t.scope==="project"?'<span class="tag proj"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>پروژه</span>':'<span class="tag"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>قطعه</span>')+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openDocTypeModal('"+esc(t.code)+"')")+delIconBtn("del('deleteDocType',{code:'"+esc(t.code)+"'})")+"</div></td></tr>";
+  /* doctypes — ترتیبِ این جدول همان «ترتیبِ پیش‌فرض» در همهٔ پروژه‌هاست: اول اسنادِ سطحِ پروژه،
+     سپس سطحِ قطعه؛ جابه‌جایی فقط درونِ هر گروه (data-scope). */
+  document.getElementById("doctypesBody").innerHTML=docTypesDefault("project").concat(docTypesDefault("part")).map(function(t){
+    return "<tr "+mgRowAttrs(t.code, t.scope==="project"?"project":"part")+"><td class='col-el'><span class='el-badge'>"+docTypeIconInner(t)+"</span></td><td class='nm-fa'>"+esc(t.nameFa)+"</td><td class='spec-en c-mid'><span class='en-shift'>"+esc(t.nameEn)+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(t.code)+"</span></td><td class='c-mid'>"+(t.scope==="project"?'<span class="tag proj"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>پروژه</span>':'<span class="tag"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>قطعه</span>')+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openDocTypeModal('"+esc(t.code)+"')")+delIconBtn("del('deleteDocType',{code:'"+esc(t.code)+"'})")+mgGripHTML()+"</div></td></tr>";
   }).join("")||emptyRow(6);
   // part info modules (پارامتر‌های اطلاعاتِ قطعه) — فهرستِ اصلیِ سراسری
   var pmBody=document.getElementById("partmodsBody");
-  if(pmBody) pmBody.innerHTML=partModsSorted().map(function(m){
-    return "<tr><td><div class='pm-cell'><span class='el-badge'>"+PARTMOD_EL_SVG+"</span><span class='nm-fa'>"+esc(m.nameFa)+"</span></div></td><td class='spec-en c-mid'><span class='en-shift'>"+esc(partModEn(m)||"—")+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(partModUnit(m)||"—")+"</span></td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModModal('"+esc(m.nameFa)+"')")+delIconBtn("del('deletePartMod',{nameFa:'"+esc(m.nameFa)+"'})")+"</div></td></tr>";
+  if(pmBody) pmBody.innerHTML=partModsSorted().map(function(m){   // ترتیبِ این جدول = ترتیبِ پیش‌فرضِ پارامترها
+    return "<tr "+mgRowAttrs(m.nameFa,"")+"><td><div class='pm-cell'><span class='el-badge'>"+PARTMOD_EL_SVG+"</span><span class='nm-fa'>"+esc(m.nameFa)+"</span></div></td><td class='spec-en c-mid'><span class='en-shift'>"+esc(partModEn(m)||"—")+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(partModUnit(m)||"—")+"</span></td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModModal('"+esc(m.nameFa)+"')")+delIconBtn("del('deletePartMod',{nameFa:'"+esc(m.nameFa)+"'})")+mgGripHTML()+"</div></td></tr>";
   }).join("")||emptyRow(4);
+  // فهرست‌های اصلیِ ردیابی: تأمین‌کنندگان و انواعِ مادهٔ خام (ترتیبِ هر جدول با کشیدن)
+  renderNamedMaster("suppliersBody", suppliersSorted(), "openSupplierModal", "deleteSupplier", SUPPLIER_EL_SVG);
+  renderNamedMaster("rawtypesBody", rawTypesSorted(), "openRawTypeModal", "deleteRawType", RAWTYPE_EL_SVG);
   // users: کارتِ کاربر (آواتار + نام + نامِ کاربری) · سمت · تگِ نقش · ویرایش
   var meU=(typeof ME!=="undefined"&&ME)?String(ME.username||""):"";
   // ترتیبِ پیش‌فرض بر اساسِ نقش: مدیرِ سیستم ← بازبین ← بیننده (و در هر گروه، الفبایی)
@@ -57,7 +61,7 @@ function fillAvatarPicker(){
 }
 function pickAvatar(btn){
   document.getElementById("usAvatar").value=btn.getAttribute("data-av");
-  document.querySelectorAll("#usAvatarPicker .av-opt").forEach(function(b){ b.classList.toggle("sel", b===btn); });
+  document.querySelectorAll("#usAvatarPicker .av-opt").forEach(function(b){ xfSet(b, "sel", b===btn); });
 }
 function setAvatarSelected(av){
   document.getElementById("usAvatar").value=av||"";
@@ -75,8 +79,77 @@ var DEL_MAP = {
   deletePart:     {arr:'parts',     test:function(x,p){return pad2(x.partNo)===pad2(p.partNo);}},
   deleteDocType:  {arr:'docTypes',  test:function(x,p){return x.code===p.code;}},
   deletePartMod:  {arr:'partMods',  test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
+  deleteSupplier: {arr:'suppliers', test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
+  deleteRawType:  {arr:'rawTypes',  test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
   deleteUser:     {arr:'users',     test:function(x,p){return x.username===p.username;}}
 };
+
+/* ═══ ترتیبِ پیش‌فرض: کشیدنِ ردیف‌های جدول‌های «انواع اسناد» و «پارامترها» ═══
+   هم‌الگوی فهرستِ مشتری‌ها و پنل‌های پروژه: فقط کشیدن از روی دستهٔ ۶‌نقطه‌ای، با انیمیشنِ FLIP.
+   پس از رهاکردن، کلِ ترتیب با یک درخواست (reorderMaster) ذخیره می‌شود و همهٔ پروژه‌هایی که
+   ترتیبِ اختصاصی ندارند بی‌درنگ از آن پیروی می‌کنند. */
+var _mgGripArmed=false;
+function mgRowAttrs(key, scope){
+  return "data-key='"+esc(key)+"'"+(scope?" data-scope='"+scope+"'":"")+" draggable='true' ondragstart='mgRowDragStart(event)' ondragend='mgRowDragEnd(event)'";
+}
+function mgGripHTML(){ return '<span class="ed-grip mg-grip" title="بکشید تا ترتیبِ پیش‌فرض در پروژه‌ها عوض شود" aria-label="جابجاییِ ترتیب" onmousedown="mgGripDown()" onclick="event.stopPropagation()">'+ED_GRIP_IC+'</span>'; }
+function mgGripDown(){ _mgGripArmed=true; }
+function mgRowDragStart(e){
+  var tr=e.currentTarget;
+  if(!_mgGripArmed){ if(e&&e.preventDefault) e.preventDefault(); return; }
+  _mgGripArmed=false;
+  if(e.dataTransfer){ e.dataTransfer.effectAllowed="move"; try{ e.dataTransfer.setData("text/plain",tr.getAttribute("data-key")||""); }catch(_){} }
+  setTimeout(function(){ tr.classList.add("mg-dragging"); },0);
+}
+function mgRowDragOver(e){
+  if(e&&e.preventDefault) e.preventDefault();
+  var tb=e.currentTarget, drag=tb&&tb.querySelector("tr.mg-dragging"); if(!drag) return;
+  var scope=drag.getAttribute("data-scope")||"";
+  var rows=[].slice.call(tb.querySelectorAll("tr[data-key]")).filter(function(r){ return (r.getAttribute("data-scope")||"")===scope; });
+  var after=null, best=-Infinity;
+  rows.forEach(function(r){ if(r===drag) return; var b=r.getBoundingClientRect(), off=e.clientY-(b.top+b.height/2);
+    if(off<0 && off>best){ best=off; after=r; } });
+  if(after===drag || (after && drag.nextElementSibling===after)) return;
+  var last=rows[rows.length-1];
+  if(!after && drag===last) return;
+  mgFlip(tb, function(){
+    if(after) tb.insertBefore(drag, after);
+    else tb.insertBefore(drag, last.nextElementSibling);   // تهِ همان گروه، نه تهِ کلِ جدول
+  });
+}
+function mgFlip(tb, mutate){
+  var items=[].slice.call(tb.querySelectorAll("tr[data-key]"));
+  var firsts=items.map(function(el){ return el.getBoundingClientRect().top; });
+  mutate();
+  items.forEach(function(el,i){ var dy=firsts[i]-el.getBoundingClientRect().top;
+    if(dy){ el.style.transition="none"; el.style.transform="translateY("+dy+"px)"; } });
+  requestAnimationFrame(function(){ items.forEach(function(el){ if(el.style.transform){
+    el.style.transition="transform .18s cubic-bezier(.2,0,0,1)"; el.style.transform=""; } }); });
+}
+function mgRowDragEnd(e){
+  var tr=e.currentTarget; tr.classList.remove("mg-dragging");
+  var tb=tr.parentNode; if(!tb) return;
+  var keys=[].slice.call(tb.querySelectorAll("tr[data-key]")).map(function(r){ return r.getAttribute("data-key"); });
+  if(tb.id==="doctypesBody") mgCommitOrder("docTypes", DB.docTypes, "code", keys);
+  else if(tb.id==="partmodsBody") mgCommitOrder("partMods", DB.partMods, "nameFa", keys);
+  else if(tb.id==="suppliersBody") mgCommitOrder("suppliers", DB.suppliers, "nameFa", keys);
+  else if(tb.id==="rawtypesBody") mgCommitOrder("rawTypes", DB.rawTypes, "nameFa", keys);
+}
+async function mgCommitOrder(table, arr, keyField, keys){
+  var changed=false;
+  keys.forEach(function(k,i){ var row=(arr||[]).find(function(x){ return String(x[keyField])===k; });
+    if(row && Number(row.order)!==i){ row.order=i; changed=true; } });
+  if(!changed) return;
+  localRefresh();   // جدول‌ها و پروژهٔ بازِ فعلی بی‌درنگ با ترتیبِ تازه
+  var r=await api("reorderMaster",{table:table, keys:keys},{silent:true});
+  if(!r||!r.ok){
+    if(r && r.error==="UNKNOWN_ACTION") toast("ذخیرهٔ ترتیب نیاز به انتشارِ مجددِ بک‌اند دارد (Deploy ▸ New version).",true);
+    else toast((r&&r.message)||"ذخیرهٔ ترتیب ناموفق بود.",true);
+    return;
+  }
+  toast("ترتیبِ پیش‌فرض ذخیره شد");
+}
+if(typeof document!=="undefined" && document.addEventListener) document.addEventListener("mouseup",function(){ _mgGripArmed=false; });
 
 function localRefresh(){
   refreshAllSelects(); renderDataTables();
@@ -269,6 +342,10 @@ async function migratePartModRename(oldName,newName){
       Object.keys(root.partModsByPart).forEach(function(pn){ var arr=root.partModsByPart[pn];
         if(Array.isArray(arr)){ for(var k=0;k<arr.length;k++){ if(String(arr[k])===oldName){ arr[k]=newName; changed=true; } } } });
     }
+    if(root.ordPartMods && typeof root.ordPartMods==="object"){   // ترتیبِ اختصاصیِ پارامترها
+      Object.keys(root.ordPartMods).forEach(function(pn){ var arr=root.ordPartMods[pn];
+        if(Array.isArray(arr)){ for(var k=0;k<arr.length;k++){ if(String(arr[k])===oldName){ arr[k]=newName; changed=true; } } } });
+    }
     if(root.partVals && typeof root.partVals==="object"){
       Object.keys(root.partVals).forEach(function(pn){ var row=root.partVals[pn];
         if(row && row[oldName]!==undefined){ row[newName]=row[oldName]; delete row[oldName]; changed=true; } });
@@ -278,6 +355,59 @@ async function migratePartModRename(oldName,newName){
       await api("saveProject",{clientCode:p.clientCode,orderNo:pad2(p.orderNo),projectNo:pad2(p.projectNo),specs:json});
     }
   }
+}
+
+/* ═══ فهرست‌های اصلیِ نام‌محورِ ردیابی: تأمین‌کننده و نوعِ مادهٔ خام ═══
+   ساختارشان یکی است (نام فارسی + نام انگلیسی + ترتیب)، پس رندر و مودالشان مشترک است. */
+var SUPPLIER_EL_SVG='<svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h3.5L22 11v5h-6z"/><circle cx="5.5" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg>';
+var RAWTYPE_EL_SVG='<svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/></svg>';
+function renderNamedMaster(bodyId, rows, editFn, delAction, icon){
+  var host=document.getElementById(bodyId); if(!host) return;
+  host.innerHTML=rows.map(function(m){
+    return "<tr "+mgRowAttrs(m.nameFa,"")+"><td><div class='pm-cell'><span class='el-badge'>"+icon+"</span><span class='nm-fa'>"+esc(m.nameFa)+"</span></div></td>"+
+      "<td class='spec-en c-mid'><span class='en-shift'>"+esc(m.nameEn||"—")+"</span></td>"+
+      "<td class='col-act'><div class='row-actions'>"+editIconBtn(editFn+"('"+esc(m.nameFa)+"')")+
+        delIconBtn("del('"+delAction+"',{nameFa:'"+esc(m.nameFa)+"'})")+mgGripHTML()+"</div></td></tr>";
+  }).join("")||emptyRow(3);
+}
+var _namedEdit={sup:"", raw:""};
+function openSupplierModal(name){ openNamedMasterModal("sup", name, DB.suppliers, "تأمین‌کننده", "مثلاً فولاد مبارکه", "e.g. Mobarakeh Steel"); }
+function openRawTypeModal(name){ openNamedMasterModal("raw", name, DB.rawTypes, "نوع مادهٔ خام", "مثلاً گرد فولادی", "e.g. Steel Round Bar"); }
+function openNamedMasterModal(kind, name, arr, title, phFa, phEn){
+  var m = name ? (arr||[]).find(function(x){ return String(x.nameFa)===String(name); }) : null;
+  _namedEdit[kind]= m ? String(m.nameFa) : "";
+  var body='<div class="um-form">'+
+    '<div class="um-row">'+
+      '<div class="um-field"><label class="fld">نام فارسی</label>'+
+        '<input id="nmFa" placeholder="'+esc(phFa)+'" value="'+esc(m?(m.nameFa||""):"")+'"></div>'+
+      '<div class="um-field"><label class="fld">نام انگلیسی</label>'+
+        '<input id="nmEn" style="direction:ltr;text-align:left" placeholder="'+esc(phEn)+'" value="'+esc(m?(m.nameEn||""):"")+'"></div>'+
+    '</div>'+
+    '<div class="um-actions">'+
+      '<button class="btn" onclick="closeModal()">انصراف</button>'+
+      '<button class="btn primary" onclick="saveNamedMaster(\''+kind+'\')">ذخیره</button>'+
+    '</div></div>';
+  showModal((m?"ویرایشِ ":"افزودنِ ")+title, body, "form-modal");
+}
+async function saveNamedMaster(kind){
+  var isSup=(kind==="sup"), arr=isSup?DB.suppliers:DB.rawTypes;
+  var name=String(document.getElementById("nmFa").value||"").trim();
+  var nameEn=String(document.getElementById("nmEn").value||"").trim();
+  if(!name){ toast("نام لازم است.",true); return; }
+  var oldName=_namedEdit[kind];
+  if((arr||[]).some(function(x){ return String(x.nameFa).trim()===name && String(x.nameFa)!==oldName; })){ toast("این نام قبلاً ثبت شده است.",true); return; }
+  var payload={nameFa:name,nameEn:nameEn};
+  if(oldName) payload.oldName=oldName;
+  var r=await api(isSup?"saveSupplier":"saveRawType", payload);
+  if(!r||!r.ok){ toast((r&&r.message)||"ذخیره ناموفق بود",true); return; }
+  var ord=0, idx=-1;
+  (arr||[]).forEach(function(x,i){ if(String(x.nameFa)===(oldName||name)){ ord=Number(x.order)||0; idx=i; } });
+  if(oldName && idx>=0) arr.splice(idx,1);
+  else if(!oldName){ var mx=0; (arr||[]).forEach(function(x){ var n=Number(x.order)||0; if(n>mx)mx=n; }); ord=mx+1; }
+  localUpsert(arr,function(x){ return String(x.nameFa)===name; },{nameFa:name,nameEn:nameEn,active:true,order:ord});
+  /* تغییرِ نام فقط فهرستِ اصلی را عوض می‌کند؛ قطعاتِ تولیدیِ ثبت‌شده مقدارِ متنیِ خودشان را
+     نگه می‌دارند تا سابقهٔ آن‌ها دست‌نخورده بماند (ردیابی به گذشته وابسته است). */
+  closeModal(); localRefresh(); toast((isSup?"تأمین‌کننده ":"نوع مادهٔ خام ")+(oldName?"به‌روزرسانی شد":"افزوده شد"));
 }
 
 /* ---- کاربران (نقش + جنسیت + سمت + آواتار) ---- */
@@ -309,7 +439,7 @@ function segControl(id, opts, cur){
 }
 function pickSeg(id, btn){
   var h=document.getElementById(id); if(h) h.value=btn.getAttribute("data-val");
-  var wrap=btn.parentNode; if(wrap) wrap.querySelectorAll(".seg-btn").forEach(function(b){ b.classList.toggle("on", b===btn); });
+  var wrap=btn.parentNode; if(wrap) wrap.querySelectorAll(".seg-btn").forEach(function(b){ xfSet(b, "on", b===btn); });
 }
 function togglePass(id, btn){
   var i=document.getElementById(id); if(!i) return;
@@ -331,7 +461,7 @@ function shakeEl(el){
    تغییر بلافاصله در UI اعمال (خوش‌بینانه) و در بک‌اند ماندگار می‌شود؛ اگر ذخیره ناموفق بود، برمی‌گردد. */
 var _userActiveBusy = {};
 function applyUserActiveUI(btn, on){
-  if(btn){ btn.classList.toggle("on", on); btn.setAttribute("aria-pressed", on?"true":"false"); }   // حلقهٔ نارنجی دورِ آواتار
+  if(btn){ xfSet(btn, "on", on); btn.setAttribute("aria-pressed", on?"true":"false"); }   // حلقهٔ نارنجی دورِ آواتار
   var tr=btn?btn.closest("tr"):null; if(tr) tr.classList.toggle("u-off", !on);   // فریز/آزادکردنِ سطر
 }
 async function toggleUserActive(ev, username){
@@ -357,7 +487,9 @@ function openUserModal(username){
   var u = username ? (DB.users||[]).find(function(x){return String(x.username)===String(username);}) : null;
   _userEdit = u ? String(u.username) : "";
   var isEdit=!!u;
-  var eye='<svg viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+  /* دو آیکون روی هم؛ CSS بینشان کراس‌فید می‌کند (هم‌الگوی چشمِ صفحهٔ ورود) */
+  var eye='<svg class="eye-on" viewBox="0 0 24 24"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>'+
+          '<svg class="eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
   var body='<div class="um-form">'+
     '<div class="um-field"><label class="fld">نام و نام خانوادگی</label>'+
       '<input id="usName" placeholder="علی شفیعی" value="'+esc(u?(u.name||""):"")+'"></div>'+

@@ -11,18 +11,18 @@ var KEBAB_IC = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circ
 
 function filteredDocs(){
   var q=(document.getElementById("aSearch").value||"").trim().toLowerCase();
-  var fc=document.getElementById("aClient").value, ft=document.getElementById("aType").value,
-      fl=document.getElementById("aLatest").value, fs=document.getElementById("aStatus").value,
-      fp=document.getElementById("aProject").value, fo=document.getElementById("aOrder").value;
+  /* چندانتخابی: درونِ هر دسته «یا» (هر کدام از مقادیرِ روشن)، بینِ دسته‌ها «و».
+     دستهٔ خالی یعنی بدونِ محدودیت. */
+  var fc=filtVals("aClient"), ft=filtVals("aType"), fl=filtVals("aLatest"),
+      fs=filtVals("aStatus"), fp=filtVals("aProject"), fo=filtVals("aOrder");
   return DB.documents.filter(function(d){
-    if(fc && d.clientCode!==fc) return false;
-    if(fo){ var oo=fo.split("|"); if(!(d.clientCode===oo[0] && pad2(d.orderNo)===pad2(oo[1]))) return false; }
-    if(fp){ var pp=fp.split("|"); if(!(d.clientCode===pp[0] && pad2(d.orderNo)===pad2(pp[1]) && pad2(d.projectNo)===pad2(pp[2]))) return false; }
-    if(ft && String(d.typeCode).toUpperCase()!==ft) return false;
-    if(fs){ var st=String(d.status||"").toLowerCase();
-            if(fs==="approved"){ if(!(st==="approved"||st==="active")) return false; }
-            else if(st!==fs) return false; }
-    if(fl==="1" && String(d.isLatest).toLowerCase()!=="true") return false;
+    if(fc.length && fc.indexOf(d.clientCode)<0) return false;
+    if(fo.length && fo.indexOf(d.clientCode+"|"+pad2(d.orderNo))<0) return false;
+    if(fp.length && fp.indexOf(d.clientCode+"|"+pad2(d.orderNo)+"|"+pad2(d.projectNo))<0) return false;
+    if(ft.length && ft.indexOf(String(d.typeCode).toUpperCase())<0) return false;
+    if(fs.length){ var st=String(d.status||"").toLowerCase(); if(st==="active") st="approved";
+            if(fs.indexOf(st)<0) return false; }
+    if(fl.length && String(d.isLatest).toLowerCase()!=="true") return false;
     if(q){
       var blob=[d.drawingNumber,docPhrase(d),clientName(d.clientCode),d.clientCode,typeName(d.typeCode),d.typeCode,d.title,partName(d.partNo),d.projectNo,d.orderNo,d.partNo].join(" ").toLowerCase();
       if(blob.indexOf(q)<0) return false;
@@ -73,8 +73,12 @@ function buildArchiveHead(){
   }).join("")+'<th class="arch-actcol" aria-hidden="true"></th></tr>';   // ستونِ باریکِ فلش/اکشن در انتهای چپ
 }
 
-/* ================= فیلترِ چیپ‌محور + پاپ‌اوورِ جامع =================
-   سلکت‌های مخفی (aClient/aOrder/aProject/aType/aStatus/aLatest) منبعِ حقیقت‌اند؛ چیپ‌ها همان‌ها را ست/پاک می‌کنند. */
+/* ================= فیلترِ آرشیو =================
+   موتورِ چیپ‌محور مشترک است (scripts/filters.js) و اینجا فقط «مشخصاتِ» آرشیو ثبت می‌شود:
+   فیلدها، مخزنِ انتخاب‌ها، فهرستِ مقادیرِ هر فیلد و کاری که با هر تغییر باید انجام شود. */
+var _filtSel={aClient:[],aOrder:[],aProject:[],aType:[],aStatus:[],aLatest:[]};
+function filtVals(id){ return _filtSel[id]||[]; }
+function filtHas(id,val){ return filtVals(id).indexOf(val)>=0; }
 var FILT_FIELDS=[
   {id:"aClient",  label:"مشتری"},
   {id:"aOrder",   label:"سفارش"},
@@ -83,46 +87,23 @@ var FILT_FIELDS=[
   {id:"aStatus",  label:"وضعیت"},
   {id:"aLatest",  label:"ریویژن"}
 ];
-var FILT_CHEV='<svg viewBox="0 0 24 24" class="ic"><polyline points="15 6 9 12 15 18"/></svg>';        // ← بازشدنِ پنلِ کناری (RTL: چپ)
-function filtFieldById(id){ for(var i=0;i<FILT_FIELDS.length;i++) if(FILT_FIELDS[i].id===id) return FILT_FIELDS[i]; return null; }
+/* برچسبِ چیپ از سلکت‌های مخفیِ همین صفحه خوانده می‌شود (aClient/aOrder/…) */
 function filtOptLabel(id,val){
   var s=document.getElementById(id); if(!s) return val;
   for(var i=0;i<s.options.length;i++) if(s.options[i].value===val) return s.options[i].text;
   return val;
 }
-/* تاگلِ روشن/خاموشِ یک مقدار در پنلِ دوم (منو باز می‌ماند تا تاگل‌ها دیده شوند) */
-function filtToggleVal(id,val){
-  var s=document.getElementById(id); if(!s) return;
-  s.value=(s.value===val)?"":val;                         // کلیک روی مقدارِ روشن → خاموش
-  if(id==="aClient"){ document.getElementById("aOrder").value=""; document.getElementById("aProject").value=""; }   // ریستِ وابسته‌ها
-  renderArchive();       // چیپ‌ها + جدول
-  filtRerenderMenu();    // به‌روزرسانیِ تاگل‌های منو (منو باز می‌ماند)
-}
-function filtClear(id){
-  var s=document.getElementById(id); if(!s) return;
-  s.value="";
-  if(id==="aClient") onArchiveClientChange(); else renderArchive();
-}
-/* ردیفِ چیپ‌های فعال + دکمهٔ + (فقط وقتی حداقل یک فیلتر فعال است) */
-function buildArchChips(){
-  var host=document.getElementById("archChips"); if(!host) return;
-  var chips=FILT_FIELDS.filter(function(f){ var s=document.getElementById(f.id); return s && s.value; }).map(function(f){
-    var s=document.getElementById(f.id);
-    // نامِ دسته (مشتری/پروژه/…) نوشته نمی‌شود؛ خودِ مقدار گویاست. عنوانِ دسته در tooltip می‌ماند.
-    return '<span class="filt-chip" title="'+esc(f.label)+'">'+
-      '<span class="fc-v">'+esc(filtOptLabel(f.id,s.value))+'</span>'+
-      '<button class="fc-x" title="حذفِ این فیلتر" onclick="filtClear(\''+f.id+'\')">'+ICON.x+'</button></span>';
+/* با تغییرِ مشتری‌ها، سفارش/پروژه‌ای که به هیچ مشتریِ روشنی تعلق ندارد کنار می‌رود
+   (به‌جای ریستِ کامل، تا انتخاب‌های سازگار از دست نروند). */
+function filtPruneDeps(){
+  var fc=_filtSel.aClient; if(!fc.length) return;
+  ["aOrder","aProject"].forEach(function(k){
+    _filtSel[k]=_filtSel[k].filter(function(v){ return fc.indexOf(String(v).split("|")[0])>=0; });
   });
-  if(!chips.length){ host.innerHTML=""; host.hidden=true; filtCloseMenu(); return; }
-  host.hidden=false;
-  host.innerHTML=chips.join("")+
-    '<button class="filt-add" id="filtAddBtn" title="افزودنِ فیلترِ بعدی" onclick="filtToggleMenu(event,\'filtAddBtn\')">'+ICON.plus+'</button>';
 }
-/* پاپ‌اوورِ دوپنله (مثلِ رفرنس): پنلِ راست = فهرستِ فیلدها؛ با کلیکِ هر فیلد، پنلِ مقادیرش کنارش باز می‌شود */
-var _filtMenu=null;
 /* مقادیرِ هر فیلد به‌صورتِ {value, fa (فارسی=راست), en (انگلیسی=چپ)} — مستقیم از داده */
 function filtFieldValues(id){
-  var fc=document.getElementById("aClient").value;
+  var fc=filtVals("aClient");
   if(id==="aClient") return clientsSorted().map(function(c){ return {value:c.code, fa:c.name||c.code, en:clientNameEn(c.code)}; });   // انگلیسی = نام لاتینِ مشتری
   if(id==="aType") return docTypesSorted().map(function(t){ return {value:String(t.code).toUpperCase(), fa:t.nameFa||t.code, en:t.nameEn||String(t.code).toUpperCase()}; });
   if(id==="aStatus") return [   // سمتِ چپ = تگِ وضعیت (به‌جای معادلِ انگلیسی)
@@ -130,78 +111,26 @@ function filtFieldValues(id){
     {value:"approved",fa:"تأییدشده"},{value:"rejected",fa:"ردشده"}
   ].map(function(x){ var si=statusInfo(x.value); return {value:x.value, fa:x.fa, enHtml:badgeHTML(si.cls,si.label)}; });
   if(id==="aLatest") return [{value:"1",fa:"فقط آخرین",en:"Latest"}];
-  if(id==="aOrder") return (DB.orders||[]).filter(function(o){ return !fc||o.clientCode===fc; }).slice().sort(function(a,b){
+  if(id==="aOrder") return (DB.orders||[]).filter(function(o){ return !fc.length||fc.indexOf(o.clientCode)>=0; }).slice().sort(function(a,b){
       return String(a.clientCode).localeCompare(String(b.clientCode),"en")||(numOf(a.orderNo)-numOf(b.orderNo)); })
     .map(function(o){ return {value:o.clientCode+"|"+pad2(o.orderNo), fa:(o.title||("سفارش "+pad2(o.orderNo)))}; });   // بدونِ انگلیسی
-  if(id==="aProject") return DB.projects.filter(function(p){ return !fc||p.clientCode===fc; }).slice().sort(function(a,b){
+  if(id==="aProject") return DB.projects.filter(function(p){ return !fc.length||fc.indexOf(p.clientCode)>=0; }).slice().sort(function(a,b){
       return String(a.clientCode).localeCompare(String(b.clientCode),"en")||(numOf(a.orderNo)-numOf(b.orderNo))||(numOf(a.projectNo)-numOf(b.projectNo)); })
     .map(function(p){ return {value:p.clientCode+"|"+pad2(p.orderNo)+"|"+pad2(p.projectNo), fa:(p.description||("پروژه "+pad2(p.projectNo)))}; });   // بدونِ انگلیسی
   return [];
 }
-function filtMenuHTML(activeId){
-  var fieldList='<div class="filt-fields">'+FILT_FIELDS.map(function(f){
-    var s=document.getElementById(f.id), on=!!(s&&s.value), h="filtPickField('"+f.id+"')";
-    return '<button type="button" class="filt-item filt-field'+(f.id===activeId?' active':'')+(on?' has-val':'')+'" onmouseover="'+h+'" onclick="event.stopPropagation();'+h+'"><span>'+esc(f.label)+'</span>'+FILT_CHEV+'</button>';
-  }).join("")+'</div>';
-  if(!activeId) return fieldList;   // هنوز فیلدی انتخاب نشده → فقط فهرستِ فیلدها
-  var cur=(function(){ var s=document.getElementById(activeId); return s?s.value:""; })();
-  var vals=filtFieldValues(activeId).map(function(v){
-    var on=(v.value===cur);
-    var enPart = v.enHtml ? ('<span class="fv-tag">'+v.enHtml+'</span>') : (v.en ? ('<span class="fv-en">'+esc(v.en)+'</span>') : '');
-    return '<button type="button" class="filt-item filt-val'+(on?' sel':'')+'" onclick="event.stopPropagation();filtToggleVal(\''+activeId+'\',\''+esc(v.value)+'\')">'+
-      '<span class="ff-l"><span class="ed-check'+(on?' on':'')+'"></span><span class="fv-fa">'+esc(v.fa)+'</span></span>'+enPart+'</button>';
-  }).join("");
-  var panel=vals||'<div class="filt-empty">گزینه‌ای نیست</div>';
-  return fieldList+'<div class="filt-panel">'+panel+'</div>';
-}
-function filtPickField(id){
-  if(!_filtMenu || _filtMenu._active===id) return;   // گاردِ ضدِ رندرِ تکراری هنگامِ حرکتِ موس روی همان فیلد
-  _filtMenu._active=id; _filtMenu.innerHTML=filtMenuHTML(id); filtReposition();
-}
-function filtRerenderMenu(){ if(_filtMenu){ _filtMenu.innerHTML=filtMenuHTML(_filtMenu._active); filtReposition(); } }
-function filtReposition(){ var a=_filtMenu&&document.getElementById(_filtMenu._anchor); if(a) filtPosition(a); }
-function filtPosition(anchor){
-  if(!_filtMenu) return;
-  var r=anchor.getBoundingClientRect(), mw=_filtMenu.offsetWidth, mh=_filtMenu.offsetHeight;
-  var top=r.bottom+12; if(top+mh>window.innerHeight-8) top=Math.max(8, r.top-mh-12);
-  var left=r.right-mw; if(left<8) left=8; if(left+mw>window.innerWidth-8) left=window.innerWidth-8-mw;
-  _filtMenu.style.top=Math.max(8,top)+"px"; _filtMenu.style.left=left+"px";
-}
-function filtOutside(e){ if(_filtMenu && _filtMenu.contains(e.target)) return; filtCloseMenu(); }
-/* اسکرولِ صفحه منو را می‌بندد، اما اسکرول در خودِ منو نه (رویداد در فازِ capture می‌آید) */
-function filtOnScroll(e){
-  var t=e.target;
-  if(_filtMenu && t && t.nodeType===1 && (t===_filtMenu || _filtMenu.contains(t))) return;
-  filtCloseMenu();
-}
-function filtCloseMenu(){
-  if(!_filtMenu) return;
-  _filtMenu.remove(); _filtMenu=null;
-  document.removeEventListener("click", filtOutside, false);
-  document.removeEventListener("scroll", filtOnScroll, true);
-  window.removeEventListener("resize", filtCloseMenu);
-}
-function filtToggleMenu(ev, anchorId){
-  ev.stopPropagation();
-  var wasFor=_filtMenu && _filtMenu._anchor===anchorId;
-  filtCloseMenu();
-  if(wasFor) return;   // toggle
-  var anchor=document.getElementById(anchorId); if(!anchor) return;
-  var m=document.createElement("div"); m.className="filt-pop"; m._anchor=anchorId;
-  m.innerHTML=filtMenuHTML(null);
-  document.body.appendChild(m); _filtMenu=m; filtPosition(anchor);
-  setTimeout(function(){
-    document.addEventListener("click", filtOutside, false);
-    document.addEventListener("scroll", filtOnScroll, true);
-    window.addEventListener("resize", filtCloseMenu);
-  },0);
-}
+filtRegister("arch", {
+  fields: FILT_FIELDS, sel: _filtSel, values: filtFieldValues, label: filtOptLabel,
+  prune: filtPruneDeps, onChange: function(){ renderArchive(); },
+  chipsHost: "archChips", addBtnId: "filtAddBtn"
+});
+function buildArchChips(){ buildFiltChips("arch"); }
 
 /* --- فیلتر پروژه (وابسته به مشتری) --- */
 function populateArchiveProjects(){
   var el=document.getElementById("aProject"); if(!el) return;
-  var cur=el.value, fc=document.getElementById("aClient").value;
-  var list=DB.projects.filter(function(p){ return !fc || p.clientCode===fc; }).slice().sort(function(a,b){
+  var fc=filtVals("aClient");
+  var list=DB.projects.filter(function(p){ return !fc.length || fc.indexOf(p.clientCode)>=0; }).slice().sort(function(a,b){
     return String(a.clientCode).localeCompare(String(b.clientCode),"en")||(numOf(a.orderNo)-numOf(b.orderNo))||(numOf(a.projectNo)-numOf(b.projectNo));
   });
   el.innerHTML='<option value="">همه پروژه‌ها</option>'+list.map(function(p){
@@ -209,13 +138,12 @@ function populateArchiveProjects(){
     var label=p.clientCode+"-"+pad2(p.orderNo)+"-"+pad2(p.projectNo)+(p.description?(" — "+p.description):"");
     return '<option value="'+esc(val)+'">'+esc(label)+'</option>';
   }).join("");
-  el.value=(cur && list.some(function(p){ return (p.clientCode+"|"+pad2(p.orderNo)+"|"+pad2(p.projectNo))===cur; }))?cur:"";
 }
 /* فیلترِ سفارش (وابسته به مشتری) — value = «کدمشتری|شمارهٔ‌سفارش» */
 function populateArchiveOrders(){
   var el=document.getElementById("aOrder"); if(!el) return;
-  var cur=el.value, fc=document.getElementById("aClient").value;
-  var list=(DB.orders||[]).filter(function(o){ return !fc || o.clientCode===fc; }).slice().sort(function(a,b){
+  var fc=filtVals("aClient");
+  var list=(DB.orders||[]).filter(function(o){ return !fc.length || fc.indexOf(o.clientCode)>=0; }).slice().sort(function(a,b){
     return String(a.clientCode).localeCompare(String(b.clientCode),"en")||(numOf(a.orderNo)-numOf(b.orderNo));
   });
   el.innerHTML='<option value="">همه سفارش‌ها</option>'+list.map(function(o){
@@ -223,11 +151,11 @@ function populateArchiveOrders(){
     var label=o.clientCode+"-"+pad2(o.orderNo)+(o.title?(" — "+o.title):"");
     return '<option value="'+esc(val)+'">'+esc(label)+'</option>';
   }).join("");
-  el.value=(cur && list.some(function(o){ return (o.clientCode+"|"+pad2(o.orderNo))===cur; }))?cur:"";
 }
-function onArchiveClientChange(){ document.getElementById("aOrder").value=""; document.getElementById("aProject").value=""; renderArchive(); }
+function onArchiveClientChange(){ filtPruneDeps(); renderArchive(); }
 function clearArchiveFilters(){
-  ["aSearch","aClient","aOrder","aProject","aType","aStatus","aLatest"].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=""; });
+  var el=document.getElementById("aSearch"); if(el) el.value="";
+  for(var k in _filtSel) _filtSel[k]=[];
   renderArchive();
 }
 
@@ -268,9 +196,7 @@ function renderArchive(){
   var rows=filteredDocs().slice().sort(archCompare);
   // امضای فیلتر/سورت/تعدادِ صفحه — اگر تغییر کند به صفحهٔ ۱ برمی‌گردیم (ناوبریِ صفحه امضا را عوض نمی‌کند)
   var sig=[_arch.sortKey,_arch.sortDir,_arch.perPage,
-    document.getElementById("aSearch").value,document.getElementById("aClient").value,
-    document.getElementById("aOrder").value,document.getElementById("aProject").value,document.getElementById("aType").value,
-    document.getElementById("aStatus").value,document.getElementById("aLatest").value].join("|");
+    document.getElementById("aSearch").value, JSON.stringify(_filtSel)].join("|");
   if(sig!==_arch.sig){ _arch.page=1; _arch.sig=sig; }
   var total=rows.length, per=_arch.perPage;
   var pages=Math.max(1, Math.ceil(total/per)); _arch.pages=pages;
@@ -476,7 +402,7 @@ function archKebab(ev, num){
   },0);
 }
 async function delDocument(num){
-  if(!(await uiConfirm("حذف سند «"+num+"»؟ سند به «سطل زباله» می‌رود و تا ۳۰ روز قابلِ بازیابی است؛ پس از آن سامانه آن را برای همیشه حذف می‌کند.",{danger:true,okLabel:"حذف"}))) return;
+  if(!(await uiConfirm("حذف سند «"+num+"»؟ سند به «سطل زباله» می‌رود و تا ۳۰ روز قابلِ بازیابی است؛ پس از آن سامانه حذف دائمی‌اش می‌کند.",{danger:true,okLabel:"حذف"}))) return;
   var r=await api("deleteDocument",{drawingNumber:num});
   if(r.ok){ toast("به سطلِ زباله منتقل شد"); refreshDocuments(); } else toast(r.message||"حذف ناموفق",true);
 }
@@ -510,7 +436,7 @@ async function rbRefresh(){
   if(!r||!r.ok){ _rbDocs=[]; if(btnAll) btnAll.style.display="none"; host.innerHTML='<div class="rb-empty muted">خطا در دریافتِ فهرست.</div>'; return; }
   var docs=r.documents||[]; _rbDocs=docs;
   if(btnAll) btnAll.style.display=docs.length?"":"none";
-  if(!docs.length){ host.innerHTML='<div class="rb-empty">'+emptyState("سطلِ زباله خالی است","اسنادی که حذف کنید تا ۳۰ روز اینجا می‌مانند و قابلِ بازیابی‌اند؛ پس از آن سامانه آن‌ها را برای همیشه پاک می‌کند.")+'</div>'; return; }
+  if(!docs.length){ host.innerHTML='<div class="rb-empty">'+emptyState("سطلِ زباله خالی است","اسنادی که حذف کنید تا ۳۰ روز اینجا می‌مانند و قابلِ بازیابی‌اند؛ پس از آن سامانه حذف دائمی‌شان می‌کند.")+'</div>'; return; }
   host.innerHTML='<div class="rb-list">'+docs.map(rbRowHTML).join("")+'</div>';
 }
 function rbRowHTML(d){
@@ -533,7 +459,7 @@ function rbRowHTML(d){
     '<span class="rb-days'+(dl<=5?" low":"")+'">'+faN(dl)+' روز مانده</span>'+
     '<div class="rb-acts">'+
       '<button class="icon-btn sm" onclick="rbRestore(\''+num+'\')" title="بازیابیِ سند" aria-label="بازیابیِ سند">'+RB_RESTORE_IC+'</button>'+
-      '<button class="icon-btn sm danger" onclick="rbPurge(\''+num+'\')" title="حذف برای همیشه" aria-label="حذف برای همیشه">'+RB_PURGE_IC+'</button>'+
+      '<button class="icon-btn sm danger" onclick="rbPurge(\''+num+'\')" title="حذف دائمی" aria-label="حذف دائمی">'+RB_PURGE_IC+'</button>'+
     '</div>'+
   '</div>';
 }
@@ -544,19 +470,19 @@ async function rbRestore(num){
 }
 /* حذفِ همیشگیِ یک سند از سطلِ زباله (برگشت‌ناپذیر) */
 async function rbPurge(num){
-  if(!(await uiConfirm("سندِ «"+num+"» برای همیشه حذف می‌شود و دیگر قابلِ بازیابی نیست. مطمئنید؟",{danger:true,okLabel:"حذف برای همیشه"}))) return;
+  if(!(await uiConfirm("سندِ «"+num+"» حذف دائمی می‌شود و دیگر قابلِ بازیابی نیست. مطمئنید؟",{danger:true,okLabel:"حذف دائمی"}))) return;
   var r=await api("purgeDocument",{drawingNumber:num});
   /* ⚠ refreshDocuments لازم است: حذفِ دائم یک رویدادِ 'purged' در گردشِ کار ثبت
      می‌کند و بدونِ این، DB.workflow به‌روز نمی‌شد و آن رویداد تا رفرشِ کاملِ صفحه
      در «فعالیت‌های اخیر» دیده نمی‌شد. حذفِ نرم و بازیابی این را از قبل داشتند. */
-  if(r&&r.ok){ toast("برای همیشه حذف شد"); await rbRefresh(); refreshDocuments(); }
+  if(r&&r.ok){ toast("حذف دائمی شد"); await rbRefresh(); refreshDocuments(); }
   else toast((r&&r.message)||"حذف ناموفق",true);
 }
-/* خالی‌کردنِ کاملِ سطلِ زباله — همهٔ رکوردها برای همیشه حذف می‌شوند */
+/* خالی‌کردنِ کاملِ سطلِ زباله — همهٔ رکوردها حذفِ دائمی می‌شوند */
 async function rbPurgeAll(){
   var nums=_rbDocs.map(function(d){ return d.drawingNumber; });
   if(!nums.length) return;
-  if(!(await uiConfirm("همهٔ "+faN(nums.length)+" سندِ داخلِ سطلِ زباله برای همیشه حذف می‌شوند و قابلِ بازیابی نیستند. مطمئنید؟",{danger:true,okLabel:"حذف همه"}))) return;
+  if(!(await uiConfirm("همهٔ "+faN(nums.length)+" سندِ داخلِ سطلِ زباله حذف دائمی می‌شوند و قابلِ بازیابی نیستند. مطمئنید؟",{danger:true,okLabel:"حذف دائمیِ همه"}))) return;
   toast("در حال حذفِ همه…");
   for(var i=0;i<nums.length;i++){ await api("purgeDocument",{drawingNumber:nums[i]},{silent:true,quiet:true}); }
   toast("سطلِ زباله خالی شد");

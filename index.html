@@ -145,7 +145,7 @@
       <div class="nav-tree">
         <div class="nav-trow">
           <button class="nav-item nav-tmain" data-tab="project">
-            <svg class="ni ni-folder" viewBox="0 0 24 24"><path class="fd-back" d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path class="fd-lid" d="M2 11h20a1 1 0 0 1 .97 1.24l-1.8 7.2A2 2 0 0 1 19.23 21H4"/></svg>
+            <svg class="ni ni-clients" viewBox="0 0 24 24"><path class="cl-body" d="M2 21V11.8l6 3.4V11.8l6 3.4V6.4l6 3.4V21z"/><line class="cl-ground" x1="1.5" y1="21" x2="22.5" y2="21"/><circle class="cl-w1" cx="5" cy="18.2" r="1.05" fill="currentColor" stroke="none"/><circle class="cl-w2" cx="11" cy="18.2" r="1.05" fill="currentColor" stroke="none"/><circle class="cl-w3" cx="17" cy="18.2" r="1.05" fill="currentColor" stroke="none"/><path class="cl-smoke" d="M13.2 4.7c0-1.15 1.7-1.15 1.7-2.3"/></svg>
             مشتریان و پروژه‌ها
           </button>
           <button class="nav-exp" id="navRootExp" onclick="navToggleRoot(event)" aria-label="نمایش/پنهان‌سازی مشتریان" aria-expanded="false">
@@ -155,8 +155,12 @@
         <div class="nav-collapse" id="navTreeChildren"></div>
       </div>
       <button class="nav-item" data-tab="archive">
-        <svg class="ni ni-search" viewBox="0 0 24 24"><g class="sr-bob"><g class="sr-mag"><circle class="sr-glass" cx="11" cy="11" r="8"/><line class="sr-handle" x1="21" y1="21" x2="16.65" y2="16.65"/><circle class="sr-dot" cx="11" cy="11" r="0"/></g></g></svg>
+        <svg class="ni ni-folder" viewBox="0 0 24 24"><path class="fd-back" d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/><path class="fd-lid" d="M2 11h20a1 1 0 0 1 .97 1.24l-1.8 7.2A2 2 0 0 1 19.23 21H4"/></svg>
         آرشیو اسناد
+      </button>
+      <button class="nav-item" data-tab="instances">
+        <svg class="ni ni-search" viewBox="0 0 24 24"><g class="sr-bob"><g class="sr-mag"><circle class="sr-glass" cx="11" cy="11" r="8"/><line class="sr-handle" x1="21" y1="21" x2="16.65" y2="16.65"/><circle class="sr-dot" cx="11" cy="11" r="0"/></g></g></svg>
+        ردیابی قطعات تولیدی
       </button>
       <button class="nav-item adminOnly" data-tab="trash">
         <svg class="ni ni-trash" viewBox="0 0 24 24"><path class="tr-can" d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><line class="tr-b1" x1="10" y1="11" x2="10" y2="17"/><line class="tr-b2" x1="14" y1="11" x2="14" y2="17"/><g class="tr-lid"><polyline points="3 6 5 6 21 6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></g></svg>
@@ -306,7 +310,7 @@
           <div class="arch-search">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="aSearch" placeholder="شماره سند، مشتری، نوع، عنوان خودکار…" oninput="renderArchive()">
-            <button type="button" class="icon-btn sm arch-filter-btn" id="archFilterBtn" title="افزودنِ فیلتر" onclick="filtToggleMenu(event,'archFilterBtn')">
+            <button type="button" class="icon-btn sm arch-filter-btn" id="archFilterBtn" title="افزودنِ فیلتر" onclick="filtToggleMenu(event,'archFilterBtn','arch')">
               <svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
             </button>
           </div>
@@ -341,6 +345,18 @@
     </section>
 
     <!-- ---------- سطل زباله (اسنادِ حذف‌شده) ---------- -->
+    <!-- ---------- ردیابیِ قطعاتِ تولیدی ---------- -->
+    <section id="tab-instances" class="tabpane hidden">
+      <div class="card">
+        <h3 class="spec-sec-t">
+          <svg viewBox="0 0 24 24"><g class="sr-bob"><g class="sr-mag"><circle class="sr-glass" cx="11" cy="11" r="8"/><line class="sr-handle" x1="21" y1="21" x2="16.65" y2="16.65"/><circle class="sr-dot" cx="11" cy="11" r="0"/></g></g></svg>
+          ردیابی قطعات تولیدی
+          <span class="sec-act"><button id="instAddBtn" class="btn sm add-btn" onclick="openInstanceModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>ثبت قطعهٔ تولیدی</button></span>
+        </h3>
+        <div id="instBody"></div>
+      </div>
+    </section>
+
     <section id="tab-trash" class="tabpane hidden">
       <div class="card">
         <h3 class="spec-sec-t">
@@ -379,22 +395,32 @@
     <!-- ---------- تنظیمات سامانه ---------- -->
     <section id="tab-data" class="tabpane hidden">
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات<span class="sec-act"><button class="btn sm add-btn" onclick="openPartModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>قطعه جدید</button></span></h3>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات<span class="sec-act"><button class="icon-btn" title="قطعه جدید" aria-label="قطعه جدید" onclick="openPartModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table parts-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی قطعه</th><th class="c-mid"><span class="en-shift">نام انگلیسی قطعه</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partsBody"></tbody></table></div>
       </div>
 
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد<span class="sec-act"><button class="btn sm add-btn" onclick="openDocTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>سند جدید</button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی سند</th><th class="c-mid"><span class="en-shift">نام انگلیسی سند</span></th><th class="c-mid"><span class="unit-shift">کد سند</span></th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody"></tbody></table></div>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد<span class="sec-act"><button class="icon-btn" title="سند جدید" aria-label="سند جدید" onclick="openDocTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
+        <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی سند</th><th class="c-mid"><span class="en-shift">نام انگلیسی سند</span></th><th class="c-mid"><span class="unit-shift">کد سند</span></th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات<span class="sec-act"><button class="btn sm add-btn" onclick="openPartModModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>پارامتر جدید</button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی پارامتر</span></th><th class="c-mid"><span class="unit-shift">واحد</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody"></tbody></table></div>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات<span class="sec-act"><button class="icon-btn" title="پارامتر جدید" aria-label="پارامتر جدید" onclick="openPartModModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
+        <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی پارامتر</span></th><th class="c-mid"><span class="unit-shift">واحد</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
       <div class="card">
-        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران سامانه<span class="sec-act"><button class="btn sm add-btn" onclick="openUserModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>کاربر جدید</button></span></h3>
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M16 3h1.5a2 2 0 0 1 1.7.95L22 8v8a1 1 0 0 1-1 1h-1"/><path d="M16 17H9"/><rect x="1" y="3" width="15" height="14" rx="2"/><circle cx="6.5" cy="19.5" r="2"/><circle cx="18.5" cy="19.5" r="2"/></svg>تأمین‌کنندگان مواد خام<span class="sec-act"><button class="icon-btn" title="تأمین‌کننده جدید" aria-label="تأمین‌کننده جدید" onclick="openSupplierModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
+        <div class="tablewrap"><table class="mgmt-table suppliers-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="suppliersBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
+      </div>
+
+      <div class="card">
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/></svg>انواع مادهٔ خام<span class="sec-act"><button class="icon-btn" title="نوع مادهٔ خام جدید" aria-label="نوع مادهٔ خام جدید" onclick="openRawTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
+        <div class="tablewrap"><table class="mgmt-table rawtypes-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="rawtypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
+      </div>
+
+      <div class="card">
+        <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران سامانه<span class="sec-act"><button class="icon-btn" title="کاربر جدید" aria-label="کاربر جدید" onclick="openUserModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="users-table"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp open" aria-expanded="true" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام و نام خانوادگی کاربر</span></th><th class="c-mid"><span class="en-shift">نام کاربری</span></th><th>سمت</th><th>نقش</th><th><span class="act-h">عملیات</span></th></tr></thead><tbody id="usersBody"></tbody></table></div>
       </div>
     </section>
@@ -429,6 +455,26 @@
   </div>
 </div>
 
+<!-- ============ مودال ثبت قطعهٔ تولیدیِ جدید (همان ویزاردِ ریلِ کد) ============ -->
+<div id="newInstModal" class="modal hidden" onclick="if(event.target===this)closeNewInstModal()">
+  <div class="box newdoc-box">
+    <header><strong id="iwTitle">ثبت قطعهٔ تولیدیِ جدید</strong>
+      <button class="modal-x" onclick="closeNewInstModal()" aria-label="بستن" title="بستن">✕</button></header>
+    <div class="body"><div class="newdoc-body">
+      <!-- ریلِ افقیِ کد: بالای بدنه، ثابت (خارج از ناحیهٔ اسکرول) -->
+      <div class="nd-rail" id="iwRail"></div>
+      <div class="nd-scroll" id="iwScroll">
+        <div class="nd-stage" id="iwStage"></div>
+        <div class="nd-final" id="iwFinal" hidden></div>
+        <div class="nd-spacer" id="iwSpacer" aria-hidden="true"></div>
+      </div>
+      <!-- ورودی‌های مخفیِ مقدارِ ایستگاه‌ها (موتورِ ویزارد با همین idها کار می‌کند) -->
+      <input type="hidden" id="iwC"><input type="hidden" id="iwO">
+      <input type="hidden" id="iwP"><input type="hidden" id="iwPart">
+    </div></div>
+  </div>
+</div>
+
 <div id="modalHost"></div>
 <div id="toastHost"></div>
 <div id="loadingOverlay" class="loading-overlay hidden">
@@ -446,12 +492,15 @@
 <script src="scripts/selects.js"></script>
 <script src="scripts/dashboard.js"></script>
 <script src="scripts/documents.js"></script>
+<script src="scripts/wizard.js"></script>
+<script src="scripts/filters.js"></script>
 <script src="scripts/archive.js"></script>
 <script src="scripts/downloads.js"></script>
 <script src="scripts/docmodal.js"></script>
 <script src="scripts/review.js"></script>
 <script src="scripts/projects.js"></script>
 <script src="scripts/help.js"></script>
+<script src="scripts/instances.js"></script>
 <script src="scripts/settings.js"></script>
 <script src="scripts/app.js"></script>
 </body>

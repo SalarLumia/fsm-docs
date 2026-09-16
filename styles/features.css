@@ -122,6 +122,7 @@
   font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.14s}
 .af-tab:hover{border-color:var(--brand);color:var(--brand)}
 .af-tab.on{border-color:var(--brand);background:#fff3e6;color:var(--brand);font-weight:700}
+.af-tab.on,.af-tab.xf-out{transition:all .14s,border-color var(--xf-t),background-color var(--xf-t),color var(--xf-t)}
 /* دکمهٔ «بارگذاریِ نسخهٔ جدید» وقتی سند در حالِ بازبینی است: خاکستری، ولی کلیک‌پذیر (برای نمایشِ پیامِ راهنما) */
 .dm-act-disabled{color:var(--muted);background:var(--panel);border-color:var(--line);cursor:pointer}
 .dm-act-disabled:hover{color:var(--muted);background:var(--panel);border-color:var(--line)}
@@ -233,9 +234,13 @@
 .ver-row{position:relative;z-index:0;cursor:pointer;padding:10px 12px}
 /* هم‌منطقِ .nav-item سایدبار: هاور خاکستریِ خنثی، انتخاب نارنجی.
    ⚠ تمام‌عرض (right/left:0) تا نوارِ نارنجی دقیقاً روی لبهٔ راستِ همین کادر بنشیند. */
-.ver-row:hover::before,.ver-row.sel::before{content:"";position:absolute;z-index:-1;
-  top:0;bottom:0;right:0;left:0;border-radius:9px;pointer-events:none;
-  background:var(--panel)}
+/* ⚠ لایه همیشه ساخته می‌شود (شفاف)، نه فقط هنگامِ هاور/انتخاب: شبه‌عنصری که تازه
+   ساخته شود حالتِ قبلی ندارد و پس‌زمینه‌اش نمی‌تواند محو/ظاهر شود. */
+.ver-row::before{content:"";position:absolute;z-index:-1;
+  top:0;bottom:0;right:0;left:0;border-radius:9px;pointer-events:none;background:transparent}
+.ver-row:hover::before{background:var(--panel)}
+/* کراس‌فید فقط روی انتخاب و خروج از انتخاب (.xf-out)؛ هاور آنی می‌ماند */
+.ver-row.sel::before,.ver-row.xf-out::before{transition:background-color var(--xf-t)}
 /* سلولِ انتخاب‌شده هاورِ جداگانه ندارد: نارنجی در هر حالتی ثابت می‌ماند، وگرنه
    تغییرِ تُن هنگامِ هاور مثلِ دو لایهٔ روی هم دیده می‌شود. */
 .ver-row.sel::before,.ver-row.sel:hover::before{background:#fff3e6}
@@ -584,8 +589,11 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* هاور و انتخاب، هر دو با همان کارتِ نارنجیِ گوشه‌گردِ شناور (هم‌سبک با آرشیو/جدول‌های تنظیمات)؛
    تفاوتِ سلولِ انتخاب‌شده فقط خطِ عمودیِ کنارش است، نه پس‌زمینهٔ متفاوت. */
 .cp-client-item:hover,.cp-client-item.sel{background:transparent}
-.cp-client-item:hover::before,.cp-client-item.sel::before{content:"";position:absolute;z-index:-1;background:#fff3e6;
+/* ⚠ لایه همیشه ساخته می‌شود (شفاف) تا پس‌زمینه‌اش بتواند محو/ظاهر شود؛ همان منطقِ .ver-row */
+.cp-client-item::before{content:"";position:absolute;z-index:-1;background:transparent;
   top:4px;bottom:4px;right:8px;left:8px;border-radius:12px;pointer-events:none}
+.cp-client-item:hover::before,.cp-client-item.xf-hov::before,.cp-client-item.sel::before{background:#fff3e6}
+.cp-client-item.sel::before,.cp-client-item.xf-out::before{transition:background-color var(--xf-t)}
 /* لوگو (و به‌تبعِ آن نام/نامِ لاتینِ کنارش، چون هم‌فرزندِ فلکس‌اند) ۴px به چپ می‌رود تا فاصلهٔ افقیِ لوگو-خط از ۲px به ۶px برسد؛
    خودِ خط ثابت می‌ماند (right:8px بدونِ تغییر) */
 .cp-client-item .cp-logo{margin-inline-start:4px}
@@ -636,11 +644,21 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .cp-empty-hint{font-size:12.5px;color:var(--muted);padding:8px 2px}
 
 /* نوار سفارش‌ها (فشرده) */
-.cp-order-strip{display:flex;flex-wrap:wrap;gap:10px}
-.cp-order-card{position:relative;width:190px;min-height:112px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;
+/* تیترِ سکشن‌های پنلِ مشتری با یا بدونِ دکمهٔ + هم‌قد است (۳۰px دکمه + ۱۲px پدینگ)،
+   تا وقتی دکمهٔ + سفارش (مضربِ ۵) می‌آید/می‌رود کارت‌ها جابه‌جا نشوند */
+.cp-section>.spec-sec-t{min-height:42px}
+/* گریدِ ۵ستونه با عرضِ روان: هر ستون دقیقاً یک‌پنجمِ عرض (منهای ۴ فاصله) است، پس در صفحه‌های
+   استاندارد همیشه ۵ کارت کنارِ هم می‌نشیند و فاصله‌ها ثابت (۱۰px) می‌مانند. کفِ ۱۵۰px فقط در
+   ظرف‌های باریک عمل می‌کند و تعدادِ ستون را کم می‌کند. ⚠ ‎41px به‌جای 40px: با 40 گردکردنِ اعشار
+   گاهی جا را برای ستونِ پنجم ۰٫۰۰۱px کم می‌آورد و ردیف ۴تایی می‌شد.
+   قانونِ «مضربِ ۵ = بدونِ باکسِ سفارشِ جدید» (ordersSectionHTML) به همین ۵ستونه بودن تکیه دارد. */
+.cp-order-strip{display:grid;grid-template-columns:repeat(auto-fill,minmax(max(150px,calc((100% - 41px) / 5)),1fr));gap:10px}
+.cp-order-card{position:relative;min-width:0;min-height:112px;border:1px solid var(--line);border-radius:11px;padding:11px 12px;
   cursor:pointer;transition:.14s;background:#fafafa;display:flex;flex-direction:column}
-.cp-order-card:hover{background:#fff8f0}   /* فقط پس‌زمینه؛ کادر تغییرِ رنگ ندارد */
-.cp-order-card.sel{border-color:var(--brand);background:#fff8f0}   /* حالتِ فعال/انتخاب‌شده: کادر نارنجی می‌شود (بدونِ سایه‌ای که از کادر بیرون بزند) */
+.cp-order-card:hover,.cp-order-card.xf-hov{background:#fff8f0}   /* فقط پس‌زمینه؛ کادر تغییرِ رنگ ندارد */
+.cp-order-card.sel{border-color:var(--brand);background:#fff8f0}
+/* کراس‌فید: فقط کادرِ نارنجی کندتر می‌آید/می‌رود؛ بقیهٔ گذارهای کارت همان ۰٫۱۴ ثانیه */
+.cp-order-card.sel,.cp-order-card.xf-out{transition:all .14s,border-color var(--xf-t),background-color var(--xf-t)}   /* حالتِ فعال/انتخاب‌شده: کادر نارنجی می‌شود (بدونِ سایه‌ای که از کادر بیرون بزند) */
 .coc-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .coc-title{font-size:13px;font-weight:700;color:var(--txt)}
 .coc-acts{display:flex;gap:3px;opacity:0;transition:.12s}
@@ -649,10 +667,10 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* شمارهٔ پروژه‌ها و تاریخ ایجاد همیشه به لبهٔ پایینِ کارت می‌چسبند
    (کارت‌های یک ردیف هم‌ارتفاع‌اند، پس این خط در همه هم‌تراز می‌شود) */
 .coc-meta{font-size:11.5px;color:var(--muted);margin-top:auto;padding-top:6px}
-/* کارتِ «سفارش جدید» دقیقاً هم‌اندازهٔ کارتِ سفارشِ پُر است: همان عرض (۱۹۰)، padding و حداقل‌ارتفاعِ استاندارد (۱۱۲).
+/* کارتِ «سفارش جدید» دقیقاً هم‌اندازهٔ کارتِ سفارشِ پُر است: همان ستونِ گرید، padding و حداقل‌ارتفاعِ استاندارد (۱۱۲).
    min-height باعث می‌شود حتی در حالتِ خالی (بدونِ سفارش، بدونِ هم‌ردیف) هم اندازهٔ استاندارد بماند؛
    و وقتی سفارشِ پُری هست، چون هم‌ردیفِ flex‌اند (align-items:stretch) به قدِ آن‌ها کشیده می‌شود. */
-.cp-order-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;width:190px;min-height:112px;
+.cp-order-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:112px;
   border:1.5px dashed var(--line);border-radius:11px;background:none;cursor:pointer;color:var(--muted);
   font-family:inherit;font-size:12px;font-weight:600;transition:.14s;padding:11px 12px}
 .cp-order-add:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
@@ -723,6 +741,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
   display:grid;place-items:center;cursor:pointer;transition:.12s;padding:0;line-height:1}
 .av-opt:hover{border-color:var(--brand);background:#fff8f0}
 .av-opt.sel{border-color:var(--brand);background:#fff3e6;box-shadow:0 0 0 3px #f7941f22}
+.av-opt.sel,.av-opt.xf-out{transition:all .12s,border-color var(--xf-t),background-color var(--xf-t),box-shadow var(--xf-t)}
 
 /* ===== پنلِ کاربران: جدولِ اعضا + تگِ نقش ===== */
 /* سلولِ کاربر: آواتار + نام (نامِ کاربری ستونِ جداگانه دارد) */
@@ -754,6 +773,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
    رفتارِ hover و focus از دکمهٔ دایره‌ایِ قبلی (.ed-check) به همین‌جا منتقل شد. */
 .av-toggle{border:none;padding:0;cursor:pointer;font:inherit;-webkit-appearance:none;appearance:none;transition:box-shadow .15s,opacity .2s}
 .av-toggle.on{box-shadow:inset 0 0 0 2px var(--brand)}
+.av-toggle.on,.av-toggle.xf-out{transition:box-shadow var(--xf-t),opacity .2s}
 .av-toggle:hover:not(.on){box-shadow:inset 0 0 0 2px #f7941f66}
 .av-toggle:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--brand)}
 /* لرزشِ خطا (اقدامِ غیرمجاز؛ مثلِ قفلِ مدیرِ اصلی) */
@@ -1324,12 +1344,18 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .seg-btn:first-child{border-inline-start:none}
 .seg-btn:hover{background:#f6f5f3;color:var(--txt)}
 .seg-btn.on{background:var(--brand);color:#fff;font-weight:600}
+.seg-btn.on,.seg-btn.xf-out{transition:all .15s,background-color var(--xf-t),color var(--xf-t)}
 /* رمز عبور با دکمهٔ نمایش/مخفی */
 .pass-wrap{position:relative;display:flex}
 .pass-wrap input{flex:1;padding-inline-end:40px}
 .pass-eye{position:absolute;inset-inline-end:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;
   display:grid;place-items:center;border:none;background:none;cursor:pointer;color:var(--muted);border-radius:7px;transition:.12s}
-.pass-eye svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pass-eye svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;
+  grid-area:1/1;transition:opacity var(--xf-t),transform var(--xf-t)}
+/* کراس‌فیدِ دو آیکون در یک خانهٔ گرید: چشمِ باز محو و کوچک می‌شود، چشمِ خط‌خورده ظاهر */
+.pass-eye .eye-off{opacity:0;transform:scale(.6) rotate(-25deg)}
+.pass-eye.on .eye-on{opacity:0;transform:scale(.6) rotate(25deg)}
+.pass-eye.on .eye-off{opacity:1;transform:none}
 .pass-eye:hover{background:var(--panel);color:var(--txt)}
 .pass-eye.on{color:var(--brand)}
 /* اکشن‌های پایینِ مودال */
@@ -1337,3 +1363,52 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .um-actions .btn.primary{min-width:150px;justify-content:center}
 
 /* ===== صفحهٔ راهنما (فعلاً جای‌نگه‌دار؛ محتوای گام‌به‌گام بعداً اضافه می‌شود) ===== */
+
+/* کاهشِ حرکت: کراس‌فیدهای انتخاب خاموش (کلاسِ .xf-out هم در این حالت اثری ندارد) */
+@media(prefers-reduced-motion:reduce){
+  .ver-row.sel::before,.ver-row.xf-out::before,.cp-client-item.sel::before,.cp-client-item.xf-out::before,
+  .cp-order-card.sel,.cp-order-card.xf-out,.af-tab.on,.af-tab.xf-out,.seg-btn.on,.seg-btn.xf-out,
+  .av-opt.sel,.av-opt.xf-out,.av-toggle.on,.av-toggle.xf-out,.pass-eye svg{transition:none}}
+
+/* ═══ ترتیبِ پیش‌فرض در جدول‌های «انواع اسناد» و «پارامترها» ═══
+   دستهٔ کشیدن کنارِ دکمه‌های عملیات؛ ستونِ عملیاتِ این دو جدول برای جای آن پهن‌تر است. */
+.doctypes-tbl th.col-act,.doctypes-tbl td.col-act,.partmods-tbl th.col-act,.partmods-tbl td.col-act{width:122px}
+.mgmt-table .mg-grip{align-self:center;height:28px;border-radius:6px}
+.mgmt-table tbody tr.mg-dragging{opacity:.4}
+.mgmt-table tbody tr.mg-dragging>td{background:#fff8f0}
+
+
+/* ═══════════════ ردیابیِ نمونه‌های فیزیکی ═══════════════ */
+.inst-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.inst-bar .arch-search{flex:1 1 260px;min-width:220px}
+.inst-sel{flex:0 0 auto;width:auto;min-width:190px;height:38px;border:1px solid var(--line);border-radius:9px;background:#fff;
+  font:inherit;font-size:12.5px;color:var(--txt);padding:0 10px;cursor:pointer}
+.inst-seg{flex-shrink:0}
+.inst-count{font-size:11.5px;font-weight:600;color:var(--muted);margin-inline-start:auto}
+.inst-tbl td{vertical-align:middle}
+.inst-code{display:flex;flex-direction:column;gap:2px}
+/* کدِ نمونه هرگز نمی‌شکند: یک شناسه است و شکستنش خواندنش را سخت می‌کند */
+.inst-num{font-size:12.5px;font-weight:700;color:var(--txt);direction:ltr;text-align:right;white-space:nowrap}
+.inst-tbl th:first-child,.inst-tbl td:first-child{width:200px}
+.inst-id{font-size:11px;color:var(--muted);direction:ltr;text-align:right}
+.inst-part{display:flex;flex-direction:column;gap:2px}
+.inst-proj{font-size:11px;color:var(--muted)}
+.inst-row.st-rejected .inst-num,.inst-row.st-rejected .nm-fa{opacity:.6}
+/* قطعهٔ ریجکت‌شده کم‌رنگ است ولی حذف نمی‌شود: سابقه‌اش بخشی از ردیابی است */
+.inst-ctx{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--panel);border:1px solid var(--line);
+  border-radius:9px;margin-bottom:12px;font-size:12.5px}
+.inst-ctx-code{margin-inline-start:auto;direction:ltr;font-size:11.5px;color:var(--muted)}
+/* ردیفِ «نمونه‌های تولیدشده» در کارتِ قطعه */
+.pi-row{cursor:pointer}
+.pi-row:hover .pi-main{color:var(--brand)}
+.pi-val{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.pi-main{font-weight:600}
+.pi-main.warn{color:var(--err)}
+.pi-extra{font-size:11px;color:var(--muted)}
+
+/* دنبالهٔ «(1 of 2 approved)» کنارِ مقدارِ پارامترِ «تعداد» — دکمه‌ای کم‌رنگ که به بخشِ ردیابی می‌برد.
+   عمداً دکمه است نه بخشی از متن: کلیک روی خودِ عدد باید ویرایشِ درجا را باز کند، نه ناوبری. */
+.pi-chip{border:none;background:none;padding:0 2px;font:inherit;font-size:11.5px;color:var(--muted);
+  cursor:pointer;transition:color .12s}
+.pi-chip:hover{color:var(--brand);text-decoration:underline}
+.pi-chip.warn{color:var(--err)}

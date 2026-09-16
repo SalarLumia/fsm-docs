@@ -67,6 +67,7 @@ function switchTab(name){
   if(name==="dashboard") renderDashboard(true);   // آرگومان true → شمارشِ عددیِ کارت‌های شاخص
   if(name==="project") renderProjectTab();
   if(name==="trash" && typeof renderTrash==="function") renderTrash();
+  if(name==="instances" && typeof renderInstances==="function") renderInstances();
   if(name==="help" && typeof renderHelp==="function") renderHelp();
   /* رزروِ ارتفاعِ آرشیو با اندازه‌گیریِ واقعی حساب می‌شود و اندازه‌گیری روی تبِ
      پنهان صفر برمی‌گرداند؛ پس با ورود به تب یک‌بار دوباره حساب می‌شود. */

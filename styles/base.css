@@ -44,3 +44,6 @@ button:focus-visible,a:focus-visible,select:focus-visible,[tabindex]:focus-visib
 .hidden{display:none!important}
 .mono{font-variant-numeric:tabular-nums;letter-spacing:.5px}
 .muted{color:var(--muted)}
+
+/* لحظهٔ برگشتِ بی‌گذار در بازپخشِ کراس‌فید (xfReplayAll در state.js) — فقط برای یک reflow روی عنصر است */
+.xf-snap,.xf-snap::before,.xf-snap::after{transition:none!important}

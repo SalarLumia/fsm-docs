@@ -16,6 +16,11 @@ body.modal-open #appView{overflow:hidden}
   /* تورفتگیِ باکسِ نارنجیِ حالتِ فعال و جایِ نوارِ لبه — تا با خطِ راهنمایِ
      عمودیِ درخت (که روی مرکزِ آیکون است) تداخل نکند. */
   --nav-pad:7px; --nav-ind:3px}
+/* اسکرول هست ولی نوارش دیده نمی‌شود: نوارِ روشنِ پیش‌فرض روی سایدبارِ ذغالی
+   وصله‌ای به نظر می‌رسد و با باز/بسته شدنِ درختِ پروژه‌ها ظاهر و ناپدید می‌شود.
+   چرخِ موس، درگ و کیبورد دست‌نخورده‌اند. */
+.sb-nav{scrollbar-width:none;-ms-overflow-style:none}
+.sb-nav::-webkit-scrollbar{width:0;height:0}
 .sb-divider{height:1px;background:rgba(255,255,255,0.08);margin:6px 8px}
 /* امضای توسعه‌دهنده در پایین منو، بالای خط جداکنندهٔ تنظیمات/خروج — ریزتر از آیتم‌های منو */
 .sb-dev{padding:8px 14px 10px;display:flex;flex-direction:column;gap:2px;text-align:center}
@@ -38,6 +43,19 @@ body.modal-open #appView{overflow:hidden}
   transform:translateY(-50%) translateX(6px) scaleY(0);
   transition:transform .28s cubic-bezier(.2,0,0,1)}
 .nav-item.active::before{transform:translateY(-50%) translateX(0) scaleY(1)}
+/* ═══ کراس‌فیدِ انتخاب ═══
+   رنگِ آیکون و متن هنگامِ انتخاب‌شدن از سفید به نارنجی حل می‌شود و هنگامِ خروج
+   برعکس — هم‌زمان و هم‌منحنی با کشیده‌شدنِ نشانگرِ لبه (۰٫۲۸ ثانیه)، پس سه تغییر
+   یک حرکت دیده می‌شوند. آیکون stroke:currentColor است و خودش همراهِ color گذار می‌کند.
+   ⚠ گذار عمداً فقط روی .active و .leaving است، نه روی قاعدهٔ پایه یا :hover — چون
+   گذار مقدارِ حالتِ *مقصد* را می‌خواند، هر گذاری روی پایه باعث می‌شد هاور هنگامِ
+   خروجِ موس بماند (همان ایرادی که در آرشیو با آنی‌کردنِ هاور رفع شد).
+   ⚠ فقط color، نه background: موس هنگامِ کلیک روی دکمه است، پس گذارِ پس‌زمینه روی
+   .active یعنی تیره‌شدنِ هاورِ دکمهٔ فعال هم با تأخیر برگردد. پس‌زمینه یک تهِ‌رنگِ
+   ۱۴٪ است و پرشش به چشم نمی‌آید؛ تغییرِ برجسته همان سفید ← نارنجیِ آیکون است.
+   .leaving را nav.js هنگامِ از دست دادنِ انتخاب ۵۲۰ms روی دکمه می‌گذارد. */
+.nav-item.active,.nav-item.leaving{transition:color .28s cubic-bezier(.2,0,0,1)}
+@media(prefers-reduced-motion:reduce){.nav-item.active,.nav-item.leaving{transition:none}}
 .nav-item.nav-logout{color:#ef4444}
 .nav-item.nav-logout:hover{background:rgba(239,68,68,0.16);color:#ff5c5c}
 .role-chip{font-size:11px;padding:3px 12px;border-radius:20px;background:#fff3e6;border:1px solid #f7941f44;color:var(--brand);font-weight:500;white-space:nowrap}
@@ -221,6 +239,22 @@ main{max-width:none;margin:0;padding:0}
    محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالاییِ خودِ پنل است. */
 .ni-folder .fd-lid{transform-origin:50% 0;transform:scaleY(.55);opacity:0}
 .nav-item.active .ni-folder .fd-lid{opacity:1;transform:scaleY(1) rotate(-4deg)}
+
+/* مشتریان و پروژه‌ها: کارخانه — در حالتِ عادی خاموش است؛ با انتخاب، پنجره‌ها
+   پلکانی روشن می‌شوند و دودِ کوره بالا می‌رود («کارخانه راه افتاد»).
+   گذارها از قاعدهٔ عمومیِ .nav-item .ni * می‌آیند، پس خروج هم خودکار برعکس می‌شود. */
+.ni-clients .cl-w1,.ni-clients .cl-w2,.ni-clients .cl-w3{opacity:.35;transform:scale(.7)}
+.nav-item.active .ni-clients .cl-w1,
+.nav-item.active .ni-clients .cl-w2,
+.nav-item.active .ni-clients .cl-w3{opacity:1;transform:scale(1)}
+.nav-item.active .ni-clients .cl-w2{transition-delay:.05s}
+.nav-item.active .ni-clients .cl-w3{transition-delay:.1s}
+/* دود: از دهانهٔ کوره بالا می‌رود و محو می‌شود */
+.ni-clients .cl-smoke{opacity:0;transform:translateY(3px)}
+.nav-item.active .ni-clients .cl-smoke{opacity:1;transform:translateY(0);transition-delay:.08s}
+@media(prefers-reduced-motion:reduce){
+  .ni-clients .cl-w1,.ni-clients .cl-w2,.ni-clients .cl-w3{opacity:1;transform:none}
+  .ni-clients .cl-smoke{opacity:0}}
 
 /* آرشیو: ذره‌بین دو بار «می‌گردد» — پایین می‌رود، به چپ کج می‌شود، به راست
    برمی‌گردد و صاف می‌ایستد — و هم‌زمان نقطه‌ای داخلِ شیشه باز می‌شود، می‌ماند

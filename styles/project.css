@@ -311,6 +311,8 @@ button.doc-ic:disabled{cursor:default}
 .mv-tools.expanded .mv-tool{align-self:stretch}
 .mv-tool:hover{background:#fff2e2;color:var(--brand2)}
 .mv-tool.on{color:var(--brand2)}
+/* فقط رنگ کند می‌شود؛ پس‌زمینهٔ هاور همان ۰٫۱۴ ثانیه می‌ماند تا هنگامِ خروجِ موس نماند */
+.mv-tool.on,.mv-tool.xf-out{transition:background .14s,color var(--xf-t)}
 .mv-burger{align-self:stretch;border-bottom:1px solid var(--line);border-radius:0}
 
 /* منوی انتخابِ قطعه — قرینهٔ تولباکس در گوشهٔ چپ؛ همان شیشه/سایز/فونت، فقط جهت آینه‌ای.
@@ -332,8 +334,10 @@ button.doc-ic:disabled{cursor:default}
   transition:max-width .18s,opacity .18s,padding .18s}
 .mv-picker.expanded .mv-pick-lab{max-width:160px;opacity:1;padding-right:8px}
 .mv-picker.expanded .mv-pick{align-self:stretch}
-.mv-pick:hover{background:#fff2e2;color:var(--brand2)}
+.mv-pick:hover,.mv-pick.xf-hov{background:#fff2e2;color:var(--brand2)}
 .mv-pick.on{color:var(--brand2);background:#fff2e2}
+.mv-pick.on,.mv-pick.xf-out{transition:background-color var(--xf-t),color var(--xf-t)}
+@media(prefers-reduced-motion:reduce){.mv-tool.on,.mv-tool.xf-out,.mv-pick.on,.mv-pick.xf-out{transition:none}}
 .mv-pick-hd{align-self:stretch;border-bottom:1px solid var(--line);border-radius:0}
 /* برچسبِ نامِ انگلیسیِ قطعه در مودالِ سند (گوشهٔ بالا-چپ) — هم‌سبکِ منوی شیشه‌ایِ ابزار/انتخاب */
 .mv-partbadge{position:absolute;top:12px;left:12px;z-index:5;direction:ltr;display:flex;align-items:center;gap:7px;
@@ -398,11 +402,11 @@ button.doc-ic:disabled{cursor:default}
 /* کلیدِ روشن/خاموشِ استاندارد (دایرهٔ برند) */
 .sp-dot{position:relative;width:20px;height:20px;border-radius:50%;border:2px solid #d4d3ce;background:#fff;
   cursor:pointer;flex-shrink:0;padding:0;justify-self:center;transition:.15s}
-.sp-dot::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+.sp-dot::after{content:"";position:absolute;inset:0;margin:auto;transform:scale(0);   /* مرکزیابی مثلِ .ed-check */
   width:8px;height:8px;border-radius:50%;background:#fff;transition:transform .15s}
 .sp-dot:hover:not(.on){border-color:var(--brand);background:#fff2e2}
 .sp-dot.on{border-color:var(--brand);background:var(--brand)}
-.sp-dot.on::after{transform:translate(-50%,-50%) scale(1)}
+.sp-dot.on::after{transform:scale(1)}
 .sp-del{width:28px;height:28px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--muted);
   display:grid;place-items:center;cursor:pointer;justify-self:center;transition:.12s}
 .sp-del:hover{border-color:var(--err);color:var(--err);background:var(--err-bg)}
@@ -431,6 +435,16 @@ button.doc-ic:disabled{cursor:default}
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .ed-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .ed-count{margin-inline-start:auto;font-size:11.5px;font-weight:500;color:var(--muted)}
+/* «ترتیب پیش‌فرض» — دکمهٔ آیکونیِ هم‌اندازهٔ .icon-btn.sm در انتهای عنوانِ کارت.
+   خاکستریِ کم‌رنگ = ترتیب همان پیش‌فرض است (بی‌اثر)؛ .is-on = ترتیبِ اختصاصی دارد و قابلِ کلیک است. */
+.ed-reset{display:inline-grid;place-items:center;width:26px;height:26px;padding:0;margin-inline-start:auto;flex-shrink:0;
+  border:1px solid #eeede9;border-radius:7px;background:#fff;color:#cfcdc8;cursor:default;
+  transition:color .12s,border-color .12s,background .12s}
+.ed-count+.ed-reset{margin-inline-start:10px}
+.ed-part-dd+.ed-reset{margin-inline-start:8px}
+.ed-reset.is-on{border-color:var(--line);color:var(--txt);cursor:pointer}
+.ed-reset.is-on:hover{color:var(--brand);border-color:var(--brand);background:#fff8f0}
+.ed-reset svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* ردیفِ چک‌لیست: دایرهٔ روشن/خاموش + نامِ فارسی + کدِ لاتین (+ حذف در ماژول‌ها) */
 .ed-doc-row{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) 0;border-bottom:1px solid #f2f1ee}
 .ed-doc-row:last-child{border-bottom:none}
@@ -448,12 +462,15 @@ button.doc-ic:disabled{cursor:default}
 /* دایرهٔ حالت‌دارِ استاندارد (برند) */
 .ed-check{position:relative;width:16px;height:16px;border-radius:50%;border:2px solid #d4d3ce;background:#fff;
   cursor:pointer;flex-shrink:0;padding:0;transition:border-color .15s,background .15s,box-shadow .15s}
-.ed-check::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);
+/* ⚠ مرکزیابی با inset:0 + margin:auto، نه top:50% + translate(-50%): در دایرهٔ ۱۳پیکسلیِ منوی فیلتر
+   top:50% به ۴٫۵px می‌رسید و translate به −۲٫۵px؛ مرورگر این دو نیم‌پیکسل را جدا گرد می‌کرد و نقطهٔ
+   سفید یک پیکسل از مرکز می‌لغزید. با margin:auto جای نقطه در خودِ چیدمان حل می‌شود و فقط scale می‌ماند. */
+.ed-check::after{content:"";position:absolute;inset:0;margin:auto;transform:scale(0);
   width:6px;height:6px;border-radius:50%;background:#fff;transition:transform .15s}
-.ed-check:hover:not(.on){border-color:var(--brand);background:#fff2e2}
+.ed-check:hover:not(.on),.ed-check.xf-hov:not(.on){border-color:var(--brand);background:#fff2e2}
 .ed-check:focus-visible{outline:none;box-shadow:0 0 0 4px #f7941f40}
 .ed-check.on{border-color:var(--brand);background:var(--brand)}
-.ed-check.on::after{transform:translate(-50%,-50%) scale(1)}
+.ed-check.on::after{transform:scale(1)}
 /* دکمهٔ حذفِ ماژول */
 .ed-del{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--muted);
   display:grid;place-items:center;cursor:pointer;transition:.12s;padding:0;flex-shrink:0}
@@ -500,6 +517,10 @@ button.doc-ic:disabled{cursor:default}
 /* آیکونِ قفلِ نوعِ سندی که سند دارد (به‌جای کلمهٔ «قفل»)؛ نارنجیِ برند */
 .ed-lock-ic{display:inline-flex;align-items:center;flex-shrink:0}
 .ed-lock-ic svg{width:13px;height:13px;fill:none;stroke:var(--brand);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* قفلِ ردیفِ اجباری («کد قطعه») درست جای دستهٔ کشیدن می‌نشیند تا ستون‌ها هم‌تراز بمانند */
+.ed-fixed-lock{width:20px;justify-content:center;align-self:stretch}
+.ed-fixed .ed-check[disabled]{opacity:.7}
+.ed-fixed .ed-doc-code{direction:ltr}
 .ed-check[disabled]{opacity:.55;cursor:not-allowed}
 /* پاورقیِ پنل — همیشه به کفِ ناحیهٔ اسکرول چسبیده (مثلِ هدر که بالا ثابت است)،
    تا دکمه‌های ذخیره/انصراف در هر وضعیتِ اسکرول در دسترس بمانند. پس‌زمینهٔ کدر + خطِ بالایی

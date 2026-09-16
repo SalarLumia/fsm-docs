@@ -145,7 +145,7 @@ function openAddFormatModal(num){
 }
 function afPickKind(kind){
   _af.kind=kind; _af.file=null;
-  [].forEach.call(document.querySelectorAll(".af-tab"), function(b){ b.classList.toggle("on", b.getAttribute("data-kind")===kind); });
+  [].forEach.call(document.querySelectorAll(".af-tab"), function(b){ xfSet(b, "on", b.getAttribute("data-kind")===kind); });
   [].forEach.call(document.querySelectorAll(".af-zone"), function(z){ z.hidden = z.getAttribute("data-kind")!==kind; });
 }
 async function submitAddFormat(){
@@ -525,8 +525,8 @@ async function dmSelectVersion(num){
   var myToken=++_dpSeq;                      // این بارگذاری؛ اگر بارگذاریِ تازه‌تری بیاید، این یکی باید بی‌سروصدا کنار برود
   if(_dpEst){ _dpEst.stop(); _dpEst=null; }  // برآوردگرِ پیش‌نمایشِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
   // هایلایت ردیف انتخاب‌شده
-  var list=document.querySelectorAll(".ver-row"); for(var i=0;i<list.length;i++) list[i].classList.remove("sel");
-  var row=document.getElementById("ver-"+num); if(row) row.classList.add("sel");
+  var row=document.getElementById("ver-"+num);
+  var list=document.querySelectorAll(".ver-row"); for(var i=0;i<list.length;i++) xfSet(list[i],"sel",list[i]===row);
   // وضعیت دکمهٔ دانلود بر اساس ریویژنِ انتخاب‌شده
   var is3DSel=String(d.typeCode).toUpperCase().indexOf("3D")===0;
   if(is3DSel){ dmInit3DDownload(d); }
