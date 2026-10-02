@@ -342,7 +342,7 @@ function iwFinalHTML(){
       '<div class="nd-fstack">'+
         '<div class="um-row">'+
           '<div class="um-field"><label class="fld">تاریخ ورودِ مادهٔ خام</label>'+
-            '<input type="date" id="inDate" style="direction:ltr;text-align:left" value="'+esc(r?String(r.receivedAt||""):"")+'" oninput="instDateHint()">'+
+            dpFieldHTML("inDate", r?String(r.receivedAt||""):"", "instDateHint()")+   // شمسی/میلادی؛ مقدارِ ذخیره‌شده همچنان ISO
             '<span class="fld-hint" id="inDateFa"></span></div>'+
           '<div class="um-field"><label class="fld">شمارهٔ هیت / بچ</label>'+
             '<input id="inHeat" style="direction:ltr;text-align:left" placeholder="H-4471" value="'+esc(r?String(r.heatNumber||""):"")+'"></div>'+
@@ -403,11 +403,10 @@ document.addEventListener("keydown",function(e){
   if(wzIsOpen("newInstModal")) closeNewInstModal();
 });
 function instSel(id){ var el=document.getElementById(id); return el?el.value:""; }
-/* معادلِ شمسیِ تاریخِ انتخاب‌شده، زیرِ همان فیلد (تقویمِ مرورگر میلادی است) */
+/* زیرِ فیلدِ تاریخ: معادلش در تقویمی که کاربر انتخاب نکرده */
 function instDateHint(){
   var el=document.getElementById("inDateFa"); if(!el) return;
-  var v=instSel("inDate");
-  el.textContent=v?("معادلِ شمسی: "+instDateFa(v)):"";
+  el.textContent=dpEquivText(instSel("inDate"));   // معادل در تقویمِ دیگر (هر کدام که انتخاب نشده)
 }
 /* وضعیتِ سهمیهٔ همین قطعه: «۱ از ۲ تأییدشده» + هشدارِ عبور از سقف */
 function instQtyHint(){
