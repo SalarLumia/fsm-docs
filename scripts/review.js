@@ -1,15 +1,31 @@
 /* ================= گردش تأیید ================= */
+/* هر سه فرمان خوش‌بینانه‌اند (optimisticOp در documents.js): وضعیتِ تازه بی‌درنگ دیده
+   می‌شود و فرمان بی‌اورلی در پس‌زمینه می‌رود؛ اگر ناموفق شد، داده از سرور برمی‌گردد. */
+function reviewSubmitOp(num){
+  return optimisticOp(function(){ localDocSet(num,{status:"pending"}); localWf(num,"submitted",""); },
+    function(){ return api("submitForReview",{drawingNumber:num},{silent:true}); });
+}
+function reviewApproveOp(num){
+  return optimisticOp(function(){
+      localDocSet(num,{status:"approved", reviewedBy:ME.username, reviewedAt:new Date().toISOString(), reviewNote:""});
+      localWf(num,"approved","");
+    }, function(){ return api("approveDocument",{drawingNumber:num},{silent:true}); });
+}
+function reviewRejectOp(num, reason){
+  return optimisticOp(function(){
+      localDocSet(num,{status:"rejected", reviewedBy:ME.username, reviewedAt:new Date().toISOString(), reviewNote:reason});
+      localWf(num,"rejected",reason);
+    }, function(){ return api("rejectDocument",{drawingNumber:num, comment:reason},{silent:true}); });
+}
 async function submitReview(num){
-  var r=await api("submitForReview",{drawingNumber:num});
-  /* مودالِ جزئیات بسته نمی‌شود؛ refreshDocuments خودش آن را با وضعیتِ تازه بازرسم می‌کند */
-  if(r.ok){ toast("برای بازبینی ارسال شد"); await refreshDocuments(); }
-  else toast(r.message||"خطا",true);
+  /* مودالِ جزئیات بسته نمی‌شود؛ رسمِ دوبارهٔ داده خودش آن را با وضعیتِ تازه بازرسم می‌کند */
+  var r=await reviewSubmitOp(num);
+  if(r.ok) toast("برای بازبینی ارسال شد"); else toast(r.message||"خطا",true);
 }
 async function approveDoc(num){
   if(!(await uiConfirm("تأیید سند «"+num+"»؟",{okLabel:"تأیید"}))) return;
-  var r=await api("approveDocument",{drawingNumber:num});
-  if(r.ok){ toast("سند تأیید شد"); await refreshDocuments(); }
-  else toast(r.message||"خطا",true);
+  var r=await reviewApproveOp(num);
+  if(r.ok) toast("سند تأیید شد"); else toast(r.message||"خطا",true);
 }
 /* رد سند: مودال با باکس دلیل (اختیاری) */
 function rejectDoc(num){
@@ -26,10 +42,10 @@ function rejectDoc(num){
 async function confirmReject(num){
   var ta=document.getElementById("rejReason");
   var reason=ta?String(ta.value).trim():"";
-  var r=await api("rejectDocument",{drawingNumber:num, comment:reason});
   /* اول فرمِ رد بسته می‌شود (فقط لایهٔ رویی)؛ سپس جزئیاتِ زیرین با وضعیتِ تازه بازرسم می‌شود */
-  if(r.ok){ toast("سند رد شد"); closeModal(); await refreshDocuments(); }
-  else toast(r.message||"خطا",true);
+  closeModal();
+  var r=await reviewRejectOp(num, reason);
+  if(r.ok) toast("سند رد شد"); else toast(r.message||"خطا",true);
 }
 
 /* یک ردیف کارتابل بازبینی (مشترک بین داشبورد و پنجرهٔ «مشاهدهٔ همه») */
@@ -142,10 +158,11 @@ function openSingleReviewTray(num){
 function srtClose(){ var w=document.getElementById("srtHost"); if(w&&w.parentNode) w.parentNode.removeChild(w); }
 async function srtApprove(num){
   if(!(await uiConfirm("تأیید سند «"+num+"»؟",{okLabel:"تأیید"}))) return;
-  var r=await api("approveDocument",{drawingNumber:num});
-  if(!r.ok){ toast(r.message||"خطا",true); return; }
-  toast("سند تأیید شد"); srtClose(); await refreshDocuments();
+  srtClose();
+  var op=reviewApproveOp(num);   // رسمِ محلی همین حالا انجام شد
   if(typeof openDocDetail==="function") openDocDetail(num);
+  var r=await op;
+  if(r.ok) toast("سند تأیید شد"); else toast(r.message||"خطا",true);
 }
 function srtReject(num){
   var body='<div class="rej-box">'+
@@ -165,16 +182,19 @@ function srtReject(num){
   var close=function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); };
   var btns=wrap.querySelectorAll("[data-v]");
   for(var i=0;i<btns.length;i++){ (function(b){ b.addEventListener("click",function(){
-    var ok=b.getAttribute("data-v")==="1"; close(); if(ok) srtConfirmReject(num);
+    /* ⚠ متنِ دلیل پیش از بستن خوانده می‌شود؛ قبلاً بعد از حذفِ پنجره خوانده می‌شد و همیشه خالی بود */
+    var ok=b.getAttribute("data-v")==="1";
+    var ta=document.getElementById("srtRejReason"), reason=ta?String(ta.value).trim():"";
+    close(); if(ok) srtConfirmReject(num, reason);
   }); })(btns[i]); }
   wrap.addEventListener("click",function(e){ if(e.target===wrap) close(); });
   var t=document.getElementById("srtRejReason"); if(t) try{ t.focus(); }catch(e){}
 }
-async function srtConfirmReject(num){
-  var ta=document.getElementById("srtRejReason");
-  var reason=ta?String(ta.value).trim():"";
-  var r=await api("rejectDocument",{drawingNumber:num, comment:reason});
-  if(!r.ok){ toast(r.message||"خطا",true); return; }
-  toast("سند رد شد"); srtClose(); await refreshDocuments();
+async function srtConfirmReject(num, reason){
+  reason=String(reason||"");
+  srtClose();
+  var op=reviewRejectOp(num, reason);
   if(typeof openDocDetail==="function") openDocDetail(num);
+  var r=await op;
+  if(r.ok) toast("سند رد شد"); else toast(r.message||"خطا",true);
 }

@@ -342,6 +342,7 @@ function logout(){
      باید برداشته شود، وگرنه پس از خروج صفحهٔ ورود نامرئی می‌ماند. */
   document.documentElement.classList.remove("has-session");
   ME={token:null}; localStorage.removeItem("fsm_session");
+  if(typeof snapClear==="function") snapClear();   // دادهٔ ذخیره‌شدهٔ نشست هم با خروج پاک می‌شود (رایانهٔ مشترک)
   stopClock();
   document.getElementById("appView").classList.add("hidden");
   document.getElementById("loginView").classList.remove("hidden");
@@ -358,12 +359,15 @@ function logout(){
    فراخوان‌های قدیمی خطا ندهند. */
 async function startApp(){
   var myRun=++_appRun;   // نسلِ این اجرا؛ اگر بعداً نسلِ تازه‌تری بیاید، این اجرا حق رسم ندارد
-  /* ⚠ در هیچ مسیری پیش از رسیدنِ داده چیزی نمایش داده نمی‌شود.
-     کاربر روی صفحهٔ ورود می‌ماند (دکمه در حالتِ «در حال بارگذاری اطلاعات…») و
-     پوستهٔ برنامه فقط یک‌بار، آن هم با دادهٔ کامل، وارد می‌شود.
-     دلیل: هر نمایشِ زودهنگام باعث می‌شد پنل‌ها یک‌بار خالی/اسکلتی دیده شوند و
-     بعد در آبشارِ واقعی دوباره از opacity:0 بالا بیایند. */
-  lgStage2();   // متنِ دکمه: ورود موفق بود، حالا داده می‌آید
+  /* ⚡ بازشدنِ فوری: اگر از نشستِ قبلیِ همین کاربر دادهٔ ذخیره‌شده‌ای هست، پوسته همین حالا
+     با آن رسم می‌شود و بوت‌استرپ در پس‌زمینه تازه‌اش می‌کند (فقط اگر چیزی فرق کرده بود،
+     دوباره رسم می‌شود). بدونِ دادهٔ ذخیره‌شده، رفتارِ قبلی برقرار است:
+     ⚠ پیش از رسیدنِ داده چیزی نمایش داده نمی‌شود؛ کاربر روی صفحهٔ ورود می‌ماند
+     (دکمه در حالتِ «در حال بارگذاری اطلاعات…») و پوسته فقط یک‌بار و با دادهٔ کامل
+     وارد می‌شود — وگرنه پنل‌ها یک‌بار خالی دیده و بعد دوباره در آبشار وارد می‌شدند. */
+  var snap=(typeof snapLoad==="function")?snapLoad():null;
+  if(snap){ applyBootData(snap); showAppShell(true); }
+  else lgStage2();   // متنِ دکمه: ورود موفق بود، حالا داده می‌آید
 
   var r=await api("bootstrap",{});
   /* نشستِ نامعتبر: api خودش logout() را صدا زده و صفحهٔ ورود را آورده،
@@ -371,6 +375,8 @@ async function startApp(){
   if(!ME.token) return;
   if(myRun!==_appRun) return;   // نشستِ تازه‌تری شروع شده؛ این پاسخ کهنه است و نباید چیزی رسم کند
   if(!r || !r.ok){
+    if(snap){ toast("ارتباط با سرویس برقرار نشد؛ آخرین دادهٔ ذخیره‌شده نمایش داده می‌شود.", true);
+      if(typeof consumePendingRoute==="function") consumePendingRoute(); return; }
     // هنوز چیزی نمایش داده نشده؛ حالا پوسته را بیاور تا خطا جایی برای دیده‌شدن داشته باشد
     document.getElementById("loginView").classList.add("hidden");
     document.getElementById("appView").classList.remove("hidden");
@@ -383,13 +389,8 @@ async function startApp(){
   /* تمدیدِ خودکار: اگر بک‌اند توکنِ تازه فرستاده، جایگزین می‌شود تا کاربرِ
      فعال وسطِ کار بیرون نیفتد. ذخیرهٔ نهایی چند خط پایین‌تر انجام می‌شود. */
   if(r.token){ ME.token=r.token; if(r.expiresAt) ME.expiresAt=r.expiresAt; }
-  DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
-  DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
-  DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
-  DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسنادِ حذف‌شده، برای معنا‌دار ماندنِ رویدادهای گذشته
-  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[];
-  DB.instanceCounts=r.instanceCounts||{};
-  DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردنِ همان بخش گرفته می‌شوند
+  var changed = !snap || bootSig(r)!==bootSig(DB);
+  applyBootData(r);
   if(!r.backendVersion){ toast("بک‌اندِ سرویس هنوز نسخهٔ قدیمی است. در Apps Script از Deploy ▸ Manage deployments، روی همان deployment «New version» را دیپلوی کنید.", true); }
   /* نقشِ معتبر همان است که بک‌اند اعلام می‌کند، نه آنچه در localStorage نوشته شده.
      بدونِ این خط، دست‌کاریِ fsm_session می‌توانست دکمه‌های مدیر را در رابط باز کند
@@ -402,14 +403,38 @@ async function startApp(){
     ME.name=meRec.name||ME.name; ME.gender=meRec.gender||ME.gender; ME.position=meRec.position||ME.position; ME.avatar=meRec.avatar||ME.avatar;
   }
   localStorage.setItem("fsm_session", JSON.stringify(ME));   // نشستِ ذخیره‌شده با مقادیرِ تأییدشده هم‌گام شود
-  applyRoleVisibility();   // اگر نقش اصلاح شد، رابط فوراً با آن هماهنگ شود
+  if(typeof snapSave==="function") snapSave();
+  if(typeof markSynced==="function") markSynced();
+  if(!snap){ showAppShell(); return; }
+  // مسیرِ بازشدنِ فوری: پوسته از قبل روی صفحه است؛ فقط اگر داده/نقش فرق کرده بود به‌روز می‌شود
+  applyRoleVisibility(); renderUserHeader();
+  if(changed){ rerenderAfterData(); if(typeof renderNavTree==="function") renderNavTree(); }
+  // سندِ QR ممکن است تازه باشد و در دادهٔ ذخیره‌شده نباشد؛ پس با دادهٔ تازه باز می‌شود
+  if(typeof consumePendingRoute==="function") consumePendingRoute();
+}
+/* دادهٔ بوت‌استرپ (یا نسخهٔ ذخیره‌شده‌اش) → DB */
+function applyBootData(r){
+  DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
+  DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
+  DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
+  DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسنادِ حذف‌شده، برای معنا‌دار ماندنِ رویدادهای گذشته
+  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[];
+  DB.instanceCounts=r.instanceCounts||{};
+  DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردنِ همان بخش گرفته می‌شوند
+}
+/* امضای کاملِ دادهٔ بوت‌استرپ — dataSig به‌علاوهٔ بخش‌هایی که فقط هنگامِ شروع می‌آیند */
+function bootSig(x){
+  return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[]]);
+}
+/* رسمِ پوستهٔ برنامه با DBِ فعلی — هم برای ورودِ عادی و هم بازشدنِ فوری با دادهٔ ذخیره‌شده */
+function showAppShell(deferRoute){
+  applyRoleVisibility();
   renderUserHeader();
   startClock();
-  applyRoleVisibility();
   refreshAllSelects();
   renderArchive(); renderDataTables();
   if(typeof renderNavTree==="function") renderNavTree();
-  /* ⚠ پوسته دقیقاً همین‌جا نمایان می‌شود: پس از آنکه همهٔ نماها با دادهٔ واقعی رسم
+  /* ⚠ پوسته دقیقاً همین‌جا نمایان می‌شود: پس از آنکه همهٔ نماها با داده رسم
      شده‌اند و بلافاصله پیش از آبشار. اگر زودتر نمایان شود، پنل‌ها یک لحظه خالی
      دیده می‌شوند و بعد دوباره در آبشار وارد می‌شوند. */
   document.getElementById("loginView").classList.add("hidden");
@@ -418,7 +443,7 @@ async function startApp(){
   switchTab("dashboard");   // پنلِ داشبورد را نمایان می‌کند و آبشار را یک‌بار پخش می‌کند
   lgBusy(false);            // دکمهٔ ورود برای دفعهٔ بعد به حالتِ عادی برگردد
   // اگر کاربر با اسکنِ QR آمده، حالا که داده آماده است همان سند باز می‌شود
-  if(typeof consumePendingRoute==="function") consumePendingRoute();
+  if(!deferRoute && typeof consumePendingRoute==="function") consumePendingRoute();
 }
 /* هدر کاربر: آواتار + (آقای/خانم + نام) + تگِ نقش | سمت */
 function renderUserHeader(){

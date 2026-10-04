@@ -41,8 +41,9 @@
 .s-idle{background:var(--gray-bg);color:#4b5563;border:1px solid var(--gray-line)}
 
 /* ---- نوار شاخص‌ها ---- */
+/* ⚠ overflow:visible (نه hidden): تولتیپِ گراف‌ها باید بتواند از قابِ نوار بیرون بزند */
 .mband{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;background:var(--card);
-  border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+  border:1px solid var(--line);border-radius:var(--radius);overflow:visible}
 @media(max-width:1150px){.mband{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:660px){.mband{grid-template-columns:1fr 1fr}}
 .mcell{position:relative;padding:var(--sp-3) var(--sp-5);border-left:1px solid var(--line);
@@ -80,7 +81,34 @@
 .d-fg{transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1),stroke .5s,stroke-opacity .5s}
 @media(prefers-reduced-motion:reduce){.d-fg{transition:stroke .3s}}
 .dtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:19px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums}
+  font-size:19px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;pointer-events:none}
+
+/* ===== تولتیپِ گراف‌های نوارِ شاخص — عیناً جعبهٔ .sgt نوارِ پیشرفتِ داشبورد (dashboard.css) =====
+   ظاهرِ جعبه از همان کلاس‌ها می‌آید؛ این‌جا فقط جای‌گیری و منطقِ نمایش تعریف می‌شود. */
+.mcell:hover{z-index:7}   /* سلولِ زیرِ موس بالاتر از همسایه‌ها تا تولتیپش زیرِ آن‌ها نرود */
+/* نوارِ «مستندات پروژه»: سه ناحیهٔ هاورِ شفاف روی نوار (بلندتر از خودِ نوار برای هدف‌گیریِ راحت) */
+.bar-wrap{position:relative}
+.bar-hits{position:absolute;left:0;right:0;top:-6px;bottom:-6px;direction:ltr}
+.mhit{position:absolute;top:0;bottom:0;cursor:pointer}
+.mhit .sgt{left:50%}
+.mhit:first-child .sgt{left:0;transform:translateX(0) translateY(4px)}
+.mhit:last-child .sgt{left:auto;right:0;transform:translateX(0) translateY(4px)}
+.mhit:hover .sgt{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.mhit:first-child:hover .sgt,.mhit:last-child:hover .sgt{transform:translateX(0) translateY(0)}
+/* برجسته‌شدنِ همان بخشِ نوار — همان واکنشِ داشبورد (روشنایی ۹۳٪) */
+.bar-wrap:has(.bh-apr:hover) .bar>i.sol{filter:brightness(.93)}
+.bar-wrap:has(.bh-reg:hover) .bar>i.faint{opacity:.45}
+.bar-wrap:has(.bh-none:hover) .bar{background:#e4e2dd}
+.bar>i,.bar{transition:width .6s,opacity .16s,filter .16s,background .16s}
+/* دونات: ناحیه‌های هاور = مسیرهای شفافِ پهن روی حلقه */
+.dwrap .d-hit{stroke:transparent;stroke-width:12;stroke-linecap:butt;pointer-events:stroke;cursor:pointer}
+.dwrap .sgt{bottom:calc(100% + 6px);left:50%}
+.dwrap:has(.dh-apr:hover) .mtip-apr,.dwrap:has(.dh-reg:hover) .mtip-reg,.dwrap:has(.dh-none:hover) .mtip-none{
+  opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
+.dwrap:has(.dh-apr:hover) .d-fg.sol{stroke-width:5.6}
+.dwrap:has(.dh-reg:hover) .d-fg.reg{stroke-width:5.6;stroke-opacity:.45}
+.dwrap:has(.dh-none:hover) .d-bg{stroke:#e4e2dd}
+.dwrap .d-bg,.dwrap .d-fg{transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1),stroke .16s,stroke-width .16s,stroke-opacity .16s}
 
 /* ============ محتوا: سطرِ (مشخصات + ویوئر) و سپس کارتِ قطعات ============ */
 .pp-content{display:flex;flex-direction:column;gap:var(--sp-5)}

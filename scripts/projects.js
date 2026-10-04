@@ -541,7 +541,7 @@ function backToClients(){
       شروعِ قوس را از بالا جدا می‌کرد برنمی‌گردد.
    pathLength=100 مسیر را روی مقیاسِ ۰..۱۰۰ نرمال می‌کند، پس درصد مستقیم
    در dasharray می‌نشیند و محاسبهٔ محیط لازم نیست. */
-function donutHTML(solidPct, regPct){
+function donutHTML(solidPct, regPct, tips){
   var CX=29, CY=29, R=24;
   /* دایرهٔ کامل با دو نیم‌قوس (یک قوسِ تنها نمی‌تواند دایره را ببندد).
      شروع از بالا و sweep-flag=0 ⇒ پادساعت‌گرد. */
@@ -560,21 +560,48 @@ function donutHTML(solidPct, regPct){
   };
   return '<div class="dwrap"><svg viewBox="0 0 58 58">'+
     '<circle class="d-bg" cx="'+CX+'" cy="'+CY+'" r="'+R+'"/>'+
-    seg(regPct,'var(--brand)',' stroke-opacity=".3"')+
-    seg(solidPct,col)+
-    '</svg><span class="dtxt">'+solidPct+'٪</span></div>';
+    seg(regPct,'var(--brand)',' stroke-opacity=".3"').replace('class="d-fg"','class="d-fg reg"')+
+    seg(solidPct,col).replace('class="d-fg"','class="d-fg sol"')+
+    (tips?mbDonutHits(FULL, solidPct, regPct, tips):'')+
+    '</svg><span class="dtxt">'+solidPct+'٪</span>'+(tips?mbTipsHTML(tips):'')+'</div>';
+}
+/* ===== تولتیپِ گراف‌های نوارِ شاخص — همان رفتار و ظاهرِ نوارِ پیشرفتِ داشبورد (.sgt) =====
+   هر گراف سه بخش دارد: تأییدشده (پررنگ)، ثبت‌شده ولی تأییدنشده (کم‌رنگ)، بارگذاری‌نشده (زمینه).
+   با رفتنِ موس روی هر بخش، جعبهٔ آمارِ همان بخش باز می‌شود و خودِ بخش کمی برجسته می‌شود.
+   tips = {apr:{t,c,rows}, reg:{…}, none:{…}} — rows = [[برچسب, مقدار], …]؛ بخشِ خالی (null) ناحیهٔ هاور ندارد. */
+function mbTipHTML(key, tp){
+  return '<span class="sgt mtip-'+key+'"><div class="sgt-h"><i class="sgt-sw" style="background:'+tp.c+'"></i>'+
+    '<span class="sgt-t">'+esc(tp.t)+'</span></div>'+
+    tp.rows.map(function(r){ return '<div class="sgt-r"><span>'+esc(r[0])+'</span><b>'+esc(r[1])+'</b></div>'; }).join("")+'</span>';
+}
+function mbTipsHTML(tips){
+  return ["apr","reg","none"].map(function(k){ return tips[k]?mbTipHTML(k,tips[k]):""; }).join("");
+}
+/* ناحیه‌های هاورِ دونات: مسیرهای شفافِ پهن روی همان دایره، تا هدف‌گیریِ حلقهٔ باریک آسان باشد.
+   ترتیب مهم است — بالاترین لایه برنده است: کلِ دایره (بارگذاری‌نشده) ← ثبت‌شده ← تأییدشده. */
+function mbDonutHits(FULL, sp, rp, tips){
+  var hit=function(k, v){ if(!tips[k] || v<=0) return "";
+    return '<path class="d-hit dh-'+k+'" d="'+FULL+'" pathLength="100" stroke-dasharray="'+(v>=100?"100 0":v+" "+(100-v))+'"/>'; };
+  return hit("none",100)+hit("reg",rp)+hit("apr",sp);
+}
+/* سطرهای استاندارد: تعداد + سهم از کل (+ سطرهای اختیاریِ بیشتر) */
+function mbRows(n, total, unit, extra){
+  var r=[["تعداد", faN(n)+" "+unit], ["سهم از کل", faN(total?Math.round(n/total*100):0)+"٪"]];
+  return r.concat(extra||[]);
 }
 
 /* پرشدنِ حلقه‌ها پس از رندر — مقدار از data-v خوانده و روی dasharray نشانده
    می‌شود. یک فریم صبر می‌کنیم تا مرورگر حالتِ اولیه (صفر) را ثبت کند، وگرنه
    هر دو مقدار در یک فریم اعمال می‌شوند و گذار اجرا نمی‌شود. */
-function playDonutsIn(root){
+/* instant=true: مقدارِ نهایی همین حالا و پیش از اولین رسمِ مرورگر نشانده می‌شود، پس گذاری اجرا نمی‌شود. */
+function playDonutsIn(root, instant){
   var sc=root||document;
   var rings=sc.querySelectorAll(".d-fg[data-v]");
   var bars=sc.querySelectorAll(".mhero-vis .bar>i[data-w]");
   var pctEl=sc.querySelector(".mhero-pct[data-p]");
   if(!rings.length && !bars.length && !pctEl) return;
-  requestAnimationFrame(function(){ requestAnimationFrame(function(){
+  var raf=instant ? function(f){ f(); } : requestAnimationFrame;
+  raf(function(){ raf(function(){
     [].forEach.call(rings, function(el){
       el.setAttribute("stroke-dasharray",(el.getAttribute("data-v")||0)+" 100");
       el.removeAttribute("data-v");
@@ -588,18 +615,18 @@ function playDonutsIn(root){
     if(pctEl){
       var t=parseInt(pctEl.getAttribute("data-p"),10)||0;
       pctEl.removeAttribute("data-p");
-      if(typeof countUpPercent==="function") countUpPercent(pctEl,t);
+      if(typeof countUpPercent==="function" && !instant) countUpPercent(pctEl,t);
       else pctEl.textContent=t+"٪";
     }
   }); });
 }
-function cellDonut(label,appr,reg,total,unit){
+function cellDonut(label,appr,reg,total,unit,tips){
   var sp=total?Math.round(appr/total*100):0, rp=total?Math.round(reg/total*100):0;
   var leg = unit
     ? '<div class="mleg"><i></i>تکمیل‌شده <b>'+faN(appr)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>'+
       '<div class="mleg faint"><i></i>شروع‌شده <b>'+faN(reg)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>'
     : '<div class="mleg"><i></i>تأییدشده</div><div class="mleg faint"><i></i>ثبت‌شده</div>';
-  return '<div class="mcell"><div class="mdonut">'+donutHTML(sp,rp)+
+  return '<div class="mcell"><div class="mdonut">'+donutHTML(sp,rp,tips)+
       '<div class="mtext"><div class="mlabel">'+esc(label)+'</div>'+leg+'</div>'+
     '</div></div>';
 }
@@ -623,13 +650,45 @@ function mbandHTML(p,s){
   var partsApp=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.every(hasApp); }).length;
   var total=pTot+dTot, reg=pReg+dReg, apr=pApp+dApp;
   var regPct=total?Math.round(reg/total*100):0, aprPct=total?Math.round(apr/total*100):0;
+  /* تفکیکِ «ثبت‌شده ولی تأییدنشده» بر اساسِ وضعیتِ آخرین ریویژنِ هر ماژول (برای تولتیپ) */
+  var latestSt=function(m){ var d=pdocs.filter(function(x){ return pad2(x.partNo)===m.part && String(x.typeCode).toUpperCase()===m.type &&
+      String(x.isLatest).toLowerCase()==="true"; })[0]; return d?String(d.status||"").toLowerCase():""; };
+  var waiting=s.modules.filter(function(m){ return hasDoc(m) && !hasApp(m); });
+  var nPend=waiting.filter(function(m){ return latestSt(m)==="pending"; }).length;
+  var nRej=waiting.filter(function(m){ return latestSt(m)==="rejected"; }).length;
+  var nDraft=waiting.length-nPend-nRej;
+  var solidC=aprPct===100?"var(--ok)":"var(--brand)", faintC="#fcd4a5", noneC="#f0efeb";
+  var heroTips={
+    apr: apr ? {t:"تأییدشده", c:solidC, rows:mbRows(apr,total,"سند",[["نقشه‌های پروژه",faN(dApp)],["مدارک عمومی",faN(pApp)]])} : null,
+    reg: (reg-apr) ? {t:"ثبت‌شده، تأییدنشده", c:faintC, rows:mbRows(reg-apr,total,"سند",
+      [["در انتظار بازبینی",faN(nPend)],["ایجادشده",faN(nDraft)]].concat(nRej?[["ردشده",faN(nRej)]]:[]))} : null,
+    none: (total-reg) ? {t:"بارگذاری‌نشده", c:noneC, rows:mbRows(total-reg,total,"سند",[["نقشه‌های پروژه",faN(dTot-dReg)],["مدارک عمومی",faN(pTot-pReg)]])} : null
+  };
+  /* ناحیه‌های هاورِ نوار: سه نوارِ شفاف کنارِ هم (چپ‌به‌راست، هم‌جهتِ پرشدنِ نوار) با ارتفاعِ بیشتر از خودِ نوار.
+     بیرونِ .bar قرار می‌گیرند چون .bar برای گوشه‌های گرد overflow:hidden دارد و تولتیپ را می‌بُرید. */
+  var bh=function(k,from,w){ return (heroTips[k] && w>0) ? '<span class="mhit bh-'+k+'" style="left:'+from+'%;width:'+w+'%">'+mbTipHTML(k,heroTips[k])+'</span>' : ""; };
+  var barHits='<div class="bar-hits">'+bh("apr",0,aprPct)+bh("reg",aprPct,regPct-aprPct)+bh("none",regPct,100-regPct)+'</div>';
+  /* تولتیپِ دونات‌ها: همان سه بخش؛ برای دوناتِ قطعات «تکمیل‌شده/شروع‌شده/شروع‌نشده» */
+  var dTips=function(a,r,t,unit,aprT,regT,noneT,names){
+    return { apr: a ? {t:aprT, c:(t&&a===t)?"var(--ok)":"var(--brand)", rows:mbRows(a,t,unit,names&&names.apr)} : null,
+             reg: (r-a)>0 ? {t:regT, c:faintC, rows:mbRows(r-a,t,unit,names&&names.reg)} : null,
+             none: (t-r)>0 ? {t:noneT, c:noneC, rows:mbRows(t-r,t,unit,names&&names.none)} : null };
+  };
+  /* برای دوناتِ قطعات، نامِ قطعه‌های هر بخش هم می‌آید (حداکثر ۳ نام + «و n قطعهٔ دیگر») */
+  var nameRow=function(list){ if(!list.length) return [];
+    var nm=list.slice(0,3).map(function(pn){ return partNameFa(pn); }).join("، ");
+    if(list.length>3) nm+=" و "+faN(list.length-3)+" قطعهٔ دیگر";
+    return [["قطعات", nm]]; };
+  var pDone=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.every(hasApp); });
+  var pStart=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.some(hasDoc) && !mm.every(hasApp); });
+  var pIdle=parts.filter(function(pn){ return pDone.indexOf(pn)<0 && pStart.indexOf(pn)<0; });
   var hero='<div class="mcell"><div class="mdonut">'+
       /* ⚠ عرض از صفر شروع می‌شود و مقدارِ واقعی روی data-w می‌نشیند؛ playDonutsIn
          پس از رندر اعمالش می‌کند. مثلِ حلقه‌ها: عنصرِ ساخته‌شده با innerHTML در
          حالتِ نهایی متولد می‌شود و بدونِ این کار هیچ گذاری اجرا نمی‌شود. */
       '<div class="mhero-vis"><span class="mhero-pct" data-p="'+aprPct+'">۰٪</span>'+
-        '<div class="bar"><i class="faint" data-w="'+regPct+'" style="width:0;background:var(--brand)"></i>'+
-          '<i data-w="'+aprPct+'" style="width:0;background:'+(aprPct===100?"var(--ok)":"var(--brand)")+'"></i></div>'+
+        '<div class="bar-wrap"><div class="bar"><i class="faint" data-w="'+regPct+'" style="width:0;background:var(--brand)"></i>'+
+          '<i class="sol" data-w="'+aprPct+'" style="width:0;background:'+(aprPct===100?"var(--ok)":"var(--brand)")+'"></i></div>'+barHits+'</div>'+
       '</div>'+
       /* لایهٔ کم‌رنگِ نوار همچنان «ثبت‌شده» است (نوار باید پیشرفت را نشان دهد، نه کمبود)؛
          ولی راهنمای دوم به تعدادِ ماژول‌هایِ بدونِ سند تغییر کرد — همان عددی که می‌گوید چقدر کار مانده. */
@@ -638,9 +697,11 @@ function mbandHTML(p,s){
         '<div class="mleg faint"><i></i>بارگذاری‌نشده <b>'+faN(total-reg)+'</b></div></div>'+
     '</div></div>';
   return hero+
-    cellDonut("پیشرفتِ قطعات", partsApp, partsReg, parts.length, "قطعه")+
-    cellDonut("نقشه‌های پروژه", dApp, dReg, dTot)+
-    cellDonut("مدارک عمومی پروژه", pApp, pReg, pTot);
+    cellDonut("پیشرفتِ قطعات", partsApp, partsReg, parts.length, "قطعه",
+      dTips(partsApp, partsReg, parts.length, "قطعه", "تکمیل‌شده", "شروع‌شده", "شروع‌نشده",
+        {apr:nameRow(pDone), reg:nameRow(pStart), none:nameRow(pIdle)}))+
+    cellDonut("نقشه‌های پروژه", dApp, dReg, dTot, undefined, dTips(dApp, dReg, dTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"))+
+    cellDonut("مدارک عمومی پروژه", pApp, pReg, pTot, undefined, dTips(pApp, pReg, pTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"));
 }
 /* آیکن‌های سربرگِ کارت‌ها (خطی، هم‌زبانِ نظام طراحی) */
 var SEC_IC_DOC='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>';
@@ -655,6 +716,12 @@ var SEC_IC_CLIENT='<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5
 
 function showProjectDetail(c,o,pr){
   c=String(c); o=pad2(o); pr=pad2(pr);
+  /* بازرسمِ همان پروژه‌ای که الان روی صفحه است (ویرایشِ یک مقدار، رسیدنِ دادهٔ تازه):
+     انیمیشنِ ورود و پرشدنِ حلقه‌ها از صفر تکرار نمی‌شود، وگرنه هر به‌روزرسانی پنل را می‌لرزاند. */
+  var hostPrev=document.getElementById("projectDetailView");
+  var sameView=_projView.mode==="detail" && _projView.c===c && _projView.o===o && _projView.pr===pr &&
+    hostPrev && !hostPrev.classList.contains("hidden") &&
+    !document.getElementById("tab-project").classList.contains("hidden");
   _projView={mode:"detail",c:c,o:o,pr:pr}; _cp.client=c; _cp.order=o;
   navRefreshSelection();   // همان دلیل: تغییرِ انتخاب، نه تغییرِ فهرست
   var p=findProject(c,o,pr);
@@ -662,6 +729,7 @@ function showProjectDetail(c,o,pr){
   document.getElementById("cpView").classList.add("hidden");
   host.classList.remove("hidden");
   if(!p){ host.innerHTML='<p class="muted">پروژه یافت نشد.</p>'; return; }
+  var keptMv=mvDetachForRerender(c,o,pr);   // بازسازیِ همین پروژه → ویوئرِ زنده کنار گذاشته می‌شود
   var s=projectStats(p);
   var admin=ME.role==="admin";
   var stCls=s.status.cls==="badge-approved"?"s-done":(s.status.cls==="badge-pending"?"s-run":"s-idle");
@@ -703,10 +771,11 @@ function showProjectDetail(c,o,pr){
       '</div>'+
     '</section>';
   // ورودِ آبشاریِ بالا‌به‌پایین: هدر ← نوارِ شاخص ← کارتِ مشخصات ← کارتِ قطعات
-  if(typeof revealCascade==="function") revealCascade(host.querySelector(".ppanel"));
-  playDonutsIn(host);   // حلقه‌ها، نوارِ «مستندات پروژه» و عددِ درصد از صفر پر می‌شوند
+  if(!sameView && typeof revealCascade==="function") revealCascade(host.querySelector(".ppanel"));
+  playDonutsIn(host, sameView);   // حلقه‌ها، نوارِ «مستندات پروژه» و عددِ درصد از صفر پر می‌شوند (بازرسم: بی‌درنگ)
   /* اولین مدلِ فهرست (مونتاژ اگر باشد، وگرنه قطعهٔ اول) خودکار بار می‌شود تا پنل
      با ویوئرِ خالی باز نشود. پس از رندرِ DOM اجرا می‌شود چون mvLoadPart به #mvShell نیاز دارد. */
+  if(mvReattach(keptMv)) return;   // ویوئرِ قبلی سرِ جایش برگشت؛ بارگذاریِ دوباره لازم نیست
   var first=(_mvParts||[]).filter(function(x){ return x.fileId; })[0];
   if(first) setTimeout(function(){
     if(document.getElementById("mvShell")) mvLoadPart(first.fileId, first.part);
@@ -1812,6 +1881,31 @@ var _mvPickerExpanded=false; // وضعیتِ باز/بستهٔ منوی انتخ
 var _mvLoadSeq=0;           // توکنِ بارگذاری — فقط جدیدترین mvLoadPart اجازهٔ تغییرِ DOM دارد (ضدِ رقابت/تکرار)
 var _mvEst=null;            // برآوردگرِ نوارِ پیشرفتِ فعالِ ویوئر — تا تایمرِ بارگذاریِ قبلی با بارگذاریِ جدید روی یک المانِ درصد ننویسد
 var _mvCurFileId=null;      // شناسهٔ فایلِ GLBِ مدلِ درحال‌نمایش در پنلِ پروژه (برای منابعِ AR)
+var _mvCurPart="";          // قطعهٔ مدلِ درحال‌نمایش — برای بازسازیِ منوی انتخاب روی ویوئرِ حفظ‌شده
+var _mvKey="";              // «مشتری|سفارش|پروژه»ِ ویوئرِ فعلی — ویوئر فقط برای همان پروژه حفظ می‌شود
+/* هر تغییری در پنلِ پروژه (ویرایشِ مقدار، روشن‌کردنِ ماژول، رسیدنِ دادهٔ تازه) کلِ پنل را از نو می‌سازد.
+   ویوئرِ سه‌بعدی نباید با آن از بین برود: پیش از بازسازی از DOM جدا و پس از آن سرِ جایش برگردانده
+   می‌شود — مدل، زاویهٔ دوربین و قطعهٔ انتخاب‌شده دست‌نخورده می‌مانند. */
+function mvDetachForRerender(c,o,pr){
+  var sh=document.getElementById("mvShell");
+  if(!sh || !sh.isConnected || !_mvCurFileId) return null;
+  if(_mvKey!==[c,o,pr].join("|")) return null;                    // پروژهٔ دیگر → ویوئرِ تازه
+  if(document.fullscreenElement && sh.contains(document.fullscreenElement)) return null;
+  if(!_blobUrls.mvModel && sh.querySelector("model-viewer")) return null;   // URL آزاد شده (ترکِ تب)
+  sh.parentNode.removeChild(sh);
+  return sh;
+}
+function mvReattach(old){
+  if(!old) return false;
+  var still=(_mvParts||[]).some(function(x){ return String(x.fileId)===String(_mvCurFileId); });
+  var fresh=document.getElementById("mvShell");
+  if(!still || !fresh) return false;                              // مدل حذف/جایگزین شده → بارگذاریِ عادی
+  fresh.parentNode.replaceChild(old, fresh);
+  // فهرستِ قطعاتِ دارای مدل ممکن است عوض شده باشد؛ فقط منوی انتخاب از نو ساخته می‌شود
+  var pk=old.querySelector("#mvPicker");
+  if(pk) pk.outerHTML=mvPickerHTML(_mvParts, _mvCurPart);
+  return true;
+}
 function projectModelParts(p){
   /* هر نوعِ سندی که با 3D شروع می‌شود مدلِ سه‌بعدی است (3D برای قطعه، 3DA برای مونتاژ). */
   var all=projectDocs(p).filter(function(d){ return String(d.typeCode).toUpperCase().indexOf("3D")===0 &&
@@ -1911,7 +2005,8 @@ function loadBarEstimate(getScope, cap){
   function tick(){ if(useReal) return; p += Math.max(0.3,(cap-p)*0.02); if(p>cap)p=cap;
     var s=getScope&&getScope(); if(s) loadBarPct(s, Math.round(p)); }
   function stop(){ if(timer){ clearInterval(timer); timer=null; } }
-  return { real:function(v){ useReal=true; var s=getScope&&getScope(); if(s) loadBarPct(s, v); },
+  /* درصدِ واقعی ممکن است دیرتر از شروعِ دانلود برسد (حجم موازی گرفته می‌شود)؛ نوار هرگز عقب نمی‌رود */
+  return { real:function(v){ useReal=true; p=Math.max(p, v); var s=getScope&&getScope(); if(s) loadBarPct(s, p); },
            stop:stop, done:function(){ stop(); var s=getScope&&getScope(); if(s) loadBarPct(s, 100); } };
 }
 function loadBarHide(scope){ if(!scope) return; var el=scope.querySelector(".mv-load"); if(!el) return;
@@ -1920,6 +2015,7 @@ function loadBarHide(scope){ if(!scope) return; var el=scope.querySelector(".mv-
 async function mvLoadPart(fileId, part){
   if(!fileId){ toast("این قطعه مدلی ندارد.",true); return; }
   _mvCurFileId=fileId;   // برای دکمهٔ واقعیتِ افزوده (منابعِ عمومیِ AR از روی همین شناسه)
+  _mvCurPart=part; _mvKey=[_projView.c,_projView.o,_projView.pr].join("|");
   var shell=document.getElementById("mvShell"); if(!shell) return;
   var myToken=++_mvLoadSeq;   // اگر بارگذاریِ تازه‌تری شروع شود، این یکی باید بی‌سروصدا کنار برود
   if(_mvEst){ _mvEst.stop(); _mvEst=null; }   // برآوردگرِ بارگذاریِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
@@ -1947,6 +2043,7 @@ async function mvLoadPart(fileId, part){
   var est=loadBarEstimate(scope, 92);   // پیشرفتِ نرمِ تخمینی تا نوار روی صفر نماند
   _mvEst=est;
   try{
+    // getFileRetry فایل‌های قبلاً دانلودشده را از حافظهٔ موقت (api.js) بی‌درنگ برمی‌گرداند
     var r=await getFileRetry(fileId, {onProgress: function(loaded,total){ if(myToken===_mvLoadSeq && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(myToken!==_mvLoadSeq){ est.stop(); return; }   // منسوخ شد — نتیجه را دور بریز
     if(!r||!r.ok){ est.stop(); loadBarHide(scope()); var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML='<div class="mv-empty-t">دریافتِ مدل ناموفق بود.</div>'+mvRetryBtn(fileId,part); return; }

@@ -270,7 +270,7 @@
 /* ⚠ min-height برابرِ ارتفاعِ .icon-btn.sm (26px): سطر در حالتِ بسته هم همان
    ارتفاع را می‌گیرد، پس با ظاهرشدنِ دکمه‌ها هنگامِ اکسپند، متن ۵px بالا/پایین
    نمی‌پرد. */
-.ver-descrow{display:flex;align-items:center;gap:10px;margin-top:4px;min-height:26px}
+.ver-descrow{display:flex;align-items:center;gap:10px;margin-top:4px;min-height:26px;position:relative}
 /* سندِ بدونِ توضیح در حالتِ بسته سطرِ خالی نمی‌گیرد: ارتفاعِ رزروشده فقط برای
    جلوگیری از پرشِ *متن* بود، و وقتی متنی نیست پرشی هم در کار نیست.
    با اکسپند، دکمه‌ها خودشان ارتفاع را باز می‌کنند. */
@@ -289,12 +289,18 @@
    در گردش‌کارِ اکسپندشده است. */
 .ver-desc{flex:1;min-width:0;padding-inline-start:8px;font-size:11.5px;font-weight:500;
   color:var(--muted);line-height:1.8;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .28s,visibility .28s}
+/* توضیحِ یک‌خطی فقط پیش‌نمایشِ حالتِ بسته است: با اکسپند محو می‌شود چون متنِ کاملش
+   زیرِ «ایجاد سند» در گردش‌کار می‌آید (دوباره‌نمایی نشود). جایش در چیدمان می‌ماند تا اکشن‌ها نپرند. */
+.ver-row.open .ver-desc{opacity:0;visibility:hidden}
 /* اکشن‌ها فقط در حالتِ باز — تا حذف در فهرستِ بسته در دسترسِ یک کلیکِ اتفاقی نباشد */
 /* ⚠ به‌جای display (که انیمیت نمی‌شود) از opacity استفاده می‌شود تا دکمه‌ها
    هم‌زمان با باز/بسته‌شدنِ سطر محو شوند. visibility جلوی کلیک در حالتِ بسته
    را می‌گیرد. */
+/* ⚠ absolute: دکمه‌ها در حالتِ بسته جا نمی‌گیرند تا توضیح تا لبهٔ محتوای سلول (همان لبهٔ فلش) ادامه یابد؛
+   در حالتِ باز توضیح محو است، پس هم‌پوشانی دیده نمی‌شود. */
 .ver-descrow .ver-acts{display:flex;flex-shrink:0;opacity:0;visibility:hidden;
+  position:absolute;inset-inline-end:0;top:50%;transform:translateY(-50%);
   transition:opacity .28s,visibility .28s}
 .ver-row.open .ver-descrow .ver-acts{opacity:1;visibility:visible}
 /* عیناً نامِ مشتری در «مشخصات سند» (.dm-row + .dm-v): ۱۱٫۵px با وزنِ ۵۰۰ */
@@ -387,7 +393,42 @@
 .rv-up{padding:18px 20px;display:flex;flex-direction:column;gap:4px;max-width:520px;margin:0 auto}
 .rv-num{font-size:13px;font-weight:700;color:var(--brand);text-align:center;background:#fff8f0;
   border:1px solid var(--brand);border-radius:8px;padding:6px 10px}
-.rv-lead{margin:8px 0 4px;font-size:12.5px;color:var(--muted);line-height:1.75}
+.rv-lead{margin:8px 0 4px;font-size:12.5px;color:var(--muted);line-height:1.75}   /* پنجرهٔ افزودنِ فرمت */
+/* سربرگِ دوسلولیِ «ریویژنِ فعلی → ریویژنِ جدید» — هم‌الگوی ریلِ ویزاردِ ثبت سند (.nd-rail):
+   چپ‌به‌راست، مقدار بالا (۱۳px/۸۰۰ — شمارهٔ کامل در عرضِ مودال جا شود) و برچسبِ لاتینِ کوچک زیرش (۹px)، خطِ اتصالِ نازک بینِ سلول‌ها. */
+/* نوارِ بالای پنجره — عیناً .nd-rail ویزارد: زمینهٔ خاکستری، و سایهٔ زیرش که لبهٔ برش می‌سازد
+   و نوار را روی بدنه (بالاتر از آن) نشان می‌دهد */
+.rv-band{position:relative;z-index:2;background:#f4f4f2;padding:18px 24px 14px;box-shadow:0 8px 14px -10px #0000002e}
+.rv-band .rv-num{max-width:480px;margin:0 auto}
+.rv-flow{display:flex;align-items:center;justify-content:center;direction:ltr;max-width:480px;margin:0 auto}
+.rv-cell{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;flex:1 1 0;min-width:0;
+  padding:9px 10px;border:1px solid #c9c7c2;border-radius:12px;background:#fff}
+.rv-cn{font-size:13px;font-weight:800;color:var(--txt);font-variant-numeric:tabular-nums;letter-spacing:0;line-height:1.15;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.rv-cap{font-size:9px;font-weight:800;color:var(--muted);letter-spacing:.09em;line-height:1;text-transform:uppercase}
+/* ریویژنِ فعلی = مرحلهٔ انجام‌شده، عیناً مثلِ .nd-chip.done ویزارد: کادرِ نارنجیِ ثابت + زمینهٔ نارنجیِ کم‌رنگ */
+.rv-cell.prev{border-color:var(--brand);background:#fff8f0}
+.rv-cell.next{box-shadow:0 6px 16px rgba(0,0,0,.08)}
+.rv-cell.next .rv-cn b,.rv-cell.next .rv-cap{color:var(--brand)}
+/* رینگِ نارنجیِ چرخان دورِ سلولِ جدید — هم‌ظاهرِ .nd-ring ویزارد، ولی با SVG:
+   pathLength=100 محیطِ کادر را صد واحد می‌کند و خطِ ۲۲ واحدی با dashoffset خطی جلو می‌رود،
+   پس سرعت روی همهٔ ضلع‌ها و گوشه‌ها یکسان است (conic-gradient در کادرِ عریض یکنواخت نبود).
+   اندازهٔ مستطیل با ویژگی‌های خودِ SVG (۱۰۰٪) — هندسهٔ CSS روی rect در سافاری قابلِ‌اتکا نیست؛
+   SVG ربع‌پیکسل بیرون از لبهٔ داخلی می‌نشیند تا خطِ ۱٫۵ پیکسلی روی کادرِ ۱ پیکسلی بیفتد. */
+.rv-ring{position:absolute;left:-.25px;top:-.25px;width:calc(100% + .5px);height:calc(100% + .5px);pointer-events:none;overflow:visible}
+.rv-ring rect{fill:none;stroke:#f7941f;stroke-width:1.5;stroke-linecap:round;stroke-dasharray:22 78;
+  animation:rv-ring 2.4s linear infinite}
+@keyframes rv-ring{from{stroke-dashoffset:0}to{stroke-dashoffset:-100}}
+/* خطِ اتصالِ نارنجی — هم‌سبکِ .nd-cx.on ویزارد (اتصالِ بعد از مرحلهٔ انجام‌شده) */
+.rv-cx{flex:0 0 auto;width:34px;height:1px;background:var(--brand)}
+@media(max-width:480px){
+  .rv-flow{flex-direction:column}
+  .rv-cell{width:100%}
+  .rv-cx{width:1px;height:22px}
+}
+@media(prefers-reduced-motion:reduce){
+  .rv-ring rect{animation:none;stroke-dasharray:none}
+}
 
 /* ================= ویزاردِ «ثبت سند / فایل جدید» — ریلِ افقیِ باکس‌های شماره + فهرستِ ایستگاهِ فعال ================= */
 /* --- ریل: هر قطعهٔ شماره یک باکسِ جدا؛ باکسِ فعال بزرگ‌تر و دورش نوارِ نارنجیِ چرخان --- */
@@ -1315,9 +1356,9 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .tbl-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
 .tbl-exp.open{color:var(--brand)}   /* باز = فلشِ نارنجی */
 .tbl-exp.open .chev{transform:rotate(180deg)}   /* باز = فلش رو به بالا (مثلِ سایدبار) */
-/* جمع‌شدنِ نرمِ سطرها (tbody) با انیمیشنِ max-height + محوشدگی — معادلِ گرید 0fr↔1fr سایدبار در ساختارِ table */
-.mgmt-table tbody,.users-table tbody{transition:max-height .26s cubic-bezier(0,0,.2,1),opacity .2s}
-.mgmt-table.collapsed tbody,.users-table.collapsed tbody{max-height:0;opacity:0;overflow:hidden}
+/* جمع = ۴ سطر (max-height پیش‌فرضِ 212px)، باز = همهٔ سطرها؛ انیمیشنِ max-height در toggleMgmtTable با ارتفاعِ واقعی انجام می‌شود */
+.mgmt-table tbody,.users-table tbody{transition:max-height .26s cubic-bezier(0,0,.2,1)}
+.mgmt-table.expanded tbody,.users-table.expanded tbody{max-height:none}
 @media(prefers-reduced-motion:reduce){
   .tbl-exp .chev{transition:none}
   .mgmt-table tbody,.users-table tbody{transition:none}

@@ -689,10 +689,16 @@ async function dmDeleteVersion(num){
   var msg=isCur ? "حذف «ریویژن فعلی» ("+num+")؟ ریویژن قبلی جایگزینِ آن می‌شود و فایلش به سطلِ زبالهٔ گوگل‌درایو می‌رود (تا حدود یک ماه قابلِ بازیابی)."
                 : "حذف ریویژن «"+num+"»؟ فایلش به سطلِ زبالهٔ گوگل‌درایو می‌رود (تا حدود یک ماه قابلِ بازیابی).";
   if(!(await uiConfirm(msg,{danger:true,okLabel:"حذف"}))) return;
-  var r=await api("deleteDocument",{drawingNumber:num});
+  /* خوش‌بینانه: ریویژن همین حالا از فهرست بیرون می‌رود و جزئیات روی ریویژنِ باقی‌مانده باز می‌شود؛
+     حذف در پس‌زمینه انجام و اگر ناموفق شد داده از سرور برمی‌گردد. */
+  var op=optimisticOp(function(){ localDeleteDoc(num); },
+    function(){ return api("deleteDocument",{drawingNumber:num},{silent:true}); });
+  dmAfterDelete(d);
+  var r=await op;
   if(!r.ok){ toast(r.message||"حذف ناموفق",true); return; }
   toast("ریویژن حذف شد");
-  await refreshDocuments();
+}
+function dmAfterDelete(d){
   // ریویژن‌های باقی‌ماندهٔ همین مبنا
   var remaining=DB.documents.filter(function(x){
     return x.clientCode===d.clientCode && pad2(x.orderNo)===pad2(d.orderNo) &&
@@ -708,6 +714,24 @@ async function dmDeleteVersion(num){
 /* ============ بارگذاری ریویژن/نسخهٔ جدید (پنل فشرده: فقط فایل + توضیح) ============ */
 var _rv = { baseNum:"", mode:"", file:null };
 
+/* سربرگِ «ریویژنِ جدید»: دو سلول — ریویژنِ فعلی ← ریویژنی که ساخته می‌شود.
+   قبلاً فقط شمارهٔ سندِ مبنا (یعنی ریویژنِ قبلی) بزرگ نشان داده می‌شد و گمراه‌کننده بود.
+   الگو همان ریلِ ویزاردِ ثبت سند است: چپ‌به‌راست، مقدار بالا و برچسبِ لاتینِ کوچک زیرش،
+   و خطِ اتصالِ نازک بینِ سلول‌ها. بخشِ ریویژن جدا رنگ می‌گیرد تا تنها تفاوتِ دو شماره دیده شود. */
+function rvFlowHTML(d, rs){
+  var prev=(rs.latest&&rs.latest.drawingNumber)||d.drawingNumber;
+  var stem=["FSM",String(d.clientCode).toUpperCase(),pad2(d.orderNo),pad2(d.projectNo),pad2(d.partNo),String(d.typeCode).toUpperCase()].join("-");
+  var prevRev=String(prev).split("-").pop();
+  var num=function(rev){ return '<span class="rv-cn">'+esc(stem)+'-<b>'+esc(rev)+'</b></span>'; };
+  return '<div class="rv-flow">'+
+    '<div class="rv-cell prev">'+num(prevRev)+'<span class="rv-cap">CURRENT REV</span></div>'+
+    '<span class="rv-cx" aria-hidden="true"></span>'+
+    /* رینگ با SVG (نه conic-gradient): خط با سرعتِ ثابت روی محیطِ کادر حرکت می‌کند.
+       گرادیانِ زاویه‌ای در کادرِ عریض روی ضلع‌های بلند تند و روی ضلع‌های کوتاه کند می‌شد. */
+    '<div class="rv-cell next"><svg class="rv-ring" aria-hidden="true"><rect width="100%" height="100%" rx="12" ry="12" pathLength="100"/></svg>'+
+      num(pad2(rs.nextRev))+'<span class="rv-cap">NEW REV</span></div>'+
+  '</div>';
+}
 /* تصمیم‌گیرِ ورودی: بر اساس وضعیت ریویژن فعلیِ مبنا، حالت درست را باز می‌کند. */
 function startRevisionUpload(num){
   var d=docByNumber(num); if(!d){ toast("سند یافت نشد.",true); return; }
@@ -727,7 +751,7 @@ function openRevisionUploadModal(baseNum, mode){
   var rs=revState(d.clientCode,d.orderNo,d.projectNo,d.partNo,d.typeCode);
   var lead=isVer
     ? 'نسخهٔ اصلاح‌شدهٔ همین ریویژن (بدون تغییر شماره) را بارگذاری کنید؛ نسخهٔ قبلی جایگزین می‌شود.'
-    : 'ریویژن بعدی این سند («<b>ریویژن '+esc(pad2(rs.nextRev))+'</b>») ثبت می‌شود.';
+    : 'ریویژن بعدی این سند با عنوان «<b>ریویژن '+esc(pad2(rs.nextRev))+'</b>» ثبت می‌شود.';
   var noteLabel=isVer?"توضیحات این نسخه":"توضیحات این ریویژن";
   var upIco='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
   var stpTag = isVer?"فرمتِ اصلی برای آرشیوِ اسناد — اختیاری":"فرمتِ اصلی برای آرشیوِ اسناد — الزامی";
@@ -746,14 +770,21 @@ function openRevisionUploadModal(baseNum, mode){
     ? '<div class="rv-3d-hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".6" fill="currentColor" stroke="none"/></svg>'+
         '<span>فقط فرمتی را بارگذاری کنید که تغییر کرده؛ هر فرمتی که خالی بماند، از نسخهٔ قبلیِ همین سند استفاده می‌شود.</span></div>'
     : '';
-  var body='<div class="rv-up">'+
-    '<div class="rv-num mono" style="direction:ltr">'+esc(baseNum)+'</div>'+
-    '<p class="rv-lead">'+lead+'</p>'+
-    dzHTML+hint3D+
-    '<label class="fld" style="margin-top:12px">'+noteLabel+'</label>'+
-    '<textarea id="rvNote" class="rej-ta" rows="2" placeholder="'+(isVer?"تغییرات این نسخه…":"تغییرات و دلیل این ریویژن…")+'"></textarea>'+
+  /* چیدمان هم‌الگوی ویزاردِ ثبت سند: نوارِ شماره بالا (زمینهٔ خاکستری + سایهٔ زیرش، مثلِ .nd-rail)،
+     و در بدنه اول توضیحات و بعد بارگذاریِ فایل (مثلِ .nd-fstack). */
+  var body='<div class="rv-band">'+
+      (isVer ? '<div class="rv-num mono" style="direction:ltr">'+esc(baseNum)+'</div>' : rvFlowHTML(d, rs))+
+    '</div>'+
+    '<div class="rv-up">'+
+    /* هم‌کلاسِ توضیحِ ویزاردِ ثبت سند (#nRevBanner): نقطهٔ نارنجی + متنِ ۱۱px کم‌رنگ + بخشِ پررنگِ نارنجی */
+    '<div class="nd-revnote">'+lead+'</div>'+
+    '<div class="nd-fstack">'+
+      '<div class="ndoc-note"><textarea id="rvNote" class="ndoc-note-ta" aria-label="'+esc(noteLabel)+'" placeholder="'+(isVer?"تغییرات این نسخه را بنویسید.":NOTE_PH_REV)+'"></textarea></div>'+
+      dzHTML+
+    '</div>'+
+    hint3D+
     '<div class="clm-actions"><button class="btn" onclick="closeModal()">انصراف</button>'+
-      '<button class="btn primary" onclick="submitRevisionUpload()">'+upIco+'بارگذاری</button></div>'+
+      '<button class="btn primary" onclick="submitRevisionUpload()">'+upIco+(isVer?'ثبت نسخه':'ثبت ریویژن')+'</button></div>'+
   '</div>';
   showModal(isVer?"بارگذاری نسخهٔ جدید":"بارگذاری ریویژن جدید", body, "box-narrow");
   rvInitDrop("rvDrop","rvFile");
@@ -848,11 +879,9 @@ async function submitRevisionUpload(){
     label: label, action: action, payload: payload,
     onSuccess: async function(r){
       if(!r || !r.ok){ toast((r&&r.message)||"بارگذاری ناموفق",true); return; }
-      var targetNum = r.drawingNumber || _rv.baseNum;
       toast("بارگذاری شد");
-      var sr=await api("submitForReview",{drawingNumber:targetNum},{silent:true, quiet:true});
+      var sr=await uploadedThenSubmit(r, payload, isVer?{num:payload.drawingNumber, note:note}:null);
       if(sr && sr.ok) toast("برای بازبینی ارسال شد");
-      await refreshDocuments();
     }
   });
 }

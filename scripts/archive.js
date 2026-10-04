@@ -403,8 +403,9 @@ function archKebab(ev, num){
 }
 async function delDocument(num){
   if(!(await uiConfirm("حذف سند «"+num+"»؟ سند به «سطل زباله» می‌رود و تا ۳۰ روز قابلِ بازیابی است؛ پس از آن سامانه حذف دائمی‌اش می‌کند.",{danger:true,okLabel:"حذف"}))) return;
-  var r=await api("deleteDocument",{drawingNumber:num});
-  if(r.ok){ toast("به سطلِ زباله منتقل شد"); refreshDocuments(); } else toast(r.message||"حذف ناموفق",true);
+  var r=await optimisticOp(function(){ localDeleteDoc(num); },
+    function(){ return api("deleteDocument",{drawingNumber:num},{silent:true}); });
+  if(r.ok) toast("به سطلِ زباله منتقل شد"); else toast(r.message||"حذف ناموفق",true);
 }
 
 /* ================= سطلِ زباله (تبِ اسنادِ حذف‌شده — قابلِ بازیابی تا ۳۰ روز) ================= */

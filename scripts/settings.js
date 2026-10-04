@@ -44,14 +44,25 @@ function renderDataTables(){
 }
 function emptyRow(cols){ return '<tr><td colspan="'+cols+'" class="muted" style="text-align:center;padding:14px">موردی نیست.</td></tr>'; }
 
-/* جمع/بازکردنِ سطرهای یک جدولِ تنظیمات — رفتار و انیمیشنِ فلش عیناً مثلِ درختِ سایدبار:
-   کلاسِ collapsed روی خودِ table (tbody با انیمیشنِ max-height جمع می‌شود)، و کلاسِ open روی فلش (چرخشِ ۱۸۰°). */
+/* جمع/بازکردنِ سطرهای یک جدولِ تنظیمات — انیمیشنِ فلش عیناً مثلِ درختِ سایدبار:
+   جمع = ۴ سطر (max-height پیش‌فرضِ tbody)، باز = همهٔ سطرها (کلاسِ expanded روی table → max-height:none).
+   چون max-height:none انیمیشن نمی‌گیرد، حینِ گذار ارتفاعِ واقعی به‌صورتِ inline ست و بعد پاک می‌شود. */
 function toggleMgmtTable(btn){
   var tbl=btn.closest("table"); if(!tbl) return;
-  var collapsed=tbl.classList.toggle("collapsed");   // true = حالا جمع شد
-  var open=!collapsed;
+  var body=tbl.tBodies[0];
+  var open=!tbl.classList.contains("expanded");
   btn.classList.toggle("open",open);
   btn.setAttribute("aria-expanded",open?"true":"false");
+  if(!body){ tbl.classList.toggle("expanded",open); return; }
+  var from=body.getBoundingClientRect().height;
+  tbl.classList.toggle("expanded",open);
+  body.style.maxHeight="";
+  var to=open?body.scrollHeight:parseFloat(getComputedStyle(body).maxHeight);
+  body.style.maxHeight=from+"px";
+  void body.offsetHeight;   // reflow تا گذار از ارتفاعِ فعلی شروع شود
+  body.style.maxHeight=to+"px";
+  clearTimeout(body._expT);
+  body._expT=setTimeout(function(){ body.style.maxHeight=""; }, 300);
 }
 
 /* ---- آواتار ---- */

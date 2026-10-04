@@ -91,12 +91,13 @@ async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal){
       body: JSON.stringify({ action:"getFile", token:ME.token, payload:{ fileId:fileId } }), redirect:"follow" });
     if(!res.ok) throw new Error("HTTP "+res.status);
     var total=parseInt(res.headers.get("Content-Length")||"0",10)||0;
-    if(!total && expectedTotal>0) total=expectedTotal;   // بدونِ Content-Length: از حجمِ فایل درصدِ واقعی بساز
+    /* expectedTotal می‌تواند عدد باشد یا ظرفِ {v} که درخواستِ موازیِ حجم بعداً پرش می‌کند */
+    var expT=function(){ return (expectedTotal && typeof expectedTotal==="object") ? (expectedTotal.v||0) : (expectedTotal||0); };
     if(!res.body || typeof res.body.getReader!=="function") return await res.json();   // مرورگرِ بدونِ استریم: یک‌جا
     var reader=res.body.getReader(), chunks=[], loaded=0, rd;
     while(!(rd=await reader.read()).done){
       chunks.push(rd.value); loaded+=rd.value.length;
-      if(onProgress) try{ onProgress(loaded, total); }catch(_){}
+      if(onProgress) try{ onProgress(loaded, total||expT()); }catch(_){}   // بدونِ Content-Length: از حجمِ فایل درصدِ واقعی بساز
     }
     var buf=new Uint8Array(loaded), off=0, i;
     for(i=0;i<chunks.length;i++){ buf.set(chunks[i], off); off+=chunks[i].length; }
@@ -114,18 +115,36 @@ async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal){
    ۳ بار بی‌صدا تلاش می‌شود؛ اگر همه شکست خورد، آخرین نتیجهٔ ناموفق برمی‌گردد و خودِ فراخوان پیام می‌دهد.
    o.onProgress(loaded,total): اگر داده شود از مسیرِ استریمی (نوارِ پیشرفت) استفاده می‌شود. */
 function fileSleep(ms){ return new Promise(function(res){ setTimeout(res, ms); }); }
+/* حافظهٔ موقتِ فایل‌ها (fileId → پاسخِ getFile) برای همین نشستِ صفحه.
+   هر پیش‌نمایش (مدلِ سه‌بعدیِ پنلِ پروژه، فایلِ مودالِ جزئیات) پس از هر بازرسم دوباره از درایو
+   دانلود می‌شد. محتوای یک fileId عوض نمی‌شود (ریویژن/نسخهٔ جدید فایلِ تازه با شناسهٔ تازه می‌سازد)،
+   پس نگه‌داشتنش امن است. سقفِ تعداد و حجم تا حافظهٔ مرورگر پر نشود؛ قدیمی‌ترین‌ها اول بیرون می‌روند. */
+var _fileCache={}, _fileCacheOrder=[], _fileCacheChars=0;
+var FILE_CACHE_MAX_N=20, FILE_CACHE_MAX_CHARS=120*1024*1024;   // ≈ ۹۰ مگابایت فایلِ واقعی (base64)
+function fileCachePut(id, r){
+  var n=String(r.base64||"").length;
+  if(!id || n>FILE_CACHE_MAX_CHARS/2) return;   // فایلِ خیلی بزرگ کش نمی‌شود
+  if(_fileCache[id]){ _fileCacheChars-=String(_fileCache[id].base64||"").length; _fileCacheOrder=_fileCacheOrder.filter(function(x){ return x!==id; }); }
+  _fileCache[id]=r; _fileCacheOrder.push(id); _fileCacheChars+=n;
+  while(_fileCacheOrder.length>FILE_CACHE_MAX_N || _fileCacheChars>FILE_CACHE_MAX_CHARS){
+    var old=_fileCacheOrder.shift(); _fileCacheChars-=String((_fileCache[old]||{}).base64||"").length; delete _fileCache[old];
+  }
+}
 async function getFileRetry(fileId, o){
   o=o||{}; var tries=3, r=null;
-  // اگر onProgress هست ولی حجمِ موردانتظار داده نشده، یک‌بار از بک‌اند بگیر تا درصد واقعی شود (بهترین‌تلاش)
+  if(fileId && _fileCache[fileId]){ if(o.onProgress) try{ o.onProgress(1,1); }catch(e){} return _fileCache[fileId]; }
+  /* اگر onProgress هست ولی حجمِ موردانتظار داده نشده، حجم از بک‌اند گرفته می‌شود تا درصد واقعی شود.
+     ⚡ هم‌زمان با دانلود، نه پیش از آن: قبلاً دانلود تا پایانِ این درخواست (۱–۲ ثانیه) منتظر می‌ماند.
+     تا رسیدنش، نوار با پیشرفتِ تخمینی جلو می‌رود؛ پس از رسیدن، درصدِ واقعی جایش را می‌گیرد. */
   var exp=Number(o.expectedTotal)||0;
   if(o.onProgress && !exp && typeof apiFileSize==="function"){
-    var sz=await apiFileSize(fileId);
-    if(sz>0) exp=Math.ceil(sz/3)*4 + 120;   // طولِ base64 + سرریزِ JSON
+    var holder={v:0}; exp=holder;
+    apiFileSize(fileId).then(function(sz){ if(sz>0) holder.v=Math.ceil(sz/3)*4 + 120; });   // طولِ base64 + سرریزِ JSON
   }
   for(var i=0;i<tries;i++){
     if(o.onProgress && typeof apiGetFileStreamed==="function") r=await apiGetFileStreamed(fileId, o.onProgress, true, exp);
     else r=await api("getFile",{fileId:fileId},{silent:true, quiet:true});
-    if(r && r.ok) return r;                     // موفق شد
+    if(r && r.ok){ fileCachePut(fileId, r); return r; }   // موفق شد
     if(i<tries-1) await fileSleep(650*(i+1));   // ۰٫۶۵s سپس ۱٫۳s پیش از تلاشِ بعدی
   }
   return r;

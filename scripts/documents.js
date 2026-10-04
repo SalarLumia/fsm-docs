@@ -17,6 +17,9 @@ var ND_META = {
 /* آیکون‌های ویزارد */
 var ND_CHEV ='<svg class="nd-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>';
 var ND_OK_IC='<svg class="nd-ok" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+/* متنِ راهنمای کادرِ توضیحات — مشترک بینِ ویزاردِ ثبت سند و پنجرهٔ ریویژنِ جدید (docmodal.js) */
+var NOTE_PH_NEW="یادداشت‌های مربوط به این سند جدید را در اینجا ثبت کنید.";
+var NOTE_PH_REV="تغییرات مربوط به این ریویژن از این سند را در اینجا ثبت کنید.";
 var ND_UPLOAD='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
 var ND_COPY ='<svg class="ic" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
 var ND_INFO_IC='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
@@ -406,7 +409,7 @@ function ndFinalHTML(){
           /* نوتِ زیرِ فیلد (نه فقط placeholder): متنِ داخلِ فیلد به‌محضِ شروعِ تایپ محو
              می‌شود — یعنی دقیقاً همان لحظه‌ای که قالبِ نوشتن اهمیت پیدا می‌کند. متنش را
              updateRevMode بر اساسِ نوعِ سند پر می‌کند. */
-          '<div class="ndoc-note"><textarea id="nTitle" class="ndoc-note-ta" placeholder="تغییرات و یادداشت‌های مربوط به این نسخه ریویژن را بنویسید."></textarea>'+
+          '<div class="ndoc-note"><textarea id="nTitle" class="ndoc-note-ta" placeholder="'+NOTE_PH_NEW+'"></textarea>'+
             '<div class="rv-3d-hint" id="nNoteHint" hidden></div></div>'+
           (is3D?nd3DUploadHTML():ndFileHTML())+
         '</div>'+
@@ -418,7 +421,7 @@ function ndFinalHTML(){
             '</button>'+
             '<div class="nd-step-hint nd-copy-hint" id="nCopyHint">'+ND_INFO_IC+'برای کپی کردن نام سند، روی آن کلیک نمایید.</div>'+
           '</div>'+
-          '<button type="button" class="btn primary" id="nSubmitBtn" onclick="submitDocument()">ثبت سند</button>'+
+          '<button type="button" class="btn primary" id="nSubmitBtn" onclick="submitDocument()">'+ND_UPLOAD+'ثبت سند</button>'+
         '</div>'+
       '</div>'+
     '</div>';
@@ -457,7 +460,9 @@ function updateRevMode(){
      رفتارِ نوع‌محورِ تازه در این پنل است؛ بقیهٔ منطقِ ریویژن دست‌نخورده می‌ماند. */
   var isRD = rdTypeReady() && String(ty).toUpperCase()===RD_CODE;
   var hint = document.getElementById("nNoteHint");
-  if(titleInp) titleInp.placeholder = isRD ? RD_NOTE_PH : "تغییرات و یادداشت‌های مربوط به این نسخه ریویژن را بنویسید.";
+  /* متنِ راهنما: سندِ جدید (Rev 00) ← یادداشت؛ ریویژنِ سندِ موجود ← تغییرات. «نقشهٔ رفرنس» متنِ خودش را دارد. */
+  var isRevNote = !!(c&&o&&pr&&pt&&ty) && revState(c,o,pr,pt,ty).mode!=="new";
+  if(titleInp) titleInp.placeholder = isRD ? RD_NOTE_PH : (isRevNote ? NOTE_PH_REV : NOTE_PH_NEW);
   if(hint){ hint.hidden = !isRD; hint.innerHTML = isRD ? (RD_INFO_IC+'<span>'+RD_NOTE_HINT+'</span>') : ""; }
   if(!(c&&o&&pr&&pt&&ty)){ if(note){ note.hidden=true; note.innerHTML=""; } if(submitBtn) submitBtn.disabled=false; _newDocBlocked=false; return; }
   var rs=revState(c,o,pr,pt,ty), msg="", cls="nd-revnote";
@@ -559,10 +564,9 @@ async function submitDocument(){
     onSuccess: async function(r){
       if(!r || !r.ok){ toast((r&&r.message)||"ثبت ناموفق بود.",true); return; }
       toast("ثبت شد: "+r.drawingNumber);
-      // ارسالِ خودکار برای بازبینی (پیش‌فرضِ فعال)
-      var sr=await api("submitForReview",{drawingNumber:r.drawingNumber},{silent:true, quiet:true});
+      // سند بی‌درنگ (در وضعیتِ «در انتظار») دیده می‌شود؛ ارسالِ خودکار برای بازبینی در پس‌زمینه
+      var sr=await uploadedThenSubmit(r, payload, null);
       if(sr && sr.ok) toast("برای بازبینی ارسال شد");
-      await refreshDocuments();
     }
   });
 }
@@ -650,14 +654,15 @@ function goNewDocForProject(c,o,pr,typeCode,part){
   ndRender();
 }
 
-async function refreshDocuments(){
-  var r=await api("bootstrap",{});
-  if(!r.ok){ return; }
-  DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
-  DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[];
-  DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
-  DB.trashedDocs=r.trashedDocs||[];
-  if(r.users&&r.users.length) DB.users=r.users;
+/* ================= به‌روزرسانیِ خوش‌بینانه =================
+   قبلاً هر فرمان دو رفت‌وبرگشت داشت: خودِ فرمان + خواندنِ دوبارهٔ کلِ داده‌ها (bootstrap)،
+   و صفحه تا پایانِ دومی تغییری نشان نمی‌داد. حالا تغییر بی‌درنگ روی DB اعمال و صفحه رسم
+   می‌شود؛ خواندنِ کامل بی‌صدا در پس‌زمینه انجام می‌شود و فقط اگر با حالتِ محلی فرق داشت
+   (خطای فرمان، تغییرِ کاربرِ دیگر) دوباره رسم می‌کند. */
+var _opsInFlight=0;   // فرمان‌های در حالِ اجرا — نتیجهٔ همگام‌سازی‌ای که وسطِ آن‌ها برسد کهنه است
+var _syncSeq=0;       // فقط جدیدترین همگام‌سازی حق دارد DB را بنویسد
+
+function rerenderAfterData(){
   refreshAllSelects();
   renderArchive(); renderDataTables(); renderDashboard();
   if(!document.getElementById("tab-project").classList.contains("hidden")) rerenderProjectTab();
@@ -667,4 +672,158 @@ async function refreshDocuments(){
   /* همین منطق برای پنجرهٔ کاملِ کارتابلِ بازبینی: داشبورد از راهِ renderDashboard
      تازه می‌شد ولی این پنجره دست‌نخورده می‌ماند و رکوردِ رسیدگی‌شده را نگه می‌داشت. */
   if(typeof reviewAllRefresh==="function") reviewAllRefresh();
+}
+/* امضای دادهٔ «دیدنی»: شناسه/زمانِ ساختِ رکوردهای گردش‌کار و زمان‌ها عمداً بیرون‌اند،
+   چون نسخهٔ محلیِ خوش‌بینانه آن‌ها را دقیقاً مثلِ سرور نمی‌داند. */
+function dataSig(src){
+  var S=function(v){ return String(v==null?"":v); };
+  var docs=(src.documents||[]).map(function(d){
+    return [d.drawingNumber,d.status,S(d.isLatest).toLowerCase(),d.fileId,d.stpFileId,d.usdzFileId,
+            revFmt(d.rev),d.title,d.reviewNote].map(S).join(""); }).sort();
+  var wf=(src.workflow||[]).map(function(w){
+    return [w.drawingNumber,w.action,w.user,w.comment].map(S).join(""); }).sort();
+  var tr=(src.trashedDocs||[]).map(function(x){ return S(x.drawingNumber); }).sort();
+  return JSON.stringify([docs,wf,tr,src.clients,src.orders,src.projects,src.parts,src.docTypes,src.partMods]);
+}
+/* opts.background: همگام‌سازیِ پس‌زمینه پس از تغییرِ خوش‌بینانه — اگر چیزی فرق نکرده بود رسم نمی‌کند،
+   و اگر وسطش فرمانِ دیگری شروع شده بود نتیجه را دور می‌ریزد (همگام‌سازیِ بعدیِ همان فرمان می‌آید). */
+async function refreshDocuments(opts){
+  var bg=!!(opts&&opts.background), my=++_syncSeq;
+  var r=await api("bootstrap",{});
+  if(!r.ok){ return; }
+  if(my!==_syncSeq) return;
+  if(bg && _opsInFlight>0) return;
+  var same = bg && dataSig(r)===dataSig(DB);
+  DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
+  DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[];
+  DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
+  DB.trashedDocs=r.trashedDocs||[];
+  if(r.users&&r.users.length) DB.users=r.users;
+  if(r.instanceCounts) DB.instanceCounts=r.instanceCounts;
+  snapSave(); markSynced();
+  if(same) return;   // صفحه همین حالا درست است؛ رسمِ دوباره فقط پرش می‌سازد
+  rerenderAfterData();
+  if(bg && opts.full && typeof renderNavTree==="function") renderNavTree();   // همگام‌سازیِ خودکار: مشتری/پروژهٔ تازهٔ کاربرانِ دیگر
+}
+
+/* ================= دادهٔ ذخیره‌شده برای بازشدنِ فوری =================
+   آخرین دادهٔ بوت‌استرپ در مرورگر نگه داشته می‌شود تا بازکردنِ بعدیِ سایت منتظرِ سرور نماند.
+   فقط برای همان کاربر، حداکثر ۷ روز، و با خروج پاک می‌شود. هر خطای ذخیره‌سازی (حالتِ خصوصی،
+   پر بودنِ فضا) بی‌صدا نادیده گرفته می‌شود — در بدترین حالت، رفتارِ قبلی (انتظار برای سرور) برمی‌گردد. */
+var SNAP_KEY="fsm_snap", SNAP_VER=1, SNAP_MAX_AGE=7*86400000;
+function snapSave(){
+  if(!ME || !ME.username) return;
+  try{
+    localStorage.setItem(SNAP_KEY, JSON.stringify({ v:SNAP_VER, u:ME.username, t:Date.now(), db:{
+      clients:DB.clients, orders:DB.orders, projects:DB.projects, parts:DB.parts, docTypes:DB.docTypes,
+      documents:DB.documents, users:DB.users, templates:DB.templates, workflow:DB.workflow, partMods:DB.partMods,
+      trashedDocs:DB.trashedDocs, suppliers:DB.suppliers, rawTypes:DB.rawTypes, instanceCounts:DB.instanceCounts } }));
+  }catch(e){ snapClear(); }
+}
+function snapLoad(){
+  try{
+    var s=JSON.parse(localStorage.getItem(SNAP_KEY)||"null");
+    if(!s || s.v!==SNAP_VER || s.u!==ME.username || !s.db) return null;
+    if(Date.now()-(s.t||0) > SNAP_MAX_AGE) return null;
+    return s.db;
+  }catch(e){ return null; }
+}
+function snapClear(){ try{ localStorage.removeItem(SNAP_KEY); }catch(e){} }
+
+/* ================= همگام‌سازیِ خودکار =================
+   تغییرهای کاربرانِ دیگر (مثلاً تأییدِ بازبین) بدونِ رفرش دیده می‌شوند: هنگامِ برگشتن به
+   زبانهٔ مرورگر (اگر دست‌کم ۴۵ ثانیه از آخرین همگام‌سازی گذشته) و هر ۴ دقیقه وقتی زبانه
+   دیده می‌شود. اگر چیزی عوض نشده باشد هیچ رسمی انجام نمی‌شود. وقتی کاربر وسطِ کاری است
+   (پنجرهٔ باز، فرمِ ثبت، تایپ در یک فیلد) به تعویق می‌افتد تا زیرِ دستش چیزی جابه‌جا نشود. */
+var _lastSync=0, SYNC_FOCUS_GAP=45000, SYNC_INTERVAL=240000;
+function markSynced(){ _lastSync=Date.now(); }
+function uiBusy(){
+  var mh=document.getElementById("modalHost"); if(mh && mh.children.length) return true;
+  if(document.querySelector(".modal:not(.hidden)")) return true;
+  var a=document.activeElement;
+  if(a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) return true;
+  return false;
+}
+function autoSync(minGap){
+  if(!ME || !ME.token || document.hidden) return;
+  var app=document.getElementById("appView"); if(!app || app.classList.contains("hidden")) return;
+  if(Date.now()-_lastSync < minGap) return;
+  if(_opsInFlight>0 || uiBusy()) return;
+  markSynced();   // جلوی درخواست‌های هم‌زمانِ تکراری را می‌گیرد
+  refreshDocuments({background:true, full:true});
+}
+document.addEventListener("visibilitychange", function(){ if(!document.hidden) autoSync(SYNC_FOCUS_GAP); });
+setInterval(function(){ autoSync(SYNC_INTERVAL); }, 30000);
+
+/* یک فرمانِ خوش‌بینانه: mutate بی‌درنگ روی DB اعمال و رسم می‌شود، سپس call (فرمانِ بک‌اند) اجرا می‌شود.
+   موفق → همگام‌سازیِ بی‌صدا در پس‌زمینه. ناموفق → همگام‌سازیِ کامل تا تغییرِ محلی برگردد. */
+async function optimisticOp(mutate, call){
+  _opsInFlight++;
+  try{ if(mutate) mutate(); }catch(e){}
+  rerenderAfterData();
+  var r;
+  try{ r=await call(); }catch(e){ r={ok:false}; }
+  finally{ _opsInFlight--; }
+  if(r && r.ok) refreshDocuments({background:true});
+  else await refreshDocuments();
+  return r||{ok:false};
+}
+/* پس از آپلودِ موفق: سند محلی ثبت/به‌روز و بی‌درنگ «در انتظارِ بازبینی» نشان داده می‌شود،
+   سپس ارسالِ خودکار برای بازبینی انجام می‌شود. newVer = {num, note} برای «نسخهٔ جدیدِ» سندِ ردشده. */
+function uploadedThenSubmit(r, payload, newVer){
+  var num=r.drawingNumber || (newVer&&newVer.num);
+  return optimisticOp(function(){
+    if(newVer){
+      var f=r.fields || {status:"draft", reviewedBy:"", reviewedAt:"", reviewNote:""};
+      localDocSet(num, f);
+      if(newVer.note!=null){ localDocSet(num,{title:String(newVer.note)}); }
+      localWf(num, "newversion", newVer.note||"");
+    } else localAddDoc(r, payload);
+    localDocSet(num,{status:"pending"}); localWf(num,"submitted","");
+  }, function(){ return api("submitForReview",{drawingNumber:num},{silent:true, quiet:true}); });
+}
+/* تغییرهای محلیِ رایج — همان چیزی که بک‌اند در شیت می‌نویسد */
+function localWf(num, action, comment){
+  DB.workflow.push({ id:"local"+Date.now()+Math.random(), drawingNumber:num, action:action,
+    user:ME.username, timestamp:new Date().toISOString(), comment:comment||"" });
+}
+function localDocSet(num, fields){
+  var d=docByNumber(num); if(!d) return null;
+  for(var k in fields) d[k]=fields[k];
+  return d;
+}
+function localSameBase(a, b){
+  return String(a.clientCode).toUpperCase()===String(b.clientCode).toUpperCase() &&
+    pad2(a.orderNo)===pad2(b.orderNo) && pad2(a.projectNo)===pad2(b.projectNo) &&
+    pad2(a.partNo)===pad2(b.partNo) && String(a.typeCode).toUpperCase()===String(b.typeCode).toUpperCase();
+}
+/* سندِ تازه‌ثبت‌شده: ردیفِ کامل از بک‌اند (r.doc، از v29) و در نبودش، ساخته‌شده از روی پیلود */
+function localAddDoc(r, payload){
+  var d=r.doc ? Object.assign({}, r.doc) : {
+    drawingNumber:r.drawingNumber, clientCode:String(payload.clientCode).toUpperCase(),
+    orderNo:pad2(payload.orderNo), projectNo:pad2(payload.projectNo), partNo:pad2(payload.partNo),
+    typeCode:String(payload.typeCode).toUpperCase(), rev:revFmt(payload.rev), title:String(payload.title||""),
+    fileId:"", fileUrl:r.fileUrl||"", uploadedBy:ME.username, timestamp:new Date().toISOString(),
+    status:"draft", reviewedBy:"", reviewedAt:"", reviewNote:"" };
+  d.isLatest=true;
+  var isRev=false;
+  DB.documents.forEach(function(x){ if(localSameBase(x,d)){ isRev=true; x.isLatest=false; } });
+  DB.documents=DB.documents.filter(function(x){ return x.drawingNumber!==d.drawingNumber; });
+  DB.documents.push(d);
+  localWf(d.drawingNumber, isRev?"revision":"created", d.title);
+  return d;
+}
+/* حذفِ نرم: سند از فهرست بیرون، به سطلِ زباله، و اگر نسخهٔ فعلی بود بالاترین ریویژنِ باقی‌مانده فعلی می‌شود */
+function localDeleteDoc(num){
+  var d=docByNumber(num); if(!d) return;
+  DB.documents=DB.documents.filter(function(x){ return x.drawingNumber!==num; });
+  DB.trashedDocs.push({ drawingNumber:num, clientCode:d.clientCode, orderNo:pad2(d.orderNo), projectNo:pad2(d.projectNo),
+    partNo:pad2(d.partNo), typeCode:d.typeCode, rev:String(d.rev==null?"":d.rev), title:d.title||"", status:d.status||"",
+    deletedAt:new Date().toISOString(), deletedBy:ME.username });
+  localWf(num, "deleted", "");
+  if(String(d.isLatest).toLowerCase()==="true"){
+    var best=null;
+    DB.documents.forEach(function(x){ if(localSameBase(x,d) && (!best || (parseInt(x.rev,10)||0)>(parseInt(best.rev,10)||0))) best=x; });
+    if(best) best.isLatest=true;
+  }
 }
