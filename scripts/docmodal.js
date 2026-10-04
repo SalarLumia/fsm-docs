@@ -26,33 +26,8 @@ async function openDocDetail(num){
   if(_topLayer && _topLayer.querySelector && _topLayer.querySelector(".doc-modal")) _mh.removeChild(_topLayer);
   _dm.num=num; _dm.selNum=num;
 
-  /* ---------- مشخصات سند: فقط نام‌های متنی (بدون کد) ---------- */
-  var meta=[
-    ["شماره سند", '<span class="mono" style="direction:ltr">'+esc(d.drawingNumber)+'</span>'],
-    ["مشتری", esc(clientName(d.clientCode))],
-    // برچسبِ ردیف خودش «پروژه» است؛ پس مقدار باید نامِ خالص باشد، نه عنوانِ پیشونددار
-    ["پروژه", esc(projectName(d)||("شمارهٔ "+pad2(d.projectNo)))],
-    ["قطعه", esc(partName(d.partNo))],
-    ["نوع سند", esc(typeName(d.typeCode))],
-    ["ثبت‌کننده", esc(userName(d.uploadedBy)||"—")],
-    ["تاریخ ثبت", fmtTimeDate(d.timestamp)]
-  ];
-  // سطرِ «بازبین» حذف شد؛ اطلاعاتِ کاملِ بازبینی در سکشنِ گردش‌کار (تاریخچهٔ سند) نمایش داده می‌شود.
-  var metaHTML=meta.map(function(m){return '<div class="dm-row"><span class="dm-k">'+m[0]+'</span><span class="dm-v">'+m[1]+'</span></div>';}).join("");
-
-  /* بنرِ رد: بینِ سکشنِ مشخصات و تاریخچه؛ هم‌سبکِ ردیف‌های مشخصات (dm-row/dm-k/dm-v) با نقطهٔ قرمزِ پالس‌دار
-     پیشِ تیتر (هم‌الگوی نقطهٔ فعالیتِ اخیرِ داشبورد) به‌جای بنرِ توپُرِ قبلی. */
-  /* هشدارِ «نسخهٔ جدیدتر»: وقتی کاربر با اسکنِ QRِ یک نقشهٔ کاغذی وارد می‌شود، ممکن است
-     کاغذِ دستش قدیمی باشد. اگر ویرایشِ تأییدشدهٔ جدیدتری هست، همین‌جا اعلام می‌شود تا
-     کسی با نقشهٔ منسوخ قطعه نسازد. */
-  var newerBanner=dmNewerRevBanner(d);
-
-  var rejBanner = (String(d.status||"").toLowerCase()==="rejected")
-    ? '<div class="dm-reject">'+
-        '<div class="dm-reject-t"><span class="dm-reject-dot"></span>این سند نیاز به اعمال تغییرات دارد.</div>'+
-        '<div class="dm-reject-note">'+(d.reviewNote?esc(d.reviewNote):'دلیلی ثبت نشده است.')+'</div>'+
-      '</div>'
-    : '';
+  var metaHTML=dmMetaHTML(d);
+  var rejBanner=dmRejectHTML(d);
 
   /* ---------- تاریخچهٔ ریویژن‌ها (جدید به قدیم) ---------- */
   var revs=revisionsOf(d);
@@ -80,18 +55,18 @@ async function openDocDetail(num){
   var body=''+
     '<div class="doc-modal">'+
       '<div class="doc-preview">'+
-        '<div class="dp-frame" id="docPreviewHost"></div>'+
+        /* بنرِ «ریویژنِ جدیدتر» روی پیش‌نمایش، چسبیده به پایینِ کادر — کنارِ همان نقشه‌ای که منسوخ است */
+        '<div class="dp-stage"><div class="dp-frame" id="docPreviewHost"></div><div id="dmNewerSlot"></div></div>'+
         '<div class="dp-actions">'+actionBtn+dmAddFormatBtnHTML(cur,is3DType)+dlBtnHTML+'</div>'+
       '</div>'+
       /* ظرفِ داخلی: خودِ .doc-side جهتِ ltr دارد تا نوارِ اسکرول سمتِ راست
          بیفتد؛ جهتِ محتوا اینجا به rtl برمی‌گردد. */
       '<div class="doc-side"><div class="doc-side-in">'+
-        newerBanner+
-        '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>مشخصات سند</div>'+metaHTML+'</div>'+
-        rejBanner+
+        '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>مشخصات سند</div><div id="dmMeta" data-num="'+esc(d.drawingNumber)+'">'+metaHTML+'</div></div>'+
+        '<div id="dmRej">'+rejBanner+'</div>'+
         '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><polyline points="12 7 12 12 15 15"/></svg>تاریخچهٔ سند</div>'+
           '<div class="ver-list">'+revHTML+'</div></div>'+
-        dmQrSectionHTML(d)+
+        '<div id="dmQrWrap">'+dmQrSectionHTML(d)+'</div>'+
       '</div></div>'+
     '</div>';
   showModal(esc(docPhrase(d)), body, "doc-box");
@@ -178,6 +153,8 @@ function dmRefreshOpen(){
   if(!top || !top.querySelector || !top.querySelector(".doc-modal")) return;
   var num=_dm.num; if(!num) return;
   if(!docByNumber(num)) return;   // سند حذف شده — بازرسم بی‌معناست
+  /* ریویژنی که کاربر در تاریخچه انتخاب کرده حفظ می‌شود (نه برگشت به ریویژنی که پنجره با آن باز شد) */
+  if(_dm.selNum && docByNumber(_dm.selNum)) num=_dm.selNum;
   openDocDetail(num);             // خودش جایِ لایهٔ هم‌نوعِ رویی را می‌گیرد
 }
 
@@ -190,12 +167,53 @@ function dmNewerRevBanner(d){
     return (parseInt(rv.rev,10)||0)>cur && String(rv.status||"").toLowerCase()==="approved";
   }).sort(function(a,b){ return (parseInt(b.rev,10)||0)-(parseInt(a.rev,10)||0); })[0];
   if(!newer) return "";
-  return '<div class="dm-newer">'+
-    '<div class="dm-newer-t"><span class="dm-newer-dot"></span>ویرایشِ جدیدتری تأیید شده است</div>'+
-    '<div class="dm-newer-note">این سند ویرایشِ '+faN(pad2(d.rev))+' است؛ ویرایشِ '+faN(pad2(newer.rev))+' تأیید شده. '+
-      'اگر نقشهٔ چاپیِ همین ویرایش را در دست دارید، از نسخهٔ تأییدشده استفاده کنید.</div>'+
-    '<button class="btn sm" onclick="openDocDetail(\''+esc(newer.drawingNumber)+'\')">مشاهدهٔ ویرایشِ '+faN(pad2(newer.rev))+'</button>'+
+  return '<div class="dm-newer dp-newer"><div class="dm-newer-main">'+
+    /* واژه و شکلِ شماره هم‌سانِ تاریخچهٔ سند: «ریویژن 01» (قبلاً «ویرایش ۱» — faN صفرِ ابتدایی را می‌انداخت) */
+    '<div class="dm-newer-t"><span class="dm-newer-dot"></span>ریویژن جدیدتری تأیید شده است</div>'+
+    '<div class="dm-newer-note">این سند ریویژن '+esc(pad2(revFmt(d.rev)))+' است؛ ریویژن '+esc(pad2(revFmt(newer.rev)))+' تأیید شده. '+
+      'اگر نقشهٔ چاپیِ همین ریویژن را در دست دارید، از نسخهٔ تأییدشده استفاده کنید.</div></div>'+
+    /* درجا همان ریویژن در پیش‌نمایش انتخاب می‌شود (نه بازکردنِ دوبارهٔ پنجره) */
+    '<button class="btn sm" onclick="dmSelectVersion(\''+esc(newer.drawingNumber)+'\')">مشاهدهٔ ریویژن '+esc(pad2(revFmt(newer.rev)))+'</button>'+
+    /* بنر روی نقشه است و ممکن است جدولِ مشخصاتِ پایینِ آن را بپوشاند؛ بستن فقط برای همین ریویژن و همین بار */
+    '<button class="dm-newer-x" onclick="dmHideNewer()" aria-label="بستن" title="بستن">✕</button>'+
   '</div>';
+}
+function dmHideNewer(){ var s=document.getElementById("dmNewerSlot"); if(s) s.innerHTML=""; }
+
+/* مشخصاتِ سند (فقط نام‌های متنی، بدونِ کد) — برای ریویژنِ انتخاب‌شده */
+function dmMetaHTML(d){
+  var meta=[
+    ["شماره سند", '<span class="mono" style="direction:ltr">'+esc(d.drawingNumber)+'</span>'],
+    ["مشتری", esc(clientName(d.clientCode))],
+    // برچسبِ ردیف خودش «پروژه» است؛ پس مقدار باید نامِ خالص باشد، نه عنوانِ پیشونددار
+    ["پروژه", esc(projectName(d)||("شمارهٔ "+pad2(d.projectNo)))],
+    ["قطعه", esc(partName(d.partNo))],
+    ["نوع سند", esc(typeName(d.typeCode))],
+    ["ثبت‌کننده", esc(userName(d.uploadedBy)||"—")],
+    ["تاریخ ثبت", fmtTimeDate(d.timestamp)]
+  ];
+  // سطرِ «بازبین» حذف شد؛ اطلاعاتِ کاملِ بازبینی در سکشنِ گردش‌کار (تاریخچهٔ سند) نمایش داده می‌شود.
+  return meta.map(function(m){return '<div class="dm-row"><span class="dm-k">'+m[0]+'</span><span class="dm-v">'+m[1]+'</span></div>';}).join("");
+}
+/* بنرِ رد: بینِ سکشنِ مشخصات و تاریخچه؛ نقطهٔ قرمزِ پالس‌دار پیشِ تیتر */
+function dmRejectHTML(d){
+  return (String(d.status||"").toLowerCase()==="rejected")
+    ? '<div class="dm-reject">'+
+        '<div class="dm-reject-t"><span class="dm-reject-dot"></span>این سند نیاز به اعمال تغییرات دارد.</div>'+
+        '<div class="dm-reject-note">'+(d.reviewNote?esc(d.reviewNote):'دلیلی ثبت نشده است.')+'</div>'+
+      '</div>'
+    : '';
+}
+/* همهٔ بخش‌های وابسته به ریویژن، همراهِ انتخابِ ریویژن به‌روز می‌شوند: مشخصات، بنرِ رد، کدِ QR
+   و بنرِ «ریویژنِ جدیدتر». قبلاً فقط یک‌بار و بر اساسِ سندی که پنجره با آن باز شده بود ساخته می‌شدند؛
+   پس انتخابِ ریویژنِ قدیمی از تاریخچه بنر را نشان نمی‌داد و برعکس، بنر روی ریویژنِ جدید می‌ماند. */
+function dmApplySelection(d){
+  var slot=document.getElementById("dmNewerSlot"); if(slot) slot.innerHTML=dmNewerRevBanner(d);
+  var side=document.getElementById("dmMeta");
+  if(side && side.getAttribute("data-num")===d.drawingNumber) return;   // بخش‌های کناری همین حالا مالِ همین ریویژن‌اند
+  if(side){ side.innerHTML=dmMetaHTML(d); side.setAttribute("data-num", d.drawingNumber); }
+  var rj=document.getElementById("dmRej"); if(rj) rj.innerHTML=dmRejectHTML(d);
+  var qr=document.getElementById("dmQrWrap"); if(qr) qr.innerHTML=dmQrSectionHTML(d);
 }
 
 /* ═══ بخشِ کدِ QR سند ═══
@@ -269,7 +287,13 @@ async function dmRenderPdf(host, blob, token){
   try{
     var buf=await blob.arrayBuffer();
     if(token!==_dpSeq) return;
-    var pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    /* ⚠ فونت‌های استاندارد و CMapها: PDFهایی که فونت‌شان جاسازی نشده (رایج در خروجیِ نرم‌افزارهای
+       نقشه‌کشی: Arial/Helvetica/ISOCPEUR) بدونِ این دو، با فونتِ جایگزینِ سیستم و عرضِ نادرستِ حروف
+       کشیده می‌شدند — متن‌ها فاصله‌دار و به‌هم‌ریخته دیده می‌شد، در حالی که خودِ فایل سالم بود.
+       هر دو پوشه محلی‌اند (vendor/pdfjs، هم‌نسخهٔ 3.11.174) و فقط برای همان PDF و همان فونت بار می‌شوند. */
+    var pdf=await pdfjsLib.getDocument({data:buf,
+      standardFontDataUrl:"vendor/pdfjs/standard_fonts/",
+      cMapUrl:"vendor/pdfjs/cmaps/", cMapPacked:true}).promise;
     if(token!==_dpSeq) return;
     host.innerHTML='<div class="pdfv" id="pdfv"></div>';
     var wrap=host.querySelector(".pdfv");
@@ -522,6 +546,7 @@ function dmToggleRev(num){
 async function dmSelectVersion(num){
   var d=docByNumber(num); if(!d) return;
   _dm.selNum=num;
+  dmApplySelection(d);
   var myToken=++_dpSeq;                      // این بارگذاری؛ اگر بارگذاریِ تازه‌تری بیاید، این یکی باید بی‌سروصدا کنار برود
   if(_dpEst){ _dpEst.stop(); _dpEst=null; }  // برآوردگرِ پیش‌نمایشِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
   // هایلایت ردیف انتخاب‌شده
