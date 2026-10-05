@@ -331,8 +331,13 @@ async function dmRenderPdf(host, blob, token){
       cv.width=Math.max(1,Math.floor(vp.width)); cv.height=Math.max(1,Math.floor(vp.height));
       cv.style.width=cssW+"px"; cv.style.height=cssH+"px";
       cv.className="pdf-page";
+      /* ⚠ بوم باید صریحاً چپ‌به‌راست باشد: جهتِ متنِ canvas از عنصر به ارث می‌رسد و سایت RTL است.
+         pdf.js بعضی متن‌ها را رشته‌ای می‌کشد (مثلاً متن‌هایی که reportlab در PDF نوشته)؛ در زمینهٔ RTL
+         الگوریتمِ دوجهتی «:»، «-» و فاصله‌ها را جابه‌جا می‌کرد → «Shaf t»، «FSM -SCC». */
+      cv.style.direction="ltr"; cv.setAttribute("dir","ltr");
       wrap.appendChild(cv);
-      await page.render({canvasContext:cv.getContext("2d"), viewport:vp}).promise;
+      var ctx2d=cv.getContext("2d"); try{ ctx2d.direction="ltr"; }catch(e){}
+      await page.render({canvasContext:ctx2d, viewport:vp}).promise;
       if(token!==_dpSeq) return;
     }
   }catch(e){
