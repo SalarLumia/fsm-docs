@@ -1376,7 +1376,11 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .tbl-exp.open .chev{transform:rotate(180deg)}   /* باز = فلش رو به بالا (مثلِ سایدبار) */
 /* جمع = ۴ سطر (max-height پیش‌فرضِ 212px)، باز = همهٔ سطرها؛ انیمیشنِ max-height در toggleMgmtTable با ارتفاعِ واقعی انجام می‌شود */
 .mgmt-table tbody,.users-table tbody{transition:max-height .26s cubic-bezier(0,0,.2,1)}
-.mgmt-table.expanded tbody,.users-table.expanded tbody{max-height:none}
+/* باز = همهٔ سطرها بی‌نوارِ اسکرول؛ جای ۹pxیِ نوار در هدر هم برداشته می‌شود تا ستون‌ها هم‌تراز بمانند */
+.mgmt-table.expanded tbody,.users-table.expanded tbody{max-height:none;overflow-y:hidden}
+.mgmt-table.expanded thead,.users-table.expanded thead{padding-inline-end:0}
+/* سقفِ ۵۶۰pxیِ عمومیِ tablewrap هم برای جدول‌های تنظیمات برداشته می‌شود؛ وگرنه بخشِ بازِ پُرسطر باز نوارِ اسکرول می‌گیرد */
+#tab-data .tablewrap{max-height:none;overflow:hidden}
 @media(prefers-reduced-motion:reduce){
   .tbl-exp .chev{transition:none}
   .mgmt-table tbody,.users-table tbody{transition:none}

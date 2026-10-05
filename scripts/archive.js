@@ -14,11 +14,12 @@ function filteredDocs(){
   /* چندانتخابی: درونِ هر دسته «یا» (هر کدام از مقادیرِ روشن)، بینِ دسته‌ها «و».
      دستهٔ خالی یعنی بدونِ محدودیت. */
   var fc=filtVals("aClient"), ft=filtVals("aType"), fl=filtVals("aLatest"),
-      fs=filtVals("aStatus"), fp=filtVals("aProject"), fo=filtVals("aOrder");
+      fs=filtVals("aStatus"), fp=filtVals("aProject"), fo=filtVals("aOrder"), fpt=filtVals("aPart");
   return DB.documents.filter(function(d){
     if(fc.length && fc.indexOf(d.clientCode)<0) return false;
     if(fo.length && fo.indexOf(d.clientCode+"|"+pad2(d.orderNo))<0) return false;
     if(fp.length && fp.indexOf(d.clientCode+"|"+pad2(d.orderNo)+"|"+pad2(d.projectNo))<0) return false;
+    if(fpt.length && fpt.indexOf(pad2(d.partNo))<0) return false;
     if(ft.length && ft.indexOf(String(d.typeCode).toUpperCase())<0) return false;
     if(fs.length){ var st=String(d.status||"").toLowerCase(); if(st==="active") st="approved";
             if(fs.indexOf(st)<0) return false; }
@@ -76,19 +77,21 @@ function buildArchiveHead(){
 /* ================= فیلترِ آرشیو =================
    موتورِ چیپ‌محور مشترک است (scripts/filters.js) و اینجا فقط «مشخصاتِ» آرشیو ثبت می‌شود:
    فیلدها، مخزنِ انتخاب‌ها، فهرستِ مقادیرِ هر فیلد و کاری که با هر تغییر باید انجام شود. */
-var _filtSel={aClient:[],aOrder:[],aProject:[],aType:[],aStatus:[],aLatest:[]};
+var _filtSel={aClient:[],aOrder:[],aProject:[],aPart:[],aType:[],aStatus:[],aLatest:[]};
 function filtVals(id){ return _filtSel[id]||[]; }
 function filtHas(id,val){ return filtVals(id).indexOf(val)>=0; }
 var FILT_FIELDS=[
   {id:"aClient",  label:"مشتری"},
   {id:"aOrder",   label:"سفارش"},
   {id:"aProject", label:"پروژه"},
+  {id:"aPart",    label:"قطعه"},
   {id:"aType",    label:"نوع سند/فایل"},
   {id:"aStatus",  label:"وضعیت"},
   {id:"aLatest",  label:"ریویژن"}
 ];
 /* برچسبِ چیپ از سلکت‌های مخفیِ همین صفحه خوانده می‌شود (aClient/aOrder/…) */
 function filtOptLabel(id,val){
+  if(id==="aPart") return val==="00" ? "اسناد سطحِ پروژه" : (partNameFa(val)||partName(val));   // سلکتِ مخفی ندارد
   var s=document.getElementById(id); if(!s) return val;
   for(var i=0;i<s.options.length;i++) if(s.options[i].value===val) return s.options[i].text;
   return val;
@@ -106,6 +109,8 @@ function filtFieldValues(id){
   var fc=filtVals("aClient");
   if(id==="aClient") return clientsSorted().map(function(c){ return {value:c.code, fa:c.name||c.code, en:clientNameEn(c.code)}; });   // انگلیسی = نام لاتینِ مشتری
   if(id==="aType") return docTypesSorted().map(function(t){ return {value:String(t.code).toUpperCase(), fa:t.nameFa||t.code, en:t.nameEn||String(t.code).toUpperCase()}; });
+  if(id==="aPart") return [{value:"00", fa:"اسناد سطحِ پروژه", en:"Project-level"}].concat(   // ۰۰ = اسنادِ سطحِ پروژه (QP، PS…)
+      partsSorted().map(function(p){ return {value:pad2(p.partNo), fa:p.nameFa||p.name, en:p.name}; }));
   if(id==="aStatus") return [   // سمتِ چپ = تگِ وضعیت (به‌جای معادلِ انگلیسی)
     {value:"draft",fa:"پیش‌نویس"},{value:"pending",fa:"در انتظار بازبینی"},
     {value:"approved",fa:"تأییدشده"},{value:"rejected",fa:"ردشده"}

@@ -51,15 +51,20 @@ function toggleMgmtTable(btn){
   var tbl=btn.closest("table"); if(!tbl) return;
   var body=tbl.tBodies[0];
   var open=!tbl.classList.contains("expanded");
+  // آکاردئون مثلِ کارت‌های پیشرفتِ پروژه در داشبورد: بازشدنِ یکی، بازِ قبلی را می‌بندد
+  if(open) document.querySelectorAll("table.expanded .tbl-exp.open").forEach(function(b){ if(b!==btn) toggleMgmtTable(b); });
   btn.classList.toggle("open",open);
   btn.setAttribute("aria-expanded",open?"true":"false");
   if(!body){ tbl.classList.toggle("expanded",open); return; }
   var from=body.getBoundingClientRect().height;
+  // حینِ اندازه‌گیری گذار خاموش است؛ وگرنه getComputedStyle در حالتِ بستن ارتفاع را فوراً به مقصد می‌پَراند و انیمیشن دیده نمی‌شود
+  body.style.transition="none";
   tbl.classList.toggle("expanded",open);
   body.style.maxHeight="";
   var to=open?body.scrollHeight:parseFloat(getComputedStyle(body).maxHeight);
   body.style.maxHeight=from+"px";
   void body.offsetHeight;   // reflow تا گذار از ارتفاعِ فعلی شروع شود
+  body.style.transition="";
   body.style.maxHeight=to+"px";
   clearTimeout(body._expT);
   body._expT=setTimeout(function(){ body.style.maxHeight=""; }, 300);
@@ -170,6 +175,17 @@ function localRefresh(){
 
 async function del(action,payload){
   if(!(typeof ME!=="undefined" && ME && ME.role==="admin")){ toast("فقط مدیر مجاز به حذف است.",true); return; }
+  // قطعهٔ درحالِ استفاده حذف نمی‌شود: حذفِ ردیفِ Parts پروژه‌ها و اسنادِ آن کد را بی‌صاحب می‌کند
+  if(action==="deletePart"){
+    var pn=pad2(payload.partNo);
+    var nProj=DB.projects.filter(function(p){ return projectPartsList(p).indexOf(pn)>=0; }).length;
+    var nDocs=DB.documents.concat(DB.trashedDocs||[]).filter(function(d){ return pad2(d.partNo)===pn; }).length;
+    if(nProj||nDocs){
+      await uiConfirm("قطعهٔ "+pn+" در "+(nProj?nProj+" پروژه":"")+(nProj&&nDocs?" و ":"")+(nDocs?nDocs+" سند":"")+
+        " استفاده شده و حذفش آن‌ها را بی‌صاحب می‌کند. اول قطعه را از پروژه‌ها بردار.",{okLabel:"متوجه شدم",cancelLabel:"بستن"});
+      return;
+    }
+  }
   if(!(await uiConfirm("حذف این مورد؟",{danger:true,okLabel:"حذف"}))) return;
   var r=await api(action,payload);
   if(r.ok){
