@@ -120,7 +120,7 @@ function pendingUploadNotice(num){
     '<header><strong>در انتظارِ بازبینی</strong><button class="modal-x" data-v="0" aria-label="بستن" title="بستن">✕</button></header>'+
     '<div class="body">'+body+'</div></div>';
   document.body.appendChild(wrap);
-  var close=function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); };
+  var close=function(){ modalClose(wrap, function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }); };
   var btns=wrap.querySelectorAll("[data-v]");
   for(var i=0;i<btns.length;i++){ (function(b){ b.addEventListener("click",function(){
     var open=b.getAttribute("data-v")==="1"; close(); if(open) openSingleReviewTray(num);
@@ -155,7 +155,9 @@ function openSingleReviewTray(num){
   document.body.appendChild(wrap);
   wrap.addEventListener("click",function(e){ if(e.target===wrap) srtClose(); });
 }
-function srtClose(){ var w=document.getElementById("srtHost"); if(w&&w.parentNode) w.parentNode.removeChild(w); }
+function srtClose(){ var w=document.getElementById("srtHost"); if(!w) return;
+  w.removeAttribute("id");   // تا کارتابلِ تازه‌ای که هم‌زمان باز می‌شود با این لایهٔ در حالِ خروج اشتباه گرفته نشود
+  modalClose(w, function(){ if(w.parentNode) w.parentNode.removeChild(w); }); }
 async function srtApprove(num){
   if(!(await uiConfirm("تأیید سند «"+num+"»؟",{okLabel:"تأیید"}))) return;
   srtClose();
@@ -179,7 +181,7 @@ function srtReject(num){
     '<button class="modal-x" data-v="0" aria-label="بستن" title="بستن">✕</button></header>'+
     '<div class="body">'+body+'</div></div>';
   document.body.appendChild(wrap);
-  var close=function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); };
+  var close=function(){ modalClose(wrap, function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }); };
   var btns=wrap.querySelectorAll("[data-v]");
   for(var i=0;i<btns.length;i++){ (function(b){ b.addEventListener("click",function(){
     /* ⚠ متنِ دلیل پیش از بستن خوانده می‌شود؛ قبلاً بعد از حذفِ پنجره خوانده می‌شد و همیشه خالی بود */

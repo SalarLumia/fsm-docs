@@ -520,11 +520,36 @@ function b64toBlob(b64,mime){
    ⚠ صرفِ querySelector(".modal") کافی نیست: #newDocModal همیشه در DOM هست و فقط
    با کلاسِ hidden پنهان می‌شود، پس همیشه پیدا می‌شد و کلاسِ modal-open هرگز
    برداشته نمی‌شد — نتیجه‌اش قفل‌ماندنِ اسکرولِ کلِ سایت بود. */
+/* ================= بستنِ انیمیشن‌دارِ پنجره‌ها (مشترک در کلِ سایت) =================
+   el کلاسِ closing می‌گیرد (انیمیشنِ خروج در components.css) و پس از پایانش done اجرا می‌شود
+   (حذف از DOM یا افزودنِ hidden). کاهشِ حرکت → بی‌درنگ. */
+var MODAL_OUT_MS=160;
+function modalClose(el, done){
+  if(!el){ if(done) done(); return; }
+  if(el.classList.contains("closing")) return;            // همین حالا در حالِ بسته‌شدن است
+  var reduce=(typeof prefersReducedMotion==="function") && prefersReducedMotion();
+  if(reduce){ if(done) done(); return; }
+  el.classList.add("closing");
+  el._mdCloseT=setTimeout(function(){ el._mdCloseT=null; el.classList.remove("closing"); if(done) done(); }, MODAL_OUT_MS);
+}
+/* پنجرهٔ ثابتی (ویزارد) که وسطِ انیمیشنِ بسته‌شدن دوباره باز می‌شود: بستنِ نیمه‌کاره لغو شود،
+   وگرنه تایمرِ بستن پنجرهٔ تازه‌بازشده را پنهان می‌کرد. */
+function modalCancelClose(el){
+  if(!el || !el._mdCloseT) return;
+  clearTimeout(el._mdCloseT); el._mdCloseT=null; el.classList.remove("closing");
+}
+/* بالاترین لایهٔ پشته‌ای که در حالِ بسته‌شدن نیست — لایهٔ در حالِ خروج تا پایانِ انیمیشن در DOM می‌ماند
+   و نباید «بالاترین پنجره» حساب شود (وگرنه بستنِ پشتِ‌سرِ‌هم یا جایگزینیِ پنجره، لایهٔ اشتباه را می‌گرفت). */
+function modalTop(host){
+  host=host||document.getElementById("modalHost"); if(!host) return null;
+  for(var el=host.lastElementChild; el; el=el.previousElementSibling){ if(!el.classList.contains("closing")) return el; }
+  return null;
+}
 function anyModalOpen(){
   var all=document.querySelectorAll(".modal");
   for(var i=0;i<all.length;i++){
     var m=all[i];
-    if(m.classList.contains("hidden")) continue;
+    if(m.classList.contains("hidden") || m.classList.contains("closing")) continue;
     if(m.offsetParent===null && getComputedStyle(m).display==="none") continue;
     return true;
   }
@@ -584,7 +609,7 @@ function showModal(title,innerHTML,boxClass){
    پنجره جمع می‌شود، پس‌زمینه تیره‌تر می‌شود و بستن باید چندبار تکرار شود. */
 function updateModal(title,innerHTML,boxClass){
   var host=document.getElementById("modalHost");
-  var top=host?host.lastElementChild:null;
+  var top=modalTop(host);
   if(!top) return showModal(title,innerHTML,boxClass);   // پنجره‌ای باز نیست → بساز
   var box=top.querySelector(".box");
   if(!box) return showModal(title,innerHTML,boxClass);
@@ -596,7 +621,7 @@ function updateModal(title,innerHTML,boxClass){
 /* بستنِ فقط بالاترین پنجره؛ اگر زیرش پنجره‌ای بود، همان دوباره دیده می‌شود. */
 function closeModal(){
   var host=document.getElementById("modalHost");
-  var top=host?host.lastElementChild:null;
+  var top=modalTop(host);
   /* پاکسازیِ پیش‌نمایش فقط وقتی که همین لایه صاحبِ پیش‌نمایش باشد؛ وگرنه بستنِ
      یک پنجرهٔ کوچکِ رویی، پیش‌نمایشِ مودالِ زیرین را هم خاموش می‌کند. */
   var ownsPreview = !!(top && top.querySelector && top.querySelector("#docPreviewHost, #filePreviewHost"));
@@ -604,16 +629,18 @@ function closeModal(){
     if(typeof _dpStopPreview==="function") _dpStopPreview();
     if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
   }
-  if(top) host.removeChild(top); else if(host) host.innerHTML="";
-  if(!anyModalOpen()) modalUnlock();
+  if(!top){ if(host) host.innerHTML=""; if(!anyModalOpen()) modalUnlock(); return; }
+  modalClose(top, function(){ if(top.parentNode) top.parentNode.removeChild(top); if(!anyModalOpen()) modalUnlock(); });
 }
 /* بستنِ کلِ پشته — برای جاهایی که پس از یک عمل، ماندنِ پنجرهٔ زیرین بی‌معناست */
 function closeAllModals(){
   var host=document.getElementById("modalHost");
   if(typeof _dpStopPreview==="function") _dpStopPreview();
   if(typeof releaseBlobUrl==="function"){ releaseBlobUrl("docPreview"); releaseBlobUrl("filePreview"); }
-  if(host) host.innerHTML="";
-  if(!anyModalOpen()) modalUnlock();
+  if(!host) return;
+  var layers=[].slice.call(host.children);
+  if(!layers.length){ if(!anyModalOpen()) modalUnlock(); return; }
+  layers.forEach(function(l){ modalClose(l, function(){ if(l.parentNode) l.parentNode.removeChild(l); if(!anyModalOpen()) modalUnlock(); }); });
 }
 
 /* ================= خروجی CSV ================= */

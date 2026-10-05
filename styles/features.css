@@ -365,14 +365,16 @@
   animation:wfPing 1.7s cubic-bezier(0,0,.2,1) infinite}
 @keyframes wfPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
 @media(prefers-reduced-motion:reduce){.wf-step.active .wf-ring::after{animation:none;opacity:0}}
-/* فاصلهٔ برابرِ خطِ عمودی بین دو نقطهٔ متوالی: بالای خط ۶px، پایینِ خط ۲px + ۴px margin-topِ نقطهٔ بعدی = ۶px */
-/* حاشیهٔ پایین برابرِ padding-bottom ِ .wf-body است، پس خط دقیقاً همان‌جا تمام
-   می‌شود که متنِ همان مرحله تمام شده و وارد فاصلهٔ زیرش نمی‌شود. */
-.wf-line{flex:1;width:2px;background:var(--line);min-height:10px;margin:5px 0 16px;border-radius:1px}
+/* ⚠ فاصلهٔ خط تا نقطهٔ بالا و پایین برابر (۵px): بالا = margin-top همین خط؛ پایین = margin-top ِ
+   نقطهٔ مرحلهٔ بعد (.wf-ring). پس margin-bottom صفر است — قبلاً ۱۶px بود و پایینِ خط ۲۱px از نقطهٔ بعدی فاصله داشت. */
+.wf-line{flex:1;width:2px;background:var(--line);min-height:10px;margin:5px 0 0;border-radius:1px}
 .wf-body{flex:1;min-width:0;padding-bottom:16px}
 /* ⚠ آخرین مرحله پدینگِ پایین نمی‌گیرد: آن ۱۶px فاصلهٔ بینِ دو مرحله است و
    وقتی مرحله‌ای بعدش نیست، فقط فضای خالی زیرِ گردش‌کار می‌سازد. */
 .wf-step:last-child .wf-body{padding-bottom:0}
+/* مرحلهٔ آینده (todo) فقط تیتر دارد و خطِ نام زیرش نیست؛ پس خطِ واصلش کوتاه‌تر از بقیه می‌شد.
+   جای همان خطِ دوم (margin-top ۳px + یک سطرِ ۱۱px×۱٫۶ از .wf-lines) رزرو می‌شود تا همهٔ خط‌ها هم‌قد شوند. */
+.wf-step.todo:not(:last-child) .wf-body::after{content:"";display:block;height:calc(3px + 11px * 1.6)}
 /* تایپوگرافیِ گردش‌کار عیناً از سکشنِ «مشخصات سند» گرفته شده تا دو بلوکِ
    هم‌جوار یک زبان داشته باشند:
    تیتر = .dm-v (11.5/500/--txt) ، توضیح = .dm-k (11.5/500/--muted) */

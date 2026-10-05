@@ -22,8 +22,9 @@ async function openDocDetail(num){
      خودش باز شود (مثلاً دکمهٔ «مشاهدهٔ ویرایشِ جدیدتر» درونِ همین پنجره).
      پنجرهٔ از نوعِ دیگر (کارتابل، فهرست) دست‌نخورده زیر می‌ماند. */
   var _mh=document.getElementById("modalHost");
-  var _topLayer=_mh?_mh.lastElementChild:null;
-  if(_topLayer && _topLayer.querySelector && _topLayer.querySelector(".doc-modal")) _mh.removeChild(_topLayer);
+  var _topLayer=modalTop(_mh);
+  var _swap=!!(_topLayer && _topLayer.querySelector && _topLayer.querySelector(".doc-modal"));
+  if(_swap) _mh.removeChild(_topLayer);
   _dm.num=num; _dm.selNum=num;
 
   var metaHTML=dmMetaHTML(d);
@@ -70,6 +71,9 @@ async function openDocDetail(num){
       '</div></div>'+
     '</div>';
   showModal(esc(docPhrase(d)), body, "doc-box");
+  /* جایگزینیِ همین پنجره (بازرسم پس از تأیید/همگام‌سازی، یا رفتن به ریویژنِ دیگر) انیمیشنِ ورود نمی‌گیرد؛
+     وگرنه پنجره با هر به‌روزرسانی بی‌دلیل چشمک می‌زد. */
+  if(_swap){ var _nl=modalTop(_mh); if(_nl) _nl.classList.add("md-swap"); }
   wfFixLines(document.getElementById("modalHost"));   // چیدمانِ دو‌خطیِ توضیح/نام در گردش‌کار
 
   /* ریویژن جاری را به‌صورت پیش‌فرض در پیش‌نمایش بارگذاری کن (بدون باز کردن گردش‌کار) */
@@ -149,7 +153,7 @@ async function submitAddFormat(){
    افزودنِ فرمت) که کاربر در حالِ پرکردنِ آن است نابود می‌شود. */
 function dmRefreshOpen(){
   var host=document.getElementById("modalHost");
-  var top=host?host.lastElementChild:null;
+  var top=modalTop(host);
   if(!top || !top.querySelector || !top.querySelector(".doc-modal")) return;
   var num=_dm.num; if(!num) return;
   if(!docByNumber(num)) return;   // سند حذف شده — بازرسم بی‌معناست

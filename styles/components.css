@@ -322,6 +322,20 @@ body.modal-open .xfer-wrap{width:34px;height:34px}
 
 /* ===== مودال ===== */
 .modal{position:fixed;inset:0;background:#0000007a;z-index:80;display:flex;align-items:center;justify-content:center;padding:24px}
+/* ===== انیمیشنِ باز/بسته‌شدنِ همهٔ پنجره‌ها =====
+   باز: زمینهٔ تیره محو می‌آید و قاب با کمی بالاآمدن و بزرگ‌شدن ظاهر می‌شود (با درج یا نمایان‌شدن خودکار اجرا می‌شود).
+   بسته: کلاسِ closing (از modalClose در archive.js) همین را برعکس پخش می‌کند و بعد پنجره حذف/پنهان می‌شود.
+   md-swap: پنجره‌ای که خودش را از نو رسم می‌کند (جزئیاتِ سند پس از تأیید/همگام‌سازی) نباید دوباره انیمیشن بگیرد. */
+.modal{animation:mdFadeIn .18s ease-out}
+.modal>.box{animation:mdPopIn .24s cubic-bezier(.2,.8,.2,1)}
+.modal.closing{animation:mdFadeOut .16s ease-in forwards;pointer-events:none}
+.modal.closing>.box{animation:mdPopOut .16s ease-in forwards}
+.modal.md-swap,.modal.md-swap>.box{animation:none}
+@keyframes mdFadeIn{from{opacity:0}}
+@keyframes mdPopIn{from{opacity:0;transform:translateY(10px) scale(.97)}}
+@keyframes mdFadeOut{to{opacity:0}}
+@keyframes mdPopOut{to{opacity:0;transform:translateY(6px) scale(.98)}}
+@media(prefers-reduced-motion:reduce){.modal,.modal>.box,.modal.closing,.modal.closing>.box{animation:none}}
 /* پنجرهٔ روی پنجره: لایهٔ دوم به بعد پوششِ کم‌رنگ‌تر می‌گیرد، وگرنه دو پوششِ
    تیره روی هم می‌افتد و صفحه تقریباً سیاه می‌شود. */
 #modalHost .modal ~ .modal{background:#00000038}

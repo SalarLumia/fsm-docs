@@ -580,6 +580,7 @@ function openNewDocModal(){
   // پاکسازیِ کاملِ DOMِ پویا تا هیچ ردپایی از دفعهٔ قبل نماند و ریل/آکاردئون/رینگ از نو ساخته شوند
   var rail=document.getElementById("ndRail"); if(rail) rail.innerHTML="";
   var stage=document.getElementById("ndStage"); if(stage) stage.innerHTML="";
+  modalCancelClose(m);
   m.classList.remove("hidden");
   modalLock();   // قفلِ اسکرول با حفظِ موقعیت (تعریف در archive.js)
   var sc=document.getElementById("ndScroll"); if(sc) sc.scrollTop=0;   // اسکرول از ابتدا
@@ -588,9 +589,12 @@ function openNewDocModal(){
 }
 function closeNewDocModal(){
   ndCloseMenu();
-  var m=document.getElementById("newDocModal"); if(m) m.classList.add("hidden");
-  // قفل فقط وقتی باز می‌شود که هیچ مودالِ دیگری باز نمانده باشد
-  if(typeof anyModalOpen!=="function" || !anyModalOpen()) modalUnlock();
+  var m=document.getElementById("newDocModal"); if(!m || m.classList.contains("hidden")) return;
+  modalClose(m, function(){
+    m.classList.add("hidden");
+    // قفل فقط وقتی باز می‌شود که هیچ مودالِ دیگری باز نمانده باشد
+    if(typeof anyModalOpen!=="function" || !anyModalOpen()) modalUnlock();
+  });
 }
 document.addEventListener("keydown",function(e){
   if(e.key!=="Escape") return;

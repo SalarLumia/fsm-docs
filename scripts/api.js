@@ -236,7 +236,8 @@ function uiConfirm(message, opts){
     var onKey;
     var settle=function(val){
       if(onKey) document.removeEventListener("keydown",onKey,true);
-      if(wrap.parentNode) wrap.parentNode.removeChild(wrap);
+      /* پاسخ بی‌درنگ برمی‌گردد (کارِ بعدی معطلِ انیمیشن نمی‌ماند)؛ خودِ پنجره با انیمیشن بسته می‌شود */
+      modalClose(wrap, function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); });
       resolve(val);
     };
     var btns=wrap.querySelectorAll("[data-v]");

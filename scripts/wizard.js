@@ -298,14 +298,17 @@ function wzOpen(cfg){
   var rail=wzEl("rail"); if(rail) rail.innerHTML="";
   var stage=wzEl("stage"); if(stage) stage.innerHTML="";
   var fin=wzEl("final"); if(fin){ fin.hidden=true; fin.innerHTML=""; fin.classList.remove("show"); }
-  var m=document.getElementById(cfg.ids.modal); if(m) m.classList.remove("hidden");
+  var m=document.getElementById(cfg.ids.modal); if(m){ modalCancelClose(m); m.classList.remove("hidden"); }
   modalLock();
   var sc=wzEl("scroll"); if(sc) sc.scrollTop=0;
 }
 function wzClose(){
   wzClearTimers();
   var c=WZ.cfg; if(!c) return;
-  var m=document.getElementById(c.ids.modal); if(m) m.classList.add("hidden");
-  if(typeof anyModalOpen!=="function" || !anyModalOpen()) modalUnlock();
+  var m=document.getElementById(c.ids.modal); if(!m || m.classList.contains("hidden")) return;
+  modalClose(m, function(){
+    m.classList.add("hidden");
+    if(typeof anyModalOpen!=="function" || !anyModalOpen()) modalUnlock();
+  });
 }
 function wzIsOpen(id){ var m=document.getElementById(id); return !!(m && !m.classList.contains("hidden")); }
