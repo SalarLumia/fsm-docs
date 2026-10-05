@@ -2,25 +2,25 @@
 /* وضعیت ریویژن انتخاب‌شده در مودال (برای پیش‌نمایش و دانلود) */
 var _dm = { num:"", selNum:"" };
 
-/* شمارندهٔ بارگذاریِ پیش‌نمایش + برآوردگرِ نوارِ پیشرفتِ فعال.
-   بدونِ این، اگر پیش‌نمایشی پیش از تکمیل بسته و پیش‌نمایشِ تازه‌ای باز شود، تایمرِ برآوردگرِ قبلی
-   (که هنوز داخلِ await است و متوقف نشده) روی همان id=docPreviewHost می‌نویسد و عددِ درصد با نمونهٔ
-   جدید «قاطی» می‌شود. هر بارگذاریِ نو، توکن را جلو می‌برد و برآوردگرِ قبلی را متوقف می‌کند. */
+/* شمارندهٔ بارگذاری پیش‌نمایش + برآوردگر نوار پیشرفت فعال.
+   بدون این، اگر پیش‌نمایشی پیش از تکمیل بسته و پیش‌نمایش تازه‌ای باز شود، تایمر برآوردگر قبلی
+   (که هنوز داخل await است و متوقف نشده) روی همان id=docPreviewHost می‌نویسد و عدد درصد با نمونهٔ
+   جدید «قاطی» می‌شود. هر بارگذاری نو، توکن را جلو می‌برد و برآوردگر قبلی را متوقف می‌کند. */
 var _dpSeq = 0, _dpEst = null;
 function _dpStopPreview(){ _dpSeq++; if(_dpEst){ _dpEst.stop(); _dpEst=null; } }
 
 async function openDocDetail(num){
   var d=docByNumber(num);
   if(!d){
-    // سندِ حذف‌شده هنوز در سطلِ زباله است؛ پیام باید همین را بگوید، نه «یافت نشد»
-    if(trashedDocByNumber(num)) toast("این سند حذف شده و در سطلِ زباله است.",true);
+    // سند حذف‌شده هنوز در سطل زباله است؛ پیام باید همین را بگوید، نه «یافت نشد»
+    if(trashedDocByNumber(num)) toast("این سند حذف شده و در سطل زباله است.",true);
     else toast("سند یافت نشد.",true);
     return;
   }
   var si=statusInfo(d.status);
-  /* اگر خودِ پنجرهٔ جزئیاتِ سند بالاترین لایه باشد، جایِ همان را می‌گیرد نه اینکه رویِ
-     خودش باز شود (مثلاً دکمهٔ «مشاهدهٔ ویرایشِ جدیدتر» درونِ همین پنجره).
-     پنجرهٔ از نوعِ دیگر (کارتابل، فهرست) دست‌نخورده زیر می‌ماند. */
+  /* اگر خود پنجرهٔ جزئیات سند بالاترین لایه باشد، جای همان را می‌گیرد نه اینکه روی
+     خودش باز شود (مثلاً دکمهٔ «مشاهدهٔ ویرایش جدیدتر» درون همین پنجره).
+     پنجرهٔ از نوع دیگر (کارتابل، فهرست) دست‌نخورده زیر می‌ماند. */
   var _mh=document.getElementById("modalHost");
   var _topLayer=modalTop(_mh);
   var _swap=!!(_topLayer && _topLayer.querySelector && _topLayer.querySelector(".doc-modal"));
@@ -34,14 +34,14 @@ async function openDocDetail(num){
   var revs=revisionsOf(d);
   var revHTML=revs.map(function(rv){ return versionRowHTML(rv); }).join("");
 
-  /* ---------- اکشن اصلیِ متن‌محورِ بالای پنل (کنار دانلود) بر اساس وضعیت ریویژن فعلی ---------- */
+  /* ---------- اکشن اصلی متن‌محور بالای پنل (کنار دانلود) بر اساس وضعیت ریویژن فعلی ---------- */
   var cur=revs[0]||d, cst=String(cur.status||"").toLowerCase();
   var actionBtn="";
   if(ME.role==="admin"){
     if(cst==="draft") actionBtn='<button class="btn dm-act" onclick="submitReview(\''+esc(cur.drawingNumber)+'\')">'+ICON.send+'ارسال برای بازبینی</button>';
     else if(cst==="rejected") actionBtn='<button class="btn dm-act" onclick="startRevisionUpload(\''+esc(cur.drawingNumber)+'\')">'+ICON.upload+'بارگذاری نسخهٔ جدید</button>';
     else if(cst==="approved") actionBtn='<button class="btn dm-act" onclick="startRevisionUpload(\''+esc(cur.drawingNumber)+'\')">'+ICON.upload+'بارگذاری ریویژن جدید</button>';
-    // در حالِ بازبینی: دکمه غیرفعال (خاکستری) — کلیک روی آن، پیامِ راهنما + میان‌بر به کارتابلِ بازبینیِ همین سند را باز می‌کند
+    // در حال بازبینی: دکمه غیرفعال (خاکستری) — کلیک روی آن، پیام راهنما + میان‌بر به کارتابل بازبینی همین سند را باز می‌کند
     else if(cst==="pending") actionBtn='<button class="btn dm-act dm-act-disabled" onclick="pendingUploadNotice(\''+esc(cur.drawingNumber)+'\')">'+ICON.upload+'بارگذاری نسخهٔ جدید</button>';
   }
 
@@ -50,18 +50,18 @@ async function openDocDetail(num){
   var dlBtnHTML = is3DType
     ? '<div class="dm-dl-wrap" id="dmDlWrap">'+
         '<div class="dm-dl-pop" id="dmDlPop"></div>'+
-        '<button class="btn dm-dl dm-dl-incomplete" id="dpDownload" onclick="dmDownloadSelected()" disabled>'+dlIcon+'دانلود سند</button>'+
+        '<button class="btn primary dm-dl" id="dpDownload" onclick="dmDownloadSelected()" disabled>'+dlIcon+'<span id="dpDlLbl">دانلود سند</span></button>'+
       '</div>'
     : '<button class="btn primary dm-dl" id="dpDownload" onclick="dmDownloadSelected()" disabled>'+dlIcon+'دانلود سند</button>';
   var body=''+
     '<div class="doc-modal">'+
       '<div class="doc-preview">'+
-        /* بنرِ «ریویژنِ جدیدتر» روی پیش‌نمایش، چسبیده به پایینِ کادر — کنارِ همان نقشه‌ای که منسوخ است */
+        /* بنر «ریویژن جدیدتر» روی پیش‌نمایش، چسبیده به پایین کادر — کنار همان نقشه‌ای که منسوخ است */
         '<div class="dp-stage"><div class="dp-frame" id="docPreviewHost"></div><div id="dmNewerSlot"></div></div>'+
         '<div class="dp-actions">'+actionBtn+dmAddFormatBtnHTML(cur,is3DType)+dlBtnHTML+'</div>'+
       '</div>'+
-      /* ظرفِ داخلی: خودِ .doc-side جهتِ ltr دارد تا نوارِ اسکرول سمتِ راست
-         بیفتد؛ جهتِ محتوا اینجا به rtl برمی‌گردد. */
+      /* ظرف داخلی: خود .doc-side جهت ltr دارد تا نوار اسکرول سمت راست
+         بیفتد؛ جهت محتوا اینجا به rtl برمی‌گردد. */
       '<div class="doc-side"><div class="doc-side-in">'+
         '<div class="dm-sec"><div class="dm-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>مشخصات سند</div><div id="dmMeta" data-num="'+esc(d.drawingNumber)+'">'+metaHTML+'</div></div>'+
         '<div id="dmRej">'+rejBanner+'</div>'+
@@ -71,22 +71,22 @@ async function openDocDetail(num){
       '</div></div>'+
     '</div>';
   showModal(esc(docPhrase(d)), body, "doc-box");
-  /* جایگزینیِ همین پنجره (بازرسم پس از تأیید/همگام‌سازی، یا رفتن به ریویژنِ دیگر) انیمیشنِ ورود نمی‌گیرد؛
+  /* جایگزینی همین پنجره (بازرسم پس از تأیید/همگام‌سازی، یا رفتن به ریویژن دیگر) انیمیشن ورود نمی‌گیرد؛
      وگرنه پنجره با هر به‌روزرسانی بی‌دلیل چشمک می‌زد. */
   if(_swap){ var _nl=modalTop(_mh); if(_nl) _nl.classList.add("md-swap"); }
-  wfFixLines(document.getElementById("modalHost"));   // چیدمانِ دو‌خطیِ توضیح/نام در گردش‌کار
+  wfFixLines(document.getElementById("modalHost"));   // چیدمان دو‌خطی توضیح/نام در گردش‌کار
 
   /* ریویژن جاری را به‌صورت پیش‌فرض در پیش‌نمایش بارگذاری کن (بدون باز کردن گردش‌کار) */
   dmSelectVersion(num);
 }
 
-/* ═══ افزودنِ فرمتِ مکمل به سندِ سه‌بعدیِ موجود ═══
-   دکمه فقط وقتی می‌آید که واقعاً کاری برای انجام باشد: سندِ سه‌بعدی، مدیر، و دست‌کم یکی از
-   دو فرمتِ STP/USDZ جا افتاده باشد. اگر هر دو موجودند دکمه اصلاً ساخته نمی‌شود. */
+/* ═══ افزودن فرمت مکمل به سند سه‌بعدی موجود ═══
+   دکمه فقط وقتی می‌آید که واقعاً کاری برای انجام باشد: سند سه‌بعدی، مدیر، و دست‌کم یکی از
+   دو فرمت STP/USDZ جا افتاده باشد. اگر هر دو موجودند دکمه اصلاً ساخته نمی‌شود. */
 function dmMissingFormats(d){
   var out=[];
-  if(!String(d.stpFileId||"").trim())  out.push({kind:"stp",  label:"STP",  accept:".stp,.step", tag:"فرمتِ اصلی برای آرشیوِ اسناد"});
-  if(!String(d.usdzFileId||"").trim()) out.push({kind:"usdz", label:"USDZ", accept:".usdz",      tag:"برای نمایشِ واقعیتِ افزوده در iOS"});
+  if(!String(d.stpFileId||"").trim())  out.push({kind:"stp",  label:"STP",  accept:".stp,.step", tag:"فرمت اصلی برای آرشیو اسناد"});
+  if(!String(d.usdzFileId||"").trim()) out.push({kind:"usdz", label:"USDZ", accept:".usdz",      tag:"برای نمایش واقعیت افزوده در iOS"});
   return out;
 }
 function dmAddFormatBtnHTML(d, is3DType){
@@ -109,14 +109,14 @@ function openAddFormatModal(num){
     return '<div class="af-zone" data-kind="'+m.kind+'"'+(i===0?'':' hidden')+'>'+
       rvDropzoneHTML("afDrop_"+m.kind,"afFile_"+m.kind,m.accept,"فایل "+m.label,m.tag)+'</div>';
   }).join("");
-  showModal("افزودنِ فرمت به سند",
+  showModal("افزودن فرمت به سند",
     '<div class="rv-up">'+
       '<div class="rv-num mono" style="direction:ltr">'+esc(num)+'</div>'+
-      '<p class="rv-lead">فایلِ تکمیلی به همین سند افزوده می‌شود؛ '+
+      '<p class="rv-lead">فایل تکمیلی به همین سند افزوده می‌شود؛ '+
         'شمارهٔ سند و ویرایش تغییر نمی‌کند و سند دوباره به بازبینی نمی‌رود.</p>'+
       tabs+zones+
       '<div class="lg-note" style="margin-top:14px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'+
-        '<span>اگر خودِ طراحی تغییر کرده، به‌جای این کار ریویژنِ جدید بسازید.</span></div>'+
+        '<span>اگر خود طراحی تغییر کرده، به‌جای این کار ریویژن جدید بسازید.</span></div>'+
       '<div class="clm-actions"><button class="btn" onclick="closeModal()">انصراف</button>'+
         '<button class="btn primary" id="afSave" onclick="submitAddFormat()">'+ICON.plus+'افزودن</button></div>'+
     '</div>', "box-narrow");
@@ -134,23 +134,23 @@ async function submitAddFormat(){
   if(f.size>25*1024*1024){ toast("حجم فایل بیش از ۲۵ مگابایت است.",true); return; }
   var b64=await fileToBase64(f);
   var num=_af.num, kind=_af.kind;
-  /* مثلِ بقیهٔ آپلودها از «مرکزِ انتقال» عبور می‌کند تا رابط قفل نشود و پیشرفت دیده شود.
-     ⚙ برخلافِ ریویژن، عمداً submitForReview صدا زده نمی‌شود: سند تأییدشده می‌ماند. */
+  /* مثل بقیهٔ آپلودها از «مرکز انتقال» عبور می‌کند تا رابط قفل نشود و پیشرفت دیده شود.
+     ⚙ برخلاف ریویژن، عمداً submitForReview صدا زده نمی‌شود: سند تأییدشده می‌ماند. */
   closeModal();
   dlEnqueueUpload({
     label: num+" ‹ "+kind.toUpperCase(),
     action: "addFormat",
     payload: { drawingNumber:num, kind:kind, fileBase64:b64, fileName:f.name, mimeType:f.type },
     onSuccess: async function(r){
-      if(!r || !r.ok){ toast((r&&r.message)||"افزودنِ فرمت ناموفق بود.",true); return; }
-      toast("فرمتِ "+kind.toUpperCase()+" افزوده شد.");
+      if(!r || !r.ok){ toast((r&&r.message)||"افزودن فرمت ناموفق بود.",true); return; }
+      toast("فرمت "+kind.toUpperCase()+" افزوده شد.");
       await refreshDocuments();
     }
   });
 }
-/* بازرسمِ مودالِ جزئیاتِ سند پس از تازه‌شدنِ داده.
-   فقط وقتی که خودش بالاترین لایهٔ پشته باشد؛ وگرنه پنجرهٔ رویی (مثلِ فرمِ رد یا
-   افزودنِ فرمت) که کاربر در حالِ پرکردنِ آن است نابود می‌شود. */
+/* بازرسم مودال جزئیات سند پس از تازه‌شدن داده.
+   فقط وقتی که خودش بالاترین لایهٔ پشته باشد؛ وگرنه پنجرهٔ رویی (مثل فرم رد یا
+   افزودن فرمت) که کاربر در حال پرکردن آن است نابود می‌شود. */
 function dmRefreshOpen(){
   var host=document.getElementById("modalHost");
   var top=modalTop(host);
@@ -159,12 +159,12 @@ function dmRefreshOpen(){
   if(!docByNumber(num)) return;   // سند حذف شده — بازرسم بی‌معناست
   /* ریویژنی که کاربر در تاریخچه انتخاب کرده حفظ می‌شود (نه برگشت به ریویژنی که پنجره با آن باز شد) */
   if(_dm.selNum && docByNumber(_dm.selNum)) num=_dm.selNum;
-  openDocDetail(num);             // خودش جایِ لایهٔ هم‌نوعِ رویی را می‌گیرد
+  openDocDetail(num);             // خودش جای لایهٔ هم‌نوع رویی را می‌گیرد
 }
 
-/* بنرِ «نسخهٔ جدیدتر موجود است».
-   فقط وقتی نشان داده می‌شود که ویرایشِ *تأییدشدهٔ* جدیدتری وجود داشته باشد؛ پیش‌نویس یا
-   در انتظارِ بازبینی هنوز مبنای ساخت نیست و اعلامش کاربر را گمراه می‌کند. */
+/* بنر «نسخهٔ جدیدتر موجود است».
+   فقط وقتی نشان داده می‌شود که ویرایش *تأییدشدهٔ* جدیدتری وجود داشته باشد؛ پیش‌نویس یا
+   در انتظار بازبینی هنوز مبنای ساخت نیست و اعلامش کاربر را گمراه می‌کند. */
 function dmNewerRevBanner(d){
   var cur=parseInt(d.rev,10); if(isNaN(cur)) return "";
   var newer=revisionsOf(d).filter(function(rv){
@@ -172,33 +172,33 @@ function dmNewerRevBanner(d){
   }).sort(function(a,b){ return (parseInt(b.rev,10)||0)-(parseInt(a.rev,10)||0); })[0];
   if(!newer) return "";
   return '<div class="dm-newer dp-newer"><div class="dm-newer-main">'+
-    /* واژه و شکلِ شماره هم‌سانِ تاریخچهٔ سند: «ریویژن 01» (قبلاً «ویرایش ۱» — faN صفرِ ابتدایی را می‌انداخت) */
+    /* واژه و شکل شماره هم‌سان تاریخچهٔ سند: «ریویژن 01» (قبلاً «ویرایش ۱» — faN صفر ابتدایی را می‌انداخت) */
     '<div class="dm-newer-t"><span class="dm-newer-dot"></span>ریویژن جدیدتری تأیید شده است</div>'+
     '<div class="dm-newer-note">ریویژن به‌روزتری از این سند در سامانه ثبت شده است؛ برای چاپ سند، از آخرین ریویژن استفاده کنید.</div></div>'+
-    /* درجا همان ریویژن در پیش‌نمایش انتخاب می‌شود (نه بازکردنِ دوبارهٔ پنجره) */
+    /* درجا همان ریویژن در پیش‌نمایش انتخاب می‌شود (نه بازکردن دوبارهٔ پنجره) */
     '<button class="btn sm" onclick="dmSelectVersion(\''+esc(newer.drawingNumber)+'\')">مشاهدهٔ ریویژن '+esc(pad2(revFmt(newer.rev)))+'</button>'+
-    /* بنر روی نقشه است و ممکن است جدولِ مشخصاتِ پایینِ آن را بپوشاند؛ بستن فقط برای همین ریویژن و همین بار */
+    /* بنر روی نقشه است و ممکن است جدول مشخصات پایین آن را بپوشاند؛ بستن فقط برای همین ریویژن و همین بار */
     '<button class="dm-newer-x" onclick="dmHideNewer()" aria-label="بستن" title="بستن">✕</button>'+
   '</div>';
 }
 function dmHideNewer(){ var s=document.getElementById("dmNewerSlot"); if(s) s.innerHTML=""; }
 
-/* مشخصاتِ سند (فقط نام‌های متنی، بدونِ کد) — برای ریویژنِ انتخاب‌شده */
+/* مشخصات سند (فقط نام‌های متنی، بدون کد) — برای ریویژن انتخاب‌شده */
 function dmMetaHTML(d){
   var meta=[
     ["شماره سند", '<span class="mono" style="direction:ltr">'+esc(d.drawingNumber)+'</span>'],
     ["مشتری", esc(clientName(d.clientCode))],
-    // برچسبِ ردیف خودش «پروژه» است؛ پس مقدار باید نامِ خالص باشد، نه عنوانِ پیشونددار
+    // برچسب ردیف خودش «پروژه» است؛ پس مقدار باید نام خالص باشد، نه عنوان پیشونددار
     ["پروژه", esc(projectName(d)||("شمارهٔ "+pad2(d.projectNo)))],
     ["قطعه", esc(partName(d.partNo))],
     ["نوع سند", esc(typeName(d.typeCode))],
     ["ثبت‌کننده", esc(userName(d.uploadedBy)||"—")],
     ["تاریخ ثبت", fmtTimeDate(d.timestamp)]
   ];
-  // سطرِ «بازبین» حذف شد؛ اطلاعاتِ کاملِ بازبینی در سکشنِ گردش‌کار (تاریخچهٔ سند) نمایش داده می‌شود.
+  // سطر «بازبین» حذف شد؛ اطلاعات کامل بازبینی در سکشن گردش‌کار (تاریخچهٔ سند) نمایش داده می‌شود.
   return meta.map(function(m){return '<div class="dm-row"><span class="dm-k">'+m[0]+'</span><span class="dm-v">'+m[1]+'</span></div>';}).join("");
 }
-/* بنرِ رد: بینِ سکشنِ مشخصات و تاریخچه؛ نقطهٔ قرمزِ پالس‌دار پیشِ تیتر */
+/* بنر رد: بین سکشن مشخصات و تاریخچه؛ نقطهٔ قرمز پالس‌دار پیش تیتر */
 function dmRejectHTML(d){
   return (String(d.status||"").toLowerCase()==="rejected")
     ? '<div class="dm-reject">'+
@@ -207,39 +207,39 @@ function dmRejectHTML(d){
       '</div>'
     : '';
 }
-/* همهٔ بخش‌های وابسته به ریویژن، همراهِ انتخابِ ریویژن به‌روز می‌شوند: مشخصات، بنرِ رد، کدِ QR
-   و بنرِ «ریویژنِ جدیدتر». قبلاً فقط یک‌بار و بر اساسِ سندی که پنجره با آن باز شده بود ساخته می‌شدند؛
-   پس انتخابِ ریویژنِ قدیمی از تاریخچه بنر را نشان نمی‌داد و برعکس، بنر روی ریویژنِ جدید می‌ماند. */
+/* همهٔ بخش‌های وابسته به ریویژن، همراه انتخاب ریویژن به‌روز می‌شوند: مشخصات، بنر رد، کد QR
+   و بنر «ریویژن جدیدتر». قبلاً فقط یک‌بار و بر اساس سندی که پنجره با آن باز شده بود ساخته می‌شدند؛
+   پس انتخاب ریویژن قدیمی از تاریخچه بنر را نشان نمی‌داد و برعکس، بنر روی ریویژن جدید می‌ماند. */
 function dmApplySelection(d){
   var slot=document.getElementById("dmNewerSlot"); if(slot) slot.innerHTML=dmNewerRevBanner(d);
   var side=document.getElementById("dmMeta");
-  if(side && side.getAttribute("data-num")===d.drawingNumber) return;   // بخش‌های کناری همین حالا مالِ همین ریویژن‌اند
+  if(side && side.getAttribute("data-num")===d.drawingNumber) return;   // بخش‌های کناری همین حالا مال همین ریویژن‌اند
   if(side){ side.innerHTML=dmMetaHTML(d); side.setAttribute("data-num", d.drawingNumber); }
   var rj=document.getElementById("dmRej"); if(rj) rj.innerHTML=dmRejectHTML(d);
   var qr=document.getElementById("dmQrWrap"); if(qr) qr.innerHTML=dmQrSectionHTML(d);
 }
 
-/* ═══ بخشِ کدِ QR سند ═══
+/* ═══ بخش کد QR سند ═══
    کد به همان ویرایشی اشاره می‌کند که رویش چاپ می‌شود (شمارهٔ ویرایش انتهای شمارهٔ سند است)،
-   پس نقشهٔ کاغذیِ دستِ پیمانکار همیشه نسخهٔ خودش را باز می‌کند — نه نسخه‌ای که بعداً آمده.
-   اگر ویرایشِ تأییدشدهٔ جدیدتری وجود داشته باشد، خودِ سامانه پس از باز شدن به کاربر می‌گوید. */
+   پس نقشهٔ کاغذی دست پیمانکار همیشه نسخهٔ خودش را باز می‌کند — نه نسخه‌ای که بعداً آمده.
+   اگر ویرایش تأییدشدهٔ جدیدتری وجود داشته باشد، خود سامانه پس از باز شدن به کاربر می‌گوید. */
 function dmQrSectionHTML(d){
   var url=(typeof qrDocUrl==="function")?qrDocUrl(d.drawingNumber):"";
   if(!url) return "";
   var svg=(typeof qrSvg==="function")?qrSvg(url):"";
   if(!svg) return "";   // کتابخانهٔ QR نیامده — بخش اصلاً ساخته نمی‌شود
   return '<div class="dm-sec dm-qr-sec">'+
-    '<div class="dm-sec-t"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="18" y1="14" x2="18" y2="18"/><line x1="21" y1="18" x2="21" y2="21"/></svg>کدِ QR سند</div>'+
+    '<div class="dm-sec-t"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="18" y1="14" x2="18" y2="18"/><line x1="21" y1="18" x2="21" y2="21"/></svg>کد QR سند</div>'+
     '<div class="dm-qr-body">'+
       '<div class="dm-qr-img" id="dmQrImg">'+svg+'</div>'+
       '<div class="dm-qr-side">'+
-        '<p class="dm-qr-note">برای درج کنارِ جدولِ مشخصاتِ نقشه. با اسکن، همین ویرایشِ سند در سامانه باز می‌شود.</p>'+
+        '<p class="dm-qr-note">برای درج کنار جدول مشخصات نقشه. با اسکن، همین ویرایش سند در سامانه باز می‌شود.</p>'+
         '<button class="btn sm" onclick="dmDownloadQr(\''+esc(d.drawingNumber)+'\')">'+ICON.download+'دریافت تصویر</button>'+
       '</div>'+
     '</div></div>';
 }
-/* دانلودِ QR به‌صورت SVG — برداری است، پس در هر ابعادی روی نقشه چاپ شود لبه‌هایش تیز می‌ماند
-   (تصویرِ نقطه‌ای در چاپِ بزرگ پله‌پله می‌شود و اسکنر را به زحمت می‌اندازد). */
+/* دانلود QR به‌صورت SVG — برداری است، پس در هر ابعادی روی نقشه چاپ شود لبه‌هایش تیز می‌ماند
+   (تصویر نقطه‌ای در چاپ بزرگ پله‌پله می‌شود و اسکنر را به زحمت می‌اندازد). */
 function dmDownloadQr(num){
   var host=document.getElementById("dmQrImg");
   var svg=host?host.querySelector("svg"):null;
@@ -250,17 +250,17 @@ function dmDownloadQr(num){
   var a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
   a.download="QR-"+String(num||"doc")+".svg";
-  a.dataset.dlInternal="1";   // کلیکِ ساختگی نباید پنلِ انتقال را ببندد
+  a.dataset.dlInternal="1";   // کلیک ساختگی نباید پنل انتقال را ببندد
   document.body.appendChild(a); a.click(); a.remove();
   setTimeout(function(){ try{ URL.revokeObjectURL(a.href); }catch(e){} }, 4000);
 }
 
-/* یک ردیف ریویژن در تاریخچه: سرِ فشرده + اکشن‌های کارت (فقط حذف/رد/تأیید) + گردش‌کارِ اکسپند‌شونده */
-/* ═══════════════ رندرِ PDF روی canvas (pdf.js) ═══════════════
-   ⚠ کتابخانه تنبل بارگذاری می‌شود — ۳۱۳KB + ۱MB وُرکر که فقط برای کاربری که
-   واقعاً PDF باز می‌کند دانلود می‌شود، نه در بارگذاریِ اولِ سایت.
+/* یک ردیف ریویژن در تاریخچه: سر فشرده + اکشن‌های کارت (فقط حذف/رد/تأیید) + گردش‌کار اکسپند‌شونده */
+/* ═══════════════ رندر PDF روی canvas (pdf.js) ═══════════════
+   ⚠ کتابخانه تنبل بارگذاری می‌شود — ۳۱۳KB + ۱MB ورکر که فقط برای کاربری که
+   واقعاً PDF باز می‌کند دانلود می‌شود، نه در بارگذاری اول سایت.
    نسخهٔ 3.11 عمداً انتخاب شد: آخرین نسخه‌ای که UMD می‌دهد. نسخهٔ ۴ به بالا
-   فقط ES module است و با اسکریپت‌های کلاسیکِ این پروژه کار نمی‌کند. */
+   فقط ES module است و با اسکریپت‌های کلاسیک این پروژه کار نمی‌کند. */
 var _pdfLibPromise=null;
 function ensurePdfLib(){
   if(window.pdfjsLib) return Promise.resolve(true);
@@ -276,13 +276,13 @@ function ensurePdfLib(){
   });
   return _pdfLibPromise;
 }
-/* همهٔ صفحات پشتِ سرِ هم رندر می‌شوند؛ قاب خودش اسکرول می‌کند.
-   token برای این است که اگر کاربر وسطِ رندر ریویژنِ دیگری انتخاب کرد،
-   صفحاتِ نیمه‌کارهٔ قبلی روی نمای جدید نریزند. */
+/* همهٔ صفحات پشت سر هم رندر می‌شوند؛ قاب خودش اسکرول می‌کند.
+   token برای این است که اگر کاربر وسط رندر ریویژن دیگری انتخاب کرد،
+   صفحات نیمه‌کارهٔ قبلی روی نمای جدید نریزند. */
 async function dmRenderPdf(host, blob, token){
   var ok=await ensurePdfLib();
   if(token!==_dpSeq) return;
-  if(!ok){   // کتابخانه نیامد → همان ویوئرِ مرورگر، بدونِ ذره‌بین
+  if(!ok){   // کتابخانه نیامد → همان ویوئر مرورگر، بدون ذره‌بین
     host.classList.remove("is-pdf"); host.classList.add("is-frame");
     host.innerHTML='<iframe src="'+previewBlobUrl("docPreview", blob)+'"></iframe>';
     return;
@@ -290,9 +290,9 @@ async function dmRenderPdf(host, blob, token){
   try{
     var buf=await blob.arrayBuffer();
     if(token!==_dpSeq) return;
-    /* ⚠ فونت‌های استاندارد و CMapها: PDFهایی که فونت‌شان جاسازی نشده (رایج در خروجیِ نرم‌افزارهای
-       نقشه‌کشی: Arial/Helvetica/ISOCPEUR) بدونِ این دو، با فونتِ جایگزینِ سیستم و عرضِ نادرستِ حروف
-       کشیده می‌شدند — متن‌ها فاصله‌دار و به‌هم‌ریخته دیده می‌شد، در حالی که خودِ فایل سالم بود.
+    /* ⚠ فونت‌های استاندارد و CMapها: PDFهایی که فونت‌شان جاسازی نشده (رایج در خروجی نرم‌افزارهای
+       نقشه‌کشی: Arial/Helvetica/ISOCPEUR) بدون این دو، با فونت جایگزین سیستم و عرض نادرست حروف
+       کشیده می‌شدند — متن‌ها فاصله‌دار و به‌هم‌ریخته دیده می‌شد، در حالی که خود فایل سالم بود.
        هر دو پوشه محلی‌اند (vendor/pdfjs، هم‌نسخهٔ 3.11.174) و فقط برای همان PDF و همان فونت بار می‌شوند. */
     var pdf=await pdfjsLib.getDocument({data:buf,
       standardFontDataUrl:"vendor/pdfjs/standard_fonts/",
@@ -300,23 +300,23 @@ async function dmRenderPdf(host, blob, token){
     if(token!==_dpSeq) return;
     host.innerHTML='<div class="pdfv" id="pdfv"></div>';
     var wrap=host.querySelector(".pdfv");
-    /* اندازهٔ نمایش: صفحه کامل داخلِ قاب جا می‌شود (contain) — همان
-       قاعدهٔ پیش‌نمایشِ عکس، تا یک برگِ A4 بدونِ اسکرول دیده شود.
-       PAD = پدینگِ ۱۰px دو طرفِ .pdfv + جایی برای اسکرول‌بارِ احتمالی. */
+    /* اندازهٔ نمایش: صفحه کامل داخل قاب جا می‌شود (contain) — همان
+       قاعدهٔ پیش‌نمایش عکس، تا یک برگ A4 بدون اسکرول دیده شود.
+       PAD = پدینگ ۱۰px دو طرف .pdfv + جایی برای اسکرول‌بار احتمالی. */
     var PAD=28;
     var boxW=Math.max(120,(host.clientWidth||600)-PAD);
     var boxH=Math.max(120,(host.clientHeight||600)-PAD);
-    /* ⚠ رندر با سوپرسمپلینگ (بوم چند برابرِ اندازهٔ نمایش پیکسل می‌گیرد).
-       ریشهٔ تاری: قبلاً مقیاس فقط dpr بود، پس روی نمایشگرِ معمولی (dpr=1)
-       نقشهٔ A4 در همان ~۸۰۰px رندر می‌شد ≈ ۳ پیکسل بر میلی‌متر؛ متنِ
+    /* ⚠ رندر با سوپرسمپلینگ (بوم چند برابر اندازهٔ نمایش پیکسل می‌گیرد).
+       ریشهٔ تاری: قبلاً مقیاس فقط dpr بود، پس روی نمایشگر معمولی (dpr=1)
+       نقشهٔ A4 در همان ~۸۰۰px رندر می‌شد ≈ ۳ پیکسل بر میلی‌متر؛ متن
        ۲میلی‌متری نقشه ۶ پیکسل می‌شد و تار دیده می‌شد. ذره‌بین هم چیزی
-       اضافه نمی‌کرد چون پیکسلِ بیشتری وجود نداشت. حالا به‌اندازهٔ بزرگ‌نماییِ
-       ذره‌بین پیکسلِ ذخیره رندر می‌شود. سقفِ مگاپیکسل جلوی پرشدنِ حافظه
+       اضافه نمی‌کرد چون پیکسل بیشتری وجود نداشت. حالا به‌اندازهٔ بزرگ‌نمایی
+       ذره‌بین پیکسل ذخیره رندر می‌شود. سقف مگاپیکسل جلوی پرشدن حافظه
        در PDFهای چندصفحه‌ای را می‌گیرد. */
     var dpr=Math.min(window.devicePixelRatio||1, 2);
     var ss=(typeof LENS_ZOOM==="number"?LENS_ZOOM:2);
-    /* بودجهٔ کلِ ۱۶ مگاپیکسل بینِ صفحه‌ها تقسیم می‌شود (کفِ ۲ و سقفِ ۱۲)،
-       تا یک نقشهٔ تک‌برگی بیشترین وضوح را بگیرد ولی PDFِ چندصفحه‌ای حافظه را نبلعد. */
+    /* بودجهٔ کل ۱۶ مگاپیکسل بین صفحه‌ها تقسیم می‌شود (کف ۲ و سقف ۱۲)،
+       تا یک نقشهٔ تک‌برگی بیشترین وضوح را بگیرد ولی PDF چندصفحه‌ای حافظه را نبلعد. */
     var MAXPX=Math.min(12e6, Math.max(2e6, 16e6/pdf.numPages));
     for(var i=1;i<=pdf.numPages;i++){
       var page=await pdf.getPage(i);
@@ -331,9 +331,9 @@ async function dmRenderPdf(host, blob, token){
       cv.width=Math.max(1,Math.floor(vp.width)); cv.height=Math.max(1,Math.floor(vp.height));
       cv.style.width=cssW+"px"; cv.style.height=cssH+"px";
       cv.className="pdf-page";
-      /* ⚠ بوم باید صریحاً چپ‌به‌راست باشد: جهتِ متنِ canvas از عنصر به ارث می‌رسد و سایت RTL است.
+      /* ⚠ بوم باید صریحاً چپ‌به‌راست باشد: جهت متن canvas از عنصر به ارث می‌رسد و سایت RTL است.
          pdf.js بعضی متن‌ها را رشته‌ای می‌کشد (مثلاً متن‌هایی که reportlab در PDF نوشته)؛ در زمینهٔ RTL
-         الگوریتمِ دوجهتی «:»، «-» و فاصله‌ها را جابه‌جا می‌کرد → «Shaf t»، «FSM -SCC». */
+         الگوریتم دوجهتی «:»، «-» و فاصله‌ها را جابه‌جا می‌کرد → «Shaf t»، «FSM -SCC». */
       cv.style.direction="ltr"; cv.setAttribute("dir","ltr");
       wrap.appendChild(cv);
       var ctx2d=cv.getContext("2d"); try{ ctx2d.direction="ltr"; }catch(e){}
@@ -347,11 +347,11 @@ async function dmRenderPdf(host, blob, token){
 }
 
 /* ═══════════════ ذره‌بین ═══════════════
-   با کلیک روشن/خاموش می‌شود و تا وقتی روشن است، پنجرهٔ گردی همراهِ موس حرکت
-   می‌کند و همان ناحیه را با بزرگ‌نماییِ دوبرابر نشان می‌دهد.
-   روش: به‌جای کپیِ پیکسل، همان عنصر (img یا canvas) با transform: scale
-   داخلِ یک قابِ گرد کشیده می‌شود و مبدأش طوری جابه‌جا می‌شود که نقطهٔ زیرِ
-   نشانگر وسطِ ذره‌بین بیفتد. این هم برای عکس کار می‌کند هم برای canvasِ PDF. */
+   با کلیک روشن/خاموش می‌شود و تا وقتی روشن است، پنجرهٔ گردی همراه موس حرکت
+   می‌کند و همان ناحیه را با بزرگ‌نمایی دوبرابر نشان می‌دهد.
+   روش: به‌جای کپی پیکسل، همان عنصر (img یا canvas) با transform: scale
+   داخل یک قاب گرد کشیده می‌شود و مبدأش طوری جابه‌جا می‌شود که نقطهٔ زیر
+   نشانگر وسط ذره‌بین بیفتد. این هم برای عکس کار می‌کند هم برای canvas PDF. */
 var LENS_ZOOM=2, LENS_SIZE=190;
 function dmLensAttach(host){
   if(!host || host._lensOn) return;
@@ -389,7 +389,7 @@ function dmLensAttach(host){
     var w=r.width*LENS_ZOOM, h=r.height*LENS_ZOOM;
     var c=lens.firstChild;
     c.style.width=w+"px"; c.style.height=h+"px";
-    // نقطهٔ زیرِ نشانگر باید وسطِ ذره‌بین بیفتد
+    // نقطهٔ زیر نشانگر باید وسط ذره‌بین بیفتد
     c.style.left=(LENS_SIZE/2 - (x-r.left)*LENS_ZOOM)+"px";
     c.style.top =(LENS_SIZE/2 - (y-r.top )*LENS_ZOOM)+"px";
     lens.style.left=(x-LENS_SIZE/2)+"px";
@@ -400,7 +400,7 @@ function dmLensAttach(host){
     lens=null; srcEl=null;
   }
   host.addEventListener("click", function(e){
-    if(lens){ kill(); return; }                 // کلیکِ دوم = خاموش
+    if(lens){ kill(); return; }                 // کلیک دوم = خاموش
     var el=targetAt(e.clientX,e.clientY); if(!el) return;
     build(el); place(e.clientX,e.clientY);
   });
@@ -408,16 +408,16 @@ function dmLensAttach(host){
     if(!lens) return;
     var el=targetAt(e.clientX,e.clientY);
     if(!el){ kill(); return; }                  // از روی سند بیرون رفت
-    if(el!==srcEl){ build(el); }                // صفحهٔ دیگرِ PDF
+    if(el!==srcEl){ build(el); }                // صفحهٔ دیگر PDF
     place(e.clientX,e.clientY);
   });
   host.addEventListener("mouseleave", kill);
-  /* اسکرول یا بستنِ مودال، ذره‌بین را می‌بندد تا روی جای اشتباه نماند */
+  /* اسکرول یا بستن مودال، ذره‌بین را می‌بندد تا روی جای اشتباه نماند */
   host.addEventListener("scroll", kill, true);
   window.addEventListener("scroll", kill, true);
 }
-/* نمادِ سند با شمارهٔ ریویژن در مرکز — هم‌ساختارِ docTypeIconInner در projects.js
-   (همان مسیرِ SVG و همان قاعدهٔ متنِ داخلی) تا زبانِ بصریِ «المان» یکدست بماند. */
+/* نماد سند با شمارهٔ ریویژن در مرکز — هم‌ساختار docTypeIconInner در projects.js
+   (همان مسیر SVG و همان قاعدهٔ متن داخلی) تا زبان بصری «المان» یکدست بماند. */
 function revIconInner(rev){
   return '<svg class="el-doc" viewBox="0 0 24 24">'+
     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'+
@@ -436,63 +436,63 @@ function versionRowHTML(rv){
   }
   if(admin) acts.push(delIconBtn("event.stopPropagation();dmDeleteVersion('"+esc(rv.drawingNumber)+"')"));
 
-  /* سرِ سطر عمداً کم‌جزئیات است: فقط شمارهٔ ریویژن و فلشِ اکسپند.
-     «بدون فایل» و اکشن‌ها (تأیید/رد/حذف) داخلِ بخشِ بازشونده رفتند تا فهرست در
-     حالتِ بسته آرام بماند و اکشنِ حذف هم پشتِ یک کلیکِ آگاهانه باشد. */
+  /* سر سطر عمداً کم‌جزئیات است: فقط شمارهٔ ریویژن و فلش اکسپند.
+     «بدون فایل» و اکشن‌ها (تأیید/رد/حذف) داخل بخش بازشونده رفتند تا فهرست در
+     حالت بسته آرام بماند و اکشن حذف هم پشت یک کلیک آگاهانه باشد. */
   return '<div class="ver-row'+(isCur?" cur":"")+'" id="ver-'+esc(rv.drawingNumber)+'" onclick="dmToggleRev(\''+esc(rv.drawingNumber)+'\')">'+
     '<div class="ver-head">'+
-      /* المانِ ریویژن: همان نمادِ سندِ کددارِ سایت (docTypeIconInner)، ولی به‌جای
-         کدِ نوعِ سند، شمارهٔ دو‌رقمیِ ریویژن داخلش می‌نشیند. */
+      /* المان ریویژن: همان نماد سند کددار سایت (docTypeIconInner)، ولی به‌جای
+         کد نوع سند، شمارهٔ دو‌رقمی ریویژن داخلش می‌نشیند. */
       '<span class="el-badge ver-el">'+revIconInner(pad2(revFmt(rv.rev)))+'</span>'+
       '<span class="ver-rev mono">ریویژن '+esc(pad2(revFmt(rv.rev)))+'</span>'+   // شمارهٔ دو‌رقمی (۰۰/۰۱/…)
       '<div class="ver-head-end">'+
         '<span class="ver-chev"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></span>'+
       '</div>'+
     '</div>'+
-    /* سطرِ توضیح: متن در راست و اکشن‌ها (تأیید/رد/حذف) در چپ — دقیقاً زیرِ فلشِ
-       اکسپند. اکشن‌ها فقط در حالتِ باز دیده می‌شوند (CSS)، پس حذف همچنان پشتِ
-       یک کلیکِ آگاهانه می‌ماند. توضیح در هر دو حالت دیده می‌شود. */
+    /* سطر توضیح: متن در راست و اکشن‌ها (تأیید/رد/حذف) در چپ — دقیقاً زیر فلش
+       اکسپند. اکشن‌ها فقط در حالت باز دیده می‌شوند (CSS)، پس حذف همچنان پشت
+       یک کلیک آگاهانه می‌ماند. توضیح در هر دو حالت دیده می‌شود. */
     ((rv.title||acts.length)
       ? '<div class="ver-descrow'+(rv.title?'':' no-desc')+'">'+
           (rv.title?'<div class="ver-desc" title="'+esc(rv.title)+'">'+esc(rv.title)+'</div>':'<span class="ver-desc"></span>')+
           (acts.length?'<div class="ver-acts">'+acts.join("")+'</div>':'')+
         '</div>'
       : '')+
-    '<div class="ver-wf"><div class="ver-wf-in">'+                                  // wrapper برای انیمیشنِ باز/بسته‌شدن (grid 0fr→1fr)
-      '<div class="ver-wf-sep"></div>'+                                            // خطِ جداکنندهٔ پیوسته زیرِ سرِ ریویژن
-      /* ⚠ تگِ وضعیت کلاً حذف شد: تایم‌لاینِ گردش‌کار پایینِ همین بخش، وضعیت را
+    '<div class="ver-wf"><div class="ver-wf-in">'+                                  // wrapper برای انیمیشن باز/بسته‌شدن (grid 0fr→1fr)
+      '<div class="ver-wf-sep"></div>'+                                            // خط جداکنندهٔ پیوسته زیر سر ریویژن
+      /* ⚠ تگ وضعیت کلاً حذف شد: تایم‌لاین گردش‌کار پایین همین بخش، وضعیت را
          دقیق‌تر می‌گوید — مرحلهٔ انجام‌شده با رنگ و مرحلهٔ فعلی با حلقهٔ متحرک.
-         برای سندِ در انتظار هم مرحلهٔ «ارسال برای بازبینی» انجام‌شده و «تأیید
-         توسط بازبین» به‌عنوانِ مرحلهٔ آینده دیده می‌شود، پس تگ چیزی اضافه نمی‌کرد. */
+         برای سند در انتظار هم مرحلهٔ «ارسال برای بازبینی» انجام‌شده و «تأیید
+         توسط بازبین» به‌عنوان مرحلهٔ آینده دیده می‌شود، پس تگ چیزی اضافه نمی‌کرد. */
       (rv.fileId?'':'<div class="ver-bar"><span class="muted" style="font-size:11px">بدون فایل</span></div>')+
-      /* ⚠ یادداشتِ جداگانه حذف شد: همان متن هنگامِ ثبت به‌عنوانِ comment در
-         گردش‌کار ذخیره می‌شود (Code.gs ▸ addWorkflow) و زیرِ مرحلهٔ خودش
+      /* ⚠ یادداشت جداگانه حذف شد: همان متن هنگام ثبت به‌عنوان comment در
+         گردش‌کار ذخیره می‌شود (Code.gs ▸ addWorkflow) و زیر مرحلهٔ خودش
          دیده می‌شود. تأیید و رد هم comment خودشان را دارند، پس همهٔ
-         توضیحات یک‌جا و کنارِ رویدادِ مربوطشان نمایش داده می‌شوند. */
+         توضیحات یک‌جا و کنار رویداد مربوطشان نمایش داده می‌شوند. */
       workflowStepsHTML(rv.drawingNumber)+
     '</div></div>'+
   '</div>';
 }
 
-/* تایم‌لاین گردش‌کارِ یک ریویژن: رویدادهای انجام‌شده (حلقهٔ پر) + مراحلِ آیندهٔ استاندارد (حلقهٔ توخالی) */
+/* تایم‌لاین گردش‌کار یک ریویژن: رویدادهای انجام‌شده (حلقهٔ پر) + مراحل آیندهٔ استاندارد (حلقهٔ توخالی) */
 /* همان قاعدهٔ «فعالیت‌های اخیر» (fixActivityLines) برای گردش‌کار:
-   ▸ اگر توضیح در یک خط جا شود  → نام به خطِ دومِ مستقل می‌رود (کلاسِ .one)
-   ▸ اگر توضیح به خطِ دوم برسد → نام در ادامهٔ همان خط، پشتِ جداکنندهٔ نازک
-   تفاوت با مرجع: اینجا متن بریده نمی‌شود. در فهرستِ فعالیت‌ها همهٔ رکوردها باید
-   دقیقاً دو‌خطی بمانند تا فهرست یکدست باشد، ولی گردش‌کار سقفِ ارتفاع ندارد و
-   کوتاه‌کردنِ توضیحِ فنیِ سند (که تنها جای دیدنش همین‌جاست) ضرر دارد. */
+   ▸ اگر توضیح در یک خط جا شود  → نام به خط دوم مستقل می‌رود (کلاس .one)
+   ▸ اگر توضیح به خط دوم برسد → نام در ادامهٔ همان خط، پشت جداکنندهٔ نازک
+   تفاوت با مرجع: اینجا متن بریده نمی‌شود. در فهرست فعالیت‌ها همهٔ رکوردها باید
+   دقیقاً دو‌خطی بمانند تا فهرست یکدست باشد، ولی گردش‌کار سقف ارتفاع ندارد و
+   کوتاه‌کردن توضیح فنی سند (که تنها جای دیدنش همین‌جاست) ضرر دارد. */
 function wfFixLines(root){
   if(!root) return;
   var lines=root.querySelectorAll(".wf-lines");
   for(var i=0;i<lines.length;i++){
     var el=lines[i];
     var note=el.querySelector(".wf-note");
-    if(!note){ el.classList.remove("one"); continue; }   // بدونِ توضیح: نام از همان خطِ اول
+    if(!note){ el.classList.remove("one"); continue; }   // بدون توضیح: نام از همان خط اول
     el.classList.remove("one");                          // پاک‌سازی تا اندازه‌گیری تمیز باشد
     var tail=el.querySelectorAll(".wf-sep,.wf-who");
     var j;
     var lh=parseFloat(getComputedStyle(el).lineHeight)||17.6;
-    // نام موقتاً پنهان می‌شود تا ارتفاعِ خودِ توضیح سنجیده شود
+    // نام موقتاً پنهان می‌شود تا ارتفاع خود توضیح سنجیده شود
     for(j=0;j<tail.length;j++) tail[j].style.display="none";
     var oneLine = note.getBoundingClientRect().height < (lh*1.5);
     for(j=0;j<tail.length;j++) tail[j].style.display="";
@@ -503,26 +503,26 @@ function workflowStepsHTML(num){
   var d=docByNumber(num); if(!d) return '';
   var status=String(d.status||"").toLowerCase();
   var steps=workflowOf(num).map(function(w){
-    /* توضیح و نامِ کاربر جدا نگه داشته می‌شوند تا در دو خط بیایند:
-       اول توضیح، بعد نامِ ثبت‌کننده. */
+    /* توضیح و نام کاربر جدا نگه داشته می‌شوند تا در دو خط بیایند:
+       اول توضیح، بعد نام ثبت‌کننده. */
     return {label:workflowActionLabel(w.action), color:wfDotColor(w.action), done:true,
             note:String(w.comment||""), who:(userName(w.user)||""), date:fmtDate(w.timestamp)};
   });
   wfFutureSteps(status).forEach(function(a){ steps.push({label:wfFutureLabel(a), done:false, meta:"", date:""}); });
   if(!steps.length) return '<p class="muted" style="padding:6px 2px">رویدادی ثبت نشده.</p>';
-  // آخرین مرحلهٔ انجام‌شده = «مرحلهٔ فعلی» → حلقهٔ شعاعیِ متحرک (مثلِ رکوردهای فعالیتِ اخیرِ داشبورد)
+  // آخرین مرحلهٔ انجام‌شده = «مرحلهٔ فعلی» → حلقهٔ شعاعی متحرک (مثل رکوردهای فعالیت اخیر داشبورد)
   var lastDone=-1; steps.forEach(function(s,i){ if(s.done) lastDone=i; }); if(lastDone>=0) steps[lastDone].active=true;
-  /* ⚠ معکوس‌کردن بعد از تعیینِ «مرحلهٔ فعلی» انجام می‌شود، وگرنه lastDone به
-     عنصرِ اشتباه اشاره می‌کرد. جدیدترین رویداد بالا می‌آید — همان ترتیبی که
-     فهرستِ ریویژن‌ها دارد (revisionsOf هم نزولی مرتب می‌کند). */
+  /* ⚠ معکوس‌کردن بعد از تعیین «مرحلهٔ فعلی» انجام می‌شود، وگرنه lastDone به
+     عنصر اشتباه اشاره می‌کرد. جدیدترین رویداد بالا می‌آید — همان ترتیبی که
+     فهرست ریویژن‌ها دارد (revisionsOf هم نزولی مرتب می‌کند). */
   steps.reverse();
   return '<div class="wf-timeline">'+steps.map(function(s,i){
     var last=(i===steps.length-1);
     return '<div class="wf-step '+(s.done?"done":"todo")+(s.active?" active":"")+'">'+
       '<div class="wf-rail"><span class="wf-ring"'+((s.done&&s.color)?(' style="--wf:'+s.color+'"'):'')+'></span>'+(last?'':'<span class="wf-line"></span>')+'</div>'+
-      /* ساختارِ دو‌خطیِ «فعالیت‌های اخیر»: توضیح و نام در یک ظرفِ واحد می‌آیند و
-         wfFixLines پس از رندر تصمیم می‌گیرد نام به خطِ دومِ مستقل برود (توضیحِ
-         یک‌خطی) یا در ادامهٔ خطِ دوم پشتِ جداکننده بنشیند (توضیحِ دو‌خطی). */
+      /* ساختار دو‌خطی «فعالیت‌های اخیر»: توضیح و نام در یک ظرف واحد می‌آیند و
+         wfFixLines پس از رندر تصمیم می‌گیرد نام به خط دوم مستقل برود (توضیح
+         یک‌خطی) یا در ادامهٔ خط دوم پشت جداکننده بنشیند (توضیح دو‌خطی). */
       '<div class="wf-body"><div class="wf-label">'+esc(s.label)+'</div>'+
         ((s.note||s.who)
           ? '<div class="wf-lines'+(s.note?'':' no-note')+'">'+
@@ -537,14 +537,14 @@ function workflowStepsHTML(num){
 }
 
 /* کلیک روی یک ریویژن: آکاردئون گردش‌کار (هر لحظه یکی باز).
-   فایل فقط وقتی دوباره بارگذاری می‌شود که ریویژنِ دیگری (غیر از ریویژنِ در حال نمایش) انتخاب شود؛
-   کلیک روی همان ریویژنِ فعلی صرفاً منوی گردش‌کار را باز/بسته می‌کند بدون دریافت دوبارهٔ فایل. */
+   فایل فقط وقتی دوباره بارگذاری می‌شود که ریویژن دیگری (غیر از ریویژن در حال نمایش) انتخاب شود؛
+   کلیک روی همان ریویژن فعلی صرفاً منوی گردش‌کار را باز/بسته می‌کند بدون دریافت دوبارهٔ فایل. */
 function dmToggleRev(num){
   var row=document.getElementById("ver-"+num); if(!row) return;
   var willOpen=!row.classList.contains("open");
   var list=document.querySelectorAll(".ver-row"); for(var i=0;i<list.length;i++) list[i].classList.remove("open");
   if(willOpen) row.classList.add("open");
-  /* ⚠ سطرِ بسته ارتفاعِ صفر دارد (grid-template-rows:0fr)، پس اندازه‌گیریِ اولیه
+  /* ⚠ سطر بسته ارتفاع صفر دارد (grid-template-rows:0fr)، پس اندازه‌گیری اولیه
      رویش بی‌معناست. پس از باز شدن دوباره سنجیده می‌شود. */
   if(willOpen) wfFixLines(row);
   if(num!==_dm.selNum) dmSelectVersion(num);
@@ -555,27 +555,27 @@ async function dmSelectVersion(num){
   var d=docByNumber(num); if(!d) return;
   _dm.selNum=num;
   dmApplySelection(d);
-  var myToken=++_dpSeq;                      // این بارگذاری؛ اگر بارگذاریِ تازه‌تری بیاید، این یکی باید بی‌سروصدا کنار برود
-  if(_dpEst){ _dpEst.stop(); _dpEst=null; }  // برآوردگرِ پیش‌نمایشِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
+  var myToken=++_dpSeq;                      // این بارگذاری؛ اگر بارگذاری تازه‌تری بیاید، این یکی باید بی‌سروصدا کنار برود
+  if(_dpEst){ _dpEst.stop(); _dpEst=null; }  // برآوردگر پیش‌نمایش قبلی را متوقف کن تا دو تایمر روی یک المان درصد ننویسند
   // هایلایت ردیف انتخاب‌شده
   var row=document.getElementById("ver-"+num);
   var list=document.querySelectorAll(".ver-row"); for(var i=0;i<list.length;i++) xfSet(list[i],"sel",list[i]===row);
-  // وضعیت دکمهٔ دانلود بر اساس ریویژنِ انتخاب‌شده
+  // وضعیت دکمهٔ دانلود بر اساس ریویژن انتخاب‌شده
   var is3DSel=String(d.typeCode).toUpperCase().indexOf("3D")===0;
   if(is3DSel){ dmInit3DDownload(d); }
   else { var dl=document.getElementById("dpDownload"); if(dl) dl.disabled=!d.fileId; }
   // پیش‌نمایش
   var host=document.getElementById("docPreviewHost"); if(!host) return;
-  host.classList.remove("is-3d"); host.classList.remove("is-frame");   // پیش‌فرض: قابِ عادیِ flex (عکس/PDF)؛ فقط شاخهٔ سه‌بعدی دوباره فعالش می‌کند
+  host.classList.remove("is-3d"); host.classList.remove("is-frame");   // پیش‌فرض: قاب عادی flex (عکس/PDF)؛ فقط شاخهٔ سه‌بعدی دوباره فعالش می‌کند
   if(!d.fileId){
     host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="es-title">این ریویژن فایلی ندارد</div></div>';
     return;
   }
   var is3D = String(d.typeCode).toUpperCase()==="3D";
-  // نوارِ پیشرفتِ درون‌بخشی به‌جای اورلیِ تمام‌صفحه؛ فایل به‌صورتِ استریمی در همین بخش لود می‌شود و بقیهٔ سایت آزاد می‌ماند
-  /* هم‌سبکِ لودینگِ ویوئرِ سه‌بعدی: اسپینرِ لیساژو + عنوان + نامِ لاتینِ نوعِ سند،
-     و نوارِ پیشرفت زیرِ همه. نامِ لاتین خطِ جداگانه و LTR است، وگرنه در یک خطِ
-     فارسی ترتیبِ کلمات به‌هم می‌ریزد. */
+  // نوار پیشرفت درون‌بخشی به‌جای اورلی تمام‌صفحه؛ فایل به‌صورت استریمی در همین بخش لود می‌شود و بقیهٔ سایت آزاد می‌ماند
+  /* هم‌سبک لودینگ ویوئر سه‌بعدی: اسپینر لیساژو + عنوان + نام لاتین نوع سند،
+     و نوار پیشرفت زیر همه. نام لاتین خط جداگانه و LTR است، وگرنه در یک خط
+     فارسی ترتیب کلمات به‌هم می‌ریزد. */
   var _dEn=(typeof typeNameEn==="function")?typeNameEn(d.typeCode):String(d.typeCode||"");
   host.innerHTML=(typeof loadBarHTML==="function")
     ? '<div class="dp-load">'+
@@ -583,12 +583,12 @@ async function dmSelectVersion(num){
         '<div class="mv-empty-t">در حال بارگذاری سند</div>'+
         (_dEn?'<div class="mv-load-name">'+esc(_dEn)+'</div>':'')+
       '</div>'+
-      /* نوار بیرونِ .dp-load و در حالتِ چسبیده‌به‌کف (نه inline) — عیناً مثلِ ویوئرِ
-         سه‌بعدی؛ مرجعِ position آن .dp-frame است که relative دارد. */
+      /* نوار بیرون .dp-load و در حالت چسبیده‌به‌کف (نه inline) — عیناً مثل ویوئر
+         سه‌بعدی؛ مرجع position آن .dp-frame است که relative دارد. */
       loadBarHTML(false, true)
     : '<div class="dm-loading"><div class="spinner" style="width:32px;height:32px;border-width:3px"></div><span>در حال بارگذاری</span></div>';
   var getHost=function(){ return document.getElementById("docPreviewHost"); };
-  var est=(typeof loadBarEstimate==="function")?loadBarEstimate(getHost, 94):null;   // پیشرفتِ نرم تا نوار روی صفر نماند
+  var est=(typeof loadBarEstimate==="function")?loadBarEstimate(getHost, 94):null;   // پیشرفت نرم تا نوار روی صفر نماند
   _dpEst=est;
   try{
     var r=await getFileRetry(d.fileId, {onProgress: function(loaded,total){ if(est && total>0 && myToken===_dpSeq) est.real(Math.min(99,Math.round(loaded/total*100))); }});
@@ -604,44 +604,44 @@ async function dmSelectVersion(num){
       host.innerHTML=dmFailHTML(fi, num); return;
     }
     var blob=b64toBlob(r.base64, r.mimeType); var url=previewBlobUrl("docPreview", blob);
-    // فایلِ سه‌بعدی (GLB/GLTF) نباید در iframe برود (مرورگر دانلودش می‌کند)؛ با model-viewer نمایش داده می‌شود
+    // فایل سه‌بعدی (GLB/GLTF) نباید در iframe برود (مرورگر دانلودش می‌کند)؛ با model-viewer نمایش داده می‌شود
     var really3D = is3D || /^model\//.test(r.mimeType||"") || /\.(glb|gltf)$/i.test(r.name||"");
     if(really3D){
       if(typeof ensureModelViewer==="function") await ensureModelViewer();
       if(myToken!==_dpSeq) return;
       host=document.getElementById("docPreviewHost"); if(!host) return;
       if(window.customElements && customElements.get("model-viewer")){
-        // قابِ پُر (بدونِ flex-centering که لبه را می‌بُرید) + همان تولباکسِ پنلِ پروژه
+        // قاب پر (بدون flex-centering که لبه را می‌برید) + همان تولباکس پنل پروژه
         host.classList.add("is-3d");
-        /* قاب بینِ پیش‌نمایش‌ها بازاستفاده می‌شود؛ اگر پیش‌نمایشِ قبلی (PDF/تصویر) اسکرول
-           خورده باشد، همان موقعیت می‌ماند و مدلِ تازه جابه‌جا دیده می‌شود. */
+        /* قاب بین پیش‌نمایش‌ها بازاستفاده می‌شود؛ اگر پیش‌نمایش قبلی (PDF/تصویر) اسکرول
+           خورده باشد، همان موقعیت می‌ماند و مدل تازه جابه‌جا دیده می‌شود. */
         host.scrollLeft=0; host.scrollTop=0;
         host.innerHTML='<div class="mv-toolwrap">'+
           '<model-viewer id="dmMv" src="'+url+'" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="0.95" '+
-            'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" alt="مدلِ سه‌بعدی" style="background:#f4f4f2"><button slot="ar-button" class="mv-ar"></button></model-viewer>'+
-          mvPartBadgeHTML(partName(d.partNo))+                                    // برچسبِ نامِ انگلیسیِ قطعه + آیکونِ سه‌بعدی
+            'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" alt="مدل سه‌بعدی" style="background:#f4f4f2"><button slot="ar-button" class="mv-ar"></button></model-viewer>'+
+          mvPartBadgeHTML(partName(d.partNo))+                                    // برچسب نام انگلیسی قطعه + آیکون سه‌بعدی
           (typeof mvToolbarHTML==="function"?mvToolbarHTML():'')+
         '</div>';
       } else {
-        host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><div class="es-title">نمایشِ سه‌بعدی در دسترس نیست</div><div class="es-desc">فایلِ کتابخانهٔ model-viewer در پوشهٔ vendor موجود نیست.</div></div>';
+        host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><div class="es-title">نمایش سه‌بعدی در دسترس نیست</div><div class="es-desc">فایل کتابخانهٔ model-viewer در پوشهٔ vendor موجود نیست.</div></div>';
       }
     } else {
       var isPdf = /pdf/i.test(r.mimeType||"") || /\.pdf$/i.test(r.name||"");
       if(r.mimeType.indexOf("image/")===0){
         host.innerHTML='<img src="'+url+'">';
-        dmLensAttach(host);                       // ذره‌بینِ چسبیده به موس
+        dmLensAttach(host);                       // ذره‌بین چسبیده به موس
       }else if(isPdf){
         /* PDF با pdf.js روی canvas رندر می‌شود، نه در iframe.
-           دلیل: محتوای iframe به‌خاطرِ سیاستِ امنیتیِ مرورگر خواندنی نیست، پس
-           ذره‌بین روی آن ممکن نبود. با canvas، پیکسل‌ها در اختیارِ ماست. */
+           دلیل: محتوای iframe به‌خاطر سیاست امنیتی مرورگر خواندنی نیست، پس
+           ذره‌بین روی آن ممکن نبود. با canvas، پیکسل‌ها در اختیار ماست. */
         host.classList.add("is-pdf");
         host.scrollLeft=0; host.scrollTop=0;
         await dmRenderPdf(host, blob, myToken);
         if(myToken!==_dpSeq) return;
         dmLensAttach(host);
       }else{
-        /* هر چیزِ دیگری (غیرِ عکس و PDF) همان ویوئرِ داخلیِ مرورگر را می‌گیرد؛
-           اسکرولِ قاب خاموش می‌شود تا دو اسکرول‌بارِ هم‌زمان پیدا نشود. */
+        /* هر چیز دیگری (غیر عکس و PDF) همان ویوئر داخلی مرورگر را می‌گیرد؛
+           اسکرول قاب خاموش می‌شود تا دو اسکرول‌بار هم‌زمان پیدا نشود. */
         host.classList.add("is-frame");
         host.scrollLeft=0; host.scrollTop=0;
         host.innerHTML='<iframe src="'+url+'"></iframe>';
@@ -655,61 +655,62 @@ async function dmSelectVersion(num){
     if(host) host.innerHTML=dmFailHTML(FAIL_RENDER, num);
   }
 }
-/* حالتِ خطای پیش‌نمایش: علتِ واقعی (fileFailInfo / FAIL_RENDER) + توضیح + «تلاش مجدد» */
+/* حالت خطای پیش‌نمایش: علت واقعی (fileFailInfo / FAIL_RENDER) + توضیح + «تلاش مجدد» */
 function dmFailHTML(fi, num){
   return '<div class="empty-state">'+(fi.ic||"")+'<div class="es-title">'+esc(fi.t)+'</div>'+
     '<div class="es-desc">'+esc(fi.d)+'</div>'+dmRetryBtn(num)+'</div>';
 }
-/* دکمهٔ «تلاش مجدد» برای بارگذاریِ دوبارهٔ پیش‌نمایش/مدل از ابتدا */
+/* دکمهٔ «تلاش مجدد» برای بارگذاری دوبارهٔ پیش‌نمایش/مدل از ابتدا */
 function dmRetryBtn(num){
   return '<button class="btn sm es-retry" onclick="dmSelectVersion(\''+esc(num)+'\')">'+
     '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>'+
     'تلاش مجدد</button>';
 }
-/* برچسبِ نامِ انگلیسیِ قطعه (گوشهٔ ویوئرِ سه‌بعدی) — عیناً المانِ منوی انتخابِ قطعه: آیکونِ لایه‌ها + رنگِ متن (نه نارنجی) */
+/* برچسب نام انگلیسی قطعه (گوشهٔ ویوئر سه‌بعدی) — عیناً المان منوی انتخاب قطعه: آیکون لایه‌ها + رنگ متن (نه نارنجی) */
 function mvPartBadgeHTML(name){
   if(!name) return '';
   return '<div class="mv-partbadge">'+MV_LAYERS_IC+'<span class="mv-pb-t">'+esc(name)+'</span></div>';
 }
 
-/* ================= دانلودِ اسنادِ سه‌بعدی: انتخابِ فرمت با هاور ================= */
-var _dm3D = {};   // { GLB:true/false, STP:true/false, USDZ:true/false } — انتخابِ فعلی برای ریویژنِ در حالِ نمایش
-
-/* لیستِ فرمت‌های موجود روی همین ریویژن (فقط آن‌هایی که واقعاً فایل دارند نشان داده می‌شوند) */
+/* ================= دانلود اسناد سه‌بعدی: فهرست فرمت‌ها با هاور =================
+   بدون حالت انتخاب: کلیک روی هر ردیف (یا دکمهٔ کنارش) همان فرمت را دانلود می‌کند و
+   دکمهٔ پایین همیشه همهٔ فرمت‌ها را یکجا دانلود می‌کند. */
+/* لیست فرمت‌های موجود روی همین ریویژن (فقط آن‌هایی که واقعاً فایل دارند نشان داده می‌شوند) */
 function dm3DFormats(d){
   var f=[];
-  if(d.fileId)     f.push({key:"GLB",  label:"GLB / GLTF", sub:"نمایشِ سایت",        fileId:d.fileId,     name:d.drawingNumber+".glb"});
-  if(d.stpFileId)  f.push({key:"STP",  label:"STP",         sub:"فرمتِ اصلیِ آرشیو",  fileId:d.stpFileId,  name:d.stpFileName||(d.drawingNumber+".stp")});
-  if(d.usdzFileId) f.push({key:"USDZ", label:"USDZ",        sub:"واقعیتِ افزوده",     fileId:d.usdzFileId, name:d.usdzFileName||(d.drawingNumber+".usdz")});
+  if(d.fileId)     f.push({key:"GLB",  label:"GLB / GLTF", sub:"نمایش سایت",        fileId:d.fileId,     name:d.drawingNumber+".glb"});
+  if(d.stpFileId)  f.push({key:"STP",  label:"STP",         sub:"فرمت اصلی آرشیو",  fileId:d.stpFileId,  name:d.stpFileName||(d.drawingNumber+".stp")});
+  if(d.usdzFileId) f.push({key:"USDZ", label:"USDZ",        sub:"واقعیت افزوده",     fileId:d.usdzFileId, name:d.usdzFileName||(d.drawingNumber+".usdz")});
   return f;
 }
-/* هنگامِ نمایشِ هر ریویژنِ سه‌بعدی: پاپ‌آورِ فرمت‌ها را می‌سازد و دکمهٔ دانلود را به حالتِ اولیه (ناقص) برمی‌گرداند */
+/* هنگام نمایش هر ریویژن سه‌بعدی: پاپ‌آور فرمت‌ها را می‌سازد.
+   هر ردیف هم‌سبک ردیف مرکز دانلود است: کاشی فایل + نام/توضیح + دکمهٔ دانلود. */
+var DM_DL_CUBE='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+var DM_DL_ARROW='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
 function dmInit3DDownload(d){
   var wrap=document.getElementById("dmDlWrap"), pop=document.getElementById("dmDlPop"), btn=document.getElementById("dpDownload");
   if(!wrap||!pop||!btn) return;
   var formats=dm3DFormats(d);
-  _dm3D={};   // با هر تعویضِ ریویژن، انتخاب‌های قبلی پاک می‌شوند
-  if(!formats.length){
-    pop.innerHTML=""; btn.disabled=true;
-    btn.classList.remove("dm-dl-active"); btn.classList.add("dm-dl-incomplete");
-    return;
-  }
-  pop.innerHTML=formats.map(function(fm){
-    return '<button type="button" class="dm-dl-opt" data-k="'+fm.key+'" onclick="event.stopPropagation();dm3DToggle(\''+fm.key+'\')">'+
-      '<span class="ed-check" id="dmChk-'+fm.key+'"></span>'+
+  var lbl=document.getElementById("dpDlLbl");
+  if(lbl) lbl.textContent = formats.length>1 ? "دانلود تمامی فرمت‌ها" : "دانلود سند";
+  if(!formats.length){ pop.innerHTML=""; btn.disabled=true; return; }
+  pop.innerHTML='<div class="dm-dl-head">فرمت مورد نظر خود را انتخاب کنید.</div>'+
+    formats.map(function(fm){
+    return '<div class="dm-dl-opt" role="button" tabindex="0" title="دانلود '+esc(fm.label)+'"'+
+        ' onclick="event.stopPropagation();dm3DDownloadOne(\''+fm.key+'\')"'+
+        ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();dm3DDownloadOne(\''+fm.key+'\')}">'+
+      '<span class="dm-dl-tile">'+DM_DL_CUBE+'</span>'+
       '<span class="dm-dl-opt-t"><span class="dm-dl-opt-l">'+esc(fm.label)+'</span><span class="dm-dl-opt-s">'+esc(fm.sub)+'</span></span>'+
-    '</button>';
+      '<span class="dm-dl-one" aria-hidden="true">'+DM_DL_ARROW+'</span>'+
+    '</div>';
   }).join("");
   btn.disabled=false;
-  btn.classList.remove("dm-dl-active"); btn.classList.add("dm-dl-incomplete");
 }
-/* تاگل‌کردنِ یک فرمت در پاپ‌آور — اولین انتخاب، دکمهٔ دانلود را از حالتِ ناقص به فعال (نارنجی) می‌برد */
-function dm3DToggle(key){
-  _dm3D[key]=!_dm3D[key];
-  var chk=document.getElementById("dmChk-"+key); if(chk) chk.classList.toggle("on",_dm3D[key]);
-  var any=Object.keys(_dm3D).some(function(k){ return _dm3D[k]; });
-  var btn=document.getElementById("dpDownload");
-  if(btn){ btn.classList.toggle("dm-dl-active",any); btn.classList.toggle("dm-dl-incomplete",!any); }
+/* دانلود تکی یک فرمت (کلیک روی ردیف) */
+function dm3DDownloadOne(key){
+  var d=docByNumber(_dm.selNum); if(!d) return;
+  var fm=dm3DFormats(d).filter(function(x){ return x.key===key; })[0];
+  if(fm) downloadFile(fm.fileId, fm.name);
 }
 /* دانلود ریویژن در حال نمایش */
 function dmDownloadSelected(){
@@ -720,8 +721,8 @@ function dmDownloadSelected(){
     if(!d.fileId){ toast("این ریویژن فایلی برای دانلود ندارد.",true); return; }
     downloadFile(d.fileId, d.drawingNumber); return;
   }
-  var formats=dm3DFormats(d).filter(function(fm){ return _dm3D[fm.key]; });
-  if(!formats.length){ toast("دست‌کم یک فرمت را برای دانلود انتخاب کنید.",true); return; }
+  var formats=dm3DFormats(d);   // دکمهٔ پایین = همهٔ فرمت‌ها یکجا
+  if(!formats.length){ toast("این ریویژن فایلی برای دانلود ندارد.",true); return; }
   formats.forEach(function(fm){ downloadFile(fm.fileId, fm.name); });
 }
 
@@ -729,10 +730,10 @@ function dmDownloadSelected(){
 async function dmDeleteVersion(num){
   var d=docByNumber(num); if(!d) return;
   var isCur=String(d.isLatest).toLowerCase()==="true";
-  var msg=isCur ? "حذف «ریویژن فعلی» ("+num+")؟ ریویژن قبلی جایگزینِ آن می‌شود و فایلش به سطلِ زبالهٔ گوگل‌درایو می‌رود (تا حدود یک ماه قابلِ بازیابی)."
-                : "حذف ریویژن «"+num+"»؟ فایلش به سطلِ زبالهٔ گوگل‌درایو می‌رود (تا حدود یک ماه قابلِ بازیابی).";
+  var msg=isCur ? "حذف «ریویژن فعلی» ("+num+")؟ ریویژن قبلی جایگزین آن می‌شود و فایلش به سطل زبالهٔ گوگل‌درایو می‌رود (تا حدود یک ماه قابل بازیابی)."
+                : "حذف ریویژن «"+num+"»؟ فایلش به سطل زبالهٔ گوگل‌درایو می‌رود (تا حدود یک ماه قابل بازیابی).";
   if(!(await uiConfirm(msg,{danger:true,okLabel:"حذف"}))) return;
-  /* خوش‌بینانه: ریویژن همین حالا از فهرست بیرون می‌رود و جزئیات روی ریویژنِ باقی‌مانده باز می‌شود؛
+  /* خوش‌بینانه: ریویژن همین حالا از فهرست بیرون می‌رود و جزئیات روی ریویژن باقی‌مانده باز می‌شود؛
      حذف در پس‌زمینه انجام و اگر ناموفق شد داده از سرور برمی‌گردد. */
   var op=optimisticOp(function(){ localDeleteDoc(num); },
     function(){ return api("deleteDocument",{drawingNumber:num},{silent:true}); });
@@ -750,17 +751,17 @@ function dmAfterDelete(d){
   });
   if(remaining.length){
     var latest=remaining.filter(function(x){return String(x.isLatest).toLowerCase()==="true";})[0]||remaining[0];
-    openDocDetail(latest.drawingNumber);   // خودش جایِ لایهٔ جزئیاتِ کنونی را می‌گیرد
+    openDocDetail(latest.drawingNumber);   // خودش جای لایهٔ جزئیات کنونی را می‌گیرد
   } else { closeModal(); }
 }
 
 /* ============ بارگذاری ریویژن/نسخهٔ جدید (پنل فشرده: فقط فایل + توضیح) ============ */
 var _rv = { baseNum:"", mode:"", file:null };
 
-/* سربرگِ «ریویژنِ جدید»: دو سلول — ریویژنِ فعلی ← ریویژنی که ساخته می‌شود.
-   قبلاً فقط شمارهٔ سندِ مبنا (یعنی ریویژنِ قبلی) بزرگ نشان داده می‌شد و گمراه‌کننده بود.
-   الگو همان ریلِ ویزاردِ ثبت سند است: چپ‌به‌راست، مقدار بالا و برچسبِ لاتینِ کوچک زیرش،
-   و خطِ اتصالِ نازک بینِ سلول‌ها. بخشِ ریویژن جدا رنگ می‌گیرد تا تنها تفاوتِ دو شماره دیده شود. */
+/* سربرگ «ریویژن جدید»: دو سلول — ریویژن فعلی ← ریویژنی که ساخته می‌شود.
+   قبلاً فقط شمارهٔ سند مبنا (یعنی ریویژن قبلی) بزرگ نشان داده می‌شد و گمراه‌کننده بود.
+   الگو همان ریل ویزارد ثبت سند است: چپ‌به‌راست، مقدار بالا و برچسب لاتین کوچک زیرش،
+   و خط اتصال نازک بین سلول‌ها. بخش ریویژن جدا رنگ می‌گیرد تا تنها تفاوت دو شماره دیده شود. */
 function rvFlowHTML(d, rs){
   var prev=(rs.latest&&rs.latest.drawingNumber)||d.drawingNumber;
   var stem=["FSM",String(d.clientCode).toUpperCase(),pad2(d.orderNo),pad2(d.projectNo),pad2(d.partNo),String(d.typeCode).toUpperCase()].join("-");
@@ -769,13 +770,13 @@ function rvFlowHTML(d, rs){
   return '<div class="rv-flow">'+
     '<div class="rv-cell prev">'+num(prevRev)+'<span class="rv-cap">CURRENT REV</span></div>'+
     '<span class="rv-cx" aria-hidden="true"></span>'+
-    /* رینگ با SVG (نه conic-gradient): خط با سرعتِ ثابت روی محیطِ کادر حرکت می‌کند.
-       گرادیانِ زاویه‌ای در کادرِ عریض روی ضلع‌های بلند تند و روی ضلع‌های کوتاه کند می‌شد. */
+    /* رینگ با SVG (نه conic-gradient): خط با سرعت ثابت روی محیط کادر حرکت می‌کند.
+       گرادیان زاویه‌ای در کادر عریض روی ضلع‌های بلند تند و روی ضلع‌های کوتاه کند می‌شد. */
     '<div class="rv-cell next"><svg class="rv-ring" aria-hidden="true"><rect width="100%" height="100%" rx="12" ry="12" pathLength="100"/></svg>'+
       num(pad2(rs.nextRev))+'<span class="rv-cap">NEW REV</span></div>'+
   '</div>';
 }
-/* تصمیم‌گیرِ ورودی: بر اساس وضعیت ریویژن فعلیِ مبنا، حالت درست را باز می‌کند. */
+/* تصمیم‌گیر ورودی: بر اساس وضعیت ریویژن فعلی مبنا، حالت درست را باز می‌کند. */
 function startRevisionUpload(num){
   var d=docByNumber(num); if(!d){ toast("سند یافت نشد.",true); return; }
   var cur=revisionsOf(d)[0]||d, cst=String(cur.status||"").toLowerCase();
@@ -786,8 +787,8 @@ function startRevisionUpload(num){
 
 function openRevisionUploadModal(baseNum, mode){
   var d=docByNumber(baseNum); if(!d){ toast("سند یافت نشد.",true); return; }
-  // نوعِ سند از روی همان مبنا مشخص می‌شود: برای سه‌بعدی، فرمتِ آپلود باید همانی بماند که قبلاً ثبت شده (STP/GLB/USDZ)،
-  // نه فرمتِ عمومیِ PDF/تصویر — وگرنه امکانِ بارگذاریِ فایلِ سه‌بعدی از این مسیر اصلاً وجود نداشت.
+  // نوع سند از روی همان مبنا مشخص می‌شود: برای سه‌بعدی، فرمت آپلود باید همانی بماند که قبلاً ثبت شده (STP/GLB/USDZ)،
+  // نه فرمت عمومی PDF/تصویر — وگرنه امکان بارگذاری فایل سه‌بعدی از این مسیر اصلاً وجود نداشت.
   var is3D=String(d.typeCode).toUpperCase().indexOf("3D")===0;
   _rv={ baseNum:baseNum, mode:mode, file:null, file3:null, file2:null, is3D:is3D };
   var isVer=(mode==="version");
@@ -797,29 +798,29 @@ function openRevisionUploadModal(baseNum, mode){
     : 'ریویژن بعدی این سند با عنوان «<b>ریویژن '+esc(pad2(rs.nextRev))+'</b>» ثبت می‌شود.';
   var noteLabel=isVer?"توضیحات این نسخه":"توضیحات این ریویژن";
   var upIco='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
-  var stpTag = isVer?"فرمتِ اصلی برای آرشیوِ اسناد — اختیاری":"فرمتِ اصلی برای آرشیوِ اسناد — الزامی";
+  var stpTag = isVer?"فرمت اصلی برای آرشیو اسناد — اختیاری":"فرمت اصلی برای آرشیو اسناد — الزامی";
   var glbTag = isVer?"برای نمایش در سایت — اختیاری":"برای نمایش در سایت — الزامی";
   var dzHTML = is3D
     ? '<div class="nd-up-grid nd-up-3">'+
         rvDropzoneHTML("rvDrop3","rvFile3",".stp,.step","فایل STP",stpTag)+
         rvDropzoneHTML("rvDrop","rvFile",".glb,.gltf","فایل GLB/GLTF",glbTag)+
-        rvDropzoneHTML("rvDrop2","rvFile2",".usdz","فایل USDZ","برای نمایش در واقعیتِ افزوده — اختیاری")+
+        rvDropzoneHTML("rvDrop2","rvFile2",".usdz","فایل USDZ","برای نمایش در واقعیت افزوده — اختیاری")+
       '</div>'
     : '<div class="nd-up-grid nd-up-1">'+
         rvDropzoneHTML("rvDrop","rvFile",".pdf,image/*","فایل","PDF یا تصویر — الزامی")+
       '</div>';
-  // فقط برای «نسخهٔ جدید» (سندِ ردشده) صادق است: می‌شود فقط فرمتِ تغییریافته را بارگذاری کرد
+  // فقط برای «نسخهٔ جدید» (سند ردشده) صادق است: می‌شود فقط فرمت تغییریافته را بارگذاری کرد
   var hint3D = (is3D && isVer)
     ? '<div class="rv-3d-hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".6" fill="currentColor" stroke="none"/></svg>'+
-        '<span>فقط فرمتی را بارگذاری کنید که تغییر کرده؛ هر فرمتی که خالی بماند، از نسخهٔ قبلیِ همین سند استفاده می‌شود.</span></div>'
+        '<span>فقط فرمتی را بارگذاری کنید که تغییر کرده؛ هر فرمتی که خالی بماند، از نسخهٔ قبلی همین سند استفاده می‌شود.</span></div>'
     : '';
-  /* چیدمان هم‌الگوی ویزاردِ ثبت سند: نوارِ شماره بالا (زمینهٔ خاکستری + سایهٔ زیرش، مثلِ .nd-rail)،
-     و در بدنه اول توضیحات و بعد بارگذاریِ فایل (مثلِ .nd-fstack). */
+  /* چیدمان هم‌الگوی ویزارد ثبت سند: نوار شماره بالا (زمینهٔ خاکستری + سایهٔ زیرش، مثل .nd-rail)،
+     و در بدنه اول توضیحات و بعد بارگذاری فایل (مثل .nd-fstack). */
   var body='<div class="rv-band">'+
       (isVer ? '<div class="rv-num mono" style="direction:ltr">'+esc(baseNum)+'</div>' : rvFlowHTML(d, rs))+
     '</div>'+
     '<div class="rv-up">'+
-    /* هم‌کلاسِ توضیحِ ویزاردِ ثبت سند (#nRevBanner): نقطهٔ نارنجی + متنِ ۱۱px کم‌رنگ + بخشِ پررنگِ نارنجی */
+    /* هم‌کلاس توضیح ویزارد ثبت سند (#nRevBanner): نقطهٔ نارنجی + متن ۱۱px کم‌رنگ + بخش پررنگ نارنجی */
     '<div class="nd-revnote">'+lead+'</div>'+
     '<div class="nd-fstack">'+
       '<div class="ndoc-note"><textarea id="rvNote" class="ndoc-note-ta" aria-label="'+esc(noteLabel)+'" placeholder="'+(isVer?"تغییرات این نسخه را بنویسید.":NOTE_PH_REV)+'"></textarea></div>'+
@@ -868,7 +869,7 @@ function rvInitDrop(zoneId,inputId){
            : inputId==="rvFile2" ? /\.usdz$/i.test(f.name)
            : _rv.is3D            ? /\.(glb|gltf)$/i.test(f.name)
            :                       (/^image\//.test(f.type)||/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name));
-    if(!ok){ toast("فرمتِ فایل مجاز نیست.",true); return; }
+    if(!ok){ toast("فرمت فایل مجاز نیست.",true); return; }
     try{ var dt=new DataTransfer(); dt.items.add(f); inp.files=dt.files; }
     catch(err){ toast("مرورگر شما از رهاکردن فایل پشتیبانی نمی‌کند؛ از دکمهٔ انتخاب استفاده کنید.",true); return; }
     rvFilePicked(zoneId,inputId);
@@ -877,20 +878,20 @@ function rvInitDrop(zoneId,inputId){
 async function submitRevisionUpload(){
   var isVer=(_rv.mode==="version");
   var f=_rv.file;
-  // «نسخهٔ جدید» (سندِ ردشده) روی سه‌بعدی: هر سه فایل اختیاری‌اند — هرکدام خالی بماند، نسخهٔ قبلیِ
+  // «نسخهٔ جدید» (سند ردشده) روی سه‌بعدی: هر سه فایل اختیاری‌اند — هرکدام خالی بماند، نسخهٔ قبلی
   // همان فایل در بک‌اند دست‌نخورده می‌ماند؛ فقط باید دست‌کم یکی از سه فایل انتخاب شده باشد.
-  // «ریویژنِ جدید» (سندِ تأییدشده) یک رکوردِ کاملاً جدید می‌سازد، پس فایلِ اصلی (و برای سه‌بعدی، STP) همچنان الزامی است.
+  // «ریویژن جدید» (سند تأییدشده) یک رکورد کاملاً جدید می‌سازد، پس فایل اصلی (و برای سه‌بعدی، STP) همچنان الزامی است.
   if(_rv.is3D && isVer){
     if(!f && !_rv.file3 && !_rv.file2){ toast("دست‌کم یکی از فایل‌های STP، GLB یا USDZ را بارگذاری کنید.",true); return; }
   } else {
-    if(!f){ toast(_rv.is3D?"بارگذاریِ فایلِ GLB/GLTF الزامی است.":"بارگذاری فایل الزامی است.",true); return; }
-    if(_rv.is3D && !_rv.file3){ toast("بارگذاریِ فایلِ STP الزامی است.",true); return; }
+    if(!f){ toast(_rv.is3D?"بارگذاری فایل GLB/GLTF الزامی است.":"بارگذاری فایل الزامی است.",true); return; }
+    if(_rv.is3D && !_rv.file3){ toast("بارگذاری فایل STP الزامی است.",true); return; }
   }
   if(f && f.size>25*1024*1024){ toast("حجم فایل بیش از ۲۵ مگابایت است.",true); return; }
   var ta=document.getElementById("rvNote"); var note=ta?String(ta.value).trim():"";
   var base=docByNumber(_rv.baseNum); if(!base){ toast("سند یافت نشد.",true); return; }
   var b64=f?(await fileToBase64(f)):null;
-  // انتخابِ اندپوینت/پیلود بر اساسِ حالت (ریویژنِ جدیدِ همان مبنا یا سندِ جدید)
+  // انتخاب اندپوینت/پیلود بر اساس حالت (ریویژن جدید همان مبنا یا سند جدید)
   var action, payload, label;
   if(isVer){
     action="uploadNewVersion";
@@ -905,7 +906,7 @@ async function submitRevisionUpload(){
         fileBase64:b64, fileName:f.name, mimeType:f.type};
     label=base.drawingNumber;
   }
-  // اسنادِ سه‌بعدی: STP و USDZ هم همراهِ همین درخواست ارسال می‌شوند (هرکدام که انتخاب شده باشد)
+  // اسناد سه‌بعدی: STP و USDZ هم همراه همین درخواست ارسال می‌شوند (هرکدام که انتخاب شده باشد)
   if(_rv.is3D){
     if(_rv.file3){
       if(_rv.file3.size>25*1024*1024){ toast("حجم فایل STP بیش از ۲۵ مگابایت است.",true); return; }

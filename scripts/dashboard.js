@@ -1,6 +1,6 @@
 /* ================= داشبورد ================= */
-/* animate=true فقط هنگامِ ورود به تبِ داشبورد (بارِ اول یا کلیکِ سایدبار) داده می‌شود؛
-   رفرش‌های پس‌زمینه (ثبتِ سند، تغییرِ تنظیمات) بدونِ آرگومان صدا می‌زنند تا شمارش/ورود دوباره پخش نشود. */
+/* animate=true فقط هنگام ورود به تب داشبورد (بار اول یا کلیک سایدبار) داده می‌شود؛
+   رفرش‌های پس‌زمینه (ثبت سند، تغییر تنظیمات) بدون آرگومان صدا می‌زنند تا شمارش/ورود دوباره پخش نشود. */
 function renderDashboard(animate){
   var activeProjCount=DB.projects.filter(function(p){ return projectDocs(p).length>0; }).length;
 
@@ -15,8 +15,8 @@ function renderDashboard(animate){
   renderRecentActivity();
 }
 
-/* متنِ واقعیِ «تغییر نسبت به دیروز» برایِ هر کارتِ شاخص — بر پایهٔ رویدادهای واقعیِ ۲۴ساعتِ اخیر
-   (DB.workflow)، نه یک متنِ ثابتِ نمایشی. هر رویداد فقط یک‌بار می‌تواند در دلیلِ تغییرِ هر کارت بشمارَد. */
+/* متن واقعی «تغییر نسبت به دیروز» برای هر کارت شاخص — بر پایهٔ رویدادهای واقعی ۲۴ساعت اخیر
+   (DB.workflow)، نه یک متن ثابت نمایشی. هر رویداد فقط یک‌بار می‌تواند در دلیل تغییر هر کارت بشمارد. */
 function updateKpiFeet(){
   var since=new Date(Date.now()-24*3600*1000).toISOString();
   var recentWf=(DB.workflow||[]).filter(function(w){ return (w.timestamp||"")>=since; });
@@ -25,7 +25,7 @@ function updateKpiFeet(){
   var approvedN=countAction("approved");
   var submittedN=countAction("submitted");
   var rejectedN=countAction("rejected");
-  // پروژه‌های فعال: پروژه‌ای که اولین سندش در ۲۴ساعتِ اخیر ثبت شده، «تازه‌فعال‌شده» حساب می‌شود
+  // پروژه‌های فعال: پروژه‌ای که اولین سندش در ۲۴ساعت اخیر ثبت شده، «تازه‌فعال‌شده» حساب می‌شود
   var newActiveProjects=DB.projects.filter(function(p){
     var docs=projectDocs(p); if(!docs.length) return false;
     var first=docs.reduce(function(m,d){ return (!m||(d.timestamp||"")<m)?(d.timestamp||""):m; },"");
@@ -33,10 +33,10 @@ function updateKpiFeet(){
   }).length;
 
   setKpiFoot("kpiFootActiveProjects", newActiveProjects, function(n){ return n+" پروژهٔ تازه‌فعال‌شده"; });
-  setKpiFoot("kpiFootDocs", newDocs, function(n){ return n+" سندِ جدید"; });
-  setKpiFoot("kpiFootApproved", approvedN, function(n){ return n+" تأییدِ جدید"; });
+  setKpiFoot("kpiFootDocs", newDocs, function(n){ return n+" سند جدید"; });
+  setKpiFoot("kpiFootApproved", approvedN, function(n){ return n+" تأیید جدید"; });
   setKpiFoot("kpiFootPending", submittedN, function(n){
-    return rejectedN>0 ? (n+" ارسالِ جدید · "+faN(rejectedN)+" عدمِ تأیید") : (n+" ارسالِ جدید");
+    return rejectedN>0 ? (n+" ارسال جدید · "+faN(rejectedN)+" عدم تأیید") : (n+" ارسال جدید");
   });
 }
 function setKpiFoot(id, n, textFn){
@@ -46,22 +46,22 @@ function setKpiFoot(id, n, textFn){
   t.textContent = n>0 ? textFn(faN(n)) : "تغییری نسبت به دیروز ندارد";
 }
 
-/* آیا کاربر کاهشِ حرکت خواسته؟ همهٔ انیمیشن‌های تزئینی پشتِ این گیت می‌شوند. */
+/* آیا کاربر کاهش حرکت خواسته؟ همهٔ انیمیشن‌های تزئینی پشت این گیت می‌شوند. */
 function prefersReducedMotion(){ return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
 
-/* کارتِ شاخص: هنگامِ ورودِ تب با شمارشِ نرم از ۰ پر می‌شود؛ در رفرشِ پس‌زمینه یا کاهشِ حرکت، مستقیم. */
+/* کارت شاخص: هنگام ورود تب با شمارش نرم از ۰ پر می‌شود؛ در رفرش پس‌زمینه یا کاهش حرکت، مستقیم. */
 function setKpi(id, val, animate, index){
   var el=document.getElementById(id); if(!el) return;
   val=Math.max(0, parseInt(val,10)||0);
   if(!animate || prefersReducedMotion()){ el.textContent=faN(val); return; }
-  countUp(el, val, (index||0)*90);   // تأخیرِ پلکانی تا شمارش‌ها با ورودِ آبشاریِ کارت‌ها هم‌گام شوند
+  countUp(el, val, (index||0)*90);   // تأخیر پلکانی تا شمارش‌ها با ورود آبشاری کارت‌ها هم‌گام شوند
 }
-/* شمارشِ ۰ → target با easeOutCubic — شمارشگرِ تعداد است، پس ارقامِ فارسی. */
+/* شمارش ۰ → target با easeOutCubic — شمارشگر تعداد است، پس ارقام فارسی. */
 function countUp(el, target, delay){
   target=Math.max(0, parseInt(target,10)||0);
   el.textContent=faN(0);
   var run=function(){
-    var dur=Math.min(1100, 380+target*22), t0=null;   // اعدادِ بزرگ‌تر کمی طولانی‌تر (با سقف)
+    var dur=Math.min(1100, 380+target*22), t0=null;   // اعداد بزرگ‌تر کمی طولانی‌تر (با سقف)
     function tick(ts){
       if(t0===null) t0=ts;
       var p=Math.min((ts-t0)/dur,1), eased=1-Math.pow(1-p,3);
@@ -72,17 +72,17 @@ function countUp(el, target, delay){
   };
   if(delay>0) setTimeout(run, delay); else run();
 }
-/* ================= ورودِ آبشاریِ عمومیِ صفحات ================= */
-/* از switchTab برای هر تب صدا زده می‌شود: به بلوک‌های سطح‌بالای تبِ فعال به‌ترتیب کلاسِ rv-in
-   با تأخیرِ پلکانی می‌دهد تا از پایین بالا بیایند. سبک است چون فقط بلوک‌های سطح‌بالا (نه ردیف‌ها)
+/* ================= ورود آبشاری عمومی صفحات ================= */
+/* از switchTab برای هر تب صدا زده می‌شود: به بلوک‌های سطح‌بالای تب فعال به‌ترتیب کلاس rv-in
+   با تأخیر پلکانی می‌دهد تا از پایین بالا بیایند. سبک است چون فقط بلوک‌های سطح‌بالا (نه ردیف‌ها)
    با transform/opacity متحرک می‌شوند. */
 function isHiddenEl(el){
   if(el.hidden) return true;
   var cs=window.getComputedStyle(el);
   return cs.display==="none" || cs.visibility==="hidden";
 }
-/* واحدهای آبشار: فرزندانِ مستقیمِ ریشه؛ ولی به درونِ هر ظرفِ rv-group (در هر عمق) فرو می‌رود
-   تا فرزندانِ همان، واحدِ آبشار شوند — پس پنل‌های تودرتو (مثلِ پنلِ مشتریان) هم پلکانی می‌آیند نه یک‌جا. */
+/* واحدهای آبشار: فرزندان مستقیم ریشه؛ ولی به درون هر ظرف rv-group (در هر عمق) فرو می‌رود
+   تا فرزندان همان، واحد آبشار شوند — پس پنل‌های تودرتو (مثل پنل مشتریان) هم پلکانی می‌آیند نه یک‌جا. */
 function collectRevealUnits(root){
   var out=[];
   (function walk(el){
@@ -94,27 +94,27 @@ function collectRevealUnits(root){
   })(root);
   return out;
 }
-/* به واحدهای درونِ root کلاسِ rv-in با تأخیرِ پلکانی می‌دهد؛ با reflow از نو پخش می‌شود.
-   هم برای ورودِ کلِ تب استفاده می‌شود، هم برای بخشی از صفحه (مثلِ سمتِ راستِ پنلِ مشتریان هنگامِ سوئیچ). */
+/* به واحدهای درون root کلاس rv-in با تأخیر پلکانی می‌دهد؛ با reflow از نو پخش می‌شود.
+   هم برای ورود کل تب استفاده می‌شود، هم برای بخشی از صفحه (مثل سمت راست پنل مشتریان هنگام سوئیچ). */
 function revealCascade(root){
   if(!root) return;
-  var prev=root.querySelectorAll(".rv-in");                       // پاک‌سازیِ پخشِ قبلی
+  var prev=root.querySelectorAll(".rv-in");                       // پاک‌سازی پخش قبلی
   [].forEach.call(prev, function(el){ el.classList.remove("rv-in"); el.style.animationDelay=""; });
-  if(prefersReducedMotion()) return;                              // کاهشِ حرکت: بدونِ آبشار، نمایشِ مستقیم
+  if(prefersReducedMotion()) return;                              // کاهش حرکت: بدون آبشار، نمایش مستقیم
   var units=collectRevealUnits(root);
-  void root.offsetWidth;                                          // اجبارِ reflow تا انیمیشن از نو پخش شود
-  units.forEach(function(el,i){ el.style.animationDelay=(Math.min(i,10)*0.06)+"s"; el.classList.add("rv-in"); }); // سقفِ تأخیر برای فهرست‌های بلند
+  void root.offsetWidth;                                          // اجبار reflow تا انیمیشن از نو پخش شود
+  units.forEach(function(el,i){ el.style.animationDelay=(Math.min(i,10)*0.06)+"s"; el.classList.add("rv-in"); }); // سقف تأخیر برای فهرست‌های بلند
 }
 function playTabReveal(pane){ revealCascade(pane); }
 
-/* کلیدِ یکتای هر پروژه (برای به‌خاطرسپاریِ کارتِ بازِ فعلی بینِ رفرش‌ها) */
+/* کلید یکتای هر پروژه (برای به‌خاطرسپاری کارت باز فعلی بین رفرش‌ها) */
 function projKey(r){ return r.c+"|"+r.o+"|"+r.pr; }
-/* کلیدِ پروژه‌ای که الان باید باز باشد؛ null = هنوز کاربر دستی چیزی انتخاب نکرده (پیش‌فرض: اولین ردیف) */
+/* کلید پروژه‌ای که الان باید باز باشد؛ null = هنوز کاربر دستی چیزی انتخاب نکرده (پیش‌فرض: اولین ردیف) */
 var _projOpenKey=null;
 
-/* کارت‌های پروژهٔ باز‌شونده. animate=true فقط هنگامِ ورود به تبِ داشبورد: نوارِ پیشرفت از صفر پر می‌شود
-   و عددِ درصدِ بالای آن هم‌زمان از صفر می‌شمارد؛ رفرش‌های پس‌زمینه مستقیم مقدارِ نهایی را نشان می‌دهند.
-   همیشه دقیقاً یک کارت باز است: پیش‌فرض اولین ردیف؛ اگر کاربر دستی کارتِ دیگری را باز کند همان می‌ماند
+/* کارت‌های پروژهٔ باز‌شونده. animate=true فقط هنگام ورود به تب داشبورد: نوار پیشرفت از صفر پر می‌شود
+   و عدد درصد بالای آن هم‌زمان از صفر می‌شمارد؛ رفرش‌های پس‌زمینه مستقیم مقدار نهایی را نشان می‌دهند.
+   همیشه دقیقاً یک کارت باز است: پیش‌فرض اولین ردیف؛ اگر کاربر دستی کارت دیگری را باز کند همان می‌ماند
    تا رفرش‌های بعدی (چون کلید در _projOpenKey نگه‌داشته می‌شود). */
 function renderProjectCards(animate){
   var host=document.getElementById("projCardsList");
@@ -122,18 +122,18 @@ function renderProjectCards(animate){
     host.innerHTML=emptyState("پروژه‌ای ثبت نشده","برای شروع، از «تنظیمات» یک پروژه بسازید تا وضعیت تکمیل آن اینجا دیده شود.");
     return;
   }
-  // آخرین پروژهٔ تغییریافته (جدیدترین timestampِ اسنادش) بالاترین؛ پروژهٔ بدونِ هیچ سندی ته صف
+  // آخرین پروژهٔ تغییریافته (جدیدترین timestamp اسنادش) بالاترین؛ پروژهٔ بدون هیچ سندی ته صف
   var all=DB.projects.map(projectStats).sort(function(a,b){return (b.last||"").localeCompare(a.last||"");});
   var rows=all.slice(0,4);            // حداکثر ۴ پروژه در داشبورد
   var IC_OK='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
   var IC_OPEN='<svg viewBox="0 0 24 24"><line x1="21.5" y1="12" x2="2.5" y2="12"/><polyline points="10 4.5 2.5 12 10 19.5"/></svg>';
   var doAnim = animate && !prefersReducedMotion();
-  // اگر کلیدِ بازِ فعلی دیگر در فهرست نیست (یا هنوز چیزی انتخاب نشده)، پیش‌فرض روی اولین ردیف بیفتد
+  // اگر کلید باز فعلی دیگر در فهرست نیست (یا هنوز چیزی انتخاب نشده)، پیش‌فرض روی اولین ردیف بیفتد
   var openIdx = rows.findIndex(function(r){ return projKey(r)===_projOpenKey; });
   if(openIdx<0){ openIdx = rows.length?0:-1; if(rows.length) _projOpenKey=projKey(rows[0]); }
 /* راهنمای نوار: دقیقاً همان سگمنت‌ها، به همان ترتیب و با همان رنگ.
-   هر سطرِ راهنما یک تکه از نوار را توضیح می‌دهد، پس عددها و نوار به
-   می‌ماند؛ تفکیکِ قطعه‌محور در تولتیپِ نوار دیده می‌شود. */
+   هر سطر راهنما یک تکه از نوار را توضیح می‌دهد، پس عددها و نوار به
+   می‌ماند؛ تفکیک قطعه‌محور در تولتیپ نوار دیده می‌شود. */
 function projLegendHTML(r){
   return '<div class="detail-stats">'+
     '<span>اسناد الزامی: <b>'+faN(r.total)+' سند</b></span>'+
@@ -141,9 +141,9 @@ function projLegendHTML(r){
     '<span>تأییدشده: <b>'+faN(r.apr)+' سند</b></span>'+
     '<span>در انتظار بازبینی: <b>'+faN(r.inRev)+' سند</b></span></div>';
 }
-/* تولتیپِ هر تکه از نوار — یک جعبهٔ سفیدِ واقعی (نه ::after)، چون باید
-   چند سطر آمار داخلش جا شود. برای سگمنتِ قطعه، تفکیکِ کامل؛ برای
-   دو سگمنتِ عمومی (در بازبینی / بارگذاری‌نشده) فقط عنوان و تعداد. */
+/* تولتیپ هر تکه از نوار — یک جعبهٔ سفید واقعی (نه ::after)، چون باید
+   چند سطر آمار داخلش جا شود. برای سگمنت قطعه، تفکیک کامل؛ برای
+   دو سگمنت عمومی (در بازبینی / بارگذاری‌نشده) فقط عنوان و تعداد. */
 function segTipHTML(g){
   var head='<div class="sgt-h"><i class="sgt-sw" style="background:'+esc(g.color)+'"></i>'+
     '<span class="sgt-t">'+esc(g.name)+'</span></div>';
@@ -158,22 +158,22 @@ function segTipHTML(g){
     '<div class="sgt-r"><span>در انتظار بازبینی</span><b>'+faN(st.inRev)+'</b></div>'+
     '<div class="sgt-r"><span>بارگذاری نشده</span><b>'+faN(st.noDoc)+'</b></div></span>';
 }
-/* نوارِ پیشرفتِ سگمنتی: هر قطعه با رنگِ خودش سهمِ اسنادِ تأییدشده‌اش را پر
-   می‌کند، سپس یک سگمنتِ کهربایی برای کلِ اسنادِ در انتظارِ بازبینی؛
-   باقیِ نوار (پس‌زمینهٔ خاکستری) = ماژول‌هایِ بدونِ سند.
-   ⚠ سگمنت‌ها کنارِ هم (flex) می‌نشینند نه روی هم؛ با position:absolute باید
-   آفستِ تجمعی حساب می‌شد که با انیمیشنِ عرض دردسرساز است. */
+/* نوار پیشرفت سگمنتی: هر قطعه با رنگ خودش سهم اسناد تأییدشده‌اش را پر
+   می‌کند، سپس یک سگمنت کهربایی برای کل اسناد در انتظار بازبینی؛
+   باقی نوار (پس‌زمینهٔ خاکستری) = ماژول‌های بدون سند.
+   ⚠ سگمنت‌ها کنار هم (flex) می‌نشینند نه روی هم؛ با position:absolute باید
+   آفست تجمعی حساب می‌شد که با انیمیشن عرض دردسرساز است. */
 function projBarHTML(r,doAnim){
-  /* بخشِ خالی (بارگذاری‌نشده) هم رسم می‌شود — با همان رنگِ پس‌زمینه،
-     پس دیده نمی‌شود ولی تولتیپِ خودش را دارد. */
+  /* بخش خالی (بارگذاری‌نشده) هم رسم می‌شود — با همان رنگ پس‌زمینه،
+     پس دیده نمی‌شود ولی تولتیپ خودش را دارد. */
   var segs=(r.segs||[]);
   if(!segs.length) return '<div class="proj-bar-bg"></div>';
   return '<div class="proj-bar-bg">'+segs.map(function(g){
     var w=doAnim?0:g.pct;
     var kc=(g.kind==="rev")?" rev":((g.kind==="none")?" none":"");
-    /* زردِ کم‌رنگ (رنگِ قطعهٔ سوم) کنارِ پس‌زمینهٔ نوار نسبتِ کنتراستِ ۱٫۰۳ دارد —
-       عملاً نامرئی. همان خطِ داخلیِ نازکی که قبلاً برای سگمنتِ «در انتظار بازبینی»
-       بود مرزش را معلوم می‌کند، بدونِ دست‌زدن به خودِ رنگ. */
+    /* زرد کم‌رنگ (رنگ قطعهٔ سوم) کنار پس‌زمینهٔ نوار نسبت کنتراست ۱٫۰۳ دارد —
+       عملاً نامرئی. همان خط داخلی نازکی که قبلاً برای سگمنت «در انتظار بازبینی»
+       بود مرزش را معلوم می‌کند، بدون دست‌زدن به خود رنگ. */
     if(String(g.color).toLowerCase()==="#fef3c7") kc+=" pale";
     return '<span class="pbar-seg'+kc+'" data-w="'+g.pct+'"'+
       ' style="width:'+w+'%;background:'+esc(g.color)+'">'+
@@ -181,24 +181,24 @@ function projBarHTML(r,doAnim){
   }).join("")+'</div>';
 }
   host.innerHTML='<div class="proj-list">'+rows.map(function(r,i){
-    /* تفکیکِ قطعه‌محور حذف شد: تعدادِ تگ‌ها با تعدادِ قطعات بالا می‌رفت
-       و در پروژهٔ چندقطعه‌ای جایی در کارت نمی‌ماند. تفکیک فقط در تولتیپِ
-       نوار و در صفحهٔ خودِ پروژه در دسترس است. */
-    /* ⚠ ظرفِ پیام همیشه رسم می‌شود (حتی خالی)؛ .pcd-foot از
-       space-between استفاده می‌کند و بدونِ همسایه، دکمهٔ مشاهده جابه‌جا می‌شود. */
+    /* تفکیک قطعه‌محور حذف شد: تعداد تگ‌ها با تعداد قطعات بالا می‌رفت
+       و در پروژهٔ چندقطعه‌ای جایی در کارت نمی‌ماند. تفکیک فقط در تولتیپ
+       نوار و در صفحهٔ خود پروژه در دسترس است. */
+    /* ⚠ ظرف پیام همیشه رسم می‌شود (حتی خالی)؛ .pcd-foot از
+       space-between استفاده می‌کند و بدون همسایه، دکمهٔ مشاهده جابه‌جا می‌شود. */
     var msg=(r.total && r.miss===0)
-      ? '<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسنادِ الزامی تأیید شده‌اند</span></div>'
+      ? '<div class="detail-msgs"><span class="msg-note">'+IC_OK+'همهٔ اسناد الزامی تأیید شده‌اند</span></div>'
       : (r.total?'<div class="detail-msgs"></div>'
-                :'<div class="detail-msgs"><span class="msg-note">هنوز سندِ الزامی‌ای تعریف نشده</span></div>');
-    // حالتِ اولیهٔ انیمیشن: نوار خالی و عددِ درصد صفر؛ مقدارهای واقعی روی data-* برای مرحلهٔ پرشدن
+                :'<div class="detail-msgs"><span class="msg-note">هنوز سند الزامی‌ای تعریف نشده</span></div>');
+    // حالت اولیهٔ انیمیشن: نوار خالی و عدد درصد صفر؛ مقدارهای واقعی روی data-* برای مرحلهٔ پرشدن
     var pctText=doAnim?"0":r.pct;
     var openCls=(i===openIdx)?" open":"";
-    var tipDown=(i===0)?" tip-down":"";   // کارتِ اول بالایِ خود جایی ندارد؛ تولتیپ به پایین باز می‌شود
+    var tipDown=(i===0)?" tip-down":"";   // کارت اول بالای خود جایی ندارد؛ تولتیپ به پایین باز می‌شود
     return '<div class="proj-card'+openCls+tipDown+'" data-pct="'+r.pct+'" data-regpct="'+r.regPct+'" data-bar="'+esc(r.status.bar)+'" data-i="'+i+'" data-key="'+esc(projKey(r))+'">'+
       '<div class="proj-card-head">'+
         '<div class="proj-card-row">'+
           '<button type="button" class="proj-card-name" onclick="openProject(\''+esc(r.c)+'\',\''+esc(r.o)+'\',\''+esc(r.pr)+'\')" title="مشاهدهٔ پروژه">پروژه تولید '+esc(r.name)+'</button>'+
-          '<button type="button" class="proj-chevron" onclick="toggleProjCard(this)" aria-label="باز/بستنِ جزئیات" aria-expanded="'+((i===openIdx)?'true':'false')+'"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></div>'+
+          '<button type="button" class="proj-chevron" onclick="toggleProjCard(this)" aria-label="باز/بستن جزئیات" aria-expanded="'+((i===openIdx)?'true':'false')+'"><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></div>'+
         '<div class="proj-card-row"><span class="proj-card-meta">'+esc(r.client)+'</span></div>'+
         '<div class="proj-prog">'+
           '<span class="pp-big pp-pct">'+pctText+'٪</span>'+
@@ -213,18 +213,18 @@ function projBarHTML(r,doAnim){
       '</div></div></div>'+
     '</div>';
   }).join("")+'</div>';
-  if(doAnim) requestAnimationFrame(function(){ requestAnimationFrame(playProjBarsIn); });   // یک فریم صبر تا استایلِ اولیه (۰٪) واقعاً رندر شود، بعد پر شدن اجرا شود
+  if(doAnim) requestAnimationFrame(function(){ requestAnimationFrame(playProjBarsIn); });   // یک فریم صبر تا استایل اولیه (۰٪) واقعاً رندر شود، بعد پر شدن اجرا شود
 }
-/* پرشدنِ آبشاریِ نوارهای پیشرفت + شمارشِ هم‌زمانِ عددِ درصد، هماهنگ با ورودِ آبشاریِ خودِ کارت‌ها (rv-in) */
+/* پرشدن آبشاری نوارهای پیشرفت + شمارش هم‌زمان عدد درصد، هماهنگ با ورود آبشاری خود کارت‌ها (rv-in) */
 function playProjBarsIn(){
   var cards=document.querySelectorAll("#projCardsList .proj-card");
   [].forEach.call(cards, function(card){
     var i=parseInt(card.getAttribute("data-i"),10)||0;
     var pct=parseInt(card.getAttribute("data-pct"),10)||0;
     var bar=card.getAttribute("data-bar")||"";
-    var delay=180+i*70;   // پس از پایانِ ورودِ خودِ کارت (rv-in) شروع شود، با تأخیرِ پلکانیِ سبک بینِ کارت‌ها
+    var delay=180+i*70;   // پس از پایان ورود خود کارت (rv-in) شروع شود، با تأخیر پلکانی سبک بین کارت‌ها
     setTimeout(function(){
-      /* نوار حالا سگمنتی است؛ هر سگمنت عرضِ خودش را از data-w می‌گیرد */
+      /* نوار حالا سگمنتی است؛ هر سگمنت عرض خودش را از data-w می‌گیرد */
       var segEls=card.querySelectorAll(".pbar-seg");
       [].forEach.call(segEls, function(el){
         el.style.width=(parseFloat(el.getAttribute("data-w"))||0)+"%"; });
@@ -233,7 +233,7 @@ function playProjBarsIn(){
     }, delay);
   });
 }
-/* شمارشِ عددِ درصد از ۰ تا target، هم‌زمان با پرشدنِ نوار (همان مدت‌زمانِ transitionِ نوار: ۰٫۶ثانیه) */
+/* شمارش عدد درصد از ۰ تا target، هم‌زمان با پرشدن نوار (همان مدت‌زمان transition نوار: ۰٫۶ثانیه) */
 function countUpPercent(el, target){
   target=Math.max(0, parseInt(target,10)||0);
   var dur=600, t0=null;
@@ -246,8 +246,8 @@ function countUpPercent(el, target){
   requestAnimationFrame(tick);
 }
 /* آکاردئون: همیشه دقیقاً یک کارت باز است (هرگز صفرتا).
-   - کلیک روی کارتِ بسته: همان باز می‌شود (و بقیه بسته)، _projOpenKey به‌روزرسانی می‌شود.
-   - کلیک روی کارتِ بازِ فعلی (یعنی «می‌خواهم مینیمایزش کنم»): به‌جای بستنِ کامل، پروژهٔ بعدیِ فهرست
+   - کلیک روی کارت بسته: همان باز می‌شود (و بقیه بسته)، _projOpenKey به‌روزرسانی می‌شود.
+   - کلیک روی کارت باز فعلی (یعنی «می‌خواهم مینیمایزش کنم»): به‌جای بستن کامل، پروژهٔ بعدی فهرست
      به‌جایش باز می‌شود (یا اگر آخری بود، اولین)، تا همیشه یکی باز بماند. */
 function toggleProjCard(el){
   var card=el.closest?el.closest(".proj-card"):null;
@@ -271,35 +271,35 @@ function toggleProjCard(el){
 }
 
 /* یک ردیف تایم‌لاین فعالیت (مشترک بین داشبورد و پنجرهٔ «مشاهدهٔ همه») */
-/* برچسب/رنگِ بج بر پایهٔ نوعِ رویداد (نه وضعیتِ لحظه‌ایِ سند) — هم‌واژهٔ تایم‌لاینِ گردش‌کار در مودال */
+/* برچسب/رنگ بج بر پایهٔ نوع رویداد (نه وضعیت لحظه‌ای سند) — هم‌واژهٔ تایم‌لاین گردش‌کار در مودال */
 function wfActionBadge(action){
   var a=String(action||"").toLowerCase();
   var map={ approved:{cls:"badge-approved",label:"تأیید"},
             rejected:{cls:"badge-rejected",label:"عدم تایید"},
             submitted:{cls:"badge-pending",label:"بازبینی"},
-            // خانوادهٔ «کارِ سازنده» همگی نارنجیِ برند‌اند — هم‌رنگِ نقطهٔ همین رویدادها در گردشِ کار
+            // خانوادهٔ «کار سازنده» همگی نارنجی برند‌اند — هم‌رنگ نقطهٔ همین رویدادها در گردش کار
             newversion:{cls:"badge-brand",label:"نسخهٔ جدید"},
             addformat:{cls:"badge-brand",label:"افزودن فرمت"},
             created:{cls:"badge-brand",label:"ایجاد"},
             revision:{cls:"badge-brand",label:"ایجاد"},
-            deleted:{cls:"badge-rejected",label:"حذف"},          // حذفِ نرم (به سطلِ زباله، قابلِ بازیابی)
-            restored:{cls:"badge-approved",label:"بازیابی"},      // بازگردانده‌شده از سطلِ زباله
-            purged:{cls:"badge-purged",label:"حذف دائمی"} };      // حذفِ همیشگی — قرمزِ تیره‌ترِ اختصاصی
+            deleted:{cls:"badge-rejected",label:"حذف"},          // حذف نرم (به سطل زباله، قابل بازیابی)
+            restored:{cls:"badge-approved",label:"بازیابی"},      // بازگردانده‌شده از سطل زباله
+            purged:{cls:"badge-purged",label:"حذف دائمی"} };      // حذف همیشگی — قرمز تیره‌تر اختصاصی
   return map[a] || { cls:"badge-draft", label:workflowActionLabel(a) };
 }
-/* یک ردیفِ فعالیت = یک رویدادِ گردش‌کار (ثبت/ارسال/تأیید/رد/بارگذاریِ نسخه) */
+/* یک ردیف فعالیت = یک رویداد گردش‌کار (ثبت/ارسال/تأیید/رد/بارگذاری نسخه) */
 function activityItemHTML(ev, isLast, asCard){
-  // سندِ زنده، وگرنه شناسنامهٔ همان سند در سطلِ زباله — تا رویدادهای گذشته با حذفِ سند بی‌معنا نشوند
+  // سند زنده، وگرنه شناسنامهٔ همان سند در سطل زباله — تا رویدادهای گذشته با حذف سند بی‌معنا نشوند
   var d=docByNumberAny(ev.drawingNumber);
   var meName=ev.user?esc(userName(ev.user)):'';
   var b=wfActionBadge(ev.action);
   var ctx=d?esc(docPhrase(d)):'';   // زمینه (نوع/قطعه/پروژه/مشتری)
   var dateHTML='<span class="rq-date">'+fmtDate(ev.timestamp)+'</span>';
   var tagHTML=badgeHTML("wf-badge act-tag "+b.cls, b.label);
-  /* بلوکِ متنیِ دو‌خطیِ ثابت: توضیح و «کاربر: نام» در یک جریانِ متنیِ واحد‌اند.
-     - اگر توضیح یک‌خطی باشد، JS کلاسِ .one را می‌گذارد و توضیح بلوکی می‌شود تا نام به خطِ دوم برود.
-     - اگر توضیح دو‌خطی شود، نام در ادامهٔ همان خطِ دوم پشتِ جداکنندهٔ نازک می‌آید.
-     مرزِ راستِ متن (همان «خطِ قرمز») با padding-inline-end در CSS تعیین می‌شود تا زیرِ تگ نرود. */
+  /* بلوک متنی دو‌خطی ثابت: توضیح و «کاربر: نام» در یک جریان متنی واحد‌اند.
+     - اگر توضیح یک‌خطی باشد، JS کلاس .one را می‌گذارد و توضیح بلوکی می‌شود تا نام به خط دوم برود.
+     - اگر توضیح دو‌خطی شود، نام در ادامهٔ همان خط دوم پشت جداکنندهٔ نازک می‌آید.
+     مرز راست متن (همان «خط قرمز») با padding-inline-end در CSS تعیین می‌شود تا زیر تگ نرود. */
   var whoHTML = meName
     ? '<span class="act-sep" aria-hidden="true"></span>'+
       '<span class="act-who"><span class="act-who-label">کاربر: </span>'+meName+'</span>'
@@ -313,7 +313,7 @@ function activityItemHTML(ev, isLast, asCard){
       tagHTML+
     '</div>';
   if(asCard){
-    // نسخهٔ کارت (مودالِ «همهٔ فعالیت‌ها») — هم‌شکلِ کارتابل بازبینی؛ تاریخ بالا کنارِ شمارهٔ سند (سمتِ چپ)
+    // نسخهٔ کارت (مودال «همهٔ فعالیت‌ها») — هم‌شکل کارتابل بازبینی؛ تاریخ بالا کنار شمارهٔ سند (سمت چپ)
     return '<div class="rq-item">'+
       '<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>'+
       '<div class="rq-main">'+
@@ -328,14 +328,14 @@ function activityItemHTML(ev, isLast, asCard){
       body+
     '</div></div>';
 }
-/* تعیینِ «حالت ۱ یا ۲» برای هر ردیفِ فعالیت، با اندازه‌گیریِ واقعیِ متن در عرضِ واقعیِ سلول
-   (نه عددِ px حدسی — علتِ شکستِ تلاش‌های قبلی همین بود).
-     ۱) نامِ کاربر موقتاً پنهان می‌شود تا ارتفاعِ خالصِ توضیح سنجیده شود.
-        ارتفاع = یک خط → حالت ۱ (کلاسِ .one): توضیح بلوکی می‌شود و نام به خطِ دومِ مستقل می‌رود.
-     ۲) وگرنه حالت ۲: نام در ادامهٔ همان خطِ دوم، پشتِ جداکنندهٔ نازک می‌ماند.
-     ۳) اگر در حالت ۲ توضیحِ بلند، نام را به خطِ سوم هُل بدهد، انتهای توضیح با «…» کوتاه
-        می‌شود (جست‌وجوی دودویی) تا نام حتماً روی خطِ دوم دیده شود؛ متنِ کامل در tooltip می‌ماند.
-   نتیجه: همیشه دقیقاً دو خط — نه بیشتر (کلمپِ CSS + مرحلهٔ ۳)، نه کمتر (min-height روی .act-body). */
+/* تعیین «حالت ۱ یا ۲» برای هر ردیف فعالیت، با اندازه‌گیری واقعی متن در عرض واقعی سلول
+   (نه عدد px حدسی — علت شکست تلاش‌های قبلی همین بود).
+     ۱) نام کاربر موقتاً پنهان می‌شود تا ارتفاع خالص توضیح سنجیده شود.
+        ارتفاع = یک خط → حالت ۱ (کلاس .one): توضیح بلوکی می‌شود و نام به خط دوم مستقل می‌رود.
+     ۲) وگرنه حالت ۲: نام در ادامهٔ همان خط دوم، پشت جداکنندهٔ نازک می‌ماند.
+     ۳) اگر در حالت ۲ توضیح بلند، نام را به خط سوم هل بدهد، انتهای توضیح با «…» کوتاه
+        می‌شود (جست‌وجوی دودویی) تا نام حتماً روی خط دوم دیده شود؛ متن کامل در tooltip می‌ماند.
+   نتیجه: همیشه دقیقاً دو خط — نه بیشتر (کلمپ CSS + مرحلهٔ ۳)، نه کمتر (min-height روی .act-body). */
 function fixActivityLines(root){
   if(!root) return;
   var lines=root.querySelectorAll(".act-lines");
@@ -346,34 +346,34 @@ function fixActivityLines(root){
     el.classList.remove("one");                       // پاک‌سازی تا اندازه‌گیری تمیز باشد
     var full=desc.getAttribute("data-full");
     if(full===null){ full=desc.textContent; desc.setAttribute("data-full", full); }
-    else desc.textContent=full;                       // بازگردانی به متنِ کامل پیش از اندازه‌گیریِ دوباره
+    else desc.textContent=full;                       // بازگردانی به متن کامل پیش از اندازه‌گیری دوباره
     var tail=el.querySelectorAll(".act-sep,.act-who");
     var j;
     var lh=parseFloat(getComputedStyle(el).lineHeight)||19.55;
-    var TWO=lh*2.5;                                   // آستانهٔ «بیش از دو خط» (با رواداریِ نصفِ خط)
+    var TWO=lh*2.5;                                   // آستانهٔ «بیش از دو خط» (با رواداری نصف خط)
     // مرحله ۱ — آیا توضیح به‌تنهایی در یک خط جا می‌شود؟ (نام موقتاً پنهان)
     for(j=0;j<tail.length;j++) tail[j].style.display="none";
     var oneLine = desc.getBoundingClientRect().height < (lh*1.5);
     for(j=0;j<tail.length;j++) tail[j].style.display="";
-    if(oneLine){ el.classList.add("one"); continue; }  // حالت ۱ — نام به خطِ دومِ مستقل می‌رود
-    // مرحله ۲ — حالت ۲: نام باید در ادامهٔ خطِ دوم دیده شود. اگر توضیح آن‌قدر بلند باشد که
-    // با افزودنِ نام به خطِ سوم برسد، انتهای توضیح با «…» کوتاه می‌شود تا جا برای نام باز شود.
-    // کلمپ موقتاً برداشته می‌شود تا ارتفاعِ واقعی (نه ارتفاعِ بریده‌شده) اندازه گرفته شود.
+    if(oneLine){ el.classList.add("one"); continue; }  // حالت ۱ — نام به خط دوم مستقل می‌رود
+    // مرحله ۲ — حالت ۲: نام باید در ادامهٔ خط دوم دیده شود. اگر توضیح آن‌قدر بلند باشد که
+    // با افزودن نام به خط سوم برسد، انتهای توضیح با «…» کوتاه می‌شود تا جا برای نام باز شود.
+    // کلمپ موقتاً برداشته می‌شود تا ارتفاع واقعی (نه ارتفاع بریده‌شده) اندازه گرفته شود.
     el.style.webkitLineClamp="unset"; el.style.display="block";
     var h=function(){ return el.getBoundingClientRect().height; };
     if(h()>TWO){
       var lo=0, hi=full.length, best=0;
-      while(lo<=hi){                                   // جست‌وجوی دودویی روی طولِ متن
+      while(lo<=hi){                                   // جست‌وجوی دودویی روی طول متن
         var mid=(lo+hi)>>1;
         desc.textContent=full.slice(0,mid).replace(/\s+$/,"")+"…";
         if(h()<=TWO){ best=mid; lo=mid+1; } else hi=mid-1;
       }
       desc.textContent=best>0 ? full.slice(0,best).replace(/\s+$/,"")+"…" : "…";
     }
-    el.style.webkitLineClamp=""; el.style.display="";  // بازگرداندنِ کلمپ (لایهٔ دومِ محافظت)
+    el.style.webkitLineClamp=""; el.style.display="";  // بازگرداندن کلمپ (لایهٔ دوم محافظت)
   }
 }
-/* با تغییرِ عرضِ پنجره نقطهٔ شکستِ متن عوض می‌شود؛ حالتِ ۱/۲ باید دوباره حساب شود */
+/* با تغییر عرض پنجره نقطهٔ شکست متن عوض می‌شود؛ حالت ۱/۲ باید دوباره حساب شود */
 var _actLinesT=null;
 window.addEventListener("resize", function(){
   clearTimeout(_actLinesT);
@@ -382,8 +382,8 @@ window.addEventListener("resize", function(){
     fixActivityLines(document.getElementById("modalHost"));
   }, 150);
 });
-/* رویدادهای گردش‌کار به‌ترتیبِ زمانِ نزولی — تأیید/رد/ارسال هم اینجا رویدادِ تازه می‌سازند.
-   fallback: اگر برگهٔ Workflow خالی بود (قبل از setup)، از خودِ اسناد (رویدادِ ثبت) بازسازی می‌شود. */
+/* رویدادهای گردش‌کار به‌ترتیب زمان نزولی — تأیید/رد/ارسال هم اینجا رویداد تازه می‌سازند.
+   fallback: اگر برگهٔ Workflow خالی بود (قبل از setup)، از خود اسناد (رویداد ثبت) بازسازی می‌شود. */
 function sortedActivity(){
   var wf=DB.workflow||[];
   if(wf.length) return [].concat(wf).sort(function(a,b){ return String(b.timestamp||"").localeCompare(String(a.timestamp||"")); });
@@ -391,21 +391,21 @@ function sortedActivity(){
     .sort(function(a,b){ return String(b.timestamp||"").localeCompare(String(a.timestamp||"")); });
 }
 
-/* ═══ ادغامِ «ارسال برای بازبینی»ِ خودکار (فقط در کارتِ داشبورد) ═══
-   پس از هر ثبتِ سند، سامانه خودش بلافاصله آن را برای بازبینی می‌فرستد
+/* ═══ ادغام «ارسال برای بازبینی» خودکار (فقط در کارت داشبورد) ═══
+   پس از هر ثبت سند، سامانه خودش بلافاصله آن را برای بازبینی می‌فرستد
    (submitDocument → submitForReview، یک رفت‌وبرگشت فاصله). پس هر بارگذاری *دو*
-   رویداد می‌سازد و کارتِ پنج‌ردیفی با دو بار بارگذاری پر می‌شود؛ رویدادهای
-   کم‌تکرار مثلِ حذف و بازیابی زیرِ همین نویز دفن می‌شدند و کاربر فکر می‌کرد
+   رویداد می‌سازد و کارت پنج‌ردیفی با دو بار بارگذاری پر می‌شود؛ رویدادهای
+   کم‌تکرار مثل حذف و بازیابی زیر همین نویز دفن می‌شدند و کاربر فکر می‌کرد
    اصلاً ثبت نمی‌شوند.
-   فقط ارسالِ *خودکار* پنهان می‌شود: ارسالی که فاصله‌اش تا ثبت/نسخهٔ جدیدِ همان
-   سند کمتر از ACT_AUTO_GAP باشد. ارسالِ دستی (پیش‌نویسی که روزها بعد فرستاده
-   می‌شود) فاصلهٔ بیشتری دارد و سرِ جایش می‌ماند.
+   فقط ارسال *خودکار* پنهان می‌شود: ارسالی که فاصله‌اش تا ثبت/نسخهٔ جدید همان
+   سند کمتر از ACT_AUTO_GAP باشد. ارسال دستی (پیش‌نویسی که روزها بعد فرستاده
+   می‌شود) فاصلهٔ بیشتری دارد و سر جایش می‌ماند.
    ⚠ همهٔ زمان‌های ثبت‌شدهٔ یک سند نگه داشته می‌شوند، نه فقط آخری: سندی که ثبت →
-   ارسال → رد → نسخهٔ جدید → ارسال شده، دو ارسالِ خودکار دارد و با نگه‌داشتنِ
-   فقط آخرین زمان، ارسالِ اول اشتباهاً باقی می‌ماند.
-   ⚠ این فیلتر عمداً فقط روی کارتِ داشبورد است؛ پنجرهٔ «مشاهدهٔ همه» همه‌چیز را
-   بدونِ کم‌وکاست نشان می‌دهد. */
-var ACT_AUTO_GAP = 120000;   // ۲ دقیقه — سخاوتمندانه برای آپلودِ کند، کوتاه‌تر از هر ارسالِ دستی
+   ارسال → رد → نسخهٔ جدید → ارسال شده، دو ارسال خودکار دارد و با نگه‌داشتن
+   فقط آخرین زمان، ارسال اول اشتباهاً باقی می‌ماند.
+   ⚠ این فیلتر عمداً فقط روی کارت داشبورد است؛ پنجرهٔ «مشاهدهٔ همه» همه‌چیز را
+   بدون کم‌وکاست نشان می‌دهد. */
+var ACT_AUTO_GAP = 120000;   // ۲ دقیقه — سخاوتمندانه برای آپلود کند، کوتاه‌تر از هر ارسال دستی
 function collapseAutoSubmit(list){
   var made = {};
   list.forEach(function(ev){
@@ -429,9 +429,9 @@ function renderRecentActivity(){
   var host=document.getElementById("recentDocsList");
   var full=sortedActivity();
   var all=collapseAutoSubmit(full);
-  var SHOW=5;   // رکوردهای بیشتر تا سلولِ فعالیت هم‌ارتفاعِ سلولِ پیشرفتِ پروژه‌ها پر شود
+  var SHOW=5;   // رکوردهای بیشتر تا سلول فعالیت هم‌ارتفاع سلول پیشرفت پروژه‌ها پر شود
   var seeAll=document.getElementById("recentSeeAll");
-  /* مبنا فهرستِ *کامل* است نه ادغام‌شده: اگر ادغام تعداد را به زیرِ پنج برساند،
+  /* مبنا فهرست *کامل* است نه ادغام‌شده: اگر ادغام تعداد را به زیر پنج برساند،
      باز هم چیزی برای دیدن در پنجرهٔ کامل هست و دکمه باید بماند. */
   if(seeAll) seeAll.hidden = full.length<=SHOW;
   if(!all.length){
@@ -442,13 +442,13 @@ function renderRecentActivity(){
   host.innerHTML='<div class="timeline-list">'+recent.map(function(d,i){
     return activityItemHTML(d, i===recent.length-1);
   }).join("")+'</div>';
-  fixActivityLines(host);   // تعیینِ حالتِ ۱/۲ پس از چیده‌شدنِ متن در عرضِ واقعی
+  fixActivityLines(host);   // تعیین حالت ۱/۲ پس از چیده‌شدن متن در عرض واقعی
 }
 
-/* پنجرهٔ کاملِ فعالیت‌ها — همهٔ رویدادها بر اساس تاریخ، قابل اسکرول */
+/* پنجرهٔ کامل فعالیت‌ها — همهٔ رویدادها بر اساس تاریخ، قابل اسکرول */
 /* ================= پنجرهٔ «همهٔ فعالیت‌ها»: صفحه‌بندی‌شده ================= */
 var _raAll=[], _raPage=1;
-var RA_PER=10;   // تعدادِ رکورد در هر صفحه
+var RA_PER=10;   // تعداد رکورد در هر صفحه
 function openRecentAllModal(){
   _raAll=sortedActivity();
   _raPage=1;
@@ -463,14 +463,14 @@ function raRender(){
     ? '<div class="rq-list">'+pageRows.map(function(d){ return activityItemHTML(d, false, true); }).join("")+'</div>'
     : emptyState("فعالیتی ثبت نشده","با ثبت اولین سند، رویدادها اینجا نمایش داده می‌شوند.");
   var foot = total>RA_PER ? raPagerHTML(total,startI,endI,_raPage,pages) : '';
-  /* ⚠ updateModal و نه showModal: این تابع با هر تغییرِ صفحه دوباره صدا زده
+  /* ⚠ updateModal و نه showModal: این تابع با هر تغییر صفحه دوباره صدا زده
      می‌شود؛ showModal لایهٔ تازه می‌ساخت و پنجره‌ها روی هم جمع می‌شدند. */
   (typeof updateModal==="function" ? updateModal : showModal)(
     "همهٔ فعالیت‌ها", '<div class="seeall-body">'+inner+foot+'</div>', "seeall-box");
   fixActivityLines(document.getElementById("modalHost"));   // همان قاعدهٔ دو‌خطی در پنجرهٔ «همهٔ فعالیت‌ها»
-  if(typeof revealCascade==="function") revealCascade(document.querySelector("#modalHost .rq-list"));   // ورودِ آبشاریِ کارت‌ها، هم‌سبک با سایت
+  if(typeof revealCascade==="function") revealCascade(document.querySelector("#modalHost .rq-list"));   // ورود آبشاری کارت‌ها، هم‌سبک با سایت
 }
-/* صفحه‌بندیِ سبک (بدونِ دراپ‌داونِ تعدادِ سطر و بدونِ متنِ بازه) — فقط ناوبری، وسط‌چین */
+/* صفحه‌بندی سبک (بدون دراپ‌داون تعداد سطر و بدون متن بازه) — فقط ناوبری، وسط‌چین */
 function raPagerHTML(total,startI,endI,page,pages){
   var atFirst=page<=1, atLast=page>=pages;
   return '<div class="arch-pager ra-pager">'+
@@ -497,7 +497,7 @@ function showDashboardSkeleton(){
   var pc=document.getElementById("projCardsList"); if(pc) pc.innerHTML='<div class="proj-list">'+skBlocks(3,"sk-card")+'</div>';
   var rc=document.getElementById("recentDocsList"); if(rc) rc.innerHTML=skBlocks(4,"sk-row");
   /* کارتابل بازبینی هم اسکلت بگیرد: پیش از این تنها بخشی بود که پاک نمی‌شد، پس
-     رکوردهای نشستِ قبلی لحظه‌ای دیده می‌شدند و بعد جای خود را به دادهٔ تازه می‌دادند. */
+     رکوردهای نشست قبلی لحظه‌ای دیده می‌شدند و بعد جای خود را به دادهٔ تازه می‌دادند. */
   var rq=document.getElementById("reviewQueueList"); if(rq) rq.innerHTML=skBlocks(2,"sk-row");
   var rqc=document.getElementById("reviewQueueCount"); if(rqc) rqc.textContent="";
   var rqs=document.getElementById("reviewSeeAll"); if(rqs) rqs.hidden=true;

@@ -1,5 +1,5 @@
 /* ================= گردش تأیید ================= */
-/* هر سه فرمان خوش‌بینانه‌اند (optimisticOp در documents.js): وضعیتِ تازه بی‌درنگ دیده
+/* هر سه فرمان خوش‌بینانه‌اند (optimisticOp در documents.js): وضعیت تازه بی‌درنگ دیده
    می‌شود و فرمان بی‌اورلی در پس‌زمینه می‌رود؛ اگر ناموفق شد، داده از سرور برمی‌گردد. */
 function reviewSubmitOp(num){
   return optimisticOp(function(){ localDocSet(num,{status:"pending"}); localWf(num,"submitted",""); },
@@ -18,7 +18,7 @@ function reviewRejectOp(num, reason){
     }, function(){ return api("rejectDocument",{drawingNumber:num, comment:reason},{silent:true}); });
 }
 async function submitReview(num){
-  /* مودالِ جزئیات بسته نمی‌شود؛ رسمِ دوبارهٔ داده خودش آن را با وضعیتِ تازه بازرسم می‌کند */
+  /* مودال جزئیات بسته نمی‌شود؛ رسم دوبارهٔ داده خودش آن را با وضعیت تازه بازرسم می‌کند */
   var r=await reviewSubmitOp(num);
   if(r.ok) toast("برای بازبینی ارسال شد"); else toast(r.message||"خطا",true);
 }
@@ -42,7 +42,7 @@ function rejectDoc(num){
 async function confirmReject(num){
   var ta=document.getElementById("rejReason");
   var reason=ta?String(ta.value).trim():"";
-  /* اول فرمِ رد بسته می‌شود (فقط لایهٔ رویی)؛ سپس جزئیاتِ زیرین با وضعیتِ تازه بازرسم می‌شود */
+  /* اول فرم رد بسته می‌شود (فقط لایهٔ رویی)؛ سپس جزئیات زیرین با وضعیت تازه بازرسم می‌شود */
   closeModal();
   var r=await reviewRejectOp(num, reason);
   if(r.ok) toast("سند رد شد"); else toast(r.message||"خطا",true);
@@ -51,7 +51,7 @@ async function confirmReject(num){
 /* یک ردیف کارتابل بازبینی (مشترک بین داشبورد و پنجرهٔ «مشاهدهٔ همه») */
 function reviewItemHTML(d, canAct, withDot){
   return '<div class="rq-item">'+
-    (withDot?'<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>':'')+   // دایرهٔ متحرک + خط، فقط در مودالِ بازشده
+    (withDot?'<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>':'')+   // دایرهٔ متحرک + خط، فقط در مودال بازشده
     '<div class="rq-main"><div class="rq-num mono" onclick="openDocDetail(\''+esc(d.drawingNumber)+'\')">'+esc(d.drawingNumber)+'</div>'+
     '<div class="rq-meta">'+esc(docPhrase(d))+'</div></div>'+
     '<div class="rq-actions">'+
@@ -68,11 +68,11 @@ function renderReviewQueue(){
   if(ME.role!=="admin" && ME.role!=="reviewer") return; // بیننده: بخش با applyRoleVisibility مخفی است
   var pend=pendingDocs();
   var seeAll=document.getElementById("reviewSeeAll");
-  // مدیرِ بدون مورد: بخش را پنهان کن تا داشبورد شلوغ نشود (بازبین همیشه می‌بیند)
+  // مدیر بدون مورد: بخش را پنهان کن تا داشبورد شلوغ نشود (بازبین همیشه می‌بیند)
   if(!pend.length && ME.role==="admin"){ section.style.display="none"; return; }
   section.style.display="";
   document.getElementById("reviewQueueCount").textContent=pend.length?(faN(pend.length)+" مورد"):"";
-  if(seeAll) seeAll.hidden = pend.length<=3;   // دکمه فقط وقتی موردِ نهفته هست
+  if(seeAll) seeAll.hidden = pend.length<=3;   // دکمه فقط وقتی مورد نهفته هست
   if(!pend.length){
     host.innerHTML=emptyState("موردی برای بازبینی نیست","اسنادی که مدیر برای بازبینی ارسال کند، اینجا برای تأیید یا رد نمایش داده می‌شوند.");
     return;
@@ -81,7 +81,7 @@ function renderReviewQueue(){
   host.innerHTML='<div class="rq-list">'+pend.slice(0,3).map(function(d){ return reviewItemHTML(d,canAct); }).join("")+'</div>';
 }
 
-/* پنجرهٔ کاملِ کارتابل بازبینی — همهٔ موارد، قابل اسکرول */
+/* پنجرهٔ کامل کارتابل بازبینی — همهٔ موارد، قابل اسکرول */
 function openReviewAllModal(){
   var pend=pendingDocs();
   var canAct = (ME.role==="admin"||ME.role==="reviewer");
@@ -89,11 +89,11 @@ function openReviewAllModal(){
     ? '<div class="rq-list">'+pend.map(function(d){ return reviewItemHTML(d,canAct,true); }).join("")+'</div>'
     : emptyState("موردی برای بازبینی نیست","همهٔ اسناد بررسی شده‌اند.");
   showModal("کارتابل بازبینی", '<div class="seeall-body" id="reviewAllBody">'+inner+'</div>', "seeall-box");
-  if(typeof revealCascade==="function") revealCascade(document.querySelector("#modalHost .rq-list"));   // ورودِ آبشاریِ ردیف‌ها، هم‌سبک با سایت
+  if(typeof revealCascade==="function") revealCascade(document.querySelector("#modalHost .rq-list"));   // ورود آبشاری ردیف‌ها، هم‌سبک با سایت
 }
-/* اگر پنجرهٔ کاملِ کارتابل باز است، فهرستش را با دادهٔ تازه دوباره بساز.
-   ⚠ بدونِ این، پس از تأیید/رد، فقط کارتابلِ داخلِ داشبورد (از راهِ renderDashboard)
-   تازه می‌شد و این پنجره رکوردِ رسیدگی‌شده را همچنان نشان می‌داد. */
+/* اگر پنجرهٔ کامل کارتابل باز است، فهرستش را با دادهٔ تازه دوباره بساز.
+   ⚠ بدون این، پس از تأیید/رد، فقط کارتابل داخل داشبورد (از راه renderDashboard)
+   تازه می‌شد و این پنجره رکورد رسیدگی‌شده را همچنان نشان می‌داد. */
 function reviewAllRefresh(){
   var body=document.getElementById("reviewAllBody"); if(!body) return;
   var pend=pendingDocs();
@@ -103,12 +103,12 @@ function reviewAllRefresh(){
     : emptyState("موردی برای بازبینی نیست","همهٔ اسناد بررسی شده‌اند.");
 }
 
-/* ================= بارگذاریِ نسخهٔ جدید هنگامی که سند هنوز در حالِ بازبینی است =================
-   دکمهٔ «بارگذاریِ نسخهٔ جدید» در پنلِ جزئیات برای وضعیتِ pending غیرفعال (خاکستری) است؛ کلیک روی آن
-   این پیام را باز می‌کند: راهنما + میان‌بر به کارتابلِ بازبینیِ «فقط همین یک سند» (نه کلِ صف). */
+/* ================= بارگذاری نسخهٔ جدید هنگامی که سند هنوز در حال بازبینی است =================
+   دکمهٔ «بارگذاری نسخهٔ جدید» در پنل جزئیات برای وضعیت pending غیرفعال (خاکستری) است؛ کلیک روی آن
+   این پیام را باز می‌کند: راهنما + میان‌بر به کارتابل بازبینی «فقط همین یک سند» (نه کل صف). */
 function pendingUploadNotice(num){
   var body='<div class="confirm-box">'+
-    '<p class="confirm-msg">آخرین نسخه از این سند هنوز در مرحلهٔ بازبینی است و تأیید وضعیت نشده است. برای بارگذاریِ نسخهٔ جدید، ابتدا وضعیت نسخهٔ فعلی را مشخص نمایید.</p>'+
+    '<p class="confirm-msg">آخرین نسخه از این سند هنوز در مرحلهٔ بازبینی است و تأیید وضعیت نشده است. برای بارگذاری نسخهٔ جدید، ابتدا وضعیت نسخهٔ فعلی را مشخص نمایید.</p>'+
     '<div class="confirm-acts">'+
       '<button class="btn" data-v="0">انصراف</button>'+
       '<button class="btn primary" data-v="1">بازبینی</button>'+
@@ -117,7 +117,7 @@ function pendingUploadNotice(num){
   var wrap=document.createElement("div");
   wrap.className="modal confirm-modal";
   wrap.innerHTML='<div class="box confirm-mbox">'+
-    '<header><strong>در انتظارِ بازبینی</strong><button class="modal-x" data-v="0" aria-label="بستن" title="بستن">✕</button></header>'+
+    '<header><strong>در انتظار بازبینی</strong><button class="modal-x" data-v="0" aria-label="بستن" title="بستن">✕</button></header>'+
     '<div class="body">'+body+'</div></div>';
   document.body.appendChild(wrap);
   var close=function(){ modalClose(wrap, function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }); };
@@ -128,11 +128,11 @@ function pendingUploadNotice(num){
   wrap.addEventListener("click",function(e){ if(e.target===wrap) close(); });
 }
 
-/* کارتابلِ بازبینیِ «تک‌رکوردی»: همان ظاهرِ کارتابلِ کامل، ولی فقط سندی که از پنلِ جزئیات صدا زده شده،
-   و در یک لایهٔ بالاترِ z-index تا روی پنلِ جزئیاتِ باز بنشیند (پنل زیرش دست‌نخورده می‌ماند).
-   اکشن‌های تأیید/رد اینجا مستقل از approveDoc/rejectDoc هستند (آن‌ها #modalHost یعنی خودِ پنلِ
-   جزئیاتِ زیرین را می‌بندند)؛ نسخهٔ این‌جا فقط همین تری را می‌بندد و بعد پنلِ جزئیات را با
-   وضعیتِ تازه دوباره می‌سازد. */
+/* کارتابل بازبینی «تک‌رکوردی»: همان ظاهر کارتابل کامل، ولی فقط سندی که از پنل جزئیات صدا زده شده،
+   و در یک لایهٔ بالاتر z-index تا روی پنل جزئیات باز بنشیند (پنل زیرش دست‌نخورده می‌ماند).
+   اکشن‌های تأیید/رد اینجا مستقل از approveDoc/rejectDoc هستند (آن‌ها #modalHost یعنی خود پنل
+   جزئیات زیرین را می‌بندند)؛ نسخهٔ این‌جا فقط همین تری را می‌بندد و بعد پنل جزئیات را با
+   وضعیت تازه دوباره می‌سازد. */
 function openSingleReviewTray(num){
   var d=docByNumber(num); if(!d){ toast("سند یافت نشد.",true); return; }
   var canAct = (ME.role==="admin"||ME.role==="reviewer");
@@ -156,12 +156,12 @@ function openSingleReviewTray(num){
   wrap.addEventListener("click",function(e){ if(e.target===wrap) srtClose(); });
 }
 function srtClose(){ var w=document.getElementById("srtHost"); if(!w) return;
-  w.removeAttribute("id");   // تا کارتابلِ تازه‌ای که هم‌زمان باز می‌شود با این لایهٔ در حالِ خروج اشتباه گرفته نشود
+  w.removeAttribute("id");   // تا کارتابل تازه‌ای که هم‌زمان باز می‌شود با این لایهٔ در حال خروج اشتباه گرفته نشود
   modalClose(w, function(){ if(w.parentNode) w.parentNode.removeChild(w); }); }
 async function srtApprove(num){
   if(!(await uiConfirm("تأیید سند «"+num+"»؟",{okLabel:"تأیید"}))) return;
   srtClose();
-  var op=reviewApproveOp(num);   // رسمِ محلی همین حالا انجام شد
+  var op=reviewApproveOp(num);   // رسم محلی همین حالا انجام شد
   if(typeof openDocDetail==="function") openDocDetail(num);
   var r=await op;
   if(r.ok) toast("سند تأیید شد"); else toast(r.message||"خطا",true);
@@ -184,7 +184,7 @@ function srtReject(num){
   var close=function(){ modalClose(wrap, function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }); };
   var btns=wrap.querySelectorAll("[data-v]");
   for(var i=0;i<btns.length;i++){ (function(b){ b.addEventListener("click",function(){
-    /* ⚠ متنِ دلیل پیش از بستن خوانده می‌شود؛ قبلاً بعد از حذفِ پنجره خوانده می‌شد و همیشه خالی بود */
+    /* ⚠ متن دلیل پیش از بستن خوانده می‌شود؛ قبلاً بعد از حذف پنجره خوانده می‌شد و همیشه خالی بود */
     var ok=b.getAttribute("data-v")==="1";
     var ta=document.getElementById("srtRejReason"), reason=ta?String(ta.value).trim():"";
     close(); if(ok) srtConfirmReject(num, reason);

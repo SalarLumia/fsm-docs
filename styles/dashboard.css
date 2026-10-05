@@ -27,7 +27,7 @@
 .kpi-figures{min-width:0}
 .kpi-icon{width:46px;height:46px;border-radius:12px;background:#fff3e6;display:grid;place-items:center;flex-shrink:0;
   transition:transform .3s cubic-bezier(0,0,.2,1)}
-/* میکرو‌هاور: با هاورِ کارت، آیکون کمی بزرگ و کج می‌شود */
+/* میکرو‌هاور: با هاور کارت، آیکون کمی بزرگ و کج می‌شود */
 .kpi-card:hover .kpi-icon{transform:scale(1.08) rotate(-5deg)}
 .kpi-icon svg{width:22px;height:22px;stroke:var(--brand);fill:none;stroke-width:1.8}
 .kpi-val{font-size:28px;font-weight:800;color:var(--txt);line-height:1}
@@ -35,13 +35,13 @@
 .kpi-sub{font-size:11px;color:var(--ok);font-weight:600;margin-top:4px}
 .kpi-foot{display:flex;align-items:center;gap:7px;padding-top:12px;border-top:1px solid var(--line);
   font-size:11px;color:var(--muted);font-weight:500}
-/* نقطهٔ هر کارت با انیمیشنِ پالس (هم‌الگوی نقطهٔ فعالیتِ اخیرِ داشبورد)، رنگش بسته به کارت شخصی‌سازی می‌شود:
+/* نقطهٔ هر کارت با انیمیشن پالس (هم‌الگوی نقطهٔ فعالیت اخیر داشبورد)، رنگش بسته به کارت شخصی‌سازی می‌شود:
    پروژه‌های فعال=نارنجی، اسناد ثبت‌شده=خاکستری، اسناد تأییدشده=سبز، در انتظار بازبینی=زرد */
 .kpi-dot{position:relative;width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--muted)}
 .kpi-dot::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:11px;border-radius:50%;
   /* ⚠ box-sizing:border-box لازم است تا حاشیه به اندازه اضافه نشود؛
-     وگرنه translate(-50%) روی عرضِ واقعی حساب نمی‌شود و پالس از مرکز خارج می‌زند.
-     عرض هم 11px می‌ماند (نه 7) تا ضخامتِ دیده‌شدهٔ حلقه مثلِ قبل پررنگ باشد. */
+     وگرنه translate(-50%) روی عرض واقعی حساب نمی‌شود و پالس از مرکز خارج می‌زند.
+     عرض هم 11px می‌ماند (نه 7) تا ضخامت دیده‌شدهٔ حلقه مثل قبل پررنگ باشد. */
   box-sizing:border-box;
   border:2px solid currentColor;opacity:.7;transform:translate(-50%,-50%) scale(.4);
   pointer-events:none;animation:kpiPing 1.7s cubic-bezier(0,0,.2,1) infinite}
@@ -49,13 +49,13 @@
 .kf-brand .kpi-dot{background:var(--brand);color:var(--brand)}
 .kf-gray  .kpi-dot{background:var(--charcoal);color:var(--charcoal)}
 .kf-ok    .kpi-dot{background:var(--ok);color:var(--ok)}
-.kf-warn  .kpi-dot{background:#eab308;color:#eab308}   /* زرد — نه کهربایی، تا با نارنجیِ برند اشتباه نشود */
+.kf-warn  .kpi-dot{background:#eab308;color:#eab308}   /* زرد — نه کهربایی، تا با نارنجی برند اشتباه نشود */
 @media(prefers-reduced-motion:reduce){.kpi-dot::after{animation:none;opacity:0}}
 
-/* ===== ورودِ آبشاریِ عمومیِ صفحات ===== */
-/* کدِ JS (playTabReveal) هنگامِ ورود به هر تب، به بلوک‌های سطح‌بالای آن کلاسِ rv-in و
-   تأخیرِ پلکانیِ inline می‌دهد؛ عناصر از پایین بالا می‌آیند. fill-mode=both تا پیش از شروعِ
-   تأخیر پنهان بمانند و پرشِ نمایش رخ ندهد. */
+/* ===== ورود آبشاری عمومی صفحات ===== */
+/* کد JS (playTabReveal) هنگام ورود به هر تب، به بلوک‌های سطح‌بالای آن کلاس rv-in و
+   تأخیر پلکانی inline می‌دهد؛ عناصر از پایین بالا می‌آیند. fill-mode=both تا پیش از شروع
+   تأخیر پنهان بمانند و پرش نمایش رخ ندهد. */
 @keyframes fsmRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .rv-in{animation:fsmRise .5s cubic-bezier(0,0,.2,1) both}
 @media(prefers-reduced-motion:reduce){
@@ -69,14 +69,14 @@
 @media(max-width:960px){.dash-panels{grid-template-columns:1fr}}
 .dash-panel{background:#ffffff;border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;box-shadow:0 1px 4px #00000008;
   display:flex;flex-direction:column}
-/* محتوای هر سلول ارتفاعِ باقی‌مانده را پر کند؛ در «فعالیت‌های اخیر» ردیف‌ها با فاصلهٔ یکسان توزیع شوند تا کف هم‌تراز شود */
+/* محتوای هر سلول ارتفاع باقی‌مانده را پر کند؛ در «فعالیت‌های اخیر» ردیف‌ها با فاصلهٔ یکسان توزیع شوند تا کف هم‌تراز شود */
 #projCardsList{flex:1;min-height:0}
 #recentDocsList{flex:1;min-height:0;display:flex;flex-direction:column}
 #recentDocsList .timeline-list{flex:1;justify-content:space-between}
 .panel-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
 .panel-hd h3{margin:0;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px}
 .panel-hd h3 svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
-/* دکمهٔ «مشاهدهٔ همه» حالا از سبکِ استانداردِ .btn.sm استفاده می‌کند (هم‌شکلِ بقیهٔ دکمه‌های سایت) */
+/* دکمهٔ «مشاهدهٔ همه» حالا از سبک استاندارد .btn.sm استفاده می‌کند (هم‌شکل بقیهٔ دکمه‌های سایت) */
 
 /* ===== کارت پروژهٔ باز‌شونده ===== */
 .proj-list{display:flex;flex-direction:column;gap:10px}
@@ -84,32 +84,32 @@
   border-radius:10px;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer;transition:.12s}
 .proj-more:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
 /* ⚠ overflow:hidden برای آن بود که محتوای بازشونده از گوشهٔ گرد بیرون نزند؛
-   ولی همان تولتیپِ نوار را هم می‌برید. حالا بریدن روی .pcd-inner انجام
-   می‌شود (همان جایی که واقعاً لازم است) و خودِ کارت آزاد می‌ماند. */
+   ولی همان تولتیپ نوار را هم می‌برید. حالا بریدن روی .pcd-inner انجام
+   می‌شود (همان جایی که واقعاً لازم است) و خود کارت آزاد می‌ماند. */
 .proj-card{border:1px solid var(--line);border-radius:12px;background:#fff;box-shadow:0 1px 3px #00000006;
-  /* ⚠ فقط همین دو ویژگی، نه «all». با «all»، هنگامِ باز/بسته‌شدن مرورگر
-     موظف بود همهٔ ویژگی‌های تغییرکرده (از جمله زنجیرهٔ calc و چیدمانِ کلِ
-     زیردرخت) را هم با منحنیِ .15s میان‌یابی کند؛ این با منحنیِ .22s/.28sِ
-     فرزندان هم‌زمان می‌شد و همان حسِ کندی/لگ را می‌ساخت. */
+  /* ⚠ فقط همین دو ویژگی، نه «all». با «all»، هنگام باز/بسته‌شدن مرورگر
+     موظف بود همهٔ ویژگی‌های تغییرکرده (از جمله زنجیرهٔ calc و چیدمان کل
+     زیردرخت) را هم با منحنی .15s میان‌یابی کند؛ این با منحنی .22s/.28s
+     فرزندان هم‌زمان می‌شد و همان حس کندی/لگ را می‌ساخت. */
   transition:border-color .15s,box-shadow .15s;
-  /* ===== قاعدهٔ واحدِ بزرگ‌شدن در حالتِ باز =====
+  /* ===== قاعدهٔ واحد بزرگ‌شدن در حالت باز =====
      هیچ اندازه‌ای دستی نوشته نمی‌شود؛ همه از دو ضریب مشتق می‌شوند:
-       --k  ← گروهِ متن (تیتر، و نامِ مشتری با نیم‌پلهٔ آن)
-       --kp ← گروهِ شاخصِ پیشرفت (عددِ درصد و ضخامتِ نوار)
-     پس نسبتِ عناصرِ هر گروه نسبت به هم دست‌نخورده و سلسله‌مراتب حفظ می‌شود. */
-  /* --k = ضریبِ رشدِ متن. در حالتِ باز، تیترِ کارت باید عیناً هم‌اندازهٔ
-     تیترِ خودِ سکشن («پیشرفت پروژه‌ها» — .panel-hd h3) شود؛ یعنی 13.5px→14px.
+       --k  ← گروه متن (تیتر، و نام مشتری با نیم‌پلهٔ آن)
+       --kp ← گروه شاخص پیشرفت (عدد درصد و ضخامت نوار)
+     پس نسبت عناصر هر گروه نسبت به هم دست‌نخورده و سلسله‌مراتب حفظ می‌شود. */
+  /* --k = ضریب رشد متن. در حالت باز، تیتر کارت باید عیناً هم‌اندازهٔ
+     تیتر خود سکشن («پیشرفت پروژه‌ها» — .panel-hd h3) شود؛ یعنی 13.5px→14px.
      پس ضریب همان 14/13.5 است و از روی همین یک عدد مشتق می‌شود، نه دستی. */
   --k:1;
   --f-title:calc(13.5px * var(--k));
   --lh-title:20px;
-  /* متنِ ثانویه (نامِ مشتری) نیم‌پله می‌گیرد نه یک پلهٔ کامل.
-     این خودش اصلِ مقیاسِ تایپ‌گرافی است: عنصرِ فرعی نباید هم‌پای عنصرِ
-     اصلی رشد کند، وگرنه فاصلهٔ سلسله‌مراتبیِ تیتر و زیرنویس کم می‌شود. */
+  /* متن ثانویه (نام مشتری) نیم‌پله می‌گیرد نه یک پلهٔ کامل.
+     این خودش اصل مقیاس تایپ‌گرافی است: عنصر فرعی نباید هم‌پای عنصر
+     اصلی رشد کند، وگرنه فاصلهٔ سلسله‌مراتبی تیتر و زیرنویس کم می‌شود. */
   --k2:calc(1 + (var(--k) - 1) * 0.45);
   --f-meta:calc(11.5px * var(--k2));
-  /* درصد و نوار عمداً پلهٔ درشت‌ترِ خود را دارند (--kp): این‌ها شاخصِ کانونیِ
-     کارتِ باز هستند و تأکیدشان خواستهٔ طراحی است، نه پیروی از رشدِ تیتر. */
+  /* درصد و نوار عمداً پلهٔ درشت‌تر خود را دارند (--kp): این‌ها شاخص کانونی
+     کارت باز هستند و تأکیدشان خواستهٔ طراحی است، نه پیروی از رشد تیتر. */
   --kp:1;
   --f-pct:calc(18px * var(--kp));
   --bar-h:calc(7px * var(--kp));
@@ -118,29 +118,29 @@
 .proj-card.open{--k:1.037;   /* 14 ÷ 13.5 — تیتر عیناً .panel-hd h3 */
   --kp:1.25;
   --tick-w:3px; --tick-h:18px; --tick-pad:11px}
-/* کارتِ باز باید روی کارت‌های بعدی بنشیند تا تولتیپش زیرِ آن‌ها نرود */
+/* کارت باز باید روی کارت‌های بعدی بنشیند تا تولتیپش زیر آن‌ها نرود */
 .proj-card.open{position:relative;z-index:2}
-/* بهینه‌سازیِ روانیِ انیمیشن: چیدمانِ داخلیِ هر کارت درونِ خودش محبوس می‌شود،
-   پس با تغییرِ ارتفاع/فونتِ یک کارت، مرورگر مجبور نیست محتوای کارت‌های دیگر
+/* بهینه‌سازی روانی انیمیشن: چیدمان داخلی هر کارت درون خودش محبوس می‌شود،
+   پس با تغییر ارتفاع/فونت یک کارت، مرورگر مجبور نیست محتوای کارت‌های دیگر
    را هم دوباره حل کند (فقط جابه‌جایشان می‌کند). paint را محبوس نمی‌کنیم چون
-   تولتیپِ نوارِ پیشرفت عمداً از کادرِ کارت بیرون می‌زند. */
+   تولتیپ نوار پیشرفت عمداً از کادر کارت بیرون می‌زند. */
 .proj-card{contain:layout}
 .proj-card:hover{border-color:#d8d6d0;box-shadow:0 3px 10px #0000000d}
 .proj-card-head{padding:13px 15px 13px;display:flex;flex-direction:column;gap:8px;
-  transition:padding-bottom .28s cubic-bezier(0,0,.2,1)}   /* هم‌زمان با انیمیشنِ باز/بستنِ proj-card-detail */
-/* فقط در حالتِ بسته: کفِ کارت ۱۰px پایین‌تر (بخشِ اکسپندشونده در این حالت با grid-rows:0fr نامرئی است) */
+  transition:padding-bottom .28s cubic-bezier(0,0,.2,1)}   /* هم‌زمان با انیمیشن باز/بستن proj-card-detail */
+/* فقط در حالت بسته: کف کارت ۱۰px پایین‌تر (بخش اکسپندشونده در این حالت با grid-rows:0fr نامرئی است) */
 .proj-card:not(.open) .proj-card-head{padding-bottom:23px}
 .proj-card-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-/* خطِ عمودیِ نارنجی پیشِ تیتر، هم‌سبکِ عنوانِ صفحهٔ جزئیاتِ پروژه (.pp-head h1)؛ ارتفاعِ خط با ::before
-   مستقل از line-heightِ متن و کوتاه‌تر از قدِ کامل، به‌طورِ مساوی از بالا/پایین وسط‌چین می‌شود */
-/* تیترِ پروژه = دکمهٔ رفتن به صفحهٔ پروژه (نه دکمهٔ باز/بستن) */
+/* خط عمودی نارنجی پیش تیتر، هم‌سبک عنوان صفحهٔ جزئیات پروژه (.pp-head h1)؛ ارتفاع خط با ::before
+   مستقل از line-height متن و کوتاه‌تر از قد کامل، به‌طور مساوی از بالا/پایین وسط‌چین می‌شود */
+/* تیتر پروژه = دکمهٔ رفتن به صفحهٔ پروژه (نه دکمهٔ باز/بستن) */
 .proj-card-name{position:relative;font-family:inherit;font-size:var(--f-title);font-weight:700;color:var(--txt);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   flex:0 1 auto;min-width:0;margin-inline-end:auto;   /* فقط به‌اندازهٔ متن ← هوور از متن بیرون نمی‌زند */
   text-align:right;border:none;background:none;cursor:pointer;
-  /* ⚠ ارتفاعِ خط به پیکسلِ ثابت قفل می‌شود (نه ضریب)، پس با بزرگ‌شدنِ
-     فونت، کادرِ خط تغییر نمی‌کند و لبهٔ بالا ثابت می‌ماند.
-     از flex استفاده نمی‌کنیم چون ellipsis را می‌شکند و مرکزِ خطِ نارنجی را هم. */
+  /* ⚠ ارتفاع خط به پیکسل ثابت قفل می‌شود (نه ضریب)، پس با بزرگ‌شدن
+     فونت، کادر خط تغییر نمی‌کند و لبهٔ بالا ثابت می‌ماند.
+     از flex استفاده نمی‌کنیم چون ellipsis را می‌شکند و مرکز خط نارنجی را هم. */
   line-height:var(--lh-title);
   padding:0 var(--tick-pad,10px) 0 0;
   transition:color .12s,font-size .22s cubic-bezier(0,0,.2,1),line-height .22s cubic-bezier(0,0,.2,1)}
@@ -152,37 +152,37 @@
 .proj-card-name:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .proj-card-meta{font-size:var(--f-meta);font-weight:500;color:var(--muted);white-space:nowrap;
   transition:font-size .22s cubic-bezier(0,0,.2,1)}
-/* پیشرفت (مثلِ حلقهٔ «مستندات پروژه»): درصدِ کلیِ بزرگ بالای نوارِ دو‌لایه؛ نوار کوتاه و از سمتِ چپ */
+/* پیشرفت (مثل حلقهٔ «مستندات پروژه»): درصد کلی بزرگ بالای نوار دو‌لایه؛ نوار کوتاه و از سمت چپ */
 .proj-prog{display:flex;flex-direction:column;align-items:flex-start;gap:6px;direction:ltr;margin-top:1px;padding-inline-start:12px}
-/* عددِ درصد ۱۵px بالاتر — با آفستِ نسبی، پس جای نوارِ پیشرفت یا هیچ عنصرِ دیگری جابه‌جا نمی‌شود */
+/* عدد درصد ۱۵px بالاتر — با آفست نسبی، پس جای نوار پیشرفت یا هیچ عنصر دیگری جابه‌جا نمی‌شود */
 .pp-big{font-size:var(--f-pct);font-weight:800;color:var(--txt);line-height:1;font-variant-numeric:tabular-nums;position:relative;top:-25px;
   transition:font-size .22s cubic-bezier(0,0,.2,1)}
-/* کارتِ باز = تمرکزِ کاربر روی همین پروژه؛ درصد هم مثلِ نوار درشت‌تر می‌شود.
-   top دست‌نخورده می‌ماند تا لبهٔ بالایِ عدد ثابت باشد و رو به پایین بزرگ شود
-   (line-height:1 یعنی ارتفاعِ خط = اندازهٔ فونت، پس رشد فقط از پایین است). */
+/* کارت باز = تمرکز کاربر روی همین پروژه؛ درصد هم مثل نوار درشت‌تر می‌شود.
+   top دست‌نخورده می‌ماند تا لبهٔ بالای عدد ثابت باشد و رو به پایین بزرگ شود
+   (line-height:1 یعنی ارتفاع خط = اندازهٔ فونت، پس رشد فقط از پایین است). */
 
 @media(prefers-reduced-motion:reduce){.pp-big{transition:none}}
 /* نوار همیشه از چپ به راست پر می‌شود (مستقل از راست‌به‌چپ بودن صفحه) */
 .proj-bar-bg{position:relative;height:7px;background:#f0efeb;border-radius:4px;overflow:hidden;direction:ltr}
-/* top:-20px نوار را بصراً بالا می‌برد ولی فضای چیدمانش سرِ جای قبلی می‌ماند و یک فاصلهٔ خالیِ نامرئیِ
-   ۲۰px زیرش جا می‌گذارد؛ margin-bottom:-20px همان فضای اشغال‌شده را واقعاً جمع می‌کند تا هرچه زیرِ
-   نوار می‌آید از لبهٔ بصریِ واقعیِ آن شروع شود و فاصله‌گذاری‌های بعدی قابلِ‌پیش‌بینی بمانند. */
-.proj-prog .proj-bar-bg{width:82%;min-width:120px;max-width:420px;top:-20px;margin-bottom:-20px}   /* ~۵۰٪ بلندتر، از سمتِ راست؛ ۲۰px بالاتر */
+/* top:-20px نوار را بصراً بالا می‌برد ولی فضای چیدمانش سر جای قبلی می‌ماند و یک فاصلهٔ خالی نامرئی
+   ۲۰px زیرش جا می‌گذارد؛ margin-bottom:-20px همان فضای اشغال‌شده را واقعاً جمع می‌کند تا هرچه زیر
+   نوار می‌آید از لبهٔ بصری واقعی آن شروع شود و فاصله‌گذاری‌های بعدی قابل‌پیش‌بینی بمانند. */
+.proj-prog .proj-bar-bg{width:82%;min-width:120px;max-width:420px;top:-20px;margin-bottom:-20px}   /* ~۵۰٪ بلندتر، از سمت راست؛ ۲۰px بالاتر */
 .proj-bar-fill{position:absolute;left:0;top:0;height:100%;border-radius:4px;transition:width .6s cubic-bezier(0,0,.2,1)}
-/* نوارِ سگمنتی: سگمنت‌ها کنارِ هم می‌نشینند و هرکدام سهمِ خودش را پر
-   می‌کند؛ جایِ خالیِ انتها همان پس‌زمینهٔ خاکستری = ماژول‌هایِ بدونِ سند. */
+/* نوار سگمنتی: سگمنت‌ها کنار هم می‌نشینند و هرکدام سهم خودش را پر
+   می‌کند؛ جای خالی انتها همان پس‌زمینهٔ خاکستری = ماژول‌های بدون سند. */
 .proj-prog .proj-bar-bg{display:flex;align-items:stretch}
 .pbar-seg{display:block;height:100%;min-width:0;transition:width .6s cubic-bezier(0,0,.2,1)}
-/* «در انتظار بازبینی» حالا خاکستریِ برند است و کنتراستِ ۳٫۲۵ با نوار دارد،
-   پس خطِ راهنما لازم ندارد. ولی زردِ کم‌رنگ (رنگِ قطعهٔ سوم) نسبت به پس‌زمینهٔ
+/* «در انتظار بازبینی» حالا خاکستری برند است و کنتراست ۳٫۲۵ با نوار دارد،
+   پس خط راهنما لازم ندارد. ولی زرد کم‌رنگ (رنگ قطعهٔ سوم) نسبت به پس‌زمینهٔ
    نوار فقط ۱٫۰۳ کنتراست دارد؛ خط به آن منتقل شد. */
 .pbar-seg.pale{box-shadow:inset 0 0 0 1px #f5d98a}
-/* سگمنتِ «بارگذاری‌نشده» هم‌رنگِ پس‌زمینه است (دیده نمی‌شود)
+/* سگمنت «بارگذاری‌نشده» هم‌رنگ پس‌زمینه است (دیده نمی‌شود)
    ولی وجود دارد تا هاور و تولتیپ داشته باشد. */
 .pbar-seg.none{background:transparent!important}
-/* ===== نوار در کارتِ باز =====
-   کارتِ باز یعنی کاربر دارد همین پروژه را می‌خواند؛ پس نوار ضخیم‌تر
-   می‌شود و تکه‌هایش قابلِ هدف‌گیری می‌شوند. */
+/* ===== نوار در کارت باز =====
+   کارت باز یعنی کاربر دارد همین پروژه را می‌خواند؛ پس نوار ضخیم‌تر
+   می‌شود و تکه‌هایش قابل هدف‌گیری می‌شوند. */
 .proj-prog .proj-bar-bg{overflow:visible;transition:height .22s cubic-bezier(0,0,.2,1)}
 .proj-prog .proj-bar-bg{height:var(--bar-h);border-radius:calc(var(--bar-h)/2)}
 .pbar-seg{position:relative}
@@ -192,15 +192,15 @@
 .proj-card.open .pbar-seg:first-child{border-radius:7px 0 0 7px}
 .proj-card.open .pbar-seg:last-child{border-radius:0 7px 7px 0}
 .proj-card.open .pbar-seg:only-child{border-radius:7px}
-/* فقط در کارتِ باز تعاملی است: نشانگرِ دست + روشن‌شدنِ تکهٔ زیرِ موس */
+/* فقط در کارت باز تعاملی است: نشانگر دست + روشن‌شدن تکهٔ زیر موس */
 .proj-card.open .pbar-seg{cursor:pointer}
 .proj-card.open .pbar-seg:hover{filter:brightness(.93)}
 /* تکهٔ شفاف با brightness واکنشی نشان نمی‌دهد؛ برایش پس‌زمینهٔ محو می‌گذاریم */
 .proj-card.open .pbar-seg.none:hover{background:#e4e2dd!important}
 
-/* ===== تولتیپِ تفصیلیِ هر تکه =====
-   یک جعبهٔ سفیدِ واقعی داخلِ سگمنت (نه ::after)، چون چند سطر آمار
-   دارد. در حالتِ عادی پنهان است و فقط با هاورِ کارتِ باز دیده می‌شود. */
+/* ===== تولتیپ تفصیلی هر تکه =====
+   یک جعبهٔ سفید واقعی داخل سگمنت (نه ::after)، چون چند سطر آمار
+   دارد. در حالت عادی پنهان است و فقط با هاور کارت باز دیده می‌شود. */
 .sgt{position:absolute;bottom:calc(100% + 10px);left:50%;
   transform:translateX(-50%) translateY(4px);
   min-width:158px;background:#fff;border:1px solid var(--line);border-radius:9px;
@@ -216,14 +216,14 @@
 .sgt-r{display:flex;align-items:center;justify-content:space-between;gap:12px;
   font-size:10.5px;font-weight:500;color:var(--muted);line-height:1.75}
 .sgt-r b{color:var(--txt);font-weight:800;font-variant-numeric:tabular-nums}
-/* جلوگیری از بریده‌شدن در لبهٔ کارت: تولتیپِ تکهٔ اول/آخر به‌جای
-   وسط‌چینی، از همان لبه تراز می‌شود تا درونِ کادر بماند. */
+/* جلوگیری از بریده‌شدن در لبهٔ کارت: تولتیپ تکهٔ اول/آخر به‌جای
+   وسط‌چینی، از همان لبه تراز می‌شود تا درون کادر بماند. */
 .pbar-seg:first-child .sgt{left:0;transform:translateX(0) translateY(4px)}
 .proj-card.open .pbar-seg:first-child:hover .sgt{transform:translateX(0) translateY(0)}
 .pbar-seg:last-child .sgt{left:auto;right:0;transform:translateX(0) translateY(4px)}
 .proj-card.open .pbar-seg:last-child:hover .sgt{transform:translateX(0) translateY(0)}
-/* کارتِ اولِ فهرست بالایِ خود جایی ندارد (سربرگِ پنل آنجاست)؛
-   تولتیپِ آن به‌جای بالا، زیرِ نوار باز می‌شود. */
+/* کارت اول فهرست بالای خود جایی ندارد (سربرگ پنل آنجاست)؛
+   تولتیپ آن به‌جای بالا، زیر نوار باز می‌شود. */
 .proj-card.tip-down .sgt{bottom:auto;top:calc(100% + 10px);transform:translateX(-50%) translateY(-4px)}
 .proj-card.tip-down.open .pbar-seg:hover .sgt{transform:translateX(-50%) translateY(0)}
 .proj-card.tip-down .pbar-seg:first-child .sgt{transform:translateX(0) translateY(-4px)}
@@ -239,7 +239,7 @@
 .pbar-seg:only-child{border-radius:4px}
 @media(prefers-reduced-motion:reduce){.pbar-seg{transition:none}}
 .proj-bar-fill.faint{background:var(--brand);opacity:.26}
-/* فلش = تنها دکمهٔ باز/بستنِ کارت؛ در حالتِ باز نارنجی می‌شود (هم‌رفتارِ فلش‌های آرشیو و جدول‌ها) */
+/* فلش = تنها دکمهٔ باز/بستن کارت؛ در حالت باز نارنجی می‌شود (هم‌رفتار فلش‌های آرشیو و جدول‌ها) */
 .proj-chevron{width:26px;height:26px;flex-shrink:0;display:inline-grid;place-items:center;
   border:none;background:none;border-radius:7px;cursor:pointer;color:#b9b7b1;
   transition:color .18s}
@@ -248,37 +248,37 @@
 .proj-chevron:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .proj-card.open .proj-chevron{color:var(--brand)}
 .proj-card.open .proj-chevron svg{transform:rotate(180deg)}
-/* باز/بسته‌شدنِ متحرک با grid-rows 0fr↔1fr (بدون پرش). در حالتِ بسته grid-template-rows:0fr خودش
-   ارتفاعِ محتوا را صفر می‌کند؛ pcd-inner هم overflow:hidden دارد، پس چیزی از کادرِ کارت بیرون نمی‌زند. */
+/* باز/بسته‌شدن متحرک با grid-rows 0fr↔1fr (بدون پرش). در حالت بسته grid-template-rows:0fr خودش
+   ارتفاع محتوا را صفر می‌کند؛ pcd-inner هم overflow:hidden دارد، پس چیزی از کادر کارت بیرون نمی‌زند. */
 .proj-card-detail{display:grid;grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(0,0,.2,1)}
 .proj-card.open .proj-card-detail{grid-template-rows:1fr}
 .pcd-inner{overflow:hidden;min-height:0}
-.pcd-body{padding:8px 15px 13px}   /* بدونِ خطِ جداکننده؛ فاصلهٔ بالا ۸px؛ کفِ کارت ۱۰px کوتاه‌تر (۲۳→۱۳) */
+.pcd-body{padding:8px 15px 13px}   /* بدون خط جداکننده؛ فاصلهٔ بالا ۸px؛ کف کارت ۱۰px کوتاه‌تر (۲۳→۱۳) */
 @media(prefers-reduced-motion:reduce){.proj-card-detail{transition:none}.proj-bar-fill{transition:none}.proj-card-head{transition:none}.proj-chevron svg{transition:none}}
-/* هم‌کلاسِ متنیِ proj-card-meta (نامِ مشتری): ۱۱٫۵px، وزنِ ۵۰۰، رنگِ muted. */
+/* هم‌کلاس متنی proj-card-meta (نام مشتری): ۱۱٫۵px، وزن ۵۰۰، رنگ muted. */
 .detail-stats{display:flex;gap:16px;padding:0;font-size:11.5px;font-weight:500;color:var(--muted);flex-wrap:wrap;
-  margin-top:10px}   /* فاصلهٔ بیشتر از نوارِ پیشرفتِ بالایش */
+  margin-top:10px}   /* فاصلهٔ بیشتر از نوار پیشرفت بالایش */
 .detail-stats b{color:var(--txt);font-weight:700}
-/* پیام‌های وضعیت — سبز و قرمز هم‌شکل و هم‌اندازه (چیپ)؛ فاصلهٔ ۶px از ردیفِ بالا از .pcd-foot می‌آید */
+/* پیام‌های وضعیت — سبز و قرمز هم‌شکل و هم‌اندازه (چیپ)؛ فاصلهٔ ۶px از ردیف بالا از .pcd-foot می‌آید */
 .detail-msgs{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0}
 .status-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;
   padding:3px 10px;border-radius:20px;border:1px solid var(--line);background:#f7f7f5;color:var(--muted)}
 .status-chip.warn{background:var(--err-bg);color:var(--err);border-color:var(--err-line)}
-/* پیامِ خنثی/تکمیل — مثلِ یادداشتِ خاکستریِ «۳ قطعه انتخاب شده» (بدونِ کادرِ رنگی) */
+/* پیام خنثی/تکمیل — مثل یادداشت خاکستری «۳ قطعه انتخاب شده» (بدون کادر رنگی) */
 .msg-note{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:var(--muted)}
 .msg-note svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-/* فوترِ جزئیات: پیامِ وضعیت (راست) + دکمهٔ اکشنِ فشردهٔ «مشاهدهٔ پروژه» (چپ)، هر دو هم‌تراز.
-   فاصلهٔ بالای این ردیف تا ردیفِ قبلی (detail-stats یا نوارِ پیشرفت) = همان ۶px استاندارد */
+/* فوتر جزئیات: پیام وضعیت (راست) + دکمهٔ اکشن فشردهٔ «مشاهدهٔ پروژه» (چپ)، هر دو هم‌تراز.
+   فاصلهٔ بالای این ردیف تا ردیف قبلی (detail-stats یا نوار پیشرفت) = همان ۶px استاندارد */
 .pcd-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:6px}
 .pcd-foot .detail-msgs{flex:1;min-width:0;margin:0}
 .proj-open-btn{flex-shrink:0}
 
 /* ===== تایم‌لاین فعالیت اخیر ===== */
 .timeline-list{display:flex;flex-direction:column}
-.tl-item{display:flex;align-items:stretch;gap:8px;padding:9px 0;direction:rtl}   /* stretch تا خط تا تهِ متن (دو خط) کشیده شود */
+.tl-item{display:flex;align-items:stretch;gap:8px;padding:9px 0;direction:rtl}   /* stretch تا خط تا ته متن (دو خط) کشیده شود */
 .tl-marker{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px;padding-top:3px}
 .tl-dot{position:relative;width:12px;height:12px;border-radius:50%;background:var(--brand);border:2px solid #fff;flex-shrink:0}
-/* حلقهٔ نارنجیِ کم‌رنگ که مثل رادار/آلارم از مرکزِ نقطه بیرون می‌زند و تکرار می‌شود */
+/* حلقهٔ نارنجی کم‌رنگ که مثل رادار/آلارم از مرکز نقطه بیرون می‌زند و تکرار می‌شود */
 .tl-dot::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:50%;
   border:2px solid rgba(247,148,31,.55);transform:translate(-50%,-50%) scale(.4);opacity:.6;
   pointer-events:none;animation:tlPing 1.7s cubic-bezier(0,0,.2,1) infinite}
@@ -286,42 +286,42 @@
   58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
 @media(prefers-reduced-motion:reduce){.tl-dot::after{animation:none;opacity:0}}
 .tl-line{flex:1;width:2px;background:var(--line);border-radius:2px;min-height:18px;margin-top:4px;
-  transform:scaleY(.75) translateY(8px);transform-origin:top}   /* هم‌اندازهٔ خطِ مودال: ۲۵٪ از پایین کوتاه‌تر، بالا ثابت؛ +۶px از پایین (translateY درونِ فضای مقیاس‌شده اجرا می‌شود، پس مقدار را بر ۰٫۷۵ تقسیم کردم تا اثرِ بصریِ واقعی ۶px شود) */
+  transform:scaleY(.75) translateY(8px);transform-origin:top}   /* هم‌اندازهٔ خط مودال: ۲۵٪ از پایین کوتاه‌تر، بالا ثابت؛ +۶px از پایین (translateY درون فضای مقیاس‌شده اجرا می‌شود، پس مقدار را بر ۰٫۷۵ تقسیم کردم تا اثر بصری واقعی ۶px شود) */
 .tl-body{flex:1;min-width:0}
 .tl-num{font-size:12.5px;font-weight:600;direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--txt);cursor:pointer;transition:color .12s}
 .tl-num:hover{color:var(--brand)}
-/* ردیفِ سرِ کارت: شمارهٔ سند سمتِ راست، تاریخ سمتِ چپِ همان ردیف (جای قبلیِ تاریخ، فقط بالا آمد) */
+/* ردیف سر کارت: شمارهٔ سند سمت راست، تاریخ سمت چپ همان ردیف (جای قبلی تاریخ، فقط بالا آمد) */
 .rq-head-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0}
 .rq-head-row .rq-num,.rq-head-row .tl-num{flex:1;min-width:0}
-/* ============ بلوکِ توضیح + نامِ کاربر: همیشه دقیقاً دو خط ============
-   ساختار: .act-body (نسبی) ▸ .act-lines (متنِ دو‌خطی) + .act-tag (لنگر در پایین‌چپ)
-   ▼▼ «خطِ قرمز» = مرزِ راستِ متن؛ فقط با همین یک عدد کنترل می‌شود ▼▼
-   این مقدار عرضِ ستونِ تگ در سمتِ چپ است؛ متن هرگز واردش نمی‌شود (در هر دو خط). */
-.act-body{--act-tag-col:118px;   /* ← جای تگ (px)؛ زیادش کن تا مرز به راست بیاید و متنِ بیشتری به خطِ دوم برود */
+/* ============ بلوک توضیح + نام کاربر: همیشه دقیقاً دو خط ============
+   ساختار: .act-body (نسبی) ▸ .act-lines (متن دو‌خطی) + .act-tag (لنگر در پایین‌چپ)
+   ▼▼ «خط قرمز» = مرز راست متن؛ فقط با همین یک عدد کنترل می‌شود ▼▼
+   این مقدار عرض ستون تگ در سمت چپ است؛ متن هرگز واردش نمی‌شود (در هر دو خط). */
+.act-body{--act-tag-col:118px;   /* ← جای تگ (px)؛ زیادش کن تا مرز به راست بیاید و متن بیشتری به خط دوم برود */
   position:relative;margin-top:2px;
   font-size:11.5px;line-height:1.7;
-  /* «هیچ‌وقت کمتر از دو خط»: ارتفاعِ ثابتِ دقیقاً دو خط (۲ × ۱۱٫۵px × ۱٫۷) */
+  /* «هیچ‌وقت کمتر از دو خط»: ارتفاع ثابت دقیقاً دو خط (۲ × ۱۱٫۵px × ۱٫۷) */
   min-height:39.1px}
-/* جریانِ متنیِ واحد؛ «هیچ‌وقت بیشتر از دو خط»: کلمپِ سخت روی دو خط */
+/* جریان متنی واحد؛ «هیچ‌وقت بیشتر از دو خط»: کلمپ سخت روی دو خط */
 .act-lines{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;
   overflow:hidden;font-size:11.5px;line-height:1.7;color:var(--muted);
-  padding-inline-end:var(--act-tag-col)}   /* ستونِ تگ رزرو می‌شود ← همان خطِ قرمز */
-/* خطِ توضیح، هم‌کلاسِ قبلی (proj-card-meta): ۱۱٫۵px، رنگِ muted */
+  padding-inline-end:var(--act-tag-col)}   /* ستون تگ رزرو می‌شود ← همان خط قرمز */
+/* خط توضیح، هم‌کلاس قبلی (proj-card-meta): ۱۱٫۵px، رنگ muted */
 .act-desc{font-size:11.5px;color:var(--muted)}
-/* حالتِ ۱ — توضیح در همان خطِ اول تمام شده: توضیح بلوکی می‌شود تا نام به خطِ دومِ مستقل برود
-   (کلاسِ .one را fixActivityLines پس از اندازه‌گیریِ واقعیِ ارتفاع اضافه می‌کند) */
+/* حالت ۱ — توضیح در همان خط اول تمام شده: توضیح بلوکی می‌شود تا نام به خط دوم مستقل برود
+   (کلاس .one را fixActivityLines پس از اندازه‌گیری واقعی ارتفاع اضافه می‌کند) */
 .act-lines.one .act-desc{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.act-lines.one .act-sep{display:none}         /* در حالتِ ۱ جداکننده لازم نیست */
-/* حالتِ ۲ — توضیح به خطِ دوم رسیده: نام در ادامهٔ همان خط، پشتِ جداکنندهٔ عمودیِ نازکِ کم‌رنگ */
+.act-lines.one .act-sep{display:none}         /* در حالت ۱ جداکننده لازم نیست */
+/* حالت ۲ — توضیح به خط دوم رسیده: نام در ادامهٔ همان خط، پشت جداکنندهٔ عمودی نازک کم‌رنگ */
 .act-sep{display:inline-block;width:1px;height:9px;margin:0 6px;vertical-align:-1px;
   background:var(--line);opacity:.75}
-/* اگر توضیحی نبود (سندِ حذف‌شده)، نام از همان خطِ اول شروع می‌شود */
+/* اگر توضیحی نبود (سند حذف‌شده)، نام از همان خط اول شروع می‌شود */
 .act-lines.no-desc .act-sep{display:none}
-/* هم‌کلاسِ متنیِ proj-card-meta (نامِ مشتری در پنلِ مجاورِ پیشرفتِ پروژه‌ها): ۱۱٫۵px، وزنِ ۵۰۰، رنگِ muted */
+/* هم‌کلاس متنی proj-card-meta (نام مشتری در پنل مجاور پیشرفت پروژه‌ها): ۱۱٫۵px، وزن ۵۰۰، رنگ muted */
 .act-who{font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap}
 .act-who-label{font-size:11.5px;font-weight:400;color:var(--muted)}
-/* تگِ وضعیت: کمی کوچک‌تر، لنگرشده در گوشهٔ پایین‌چپ ← هم‌سطر با خطِ دومِ متن */
+/* تگ وضعیت: کمی کوچک‌تر، لنگرشده در گوشهٔ پایین‌چپ ← هم‌سطر با خط دوم متن */
 .act-tag{position:absolute;inset-inline-end:0;bottom:0;transform:scale(.86);transform-origin:left bottom}
-/* تگ‌های رویدادِ «فعالیتِ اخیر»: کادرِ همه هم‌اندازه — مستقل از طول متن و آیکونِ داخل. محتوا وسط‌چین.
-   ▼▼ عرضِ همهٔ این تگ‌ها فقط با همین یک عدد کنترل می‌شود؛ کم/زیادش کن تا دلخواه شود ▼▼ */
-.badge.wf-badge{min-width:65px;justify-content:center}   /* ← عرضِ تگ‌ها (px) */
+/* تگ‌های رویداد «فعالیت اخیر»: کادر همه هم‌اندازه — مستقل از طول متن و آیکون داخل. محتوا وسط‌چین.
+   ▼▼ عرض همهٔ این تگ‌ها فقط با همین یک عدد کنترل می‌شود؛ کم/زیادش کن تا دلخواه شود ▼▼ */
+.badge.wf-badge{min-width:65px;justify-content:center}   /* ← عرض تگ‌ها (px) */

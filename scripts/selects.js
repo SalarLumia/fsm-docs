@@ -1,6 +1,6 @@
 /* ================= پر کردن سلکت‌ها ================= */
 function opt(v,label){ return '<option value="'+esc(v)+'">'+esc(label)+'</option>'; }
-/* فیلترهای آرشیو هنوز <select> واقعی‌اند؛ ثبت سند به ویزاردِ ریلِ شماره (documents.js) منتقل شد. */
+/* فیلترهای آرشیو هنوز <select> واقعی‌اند؛ ثبت سند به ویزارد ریل شماره (documents.js) منتقل شد. */
 function refreshAllSelects(){
   // فیلتر آرشیو (بدون گزینهٔ افزودن) — انتخاب فعلی هنگام رفرش داده حفظ می‌شود
   var acEl=document.getElementById("aClient"), acPrev=acEl?acEl.value:"";

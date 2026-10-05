@@ -13,12 +13,12 @@ document.addEventListener("keydown",function(e){
     e.preventDefault(); t.click();
   }
 });
-/* ═══ مقصدِ ورود از بیرون (اسکنِ QR) ═══
+/* ═══ مقصد ورود از بیرون (اسکن QR) ═══
    نشانی به دو شکل می‌تواند بیاید:
      ۱) fooladshargh.com/d?n=<شماره>&r=<ویرایش>   ← همان چیزی که در QR چاپ می‌شود
-     ۲) index.html#/doc/<شماره>                    ← لینکِ داخلیِ قابلِ اشتراک
+     ۲) index.html#/doc/<شماره>                    ← لینک داخلی قابل اشتراک
    نکتهٔ مهم: کاربر معمولاً وارد نشده است، پس مقصد نگه داشته می‌شود تا پس از ورود
-   به آن پرش کنیم. بخشِ پس از # هرگز به سرور نمی‌رود، پس شمارهٔ سند در لاگِ هیچ
+   به آن پرش کنیم. بخش پس از # هرگز به سرور نمی‌رود، پس شمارهٔ سند در لاگ هیچ
    سروری ثبت نمی‌شود. */
 var _pendingRoute = null;
 function readRoute(){
@@ -32,26 +32,26 @@ function readRoute(){
   n=String(n||"").trim().toUpperCase();
   return n?{num:n}:null;
 }
-/* مقصد را در همان بارگذاریِ اول می‌خوانیم، پیش از آنکه چیزی نشانی را عوض کند */
+/* مقصد را در همان بارگذاری اول می‌خوانیم، پیش از آنکه چیزی نشانی را عوض کند */
 _pendingRoute = readRoute();
-/* پس از آماده‌شدنِ کامل سایت صدا زده می‌شود: اگر مقصدی بوده، همان سند باز می‌شود. */
+/* پس از آماده‌شدن کامل سایت صدا زده می‌شود: اگر مقصدی بوده، همان سند باز می‌شود. */
 function consumePendingRoute(){
   var rt=_pendingRoute; _pendingRoute=null;
   if(!rt) return false;
   if(typeof openDocDetail!=="function") return false;
-  // نشانی تمیز شود تا رفرشِ بعدی دوباره همین سند را باز نکند
+  // نشانی تمیز شود تا رفرش بعدی دوباره همین سند را باز نکند
   try{ history.replaceState(null,"",location.pathname); }catch(e){}
   openDocDetail(rt.num);
   return true;
 }
 function switchTab(name){
-  // ترکِ نمای فعلی: مدلِ سه‌بعدیِ بارگذاری‌شده (اگر بود) و URLِ بلابش آزاد می‌شود تا حافظه نشت نکند
+  // ترک نمای فعلی: مدل سه‌بعدی بارگذاری‌شده (اگر بود) و URL بلابش آزاد می‌شود تا حافظه نشت نکند
   if(typeof releaseBlobUrl==="function") releaseBlobUrl("mvModel");
-  window._activeTab=name;   // تبِ فعالِ جاری؛ درختِ سایدبار حالتِ نارنجی را فقط برای همین تب نشان می‌دهد
+  window._activeTab=name;   // تب فعال جاری؛ درخت سایدبار حالت نارنجی را فقط برای همین تب نشان می‌دهد
   /* CSS نمی‌تواند «کلاس برداشته شد» را تشخیص دهد، پس آیتمی که همین حالا فعال
-     بود یک کلاسِ موقتِ leaving می‌گیرد تا آیکونش انیمیشنِ خروج (همان انیمیشنِ
-     ورود، برعکس) را اجرا کند. تایمر روی خودِ عنصر نگه داشته می‌شود تا سوئیچِ
-     پشتِ‌سرِ‌همِ تب‌ها تایمرِ قبلی را لغو کند و کلاس جا نماند. */
+     بود یک کلاس موقت leaving می‌گیرد تا آیکونش انیمیشن خروج (همان انیمیشن
+     ورود، برعکس) را اجرا کند. تایمر روی خود عنصر نگه داشته می‌شود تا سوئیچ
+     پشت‌سر‌هم تب‌ها تایمر قبلی را لغو کند و کلاس جا نماند. */
   document.querySelectorAll(".nav-item[data-tab]").forEach(function(b){
     var on = b.dataset.tab===name;
     if(!on && b.classList.contains("active")){
@@ -64,15 +64,15 @@ function switchTab(name){
   document.querySelectorAll(".tabpane").forEach(function(p){ p.classList.add("hidden"); });
   var pane=document.getElementById("tab-"+name);
   pane.classList.remove("hidden");
-  if(name==="dashboard") renderDashboard(true);   // آرگومان true → شمارشِ عددیِ کارت‌های شاخص
+  if(name==="dashboard") renderDashboard(true);   // آرگومان true → شمارش عددی کارت‌های شاخص
   if(name==="project") renderProjectTab();
   if(name==="trash" && typeof renderTrash==="function") renderTrash();
   if(name==="instances" && typeof renderInstances==="function") renderInstances();
   if(name==="help" && typeof renderHelp==="function") renderHelp();
-  /* رزروِ ارتفاعِ آرشیو با اندازه‌گیریِ واقعی حساب می‌شود و اندازه‌گیری روی تبِ
+  /* رزرو ارتفاع آرشیو با اندازه‌گیری واقعی حساب می‌شود و اندازه‌گیری روی تب
      پنهان صفر برمی‌گرداند؛ پس با ورود به تب یک‌بار دوباره حساب می‌شود. */
   if(name==="archive" && typeof archSyncReserve==="function") archSyncReserve();
-  // درختِ «مشتریان و پروژه‌ها» را تازه کن تا با ترکِ تبِ پروژه، نارنجیِ مشتری/پروژه پاک شود
+  // درخت «مشتریان و پروژه‌ها» را تازه کن تا با ترک تب پروژه، نارنجی مشتری/پروژه پاک شود
   if(name!=="project" && typeof navRefreshSelection==="function") navRefreshSelection();
-  if(typeof playTabReveal==="function") playTabReveal(pane);   // ورودِ آبشاریِ بلوک‌های همان تب
+  if(typeof playTabReveal==="function") playTabReveal(pane);   // ورود آبشاری بلوک‌های همان تب
 }

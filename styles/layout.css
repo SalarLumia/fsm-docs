@@ -1,9 +1,9 @@
 /* ===== پوستهٔ برنامه و سایدبار (سمت راست، چیدمان راست‌به‌چپ) ===== */
-/* ظرفِ اسکرولِ اصلی — توضیحش در base.css. جهتش از html ارث می‌رسد (rtl)،
-   پس نوار سمتِ چپ می‌نشیند. سایدبار position:fixed است و بیرونِ این اسکرول
-   می‌ماند؛ هدرِ چسبان هم نسبت به همین ظرف می‌چسبد، نه پنجره. */
+/* ظرف اسکرول اصلی — توضیحش در base.css. جهتش از html ارث می‌رسد (rtl)،
+   پس نوار سمت چپ می‌نشیند. سایدبار position:fixed است و بیرون این اسکرول
+   می‌ماند؛ هدر چسبان هم نسبت به همین ظرف می‌چسبد، نه پنجره. */
 #appView{height:100%;overflow:auto}
-/* قفلِ اسکرول هنگامِ باز بودنِ پنجره‌ها روی همین ظرف اعمال می‌شود، نه body */
+/* قفل اسکرول هنگام باز بودن پنجره‌ها روی همین ظرف اعمال می‌شود، نه body */
 body.modal-open #appView{overflow:hidden}
 .sidebar{width:220px;transition:width .28s cubic-bezier(.4,0,.2,1);background:var(--charcoal);box-shadow:-2px 0 16px #00000028;display:flex;flex-direction:column;
   position:fixed;right:0;top:0;bottom:0;z-index:40;flex-shrink:0}
@@ -13,12 +13,12 @@ body.modal-open #appView{overflow:hidden}
   background:#faf9f7;border-radius:12px;padding:12px 16px;box-sizing:border-box}
 .sb-caption{font-size:12px;font-weight:500;letter-spacing:.3px;color:#ffffff;text-align:center}
 .sb-nav{flex:1;padding:18px 10px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;
-  /* تورفتگیِ باکسِ نارنجیِ حالتِ فعال و جایِ نوارِ لبه — تا با خطِ راهنمایِ
-     عمودیِ درخت (که روی مرکزِ آیکون است) تداخل نکند. */
+  /* تورفتگی باکس نارنجی حالت فعال و جای نوار لبه — تا با خط راهنمای
+     عمودی درخت (که روی مرکز آیکون است) تداخل نکند. */
   --nav-pad:7px; --nav-ind:3px}
-/* اسکرول هست ولی نوارش دیده نمی‌شود: نوارِ روشنِ پیش‌فرض روی سایدبارِ ذغالی
-   وصله‌ای به نظر می‌رسد و با باز/بسته شدنِ درختِ پروژه‌ها ظاهر و ناپدید می‌شود.
-   چرخِ موس، درگ و کیبورد دست‌نخورده‌اند. */
+/* اسکرول هست ولی نوارش دیده نمی‌شود: نوار روشن پیش‌فرض روی سایدبار ذغالی
+   وصله‌ای به نظر می‌رسد و با باز/بسته شدن درخت پروژه‌ها ظاهر و ناپدید می‌شود.
+   چرخ موس، درگ و کیبورد دست‌نخورده‌اند. */
 .sb-nav{scrollbar-width:none;-ms-overflow-style:none}
 .sb-nav::-webkit-scrollbar{width:0;height:0}
 .sb-divider{height:1px;background:rgba(255,255,255,0.08);margin:6px 8px}
@@ -33,85 +33,85 @@ body.modal-open #appView{overflow:hidden}
   text-align:right;transition:.15s;font-weight:500;position:relative}
 .nav-item svg{width:17px;height:17px;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:1.8}
 .nav-item:hover{background:rgba(255,255,255,0.11);color:#ffffff}
-/* حالتِ انتخاب‌شده: تینتِ ملایم + نوارِ لبهٔ ثابت؛ متن و آیکون هر دو نارنجی می‌شوند (currentColor). */
+/* حالت انتخاب‌شده: تینت ملایم + نوار لبهٔ ثابت؛ متن و آیکون هر دو نارنجی می‌شوند (currentColor). */
 .nav-item.active{background:rgba(247,148,31,0.14);color:var(--brand)}
 .nav-item.active:hover{background:rgba(247,148,31,0.22)}
-/* نشانگرِ لبه — همیشه موجود ولی پنهان (scaleY 0 + کمی بیرونِ لبه)؛ هنگامِ active با انیمیشن
-   از لبهٔ راست بیرون/چپ می‌آید و هم‌زمان به بالا و پایین کشیده می‌شود (مثلِ نشانگرِ ردیفِ آرشیو) */
+/* نشانگر لبه — همیشه موجود ولی پنهان (scaleY 0 + کمی بیرون لبه)؛ هنگام active با انیمیشن
+   از لبهٔ راست بیرون/چپ می‌آید و هم‌زمان به بالا و پایین کشیده می‌شود (مثل نشانگر ردیف آرشیو) */
 .nav-item::before{content:"";position:absolute;top:50%;inset-inline-start:0;pointer-events:none;
   width:3px;height:18px;border-radius:3px;background:var(--brand);
   transform:translateY(-50%) translateX(6px) scaleY(0);
   transition:transform .28s cubic-bezier(.2,0,0,1)}
 .nav-item.active::before{transform:translateY(-50%) translateX(0) scaleY(1)}
-/* ═══ کراس‌فیدِ انتخاب ═══
-   رنگِ آیکون و متن هنگامِ انتخاب‌شدن از سفید به نارنجی حل می‌شود و هنگامِ خروج
-   برعکس — هم‌زمان و هم‌منحنی با کشیده‌شدنِ نشانگرِ لبه (۰٫۲۸ ثانیه)، پس سه تغییر
-   یک حرکت دیده می‌شوند. آیکون stroke:currentColor است و خودش همراهِ color گذار می‌کند.
+/* ═══ کراس‌فید انتخاب ═══
+   رنگ آیکون و متن هنگام انتخاب‌شدن از سفید به نارنجی حل می‌شود و هنگام خروج
+   برعکس — هم‌زمان و هم‌منحنی با کشیده‌شدن نشانگر لبه (۰٫۲۸ ثانیه)، پس سه تغییر
+   یک حرکت دیده می‌شوند. آیکون stroke:currentColor است و خودش همراه color گذار می‌کند.
    ⚠ گذار عمداً فقط روی .active و .leaving است، نه روی قاعدهٔ پایه یا :hover — چون
-   گذار مقدارِ حالتِ *مقصد* را می‌خواند، هر گذاری روی پایه باعث می‌شد هاور هنگامِ
-   خروجِ موس بماند (همان ایرادی که در آرشیو با آنی‌کردنِ هاور رفع شد).
-   ⚠ فقط color، نه background: موس هنگامِ کلیک روی دکمه است، پس گذارِ پس‌زمینه روی
-   .active یعنی تیره‌شدنِ هاورِ دکمهٔ فعال هم با تأخیر برگردد. پس‌زمینه یک تهِ‌رنگِ
-   ۱۴٪ است و پرشش به چشم نمی‌آید؛ تغییرِ برجسته همان سفید ← نارنجیِ آیکون است.
-   .leaving را nav.js هنگامِ از دست دادنِ انتخاب ۵۲۰ms روی دکمه می‌گذارد. */
+   گذار مقدار حالت *مقصد* را می‌خواند، هر گذاری روی پایه باعث می‌شد هاور هنگام
+   خروج موس بماند (همان ایرادی که در آرشیو با آنی‌کردن هاور رفع شد).
+   ⚠ فقط color، نه background: موس هنگام کلیک روی دکمه است، پس گذار پس‌زمینه روی
+   .active یعنی تیره‌شدن هاور دکمهٔ فعال هم با تأخیر برگردد. پس‌زمینه یک ته‌رنگ
+   ۱۴٪ است و پرشش به چشم نمی‌آید؛ تغییر برجسته همان سفید ← نارنجی آیکون است.
+   .leaving را nav.js هنگام از دست دادن انتخاب ۵۲۰ms روی دکمه می‌گذارد. */
 .nav-item.active,.nav-item.leaving{transition:color .28s cubic-bezier(.2,0,0,1)}
 @media(prefers-reduced-motion:reduce){.nav-item.active,.nav-item.leaving{transition:none}}
 .nav-item.nav-logout{color:#ef4444}
 .nav-item.nav-logout:hover{background:rgba(239,68,68,0.16);color:#ff5c5c}
 .role-chip{font-size:11px;padding:3px 12px;border-radius:20px;background:#fff3e6;border:1px solid #f7941f44;color:var(--brand);font-weight:500;white-space:nowrap}
 
-/* ===== درختِ «مشتریان و پروژه‌ها» — سلولِ یکپارچه، اکسپندشونده، روی سایدبارِ تیره ===== */
+/* ===== درخت «مشتریان و پروژه‌ها» — سلول یکپارچه، اکسپندشونده، روی سایدبار تیره ===== */
 .nav-tree{display:flex;flex-direction:column}
-/* هر ردیف یک «سلولِ یکپارچه» است: پس‌زمینه/گردی و حالت‌ها روی خودِ ردیف‌اند، نه دکمه‌های داخلش؛
-   نام و فلش هر دو داخلِ همین سلول‌اند (فلش بخشی از سلول). */
+/* هر ردیف یک «سلول یکپارچه» است: پس‌زمینه/گردی و حالت‌ها روی خود ردیف‌اند، نه دکمه‌های داخلش؛
+   نام و فلش هر دو داخل همین سلول‌اند (فلش بخشی از سلول). */
 .nav-trow{display:flex;align-items:stretch;border-radius:9px;margin:1px 0;position:relative;transition:background .15s,box-shadow .15s}
-/* فقط ردیف‌هایِ داخلِ درخت (مشتری‌ها) کنارِ خطِ راهنما قرار می‌گیرند؛
-   پس فقط باکسِ همین‌ها از سمتِ خط تورفته می‌شود تا تداخل نکند.
-   ردیف‌هایِ اصلیِ منو خطی کنارشان نیست و دست‌نخورده می‌مانند. */
+/* فقط ردیف‌های داخل درخت (مشتری‌ها) کنار خط راهنما قرار می‌گیرند؛
+   پس فقط باکس همین‌ها از سمت خط تورفته می‌شود تا تداخل نکند.
+   ردیف‌های اصلی منو خطی کنارشان نیست و دست‌نخورده می‌مانند. */
 .nav-children .nav-trow{margin-inline-start:var(--nav-pad)}
-/* نوارِ لبهٔ زیرلایه‌ها باریک‌تر از لایهٔ اصلی: ردیفِ مشتری کوتاه‌تر است،
-   پس همان پهنای ۳px در برابرِ ارتفاعِ کمتر، ضخیم‌تر دیده می‌شود. */
+/* نوار لبهٔ زیرلایه‌ها باریک‌تر از لایهٔ اصلی: ردیف مشتری کوتاه‌تر است،
+   پس همان پهنای ۳px در برابر ارتفاع کمتر، ضخیم‌تر دیده می‌شود. */
 .nav-children .nav-trow::before{width:2px;height:15px}
 .nav-trow:hover{background:rgba(255,255,255,0.10)}
-/* موردِ جاری (سلولِ ریشه یا مشتریِ انتخابی): تینت + نوارِ لبهٔ ثابت — مثلِ قبل */
+/* مورد جاری (سلول ریشه یا مشتری انتخابی): تینت + نوار لبهٔ ثابت — مثل قبل */
 .nav-trow.cur,.nav-trow:has(.nav-tmain.active){background:rgba(247,148,31,0.14)}
 .nav-trow.cur:hover,.nav-trow:has(.nav-tmain.active):hover{background:rgba(247,148,31,0.22)}
-/* نشانگرِ لبه — همیشه موجود ولی پنهان؛ هنگامِ cur/active با همان انیمیشنِ بیرون‌آمدن+کشیده‌شدن آشکار می‌شود */
+/* نشانگر لبه — همیشه موجود ولی پنهان؛ هنگام cur/active با همان انیمیشن بیرون‌آمدن+کشیده‌شدن آشکار می‌شود */
 .nav-trow::before{content:"";position:absolute;top:50%;inset-inline-start:0;z-index:1;pointer-events:none;
   width:3px;height:18px;border-radius:3px;background:var(--brand);
   transform:translateY(-50%) translateX(6px) scaleY(0);
   transition:transform .28s cubic-bezier(.2,0,0,1)}
 .nav-trow.cur::before,.nav-trow:has(.nav-tmain.active)::before{transform:translateY(-50%) translateX(0) scaleY(1)}
 @media(prefers-reduced-motion:reduce){.nav-item::before,.nav-trow::before{transition:none}}
-/* دکمه‌های داخلِ سلول شفاف‌اند و پس‌زمینه/گردیِ مستقل ندارند */
+/* دکمه‌های داخل سلول شفاف‌اند و پس‌زمینه/گردی مستقل ندارند */
 .nav-trow .nav-item,.nav-trow .nav-leaf{background:none!important;box-shadow:none!important;border-radius:0}
 .nav-trow:hover .nav-item,.nav-trow:hover .nav-leaf,.nav-trow:hover .nav-exp{color:#ffffff}
-/* متن، آیکون و چِورونِ موردِ جاری همگی نارنجی می‌شوند (currentColor).
-   والدِ روی مسیر (.path) نارنجی نمی‌شود — فقط عمیق‌ترین موردِ انتخابی نارنجی است. */
+/* متن، آیکون و چورون مورد جاری همگی نارنجی می‌شوند (currentColor).
+   والد روی مسیر (.path) نارنجی نمی‌شود — فقط عمیق‌ترین مورد انتخابی نارنجی است. */
 .nav-trow.cur .nav-leaf,
 .nav-trow:has(.nav-tmain.active) .nav-item,
 .nav-trow.cur .nav-exp,.nav-trow:has(.nav-tmain.active) .nav-exp{color:var(--brand)}
 
 .nav-trow .nav-item.active{background:none!important}
-.nav-trow .nav-item::before{content:none}   /* داخلِ درخت، نشانگر روی خودِ ردیف (.nav-trow) است نه دکمه */
+.nav-trow .nav-item::before{content:none}   /* داخل درخت، نشانگر روی خود ردیف (.nav-trow) است نه دکمه */
 .nav-trow .nav-tmain{flex:1 1 0;min-width:0;width:auto}
-/* فلشِ اکسپند: بخشی از سلول (کشیده به تمامِ ارتفاعِ سلول، بدونِ پس‌زمینهٔ جدا) */
+/* فلش اکسپند: بخشی از سلول (کشیده به تمام ارتفاع سلول، بدون پس‌زمینهٔ جدا) */
 .nav-exp{width:34px;align-self:stretch;flex-shrink:0;display:grid;place-items:center;border:none;background:none;
   color:rgba(255,255,255,0.5);cursor:pointer;padding:0;transition:color .15s}
 .nav-exp:hover{color:#ffffff}
 .nav-exp:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f99}
 .nav-exp .chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
-/* استثنا از قانونِ «باز = فلشِ نارنجی»: اینجا نارنجی معنیِ «موردِ جاری» را دارد،
-   پس فلشِ باز رنگ عوض نمی‌کند و فقط می‌چرخد. */
+/* استثنا از قانون «باز = فلش نارنجی»: اینجا نارنجی معنی «مورد جاری» را دارد،
+   پس فلش باز رنگ عوض نمی‌کند و فقط می‌چرخد. */
 .nav-exp.open .chev{transform:rotate(180deg)}
-.nav-exp-sp{width:34px;flex-shrink:0}   /* جای‌گیرِ فلش برای مشتریِ بدونِ پروژه */
-/* ظرفِ آکاردئونی: بازشدنِ نرمِ ارتفاع با ترفندِ گرید 0fr↔1fr (تنها راهِ انیمیشنِ height تا «اندازهٔ محتوا»).
-   فرزندِ داخلی overflow:hidden دارد تا هنگامِ بسته‌بودن محتوا و حاشیه‌هایش بریده شوند. */
+.nav-exp-sp{width:34px;flex-shrink:0}   /* جای‌گیر فلش برای مشتری بدون پروژه */
+/* ظرف آکاردئونی: بازشدن نرم ارتفاع با ترفند گرید 0fr↔1fr (تنها راه انیمیشن height تا «اندازهٔ محتوا»).
+   فرزند داخلی overflow:hidden دارد تا هنگام بسته‌بودن محتوا و حاشیه‌هایش بریده شوند. */
 .nav-collapse{display:grid;grid-template-rows:0fr;opacity:0;
   transition:grid-template-rows .3s cubic-bezier(0,0,.2,1),opacity .28s cubic-bezier(0,0,.2,1)}
 .nav-collapse.open{grid-template-rows:1fr;opacity:1}
 .nav-collapse-inner{overflow:hidden;min-height:0}
-/* پخشِ آبشاریِ آیتم‌های تازه‌نمایان (فقط هنگامِ باز‌کردنِ کاربر: کلاسِ موقتِ nav-anim). با > از نشتِ به ظرف‌های تودرتو جلوگیری می‌شود. */
+/* پخش آبشاری آیتم‌های تازه‌نمایان (فقط هنگام باز‌کردن کاربر: کلاس موقت nav-anim). با > از نشت به ظرف‌های تودرتو جلوگیری می‌شود. */
 @keyframes navRise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 .nav-anim>.nav-collapse-inner>.nav-children>.nav-cnode,
 .nav-anim>.nav-collapse-inner>.nav-projwrap>.nav-pleaf{animation:navRise .34s cubic-bezier(0,0,.2,1) both}
@@ -132,41 +132,41 @@ body.modal-open #appView{overflow:hidden}
   .nav-anim>.nav-collapse-inner>.nav-children>.nav-cnode,
   .nav-anim>.nav-collapse-inner>.nav-projwrap>.nav-pleaf{animation:none}
 }
-/* بدنهٔ فرزندانِ ریشه (مشتری‌ها): تورفته + خطِ راهنمای عمودی پشت‌شان (RTL: سمت راست) — مثلِ رفرنس.
-   ⚠ خط دقیقاً از مرکزِ آیکونِ ردیفِ بالایی رد می‌شود:
-   .nav-item پدینگِ افقیِ 12px دارد و آیکون 17px است → مرکز = 12 + 17/2 = 20.5px.
-   خودِ خط 1.5px پهنا دارد، پس margin = 20.5 − 0.75 = 19.75px تا مرکزِ خط روی مرکزِ آیکون بنشیند.
-   پدینگ هم کم می‌شود تا تورفتگیِ نهاییِ محتوا دست‌نخورده بماند (19.75+1.5+ـ ≈ همانِ قبل). */
+/* بدنهٔ فرزندان ریشه (مشتری‌ها): تورفته + خط راهنمای عمودی پشت‌شان (RTL: سمت راست) — مثل رفرنس.
+   ⚠ خط دقیقاً از مرکز آیکون ردیف بالایی رد می‌شود:
+   .nav-item پدینگ افقی 12px دارد و آیکون 17px است → مرکز = 12 + 17/2 = 20.5px.
+   خود خط 1.5px پهنا دارد، پس margin = 20.5 − 0.75 = 19.75px تا مرکز خط روی مرکز آیکون بنشیند.
+   پدینگ هم کم می‌شود تا تورفتگی نهایی محتوا دست‌نخورده بماند (19.75+1.5+ـ ≈ همان قبل). */
 .nav-children{display:flex;flex-direction:column;gap:1px;margin:4px 0 4px;
   margin-inline-start:19.75px;border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:0}
 .nav-cnode{display:flex;flex-direction:column}
-/* برگ (دکمهٔ رفتن به مشتری) داخلِ سلول */
+/* برگ (دکمهٔ رفتن به مشتری) داخل سلول */
 .nav-leaf{flex:1 1 0;min-width:0;display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;
   font-family:inherit;color:#fff;text-align:right;
   padding:8px 10px;transition:color .15s}
 .nav-leaf .nav-lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nav-leaf:focus-visible{outline:none;box-shadow:0 0 0 3px #f7941f55;border-radius:8px}
-/* سطحِ ۱: مشتری‌ها (لوگوی کوچک + نام) — وزنِ ۴۰۰: یک پله سبک‌تر از آیتم‌های بالا (۵۰۰) */
+/* سطح ۱: مشتری‌ها (لوگوی کوچک + نام) — وزن ۴۰۰: یک پله سبک‌تر از آیتم‌های بالا (۵۰۰) */
 .nav-cleaf{font-size:12.5px;font-weight:400}
 .nav-ci-logo{width:20px;height:20px;border-radius:6px;flex-shrink:0;object-fit:contain;background:#fff}
 .nav-ci-ph{width:20px;height:20px;border-radius:6px;flex-shrink:0;display:grid;place-items:center;
   font-size:9px;font-weight:800;color:#fff;background:rgba(255,255,255,0.2);letter-spacing:.02em}
-/* سطحِ ۲: پروژه‌ها — یک پله تورفته‌تر از مشتری، با خطِ راهنمای عمودیِ خودشان (RTL: سمت راست).
-   ⚠ همان قاعده: خط از مرکزِ لوگویِ مشتری رد می‌شود.
-   .nav-leaf پدینگِ افقیِ 10px دارد و لوگو 20px است → مرکز = 10 + 20/2 = 20px
-   از لبهٔ محتوایِ .nav-children (همان جایی که .nav-cnode شروع می‌شود).
+/* سطح ۲: پروژه‌ها — یک پله تورفته‌تر از مشتری، با خط راهنمای عمودی خودشان (RTL: سمت راست).
+   ⚠ همان قاعده: خط از مرکز لوگوی مشتری رد می‌شود.
+   .nav-leaf پدینگ افقی 10px دارد و لوگو 20px است → مرکز = 10 + 20/2 = 20px
+   از لبهٔ محتوای .nav-children (همان جایی که .nav-cnode شروع می‌شود).
    پس margin = 20 − 0.75 = 19.25px. */
 .nav-projwrap{display:flex;flex-direction:column;gap:1px;margin:2px 0 5px;
-  /* ردیفِ مشتری خودش --nav-pad تورفته شده، پس لوگویش هم همان‌قدر جابه‌جا شده؛
-     خطِ سطحِ ۲ باید همان جابه‌جایی را بگیرد تا روی مرکزِ لوگو بماند. */
+  /* ردیف مشتری خودش --nav-pad تورفته شده، پس لوگویش هم همان‌قدر جابه‌جا شده؛
+     خط سطح ۲ باید همان جابه‌جایی را بگیرد تا روی مرکز لوگو بماند. */
   margin-inline-start:calc(19.25px + var(--nav-pad));
   border-inline-start:1.5px solid rgba(255,255,255,0.15);padding-inline-start:3px}
-/* سطحِ ۲: پروژه‌ها — وزنِ ۳۰۰ (سبک‌ترین)، سفیدِ کامل؛ گرادیانِ وزن لایه‌لایه‌بودن را نشان می‌دهد */
+/* سطح ۲: پروژه‌ها — وزن ۳۰۰ (سبک‌ترین)، سفید کامل؛ گرادیان وزن لایه‌لایه‌بودن را نشان می‌دهد */
 .nav-pleaf{font-size:12px;color:#fff;font-weight:300;padding:7px 10px;border-radius:8px;transition:.15s}
 .nav-pleaf:hover{background:rgba(255,255,255,0.08);color:#ffffff}
 .nav-pleaf .nav-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.8);flex-shrink:0;transition:.15s}
 .nav-pleaf:hover .nav-dot{background:var(--brand)}
-/* پروژهٔ جاری: تینت + متنِ نارنجی + نقطهٔ نارنجی (بدونِ نوار — نقطه نشانگر است) */
+/* پروژهٔ جاری: تینت + متن نارنجی + نقطهٔ نارنجی (بدون نوار — نقطه نشانگر است) */
 .nav-pleaf.cur{background:rgba(247,148,31,0.14);color:var(--brand)}
 .nav-pleaf.cur:hover{background:rgba(247,148,31,0.22);color:var(--brand)}
 .nav-pleaf.cur .nav-dot{background:var(--brand)}
@@ -174,7 +174,7 @@ body.modal-open #appView{overflow:hidden}
 
 /* ===== بدنه: با حاشیهٔ راست برای جا دادن سایدبار ===== */
 .app-body{margin-right:220px;transition:margin-right .28s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;min-height:100vh}
-/* هنگامِ باز بودنِ درختِ منو، سایدبار با انیمیشن پهن‌تر می‌شود (و بدنه همراهش) */
+/* هنگام باز بودن درخت منو، سایدبار با انیمیشن پهن‌تر می‌شود (و بدنه همراهش) */
 body.sb-wide .sidebar{width:308px}
 body.sb-wide .app-body{margin-right:308px}
 
@@ -186,7 +186,7 @@ body.sb-wide .app-body{margin-right:308px}
 .user-badge{display:flex;align-items:center;gap:10px}
 .user-avatar{width:38px;height:38px;border-radius:50%;flex-shrink:0;display:grid;place-items:center;
   background:var(--brand);color:#fff;font-weight:800;font-size:16px;line-height:1}
-/* حلقهٔ نارنجیِ داخلی دورِ آواتارِ کاربرِ جاری (هم‌شکلِ آواتارِ فعال در جدولِ کاربران) */
+/* حلقهٔ نارنجی داخلی دور آواتار کاربر جاری (هم‌شکل آواتار فعال در جدول کاربران) */
 .user-avatar.emoji{background:#f2f1ee;font-size:22px;box-shadow:inset 0 0 0 2px var(--brand)}
 .user-meta{display:flex;flex-direction:row;align-items:center;gap:16px}
 .user-name{font-size:16.5px;font-weight:800;color:var(--txt);white-space:nowrap}
@@ -194,12 +194,12 @@ body.sb-wide .app-body{margin-right:308px}
 .top-bar-left{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:13px;font-weight:500;justify-content:flex-end}
 .top-bar-left>svg{width:15px;height:15px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .top-clock{white-space:nowrap;font-weight:500;display:inline-flex;align-items:center}
-/* خطِ جداکنندهٔ بینِ تاریخ و دکمهٔ انتقال — هم‌سبکِ جداکنندهٔ نقش/سمتِ کاربر (۱px + ۱۶px فاصله) */
+/* خط جداکنندهٔ بین تاریخ و دکمهٔ انتقال — هم‌سبک جداکنندهٔ نقش/سمت کاربر (۱px + ۱۶px فاصله) */
 .tb-sep{align-self:center;width:1px;height:18px;background:var(--line);margin-inline:9px;flex-shrink:0}
 
 /* ===== محتوای اصلی ===== */
-/* ⚠ پدینگِ پایین از ۶۰ به ۲۸ آمد. آن ۶۰ فضای ثابتی بود که «خالی» دیده می‌شد
-   ولی هیچ رشدی را جذب نمی‌کرد و بیشترِ ذخیرهٔ صفحه را می‌خورد؛ با کارت که
+/* ⚠ پدینگ پایین از ۶۰ به ۲۸ آمد. آن ۶۰ فضای ثابتی بود که «خالی» دیده می‌شد
+   ولی هیچ رشدی را جذب نمی‌کرد و بیشتر ذخیرهٔ صفحه را می‌خورد؛ با کارت که
    خودش ۲۰px حاشیهٔ پایین دارد، ۲۸ هم کافی است و ۳۲px ذخیره آزاد می‌کند. */
 .app-main{flex:1;padding:22px 24px 28px;background:var(--bg)}
 main{max-width:none;margin:0;padding:0}
@@ -208,25 +208,25 @@ main{max-width:none;margin:0;padding:0}
 .app-footer{border-top:1px solid var(--line);background:#fff;padding:6px 24px;text-align:center;
   font-size:10.5px;color:var(--muted);line-height:1.6}
 
-/* ===== آیکون‌های اصلیِ منو: تغییرِ ظریفِ حالتِ انتخاب‌شده، با انیمیشن =====
+/* ===== آیکون‌های اصلی منو: تغییر ظریف حالت انتخاب‌شده، با انیمیشن =====
    نکتهٔ کلیدی: آیکون عوض نمی‌شود؛ اجزای همان SVG جابه‌جا/چرخانده می‌شوند.
-   جای‌گزینیِ کاملِ شکل قابلِ انیمیشن نیست، ولی transform روی اجزا هست.
-   همهٔ چرخش‌ها transform-box:fill-box دارند تا مبدأ نسبت به خودِ شکل باشد
+   جای‌گزینی کامل شکل قابل انیمیشن نیست، ولی transform روی اجزا هست.
+   همهٔ چرخش‌ها transform-box:fill-box دارند تا مبدأ نسبت به خود شکل باشد
    نه نسبت به viewBox — وگرنه اجزا از قاب بیرون می‌زنند. */
 .nav-item .ni *{transition:transform .32s cubic-bezier(.34,1.3,.64,1),opacity .24s ease}
 .nav-item .ni *{transform-box:fill-box;transform-origin:50% 50%}
 @media(prefers-reduced-motion:reduce){.nav-item .ni *{transition:none}}
 
-/* داشبورد — حالتِ فعال: دو مربعِ توخالیِ سطرِ پایین قرینه به دو
-   طرف خارج می‌شوند و هم‌زمان یک مستطیلِ تو‌پُرِ نارنجی از وسط به دو
-   طرف باز می‌شود. دو کاشیِ بالا دست‌نخورده می‌مانند.
-   ⚠ مستطیل یک شکلِ جداست (نه حاصلِ کشیدنِ یکی از مربع‌ها)، وگرنه
+/* داشبورد — حالت فعال: دو مربع توخالی سطر پایین قرینه به دو
+   طرف خارج می‌شوند و هم‌زمان یک مستطیل تو‌پر نارنجی از وسط به دو
+   طرف باز می‌شود. دو کاشی بالا دست‌نخورده می‌مانند.
+   ⚠ مستطیل یک شکل جداست (نه حاصل کشیدن یکی از مربع‌ها)، وگرنه
    نمی‌شد هم‌زمان هم از وسط باز شود و هم مربع‌ها مستقل خارج شوند. */
 .ni-dash .q,.ni-dash .q-bar{transition:transform .34s cubic-bezier(.4,0,.2,1),opacity .22s ease,visibility .34s}
-/* مستطیل در حالتِ عادی کاملاً نامرئی است.
-   ⚠ scaleX(0) به‌تنهایی کافی نیست: گوشهٔ گرد در عرضِ صفر باز هم
-   یک باریکه رسم می‌کند و آیکونِ غیرفعال را عوض می‌کرد؛
-   visibility آن را قطعی از رسم خارج می‌کند (و قابلِ انیمیشن هم هست). */
+/* مستطیل در حالت عادی کاملاً نامرئی است.
+   ⚠ scaleX(0) به‌تنهایی کافی نیست: گوشهٔ گرد در عرض صفر باز هم
+   یک باریکه رسم می‌کند و آیکون غیرفعال را عوض می‌کرد؛
+   visibility آن را قطعی از رسم خارج می‌کند (و قابل انیمیشن هم هست). */
 .ni-dash .q-bar{transform-box:view-box;transform-origin:12px 17.5px;
   transform:scaleX(0);opacity:0;visibility:hidden}
 .nav-item.active .ni-dash .q-bar{visibility:visible}
@@ -235,14 +235,14 @@ main{max-width:none;margin:0;padding:0}
 .nav-item.active .ni-dash .q3{transform:translateX(-13px);opacity:0}
 .nav-item.active .ni-dash .q4{transform:translateX(13px);opacity:0}
 
-/* پوشه: پنلِ جلویی در حالتِ عادی نامرئی است؛ در حالتِ فعال
-   محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالاییِ خودِ پنل است. */
+/* پوشه: پنل جلویی در حالت عادی نامرئی است؛ در حالت فعال
+   محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالایی خود پنل است. */
 .ni-folder .fd-lid{transform-origin:50% 0;transform:scaleY(.55);opacity:0}
 .nav-item.active .ni-folder .fd-lid{opacity:1;transform:scaleY(1) rotate(-4deg)}
 
-/* مشتریان و پروژه‌ها: کارخانه — در حالتِ عادی خاموش است؛ با انتخاب، پنجره‌ها
-   پلکانی روشن می‌شوند و دودِ کوره بالا می‌رود («کارخانه راه افتاد»).
-   گذارها از قاعدهٔ عمومیِ .nav-item .ni * می‌آیند، پس خروج هم خودکار برعکس می‌شود. */
+/* مشتریان و پروژه‌ها: کارخانه — در حالت عادی خاموش است؛ با انتخاب، پنجره‌ها
+   پلکانی روشن می‌شوند و دود کوره بالا می‌رود («کارخانه راه افتاد»).
+   گذارها از قاعدهٔ عمومی .nav-item .ni * می‌آیند، پس خروج هم خودکار برعکس می‌شود. */
 .ni-clients .cl-w1,.ni-clients .cl-w2,.ni-clients .cl-w3{opacity:.35;transform:scale(.7)}
 .nav-item.active .ni-clients .cl-w1,
 .nav-item.active .ni-clients .cl-w2,
@@ -257,33 +257,33 @@ main{max-width:none;margin:0;padding:0}
   .ni-clients .cl-smoke{opacity:0}}
 
 /* آرشیو: ذره‌بین دو بار «می‌گردد» — پایین می‌رود، به چپ کج می‌شود، به راست
-   برمی‌گردد و صاف می‌ایستد — و هم‌زمان نقطه‌ای داخلِ شیشه باز می‌شود، می‌ماند
-   و بعد به‌صورتِ حلقه‌ای به بیرون می‌ترکد و محو می‌شود («پیدا شد»).
+   برمی‌گردد و صاف می‌ایستد — و هم‌زمان نقطه‌ای داخل شیشه باز می‌شود، می‌ماند
+   و بعد به‌صورت حلقه‌ای به بیرون می‌ترکد و محو می‌شود («پیدا شد»).
 
-   کوریوگرافی و زمان‌بندی عیناً از یک انیمیشنِ Lottie برداشته شده (۶۰ فریم روی
+   کوریوگرافی و زمان‌بندی عیناً از یک انیمیشن Lottie برداشته شده (۶۰ فریم روی
    ۶۰fps = یک ثانیه) ولی با CSS بازسازی شد، نه با پخش‌کنندهٔ Lottie: کتابخانه‌اش
-   ~۲۵۰KB است برای یک آیکون، رنگش داخلِ فایل قفل است و با فعال‌شدن نارنجی
-   نمی‌شود، و کنترلِ حالت جاوااسکریپت می‌خواست. هندسه و ضخامتِ ۱٫۸ همان آیکونِ
-   قبلی ماند تا در کنارِ پنج آیکونِ دیگر یکدست بماند.
+   ~۲۵۰KB است برای یک آیکون، رنگش داخل فایل قفل است و با فعال‌شدن نارنجی
+   نمی‌شود، و کنترل حالت جاوااسکریپت می‌خواست. هندسه و ضخامت ۱٫۸ همان آیکون
+   قبلی ماند تا در کنار پنج آیکون دیگر یکدست بماند.
 
-   ⚠ قاعدهٔ کلی بالا fill-box می‌دهد؛ اینجا مختصاتِ viewBox لازم است تا چرخش
-   حولِ نقطه‌ای روی دسته باشد، نه حولِ کادرِ خودِ شکل. */
+   ⚠ قاعدهٔ کلی بالا fill-box می‌دهد؛ اینجا مختصات viewBox لازم است تا چرخش
+   حول نقطه‌ای روی دسته باشد، نه حول کادر خود شکل. */
 .ni-search .sr-bob,.ni-search .sr-mag{transform-box:view-box;transform-origin:11px 11px}
-/* مبدأ چرخش روی دسته است، نه مرکزِ شیشه: نسبتِ ۰٫۷۳ از مرکز تا نوکِ دسته —
-   همان نسبتی که در فایلِ اصلی بود. حسِ «گرفتنِ دسته و گرداندنِ ذره‌بین». */
+/* مبدأ چرخش روی دسته است، نه مرکز شیشه: نسبت ۰٫۷۳ از مرکز تا نوک دسته —
+   همان نسبتی که در فایل اصلی بود. حس «گرفتن دسته و گرداندن ذره‌بین». */
 .ni-search .sr-mag{transform-origin:18.3px 18.3px}
-/* «گشتنِ» ذره‌بین هنگامِ انتخاب — یک دور، نه دو دور: فایلِ اصلی چون لوپ بود دو
-   دور داشت، ولی اینجا واکنش به یک کلیک است و باید هم‌ریتمِ بقیهٔ گذارهای سایت
+/* «گشتن» ذره‌بین هنگام انتخاب — یک دور، نه دو دور: فایل اصلی چون لوپ بود دو
+   دور داشت، ولی اینجا واکنش به یک کلیک است و باید هم‌ریتم بقیهٔ گذارهای سایت
    (~۰٫۳ ثانیه) باشد.
-   خروج = عیناً همین انیمیشن با direction:reverse — هم کی‌فریم‌ها و هم منحنیِ
-   زمان برعکس می‌شوند، پس مسیرِ رفت و برگشت دقیقاً یکی است. کلاسِ leaving را
+   خروج = عیناً همین انیمیشن با direction:reverse — هم کی‌فریم‌ها و هم منحنی
+   زمان برعکس می‌شوند، پس مسیر رفت و برگشت دقیقاً یکی است. کلاس leaving را
    switchTab روی آیتمی می‌گذارد که همین حالا فعال بود. */
 .nav-item.active .ni-search .sr-bob{animation:srBob .5s cubic-bezier(.33,0,.67,1)}
 .nav-item.active .ni-search .sr-mag{animation:srSwing .5s cubic-bezier(.33,0,.67,1)}
-/* ⚠ نامِ انیمیشن باید *متفاوت* باشد، وگرنه هیچ اتفاقی نمی‌افتد: وقتی
-   animation-name عوض نشود، مرورگر انیمیشنِ در‌حالِ‌اجرا را ادامه می‌دهد و
-   دوباره از صفر شروعش نمی‌کند. انیمیشنِ ورود تمام شده بود، پس با همان نام و
-   direction:reverse فقط به فریمِ پایانیِ معکوس می‌پرید — یعنی ظاهراً هیچ
+/* ⚠ نام انیمیشن باید *متفاوت* باشد، وگرنه هیچ اتفاقی نمی‌افتد: وقتی
+   animation-name عوض نشود، مرورگر انیمیشن در‌حال‌اجرا را ادامه می‌دهد و
+   دوباره از صفر شروعش نمی‌کند. انیمیشن ورود تمام شده بود، پس با همان نام و
+   direction:reverse فقط به فریم پایانی معکوس می‌پرید — یعنی ظاهراً هیچ
    برگشتی دیده نمی‌شد. کی‌فریم‌ها عیناً همان‌اند، فقط نام فرق دارد. */
 .nav-item.leaving .ni-search .sr-bob{animation:srBobOut .5s cubic-bezier(.33,0,.67,1) reverse}
 .nav-item.leaving .ni-search .sr-mag{animation:srSwingOut .5s cubic-bezier(.33,0,.67,1) reverse}
@@ -297,7 +297,7 @@ main{max-width:none;margin:0;padding:0}
   26.67%{transform:translateY(1.2px)}
   60%{transform:translateY(-.8px)}
   90%,100%{transform:translateY(0)}}
-/* دوقلوهای برگشت — محتوا یکسان، فقط نام جدا تا مرورگر انیمیشنِ تازه بسازد */
+/* دوقلوهای برگشت — محتوا یکسان، فقط نام جدا تا مرورگر انیمیشن تازه بسازد */
 @keyframes srSwingOut{
   0%{transform:rotate(0)}
   33.33%{transform:rotate(-13deg)}
@@ -308,26 +308,26 @@ main{max-width:none;margin:0;padding:0}
   26.67%{transform:translateY(1.2px)}
   60%{transform:translateY(-.8px)}
   90%,100%{transform:translateY(0)}}
-/* نقطهٔ داخلِ شیشه = *حالتِ انتخاب*، نه یک جلوهٔ گذرا. با transition ساخته
+/* نقطهٔ داخل شیشه = *حالت انتخاب*، نه یک جلوهٔ گذرا. با transition ساخته
    می‌شود نه animation، تا در هر دو جهت برود و بیاید: انتخاب ⟵ باز می‌شود و
-   می‌ماند، ترکِ تب ⟵ همان مسیر را برمی‌گردد.
-   ⚠ فازِ «ترکیدنِ حلقه» ی فایلِ اصلی حذف شد: آنجا نقطه در پایان خورده می‌شد و
-   چیزی نمی‌ماند، ولی اینجا نقطه باید بماند تا تبِ فعال نشانهٔ ماندگار داشته باشد.
-   دایرهٔ خط‌دار به‌جای تو‌پُر: قرصِ تو‌پُرِ شعاعِ R ⟵ r = R/2 و stroke-width = R.
-   شعاعِ ۵٫۳ از نسبتِ ۰٫۷۵ برابرِ شعاعِ داخلیِ شیشه (۷٫۱) درآمده — همان نسبتِ
-   فایلِ اصلی. منحنی همان cubic-bezier نوارِ کناری است (با کمی سرریز). */
-/* ⚠ animation و نه transition: با transition، منحنیِ سرریزدار در مسیرِ برگشت
-   باعث می‌شد شعاع زیرِ صفر برود و مرورگر آن را کلمپ کند — برگشت ناقص و بریده
-   دیده می‌شد. با animation + direction:reverse مسیرِ برگشت دقیقاً آینهٔ رفت
-   است و سرریز به‌جای فرورفتگی، یک «خیزِ» کوچک پیش از جمع‌شدن می‌سازد.
-   forwards روی حالتِ فعال لازم است تا نقطه بماند؛ این یک *حالت* است نه جلوه. */
+   می‌ماند، ترک تب ⟵ همان مسیر را برمی‌گردد.
+   ⚠ فاز «ترکیدن حلقه» ی فایل اصلی حذف شد: آنجا نقطه در پایان خورده می‌شد و
+   چیزی نمی‌ماند، ولی اینجا نقطه باید بماند تا تب فعال نشانهٔ ماندگار داشته باشد.
+   دایرهٔ خط‌دار به‌جای تو‌پر: قرص تو‌پر شعاع R ⟵ r = R/2 و stroke-width = R.
+   شعاع ۵٫۳ از نسبت ۰٫۷۵ برابر شعاع داخلی شیشه (۷٫۱) درآمده — همان نسبت
+   فایل اصلی. منحنی همان cubic-bezier نوار کناری است (با کمی سرریز). */
+/* ⚠ animation و نه transition: با transition، منحنی سرریزدار در مسیر برگشت
+   باعث می‌شد شعاع زیر صفر برود و مرورگر آن را کلمپ کند — برگشت ناقص و بریده
+   دیده می‌شد. با animation + direction:reverse مسیر برگشت دقیقاً آینهٔ رفت
+   است و سرریز به‌جای فرورفتگی، یک «خیز» کوچک پیش از جمع‌شدن می‌سازد.
+   forwards روی حالت فعال لازم است تا نقطه بماند؛ این یک *حالت* است نه جلوه. */
 .ni-search .sr-dot{r:0px;stroke-width:0}
 .nav-item.active .ni-search .sr-dot{animation:srDot .32s cubic-bezier(.34,1.3,.64,1) forwards}
 .nav-item.leaving .ni-search .sr-dot{animation:srDotOut .32s cubic-bezier(.34,1.3,.64,1) reverse}
 @keyframes srDot{from{r:0px;stroke-width:0}to{r:2.65px;stroke-width:5.3}}
 @keyframes srDotOut{from{r:0px;stroke-width:0}to{r:2.65px;stroke-width:5.3}}
-/* کاهشِ حرکت: تکان‌ها خاموش، ولی نقطه می‌ماند — آن یک *حالت* است نه جلوه،
-   و حذفش نشانهٔ تبِ فعال را از بین می‌برد. */
+/* کاهش حرکت: تکان‌ها خاموش، ولی نقطه می‌ماند — آن یک *حالت* است نه جلوه،
+   و حذفش نشانهٔ تب فعال را از بین می‌برد. */
 @media(prefers-reduced-motion:reduce){
   .nav-item.active .ni-search .sr-bob,.nav-item.active .ni-search .sr-mag,
   .nav-item.leaving .ni-search .sr-bob,.nav-item.leaving .ni-search .sr-mag,
@@ -335,7 +335,7 @@ main{max-width:none;margin:0;padding:0}
   .nav-item.active .ni-search .sr-dot{animation:none;r:2.65px;stroke-width:5.3}}
 
 /* سطل زباله: درب بلند می‌شود و زاویه می‌گیرد (لولا روی گوشهٔ راست) */
-/* ⚠ svg به‌طورِ پیش‌فرض overflow:hidden دارد، پس دربِ بلندشده از لبهٔ viewBox
+/* ⚠ svg به‌طور پیش‌فرض overflow:hidden دارد، پس درب بلندشده از لبهٔ viewBox
    بریده می‌شد و بالارفتنش دیده نمی‌شد. فقط همین آیکون اجازهٔ سرریز می‌گیرد. */
 .ni-trash{overflow:visible}
 .ni-trash .tr-lid{transform-origin:88% 90%}
@@ -343,17 +343,17 @@ main{max-width:none;margin:0;padding:0}
 .nav-item.active .ni-trash .tr-b1{transform:translateY(.6px)}
 .nav-item.active .ni-trash .tr-b2{transform:translateY(.6px)}
 
-/* ===== آیکون‌های پایینِ منو ===== */
+/* ===== آیکون‌های پایین منو ===== */
 
 /* تنظیمات: چرخدنده یک دور کامل می‌چرخد و می‌ایستد. چون چرخش «رویداد» است نه
-   «حالت»، با keyframes اجرا می‌شود؛ transition فقط بینِ دو حالتِ ثابت کار می‌کند.
-   محورِ چرخش مرکزِ خودِ چرخدنده است (view-box)، وگرنه حولِ کادرِ هر جزء می‌چرخید. */
+   «حالت»، با keyframes اجرا می‌شود؛ transition فقط بین دو حالت ثابت کار می‌کند.
+   محور چرخش مرکز خود چرخدنده است (view-box)، وگرنه حول کادر هر جزء می‌چرخید. */
 .ni-gear .gr-teeth,.ni-gear .gr-hub{transform-box:view-box;transform-origin:12px 12px}
 @keyframes gearSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .nav-item.active .ni-gear .gr-teeth{animation:gearSpin .72s cubic-bezier(.35,0,.15,1) both}
 
-/* راهنما: حلقه یک ضربان می‌گیرد و علامتِ سؤال کمی بالا/پایین می‌رود (اشارهٔ «بپرس») */
-/* حلقه و علامتِ سؤال یک‌جا حرکت می‌کنند (یک کی‌فریم روی هر دو،
+/* راهنما: حلقه یک ضربان می‌گیرد و علامت سؤال کمی بالا/پایین می‌رود (اشارهٔ «بپرس») */
+/* حلقه و علامت سؤال یک‌جا حرکت می‌کنند (یک کی‌فریم روی هر دو،
    با همان مبدأ) تا آیکون یکپارچه دیده شود نه دو لایهٔ جدا. */
 .ni-help .hp-ring,.ni-help .hp-mark{transform-box:view-box;transform-origin:12px 12px}
 @keyframes helpPop{0%{transform:scale(1)}40%{transform:scale(1.14)}
@@ -361,7 +361,7 @@ main{max-width:none;margin:0;padding:0}
 .nav-item.active .ni-help .hp-ring,
 .nav-item.active .ni-help .hp-mark{animation:helpPop .55s cubic-bezier(.34,1.4,.64,1) both}
 
-/* خروج: فلش از راست بیرون می‌رود و بلافاصله از چپ وارد می‌شود و سرِ جایش می‌ایستد.
+/* خروج: فلش از راست بیرون می‌رود و بلافاصله از چپ وارد می‌شود و سر جایش می‌ایستد.
    opacity در لحظهٔ پرش صفر می‌شود تا «برگشتن» دیده نشود و حرکت یک‌طرفه بماند. */
 .ni-out .lo-arrow{transform-box:view-box;transform-origin:12px 12px}
 @keyframes outSlide{

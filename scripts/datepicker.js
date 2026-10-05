@@ -1,13 +1,13 @@
-/* ================= انتخابگرِ تاریخِ دوتقویمی (شمسی / میلادی) =================
-   ورودیِ تاریخِ مرورگر فقط میلادی است؛ این جزء همان کار را با امکانِ جابه‌جایی بینِ دو
-   تقویم انجام می‌دهد. مقدارِ ذخیره‌شده همیشه ISO میلادی (yyyy-mm-dd) در یک ورودیِ مخفی
-   با همان id است — پس بک‌اند و کدِ خواننده هیچ تغییری نمی‌خواهند؛ تقویم فقط نمایش است.
+/* ================= انتخابگر تاریخ دوتقویمی (شمسی / میلادی) =================
+   ورودی تاریخ مرورگر فقط میلادی است؛ این جزء همان کار را با امکان جابه‌جایی بین دو
+   تقویم انجام می‌دهد. مقدار ذخیره‌شده همیشه ISO میلادی (yyyy-mm-dd) در یک ورودی مخفی
+   با همان id است — پس بک‌اند و کد خواننده هیچ تغییری نمی‌خواهند؛ تقویم فقط نمایش است.
 
-   ظاهر از الگوهای موجودِ سایت: قابِ پاپ‌آورِ منوی فیلتر، سوئیچِ .seg، حالت‌های هاور و
-   انتخابِ آیتم‌های فیلتر. انتخابِ تقویمِ کاربر در مرورگرش به خاطر سپرده می‌شود. */
+   ظاهر از الگوهای موجود سایت: قاب پاپ‌آور منوی فیلتر، سوئیچ .seg، حالت‌های هاور و
+   انتخاب آیتم‌های فیلتر. انتخاب تقویم کاربر در مرورگرش به خاطر سپرده می‌شود. */
 
-/* ── تبدیلِ جلالی ↔ میلادی (الگوریتمِ حسابیِ جلالی، هم‌ارزِ jalaali-js) ──
-   روزها با شمارهٔ روزِ ژولینی (JDN) رد و بدل می‌شوند تا هر دو جهت از یک مسیر بگذرند. */
+/* ── تبدیل جلالی ↔ میلادی (الگوریتم حسابی جلالی، هم‌ارز jalaali-js) ──
+   روزها با شمارهٔ روز ژولینی (JDN) رد و بدل می‌شوند تا هر دو جهت از یک مسیر بگذرند. */
 var DP_BREAKS=[-61,9,38,199,426,686,756,818,1111,1181,1210,1635,2060,2097,2192,2262,2324,2394,2456,3178];
 function dpDiv(a,b){ return ~~(a/b); }
 function dpMod(a,b){ return a-~~(a/b)*b; }
@@ -52,12 +52,12 @@ function dpD2J(jdn){
 function dpJalLeap(jy){ return dpJalCal(jy).leap===0; }
 
 /* ── کمکی‌های مستقل از تقویم: هر تاریخ = JDN ──
-   هر تقویم زبانِ خودش را دارد: شمسی = فارسی، ارقامِ فارسی، راست‌به‌چپ، شنبه‌اول؛
-   میلادی = انگلیسی، ارقامِ لاتین، چپ‌به‌راست، یکشنبه‌اول و قالبِ ISO (مثلِ تقویم‌های رایجِ وب). */
+   هر تقویم زبان خودش را دارد: شمسی = فارسی، ارقام فارسی، راست‌به‌چپ، شنبه‌اول؛
+   میلادی = انگلیسی، ارقام لاتین، چپ‌به‌راست، یکشنبه‌اول و قالب ISO (مثل تقویم‌های رایج وب). */
 var DP_LOC={
   j:{ dir:"rtl", months:["فروردین","اردیبهشت","خرداد","تیر","مرداد","شهریور","مهر","آبان","آذر","دی","بهمن","اسفند"],
       short:null, week:["ش","ی","د","س","چ","پ","ج"], today:"امروز", clear:"پاک کردن",
-      prev:"ماهِ قبل", next:"ماهِ بعد", up:"انتخابِ ماه و سال" },
+      prev:"ماه قبل", next:"ماه بعد", up:"انتخاب ماه و سال" },
   g:{ dir:"ltr", months:["January","February","March","April","May","June","July","August","September","October","November","December"],
       short:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
       week:["Su","Mo","Tu","We","Th","Fr","Sa"], today:"Today", clear:"Clear",
@@ -70,7 +70,7 @@ function dpMonthLen(cal,y,m){
   return new Date(Date.UTC(y,m,0)).getUTCDate();
 }
 function dpP2(n){ return (n<10?"0":"")+n; }
-/* ارقامِ هر تقویم: فارسی برای شمسی، لاتین برای میلادی */
+/* ارقام هر تقویم: فارسی برای شمسی، لاتین برای میلادی */
 function dpNum(cal,s){ s=String(s); return cal==="j"?s.replace(/[0-9]/g,function(d){ return "۰۱۲۳۴۵۶۷۸۹".charAt(+d); }):s; }
 function dpIsoToJdn(iso){
   var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso||"").trim()); if(!m) return null;
@@ -78,22 +78,22 @@ function dpIsoToJdn(iso){
 }
 function dpJdnToIso(jdn){ var g=dpD2G(jdn); return g.y+"-"+dpP2(g.m)+"-"+dpP2(g.d); }
 function dpTodayJdn(){ var t=new Date(); return dpG2D(t.getFullYear(),t.getMonth()+1,t.getDate()); }
-/* ستونِ هفته. JDN mod 7: دوشنبه=0 … یکشنبه=6. شمسی شنبه‌اول، میلادی یکشنبه‌اول. */
+/* ستون هفته. JDN mod 7: دوشنبه=0 … یکشنبه=6. شمسی شنبه‌اول، میلادی یکشنبه‌اول. */
 function dpWeekCol(cal,jdn){ return cal==="j"?dpMod(jdn+2,7):dpMod(jdn+1,7); }
 /* شمسی: ۱۴۰۵/۰۶/۳۰ — میلادی: 2026-09-21 (ISO 8601) */
 function dpFmt(cal,jdn){
   var x=dpFromJdn(cal,jdn);
   return cal==="j"?dpNum("j",x.y+"/"+dpP2(x.m)+"/"+dpP2(x.d)):(x.y+"-"+dpP2(x.m)+"-"+dpP2(x.d));
 }
-/* معادلِ تاریخ در تقویمِ «دیگر» — برای خطِ راهنمای زیرِ فیلد. تاریخ داخلِ جداکنندهٔ
-   جهت (LRI…PDI) می‌نشیند تا تاریخِ لاتین وسطِ جملهٔ فارسی به‌هم نریزد. */
+/* معادل تاریخ در تقویم «دیگر» — برای خط راهنمای زیر فیلد. تاریخ داخل جداکنندهٔ
+   جهت (LRI…PDI) می‌نشیند تا تاریخ لاتین وسط جملهٔ فارسی به‌هم نریزد. */
 function dpEquivText(iso){
   var jdn=dpIsoToJdn(iso); if(jdn==null) return "";
   var other=DP.cal==="j"?"g":"j";
-  return (other==="j"?"معادلِ شمسی: ":"معادلِ میلادی: ")+"⁦"+dpFmt(other,jdn)+"⁩";
+  return (other==="j"?"معادل شمسی: ":"معادل میلادی: ")+"⁦"+dpFmt(other,jdn)+"⁩";
 }
 
-/* ── وضعیت ── view: d = روزها، m = ماه‌های یک سال، y = دوازده سال (مثلِ تقویمِ ویندوز) */
+/* ── وضعیت ── view: d = روزها، m = ماه‌های یک سال، y = دوازده سال (مثل تقویم ویندوز) */
 var DP={ cal:"j", id:"", view:"d", vy:0, vm:0, pop:null, field:null };
 try{ var _dpc=localStorage.getItem("fsm_dp_cal"); if(_dpc==="g"||_dpc==="j") DP.cal=_dpc; }catch(e){}
 
@@ -101,8 +101,8 @@ var DP_CAL_IC='<svg viewBox="0 0 24 24" class="ic"><rect x="3" y="4" width="18" 
 var DP_R_IC='<svg viewBox="0 0 24 24" class="ic"><polyline points="9 18 15 12 9 6"/></svg>';
 var DP_L_IC='<svg viewBox="0 0 24 24" class="ic"><polyline points="15 18 9 12 15 6"/></svg>';
 
-/* فیلدِ تاریخ: ورودیِ مخفیِ ISO (همان id) + دکمه‌ای به شکلِ ورودی که پاپ‌آور را باز می‌کند.
-   onInput (اختیاری) = کدِ اجرایی پس از هر تغییر، مثلِ oninputِ ورودیِ قدیمی. */
+/* فیلد تاریخ: ورودی مخفی ISO (همان id) + دکمه‌ای به شکل ورودی که پاپ‌آور را باز می‌کند.
+   onInput (اختیاری) = کد اجرایی پس از هر تغییر، مثل oninput ورودی قدیمی. */
 function dpFieldHTML(id, iso, onInput){
   return '<input type="hidden" id="'+id+'" value="'+esc(iso||"")+'"'+(onInput?' oninput="'+esc(onInput)+'"':'')+'>'+
     '<button type="button" class="dp-field" id="'+id+'Btn" aria-haspopup="dialog" onclick="dpToggle(\''+id+'\')">'+
@@ -116,8 +116,8 @@ function dpFieldText(iso){
 }
 function dpSyncField(id){
   var inp=document.getElementById(id); if(!inp) return;
-  /* خودِ فیلد بخشی از فرمِ فارسی است و با تقویم عوض نمی‌شود (جهت و متنِ پیش‌فرض ثابت)؛
-     فقط تاریخِ داخلش و برچسبِ تقویم به تقویمِ انتخاب‌شده درمی‌آیند. */
+  /* خود فیلد بخشی از فرم فارسی است و با تقویم عوض نمی‌شود (جهت و متن پیش‌فرض ثابت)؛
+     فقط تاریخ داخلش و برچسب تقویم به تقویم انتخاب‌شده درمی‌آیند. */
   var v=document.getElementById(id+"Val"), t=document.getElementById(id+"Tag");
   if(v) v.innerHTML=dpFieldText(inp.value);
   if(t) t.textContent=DP.cal==="j"?"شمسی":"میلادی";
@@ -131,9 +131,9 @@ function dpOpen(id){
   DP.id=id; DP.field=btn; DP.view="d";
   var base=dpIsoToJdn(inp.value); if(base==null) base=dpTodayJdn();
   var x=dpFromJdn(DP.cal,base); DP.vy=x.y; DP.vm=x.m;
-  var p=document.createElement("div"); p.className="dp-pop"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","انتخابِ تاریخ");
-  /* پوسته یک‌بار ساخته می‌شود: سوئیچِ تقویم (بخشی از رابطِ فارسی، همیشه راست‌به‌چپ) ثابت
-     می‌ماند تا کراس‌فیدِ .seg-btn پخش شود؛ فقط .dp-body از نو ساخته می‌شود. */
+  var p=document.createElement("div"); p.className="dp-pop"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","انتخاب تاریخ");
+  /* پوسته یک‌بار ساخته می‌شود: سوئیچ تقویم (بخشی از رابط فارسی، همیشه راست‌به‌چپ) ثابت
+     می‌ماند تا کراس‌فید .seg-btn پخش شود؛ فقط .dp-body از نو ساخته می‌شود. */
   p.innerHTML=
     '<div class="seg dp-seg">'+
       '<button type="button" class="seg-btn'+(DP.cal==="j"?" on":"")+'" data-cal="j" onclick="dpSetCal(\'j\')">شمسی</button>'+
@@ -142,7 +142,7 @@ function dpOpen(id){
   document.body.appendChild(p); DP.pop=p;
   btn.classList.add("open");
   dpRender(); dpPlace();
-  /* بستن با کلیکِ بیرون، اسکرولِ هر ظرف، و تغییرِ اندازهٔ پنجره (مثلِ منوی فیلتر) */
+  /* بستن با کلیک بیرون، اسکرول هر ظرف، و تغییر اندازهٔ پنجره (مثل منوی فیلتر) */
   setTimeout(function(){
     document.addEventListener("pointerdown",dpOutside,true);
     window.addEventListener("scroll",dpOnScroll,true);
@@ -159,8 +159,8 @@ function dpClose(){
 }
 function dpOutside(e){ if(DP.pop && !DP.pop.contains(e.target) && !(DP.field&&DP.field.contains(e.target))) dpClose(); }
 function dpOnScroll(e){ if(DP.pop && !DP.pop.contains(e.target)) dpClose(); }
-/* Escape: در نمای ماه/سال یک پله برمی‌گردد (مثلِ ویندوز)، در نمای روزها پاپ‌آور را می‌بندد.
-   هرگز پنجرهٔ دربرگیرنده را نمی‌بندد — پس در فازِ capture و پیش از بقیه. */
+/* Escape: در نمای ماه/سال یک پله برمی‌گردد (مثل ویندوز)، در نمای روزها پاپ‌آور را می‌بندد.
+   هرگز پنجرهٔ دربرگیرنده را نمی‌بندد — پس در فاز capture و پیش از بقیه. */
 window.addEventListener("keydown",function(e){
   if(e.key!=="Escape" || !DP.pop) return;
   e.stopPropagation();
@@ -168,7 +168,7 @@ window.addEventListener("keydown",function(e){
   else if(DP.view==="m"){ DP.view="d"; dpRender(); }
   else { dpClose(); if(DP.field) DP.field.focus(); }
 },true);
-/* زیرِ فیلد، لبهٔ راست هم‌تراز با فیلد (RTL)؛ اگر پایین جا نبود، بالای فیلد */
+/* زیر فیلد، لبهٔ راست هم‌تراز با فیلد (RTL)؛ اگر پایین جا نبود، بالای فیلد */
 function dpPlace(){
   var p=DP.pop, b=DP.field; if(!p||!b) return;
   var r=b.getBoundingClientRect(), w=p.offsetWidth, h=p.offsetHeight, gap=6;
@@ -177,7 +177,7 @@ function dpPlace(){
   p.style.left=left+"px"; p.style.top=top+"px";
 }
 
-/* ── رندر: سه نما با یک قاب (عنوانِ کلیک‌پذیر + دو فلش + شبکه) ── */
+/* ── رندر: سه نما با یک قاب (عنوان کلیک‌پذیر + دو فلش + شبکه) ── */
 function dpRender(){
   var body=DP.pop&&DP.pop.querySelector(".dp-body"); if(!body) return;
   var cal=DP.cal, L=DP_LOC[cal], inp=document.getElementById(DP.id);
@@ -204,7 +204,7 @@ function dpRender(){
     }).join("")+'</div>';
     cls="dp-v-m";
   } else {
-    var y0=DP.vy-dpMod(DP.vy,12), ys="";   // بلوک‌های دوازده‌ساله، ثابت و قابلِ پیش‌بینی
+    var y0=DP.vy-dpMod(DP.vy,12), ys="";   // بلوک‌های دوازده‌ساله، ثابت و قابل پیش‌بینی
     for(var yy=y0;yy<y0+12;yy++){
       ys+='<button type="button" class="dp-cell'+(selD&&selD.y===yy?" on":"")+(todD.y===yy?" today":"")+'" data-y="'+yy+'" onclick="dpPickYear('+yy+')">'+dpNum(cal,yy)+'</button>';
     }
@@ -212,7 +212,7 @@ function dpRender(){
     grid='<div class="dp-grid dp-cells">'+ys+'</div>';
     cls="dp-v-y"; up=false;   // بالاترین سطح؛ عنوان دیگر جایی نمی‌برد
   }
-  /* فلش‌ها به جهتِ همان تقویم: در راست‌به‌چپ «قبلی» سمتِ راست است، در چپ‌به‌راست سمتِ چپ */
+  /* فلش‌ها به جهت همان تقویم: در راست‌به‌چپ «قبلی» سمت راست است، در چپ‌به‌راست سمت چپ */
   var prevIc=L.dir==="rtl"?DP_R_IC:DP_L_IC, nextIc=L.dir==="rtl"?DP_L_IC:DP_R_IC;
   body.setAttribute("dir",L.dir);
   body.innerHTML=
@@ -228,7 +228,7 @@ function dpRender(){
       (sel!=null?'<button type="button" class="dp-clear" onclick="dpPick(null)">'+L.clear+'</button>':'')+
     '</div>';
 }
-/* فلش‌ها در هر نما یک واحدِ همان نما جابه‌جا می‌کنند: ماه / سال / دوازده سال */
+/* فلش‌ها در هر نما یک واحد همان نما جابه‌جا می‌کنند: ماه / سال / دوازده سال */
 function dpShift(delta){
   if(DP.view==="d"){
     var m=DP.vm+delta, y=DP.vy;
@@ -240,7 +240,7 @@ function dpShift(delta){
 function dpUp(){ DP.view=DP.view==="d"?"m":"y"; dpRender(); }
 function dpPickYear(y){ DP.vy=y; DP.view="m"; dpRender(); }
 function dpPickMonth(m){ DP.vm=m; DP.view="d"; dpRender(); }
-/* جابه‌جاییِ تقویم: همان لحظه در تقویمِ دیگر (روزِ انتخاب‌شده، وگرنه وسطِ ماهِ در حالِ نمایش) */
+/* جابه‌جایی تقویم: همان لحظه در تقویم دیگر (روز انتخاب‌شده، وگرنه وسط ماه در حال نمایش) */
 function dpSetCal(cal){
   if(cal===DP.cal) return;
   var inp=document.getElementById(DP.id), sel=inp?dpIsoToJdn(inp.value):null;
@@ -254,7 +254,7 @@ function dpSetCal(cal){
   });
   var x=dpFromJdn(cal,anchor); DP.vy=x.y; DP.vm=x.m;
   dpRender(); dpSyncField(DP.id);
-  if(inp) inp.dispatchEvent(new Event("input"));   // خطِ «معادل» هم به تقویمِ دیگر برگردد
+  if(inp) inp.dispatchEvent(new Event("input"));   // خط «معادل» هم به تقویم دیگر برگردد
 }
 function dpPick(jdn){
   var inp=document.getElementById(DP.id); if(!inp) return;

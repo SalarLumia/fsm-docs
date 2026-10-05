@@ -1,30 +1,30 @@
 /* ============================================================
-   نمای جزئیاتِ پروژه — قابِ واحدِ .ppanel + نوارِ شاخصِ .mband + کارت‌های .spec-card.
-   (طرحِ اولیه روی یک پروتوتایپِ جدا ساخته شد؛ آن فایل حذف شده چون پیاده‌سازی
-   از آن جلو زده بود. مرجعِ معتبرِ رنگ/فونت/توکن: _dev/design-system.html)
+   نمای جزئیات پروژه — قاب واحد .ppanel + نوار شاخص .mband + کارت‌های .spec-card.
+   (طرح اولیه روی یک پروتوتایپ جدا ساخته شد؛ آن فایل حذف شده چون پیاده‌سازی
+   از آن جلو زده بود. مرجع معتبر رنگ/فونت/توکن: _dev/design-system.html)
    ============================================================ */
 
 /* عرض‌ها و فاصله‌های مشترک — عیناً پروتوتایپ.
-   --label-w عرضِ ستونِ «پارامتر»؛ چون همهٔ ردیف‌ها از همین یک مقدار می‌خوانند،
-   جواب‌ها همگی دقیقاً زیرِ هم شروع می‌شوند. --val-inset فاصله‌ای است که
-   پارامترِ فارسی و جوابِ لاتین هر دو «به‌سمتِ داخل» می‌آیند. */
-/* ⚠ ۱۷۶ بود. نامِ سند ۳۴px کمتر از این مقدار جا دارد (۲۶ آیکون + ۸ فاصله) که
+   --label-w عرض ستون «پارامتر»؛ چون همهٔ ردیف‌ها از همین یک مقدار می‌خوانند،
+   جواب‌ها همگی دقیقاً زیر هم شروع می‌شوند. --val-inset فاصله‌ای است که
+   پارامتر فارسی و جواب لاتین هر دو «به‌سمت داخل» می‌آیند. */
+/* ⚠ ۱۷۶ بود. نام سند ۳۴px کمتر از این مقدار جا دارد (۲۶ آیکون + ۸ فاصله) که
    یعنی ۱۴۲px ≈ ۲۳ نویسه — «تست غیرمخرب ذرات مغناطیسی» جا نمی‌شد. با ۲۲۰،
-   نامِ سند ۱۸۶px می‌گیرد ≈ ۳۰ نویسه. چون هر دو نوعِ ردیف از همین یک مقدار
-   می‌خوانند، ستونِ جواب‌ها هم‌زمان جابه‌جا می‌شود و هم‌ترازی حفظ می‌ماند. */
+   نام سند ۱۸۶px می‌گیرد ≈ ۳۰ نویسه. چون هر دو نوع ردیف از همین یک مقدار
+   می‌خوانند، ستون جواب‌ها هم‌زمان جابه‌جا می‌شود و هم‌ترازی حفظ می‌ماند. */
 :root{--label-w:220px; --val-gap:var(--sp-8); --val-inset:var(--sp-4);
       --spec-min:320px; --spec-max:520px; --view-min:200px;
       --spec-col-w:calc(41% - 6.09px)}
 
-/* ---- قابِ بزرگِ صفحه ---- */
+/* ---- قاب بزرگ صفحه ---- */
 .ppanel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   box-shadow:0 1px 4px #00000010;padding:var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-5)}
 
-/* ---- سرصفحهٔ پروژه: عنوان + تگِ وضعیت + بازگشت ---- */
+/* ---- سرصفحهٔ پروژه: عنوان + تگ وضعیت + بازگشت ---- */
 .pp-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-5);
   padding-bottom:var(--sp-3);border-bottom:1px solid var(--line)}
 .pp-head-main{display:flex;align-items:center;gap:var(--sp-3);min-width:0}
-/* خطِ عمودیِ نارنجیِ پیشِ عنوان با ::before (نه border) تا گوشه‌هایش گرد شوند، هم‌سبکِ کارتِ پروژهٔ داشبورد */
+/* خط عمودی نارنجی پیش عنوان با ::before (نه border) تا گوشه‌هایش گرد شوند، هم‌سبک کارت پروژهٔ داشبورد */
 .pp-head h1{position:relative;margin:0;font-size:19px;font-weight:700;color:var(--txt);min-width:0;
   padding-right:13px;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -32,7 +32,7 @@
   width:3px;height:20px;border-radius:2px;background:var(--brand)}
 .pp-head-actions{display:flex;align-items:center;gap:var(--sp-2);flex-shrink:0}
 
-/* تگِ وضعیتِ پروژه — متریکِ .tag سایت */
+/* تگ وضعیت پروژه — متریک .tag سایت */
 .mstate{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
   line-height:1.4;white-space:nowrap;flex-shrink:0}
 .mstate svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
@@ -41,7 +41,7 @@
 .s-idle{background:var(--gray-bg);color:#4b5563;border:1px solid var(--gray-line)}
 
 /* ---- نوار شاخص‌ها ---- */
-/* ⚠ overflow:visible (نه hidden): تولتیپِ گراف‌ها باید بتواند از قابِ نوار بیرون بزند */
+/* ⚠ overflow:visible (نه hidden): تولتیپ گراف‌ها باید بتواند از قاب نوار بیرون بزند */
 .mband{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;background:var(--card);
   border:1px solid var(--line);border-radius:var(--radius);overflow:visible}
 @media(max-width:1150px){.mband{grid-template-columns:1fr 1fr 1fr}}
@@ -54,7 +54,7 @@
 .mlabel{font-size:14px;line-height:1.3;color:var(--txt);font-weight:700;margin-bottom:var(--sp-2);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* سلولِ سرتیتر: درصدِ بزرگ + نوارِ دولایه + دو راهنما */
+/* سلول سرتیتر: درصد بزرگ + نوار دولایه + دو راهنما */
 .mhero-vis{flex:1;min-width:0;max-width:180px;display:flex;flex-direction:column;gap:var(--sp-2)}
 .mhero-pct{font-size:28px;font-weight:800;color:var(--txt);font-variant-numeric:tabular-nums;
   line-height:1;flex-shrink:0;text-align:left}
@@ -67,26 +67,26 @@
 .mleg.faint i{opacity:.3}
 .mleg.ok i{background:var(--ok)}
 
-/* دوناتِ درصد (چپِ سلول، متن راستِ آن) */
+/* دونات درصد (چپ سلول، متن راست آن) */
 .mdonut{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-direction:row-reverse}
 .mtext{min-width:0;display:flex;flex-direction:column;gap:var(--sp-1)}
 .dwrap{position:relative;width:84px;height:84px;flex-shrink:0}
-/* ⚠ بدونِ transform: جهت و نقطهٔ شروع در خودِ مسیرِ قوس (دستورِ A) تعیین می‌شوند.
-   چرخاندنِ ظرف با rotate/scaleX دوباره همان وابستگیِ قبلی را برمی‌گرداند. */
+/* ⚠ بدون transform: جهت و نقطهٔ شروع در خود مسیر قوس (دستور A) تعیین می‌شوند.
+   چرخاندن ظرف با rotate/scaleX دوباره همان وابستگی قبلی را برمی‌گرداند. */
 .dwrap svg{width:84px;height:84px}
 .dwrap circle,.dwrap path{fill:none;stroke-width:4.5;stroke-linecap:round}
 .d-bg{stroke:#f0efeb}
-/* پرشدنِ نرمِ حلقه: مسیر همیشه کامل است و فقط dasharray عوض می‌شود — این
-   ویژگی برخلافِ d در همهٔ مرورگرها انیمیت می‌شود. */
+/* پرشدن نرم حلقه: مسیر همیشه کامل است و فقط dasharray عوض می‌شود — این
+   ویژگی برخلاف d در همهٔ مرورگرها انیمیت می‌شود. */
 .d-fg{transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1),stroke .5s,stroke-opacity .5s}
 @media(prefers-reduced-motion:reduce){.d-fg{transition:stroke .3s}}
 .dtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
   font-size:19px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;pointer-events:none}
 
-/* ===== تولتیپِ گراف‌های نوارِ شاخص — عیناً جعبهٔ .sgt نوارِ پیشرفتِ داشبورد (dashboard.css) =====
-   ظاهرِ جعبه از همان کلاس‌ها می‌آید؛ این‌جا فقط جای‌گیری و منطقِ نمایش تعریف می‌شود. */
-.mcell:hover{z-index:7}   /* سلولِ زیرِ موس بالاتر از همسایه‌ها تا تولتیپش زیرِ آن‌ها نرود */
-/* نوارِ «مستندات پروژه»: سه ناحیهٔ هاورِ شفاف روی نوار (بلندتر از خودِ نوار برای هدف‌گیریِ راحت) */
+/* ===== تولتیپ گراف‌های نوار شاخص — عیناً جعبهٔ .sgt نوار پیشرفت داشبورد (dashboard.css) =====
+   ظاهر جعبه از همان کلاس‌ها می‌آید؛ این‌جا فقط جای‌گیری و منطق نمایش تعریف می‌شود. */
+.mcell:hover{z-index:7}   /* سلول زیر موس بالاتر از همسایه‌ها تا تولتیپش زیر آن‌ها نرود */
+/* نوار «مستندات پروژه»: سه ناحیهٔ هاور شفاف روی نوار (بلندتر از خود نوار برای هدف‌گیری راحت) */
 .bar-wrap{position:relative}
 .bar-hits{position:absolute;left:0;right:0;top:-6px;bottom:-6px;direction:ltr}
 .mhit{position:absolute;top:0;bottom:0;cursor:pointer}
@@ -95,12 +95,12 @@
 .mhit:last-child .sgt{left:auto;right:0;transform:translateX(0) translateY(4px)}
 .mhit:hover .sgt{opacity:1;visibility:visible;transform:translateX(-50%) translateY(0)}
 .mhit:first-child:hover .sgt,.mhit:last-child:hover .sgt{transform:translateX(0) translateY(0)}
-/* برجسته‌شدنِ همان بخشِ نوار — همان واکنشِ داشبورد (روشنایی ۹۳٪) */
+/* برجسته‌شدن همان بخش نوار — همان واکنش داشبورد (روشنایی ۹۳٪) */
 .bar-wrap:has(.bh-apr:hover) .bar>i.sol{filter:brightness(.93)}
 .bar-wrap:has(.bh-reg:hover) .bar>i.faint{opacity:.45}
 .bar-wrap:has(.bh-none:hover) .bar{background:#e4e2dd}
 .bar>i,.bar{transition:width .6s,opacity .16s,filter .16s,background .16s}
-/* دونات: ناحیه‌های هاور = مسیرهای شفافِ پهن روی حلقه */
+/* دونات: ناحیه‌های هاور = مسیرهای شفاف پهن روی حلقه */
 .dwrap .d-hit{stroke:transparent;stroke-width:12;stroke-linecap:butt;pointer-events:stroke;cursor:pointer}
 .dwrap .sgt{bottom:calc(100% + 6px);left:50%}
 .dwrap:has(.dh-apr:hover) .mtip-apr,.dwrap:has(.dh-reg:hover) .mtip-reg,.dwrap:has(.dh-none:hover) .mtip-none{
@@ -110,7 +110,7 @@
 .dwrap:has(.dh-none:hover) .d-bg{stroke:#e4e2dd}
 .dwrap .d-bg,.dwrap .d-fg{transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1),stroke .16s,stroke-width .16s,stroke-opacity .16s}
 
-/* ============ محتوا: سطرِ (مشخصات + ویوئر) و سپس کارتِ قطعات ============ */
+/* ============ محتوا: سطر (مشخصات + ویوئر) و سپس کارت قطعات ============ */
 .pp-content{display:flex;flex-direction:column;gap:var(--sp-5)}
 .spec3d{display:grid;gap:var(--sp-5);grid-template-columns:var(--spec-col-w) 1fr}
 @media(max-width:1100px){.spec3d{grid-template-columns:1fr}}
@@ -118,28 +118,28 @@
 .model-col{display:flex;flex-direction:column;gap:var(--sp-4);min-width:0}
 .model-col>.mv-shell,.model-col>.mv-empty,.model-col>.viewer-shell{flex:1}
 
-/* کارتِ هر بخش — عیناً .dash-panel داشبورد */
+/* کارت هر بخش — عیناً .dash-panel داشبورد */
 .spec-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
   padding:18px 20px;box-shadow:0 1px 4px #00000008}
-/* کارتِ مشخصات: ستونِ عمودی؛ گرید فضای باقی‌مانده را پر می‌کند تا ویوئر تا کفِ کارت بیاید */
+/* کارت مشخصات: ستون عمودی؛ گرید فضای باقی‌مانده را پر می‌کند تا ویوئر تا کف کارت بیاید */
 .spec-main{display:flex;flex-direction:column;min-height:var(--spec-min);max-height:var(--spec-max);overflow:auto}
 .spec-main .spec3d{flex:1}
 @media(max-width:1100px){.spec-main{max-height:none;overflow:visible}}
 
-/* تیترِ بخش (مشخصات / قطعات) — عیناً .panel-hd داشبورد */
+/* تیتر بخش (مشخصات / قطعات) — عیناً .panel-hd داشبورد */
 .spec-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .spec-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .spec-sec-t .sec-act{margin-inline-start:auto;display:flex;gap:6px}
 .spec-sec-t .icon-btn{margin-inline-start:auto}
 
-/* ============ مشخصاتِ ماژولار (کارتِ قطعات) ============ */
+/* ============ مشخصات ماژولار (کارت قطعات) ============ */
 .spec-groups{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3)}
 @media(max-width:900px){.spec-groups{grid-template-columns:1fr}}
 .spec-group{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fcfcfb;
   display:flex;flex-direction:column}
-/* جای‌گیرِ ستونِ خالی وقتی تعدادِ قطعات فرد است — هم‌اندازهٔ سلولِ قطعه (چون هم‌کلاسِ
-   .spec-group است و گرید ارتفاع را یکسان می‌کند)، هم‌سبکِ باکسِ «سفارش جدید» */
+/* جای‌گیر ستون خالی وقتی تعداد قطعات فرد است — هم‌اندازهٔ سلول قطعه (چون هم‌کلاس
+   .spec-group است و گرید ارتفاع را یکسان می‌کند)، هم‌سبک باکس «سفارش جدید» */
 .spec-group.spec-add{align-items:center;justify-content:center;gap:6px;
   border:1.5px dashed var(--line);background:none;cursor:pointer;color:var(--muted);
   font-family:inherit;font-size:12.5px;font-weight:600;transition:.14s;min-height:120px}
@@ -147,7 +147,7 @@
 .spec-group.spec-add:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 2px #f7941f55}
 .spec-group.spec-add .ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 @media(max-width:900px){.spec-group.spec-add{display:none}}   /* تک‌ستونه: جای خالی‌ای وجود ندارد */
-/* فلاشِ کوتاه هنگام ناوبری به یک قطعهٔ خاص از آرشیو (navGoPart) */
+/* فلاش کوتاه هنگام ناوبری به یک قطعهٔ خاص از آرشیو (navGoPart) */
 .spec-group.pd-flash{animation:pdFlash 1.6s ease}
 @keyframes pdFlash{0%,100%{box-shadow:0 0 0 0 rgba(247,148,31,0)}18%{box-shadow:0 0 0 3px rgba(247,148,31,.38)}}
 @media(prefers-reduced-motion:reduce){.spec-group.pd-flash{animation:none}}
@@ -155,72 +155,72 @@
 .spec-name{font-size:13px;font-weight:700;color:var(--txt);flex:1;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .spec-en{font-size:11.5px;font-weight:600;color:var(--muted);direction:ltr;letter-spacing:.02em;flex-shrink:0}
-/* نقطهٔ نارنجیِ پالس‌دار پیشِ نامِ قطعه — همان الگوی نقطهٔ کارت‌های شاخصِ داشبورد */
+/* نقطهٔ نارنجی پالس‌دار پیش نام قطعه — همان الگوی نقطهٔ کارت‌های شاخص داشبورد */
 .spec-dot{position:relative;width:7px;height:7px;border-radius:50%;flex-shrink:0;
   background:var(--brand);color:var(--brand)}
 .spec-dot::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:11px;border-radius:50%;
   /* ⚠ box-sizing:border-box لازم است تا حاشیه به اندازه اضافه نشود؛
-     وگرنه translate(-50%) روی عرضِ واقعی حساب نمی‌شود و پالس از مرکز خارج می‌زند.
-     عرض هم 11px می‌ماند (نه 7) تا ضخامتِ دیده‌شدهٔ حلقه مثلِ قبل پررنگ باشد. */
+     وگرنه translate(-50%) روی عرض واقعی حساب نمی‌شود و پالس از مرکز خارج می‌زند.
+     عرض هم 11px می‌ماند (نه 7) تا ضخامت دیده‌شدهٔ حلقه مثل قبل پررنگ باشد. */
   box-sizing:border-box;
   border:2px solid currentColor;opacity:.7;transform:translate(-50%,-50%) scale(.4);
   pointer-events:none;animation:specPing 1.7s cubic-bezier(0,0,.2,1) infinite}
 @keyframes specPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.7}
   58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
 @media(prefers-reduced-motion:reduce){.spec-dot::after{animation:none;opacity:0}}
-/* دکمهٔ ویرایشِ همین قطعه — جایِ نامِ انگلیسیِ پیشین */
+/* دکمهٔ ویرایش همین قطعه — جای نام انگلیسی پیشین */
 .spec-edit{flex-shrink:0;margin-inline-start:auto}
 .spec-body{flex:1;border-top:1px solid var(--line);background:#fff;padding:2px var(--sp-3) var(--sp-3)}
 .spec-body .doc-add-row{margin-top:8px}
 
-/* لیستِ پیوستهٔ مشخصات — همهٔ ردیف‌ها (هویت/مشخصات/سند) پشتِ سرِ هم، یک‌دست */
+/* لیست پیوستهٔ مشخصات — همهٔ ردیف‌ها (هویت/مشخصات/سند) پشت سر هم، یک‌دست */
 .spec-general,.spec-kv{display:flex;flex-direction:column}
 
-/* ردیفِ برچسب-مقدار: دوستونیِ تمیز، جداکنندهٔ افقیِ محو */
+/* ردیف برچسب-مقدار: دوستونی تمیز، جداکنندهٔ افقی محو */
 .spec-row{display:flex;align-items:center;gap:var(--val-gap);padding:var(--sp-2) 0;border-bottom:1px solid #f2f1ee}
 .spec-row:last-child{border-bottom:none}
-/* عرض به‌اندازهٔ inset بزرگ‌تر شده تا با وجودِ padding، جای متنِ پارامتر همان --label-w بماند */
+/* عرض به‌اندازهٔ inset بزرگ‌تر شده تا با وجود padding، جای متن پارامتر همان --label-w بماند */
 .spec-label{font-size:11.5px;color:var(--muted);font-weight:500;flex-shrink:0;
   width:calc(var(--label-w) + var(--val-inset));padding-inline-start:var(--val-inset);
   display:flex;align-items:center;gap:6px;overflow:hidden}
 .spec-label .lbl-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* پیش‌فرض فارسی/راست‌به‌چپ؛ فقط جوابِ لاتین کلاسِ .ltr می‌گیرد و از چپ نوشته می‌شود */
+/* پیش‌فرض فارسی/راست‌به‌چپ؛ فقط جواب لاتین کلاس .ltr می‌گیرد و از چپ نوشته می‌شود */
 .spec-val{font-size:11.5px;color:var(--txt);font-weight:500;flex:1;min-width:0}
 .spec-val.ltr{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.5px;
   padding-inline-start:var(--val-inset)}
 .spec-val.empty{color:#b9b7b2}
 .spec-val .mono{direction:ltr}
-/* واحدِ خودکارِ پارامتر — کنارِ مقدار، کم‌رنگ‌تر و سبک‌تر تا خودِ مقدار برجسته بماند */
+/* واحد خودکار پارامتر — کنار مقدار، کم‌رنگ‌تر و سبک‌تر تا خود مقدار برجسته بماند */
 .spec-unit{color:var(--muted);font-weight:400;font-size:.92em}
 .lnk-code{cursor:pointer}
 .lnk-code:hover{color:var(--brand)}
 
 /* ============ ردیف‌های سند داخل مشخصات/قطعات ============
-   ردیفِ سند دقیقاً همان دو ستونِ ردیفِ مشخصات را دارد:
-   راست = نامِ سند (پارامتر) · چپ = شمارهٔ سند (جواب) — بدونِ بج و بدونِ دکمهٔ حذف. */
+   ردیف سند دقیقاً همان دو ستون ردیف مشخصات را دارد:
+   راست = نام سند (پارامتر) · چپ = شمارهٔ سند (جواب) — بدون بج و بدون دکمهٔ حذف. */
 .pd-docs{display:flex;flex-direction:column}
 .doc-row{display:flex;align-items:center;gap:var(--val-gap);padding:var(--sp-2) 0;border-bottom:1px solid #f2f1ee}
 .doc-row:last-child{border-bottom:none}
 .doc-head{width:calc(var(--label-w) + var(--val-inset));padding-inline-start:var(--val-inset);
   flex-shrink:0;display:flex;align-items:center;gap:var(--sp-2);min-width:0}
-/* آیکنِ ابتدای ردیف: برای سندِ موجود دکمهٔ «نمایش جزئیات» و برای اسلاتِ خالی نشانِ غیرفعال */
+/* آیکن ابتدای ردیف: برای سند موجود دکمهٔ «نمایش جزئیات» و برای اسلات خالی نشان غیرفعال */
 .doc-ic{width:26px;height:26px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;
   background:#fff;border:1px solid var(--line);border-radius:7px;padding:0;font:inherit;color:var(--txt)}
 .doc-ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.25}
-.doc-ic svg text{stroke:none;fill:currentColor;font-family:inherit;font-weight:400}   /* کدِ داخلِ نمادِ سند: هم‌فونتِ سایت، وزنِ سبک‌تر */
+.doc-ic svg text{stroke:none;fill:currentColor;font-family:inherit;font-weight:400}   /* کد داخل نماد سند: هم‌فونت سایت، وزن سبک‌تر */
 button.doc-ic{cursor:pointer;transition:.15s}
 button.doc-ic:hover:not(:disabled){border-color:var(--brand);background:#fff8f0;color:var(--brand)}
 button.doc-ic:active{transform:translateY(1px)}
 button.doc-ic:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 button.doc-ic:disabled{cursor:default}
-/* نامِ سند در ستونِ راست (جایگاهِ پارامتر) است، پس عیناً کلاسِ فارسیِ استانداردِ این بخش (.spec-label) — خاکستریِ کم‌رنگ */
+/* نام سند در ستون راست (جایگاه پارامتر) است، پس عیناً کلاس فارسی استاندارد این بخش (.spec-label) — خاکستری کم‌رنگ */
 .doc-name{font-size:11.5px;color:var(--txt);font-weight:500;min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* فقط ردیفِ بدونِ سند کم‌رنگ است — هم‌منطقِ .spec-val.empty بالای همین کارت.
-   پیش از این هر دو حالت خاکستری بودند و ردیفِ دارای سند از خالی تشخیص داده نمی‌شد. */
+/* فقط ردیف بدون سند کم‌رنگ است — هم‌منطق .spec-val.empty بالای همین کارت.
+   پیش از این هر دو حالت خاکستری بودند و ردیف دارای سند از خالی تشخیص داده نمی‌شد. */
 .doc-row.empty .doc-name{color:var(--muted)}
 .doc-acts{flex:1;min-width:0;display:flex;align-items:center;gap:var(--sp-2)}
-/* جوابِ ردیفِ سند (شمارهٔ سند) عیناً .spec-val.ltr است تا لبهٔ چپش با بقیهٔ جواب‌ها یکی باشد */
+/* جواب ردیف سند (شمارهٔ سند) عیناً .spec-val.ltr است تا لبهٔ چپش با بقیهٔ جواب‌ها یکی باشد */
 .doc-num,.doc-none{font-size:11.5px;font-weight:500;flex:1;min-width:0;
   direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.5px;
   padding-inline-start:var(--val-inset);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -231,55 +231,55 @@ button.doc-ic:disabled{cursor:default}
 .doc-row.empty .doc-ic{opacity:.5}
 .doc-row.empty .doc-ic:hover,.doc-row.empty .doc-ic:focus-visible{opacity:1}
 
-/* نوارِ افزودنِ سریعِ سند برای قطعات (انواعِ خاموش) — ثانویه و محو، فقط مدیر */
+/* نوار افزودن سریع سند برای قطعات (انواع خاموش) — ثانویه و محو، فقط مدیر */
 .doc-add-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
 .doc-add-lbl{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--muted)}
 .doc-add-lbl .ic,.doc-add-lbl svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
 .doc-add-pill{font-size:11.5px;font-weight:500;color:var(--muted);background:#fff;border:1px dashed var(--line);
   border-radius:20px;padding:4px 12px;cursor:pointer;transition:.12s;font-family:inherit}
 .doc-add-pill:hover{border-style:solid;border-color:var(--brand);color:var(--brand);background:#fff8f0}
-/* دکمهٔ حذفِ کوچکِ کنارِ سربرگِ قطعه (حذفِ قطعه از پروژه) */
+/* دکمهٔ حذف کوچک کنار سربرگ قطعه (حذف قطعه از پروژه) */
 .doc-mini{width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;background:#fff;border:1px solid var(--line);
   border-radius:7px;color:var(--muted);cursor:pointer;transition:.12s;padding:0}
 .doc-mini:hover{border-color:var(--err);color:var(--err);background:var(--err-bg)}
 .doc-mini .ic,.doc-mini svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
 
-/* کنترلِ «افزودن قطعه» */
+/* کنترل «افزودن قطعه» */
 .pd-addpart{display:flex;gap:var(--sp-2);align-items:center;margin-bottom:12px}
 .pd-addpart-sel{flex:0 0 auto;min-width:200px;background:#fff;border:1px solid #d4d3ce;color:var(--txt);
   padding:8px 10px;border-radius:var(--radius-sm);font-family:inherit;font-size:12.5px}
 
-/* ============ ویورِ سه‌بعدی ============ */
-/* ویوئر عنصرِ درونیِ کارتِ مشخصات است؛ با کششِ گرید تا ارتفاعِ ردیف‌ها بالا می‌آید. */
+/* ============ ویور سه‌بعدی ============ */
+/* ویوئر عنصر درونی کارت مشخصات است؛ با کشش گرید تا ارتفاع ردیف‌ها بالا می‌آید. */
 .viewer-shell,.mv-shell{position:relative;background:var(--panel);flex:1;min-height:var(--view-min);
   border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;display:flex}
 .viewer-shell model-viewer,.mv-shell model-viewer{width:100%;height:100%;min-height:var(--view-min);
   background:transparent;--poster-color:transparent}
 .mv-ph{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:28px}
-/* حالتِ خالی (بدونِ مدل) — هم‌ابعادِ ویوئر تا اندازهٔ کارت یکی بماند */
+/* حالت خالی (بدون مدل) — هم‌ابعاد ویوئر تا اندازهٔ کارت یکی بماند */
 .mv-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;
   padding:34px 24px;min-height:var(--view-min);background:var(--panel);border:1px dashed var(--line);border-radius:var(--radius-sm)}
 .mv-empty-ic{width:56px;height:56px;display:grid;place-items:center}
 .mv-empty-ic:not(.mv-load-ic) svg{width:44px;height:44px;stroke:#c9c7c2;fill:none;stroke-width:1.4}
-/* ⚠ :not(.mv-load-ic) لازم است: این قاعده ویژگیِ بیشتری از کلاس‌های .lis-* دارد
-   و بدونِ آن، رنگِ خاکستری و ضخامتِ ۱٫۴ روی هر سه داشِ اسپینر می‌نشست و
-   اثرِ دنباله‌دارش (سه ضخامت و سه شفافیتِ متفاوت) کاملاً از بین می‌رفت. */
-/* ═══ حالتِ بارگذاریِ آیکونِ سه‌بعدی ═══
-   مکعب آرام نفس می‌کشد و خطوطِ داخلی‌اش پیاپی کشیده می‌شوند — حسِ «در حالِ
-   ساخته‌شدن» می‌دهد به‌جای چرخشِ ساده. نوارِ درصد جداگانه پیشرفتِ واقعی را می‌گوید. */
+/* ⚠ :not(.mv-load-ic) لازم است: این قاعده ویژگی بیشتری از کلاس‌های .lis-* دارد
+   و بدون آن، رنگ خاکستری و ضخامت ۱٫۴ روی هر سه داش اسپینر می‌نشست و
+   اثر دنباله‌دارش (سه ضخامت و سه شفافیت متفاوت) کاملاً از بین می‌رفت. */
+/* ═══ حالت بارگذاری آیکون سه‌بعدی ═══
+   مکعب آرام نفس می‌کشد و خطوط داخلی‌اش پیاپی کشیده می‌شوند — حس «در حال
+   ساخته‌شدن» می‌دهد به‌جای چرخش ساده. نوار درصد جداگانه پیشرفت واقعی را می‌گوید. */
 .mv-ph .mv-empty-ic:not(.mv-load-ic) svg{animation:mvCubeBreath 2.6s ease-in-out infinite;transform-origin:50% 50%}
-/* طولِ واقعیِ مسیرها حساب شده (۲۰٫۲ و ۱۰٫۱)؛ هرکدام داشِ خودش را دارد تا
-   سرعتِ کشیده‌شدنِ هر دو یکسان دیده شود. */
+/* طول واقعی مسیرها حساب شده (۲۰٫۲ و ۱۰٫۱)؛ هرکدام داش خودش را دارد تا
+   سرعت کشیده‌شدن هر دو یکسان دیده شود. */
 .mv-ph .mv-empty-ic:not(.mv-load-ic) svg polyline{stroke-dasharray:21;stroke-dashoffset:21;
   animation:mvDrawPoly 2.6s cubic-bezier(.4,0,.2,1) infinite}
 .mv-ph .mv-empty-ic:not(.mv-load-ic) svg line{stroke-dasharray:11;stroke-dashoffset:11;
   animation:mvDrawLine 2.6s cubic-bezier(.4,0,.2,1) infinite .32s}
-/* بدونِ rotate: مکعبِ ایزومتریک با چرخشِ جزئی کج به‌نظر می‌رسد، چون خطوطِ موربِ
-   طراحی‌شده‌اش دیگر با محورِ قائم جور درنمی‌آید. فقط مقیاس و شفافیت نفس می‌کشند. */
+/* بدون rotate: مکعب ایزومتریک با چرخش جزئی کج به‌نظر می‌رسد، چون خطوط مورب
+   طراحی‌شده‌اش دیگر با محور قائم جور درنمی‌آید. فقط مقیاس و شفافیت نفس می‌کشند. */
 @keyframes mvCubeBreath{0%,100%{transform:scale(1);stroke-opacity:.72}
   50%{transform:scale(1.05);stroke-opacity:1}}
-/* کشیده می‌شوند، مکث می‌کنند، سپس از همان سمت جمع می‌شوند — بازگشت به حالتِ
-   اول پیوسته است و پرشی بینِ دو دور دیده نمی‌شود. */
+/* کشیده می‌شوند، مکث می‌کنند، سپس از همان سمت جمع می‌شوند — بازگشت به حالت
+   اول پیوسته است و پرشی بین دو دور دیده نمی‌شود. */
 @keyframes mvDrawPoly{0%{stroke-dashoffset:21}40%{stroke-dashoffset:0}
   70%{stroke-dashoffset:0}100%{stroke-dashoffset:21}}
 @keyframes mvDrawLine{0%{stroke-dashoffset:11}40%{stroke-dashoffset:0}
@@ -289,14 +289,14 @@ button.doc-ic:disabled{cursor:default}
   .mv-ph .mv-empty-ic:not(.mv-load-ic) svg polyline,
   .mv-ph .mv-empty-ic:not(.mv-load-ic) svg line{animation:none;stroke-dashoffset:0}
 }
-/* ═══ اسپینرِ بارگذاریِ مدلِ سه‌بعدی (مسیرِ ∞) ═══
-   سه داش پشتِ‌هم روی یک مسیرِ بسته می‌دوند و کلِ مسیر آرام می‌چرخد.
-   --lis-dur آهنگِ دویدنِ داش‌هاست؛ چرخشِ کلی عمداً ۵ برابر کندتر است تا
-   حرکتِ اصلی خوانده شود و چشم گیج نشود. */
+/* ═══ اسپینر بارگذاری مدل سه‌بعدی (مسیر ∞) ═══
+   سه داش پشت‌هم روی یک مسیر بسته می‌دوند و کل مسیر آرام می‌چرخد.
+   --lis-dur آهنگ دویدن داش‌هاست؛ چرخش کلی عمداً ۵ برابر کندتر است تا
+   حرکت اصلی خوانده شود و چشم گیج نشود. */
 .mv-load-ic{width:64px;height:64px}
 .lis{width:100%;height:100%;color:var(--brand);--lis-dur:2.2s}
-/* مسیرِ لیساژو ~۳۵۲ واحد است (۲٫۵ برابرِ یک حلقهٔ ساده)؛ با ۳٫۲ ثانیه سر
-   کند دیده می‌شد، چون چرخشِ کلی هم بخشی از حرکتش را خنثی می‌کند. */
+/* مسیر لیساژو ~۳۵۲ واحد است (۲٫۵ برابر یک حلقهٔ ساده)؛ با ۳٫۲ ثانیه سر
+   کند دیده می‌شد، چون چرخش کلی هم بخشی از حرکتش را خنثی می‌کند. */
 .lis-rig{transform-box:view-box;transform-origin:center;
   animation:lisDrift calc(var(--lis-dur) * 9) linear infinite}
 .lis-track,.lis-tail,.lis-mid,.lis-head{stroke:currentColor;stroke-linecap:round;fill:none}
@@ -311,11 +311,11 @@ button.doc-ic:disabled{cursor:default}
 @keyframes lisMid{from{stroke-dashoffset:9}to{stroke-dashoffset:-91}}
 @keyframes lisTail{from{stroke-dashoffset:29}to{stroke-dashoffset:-71}}
 @keyframes lisDrift{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-/* با کاهشِ حرکت، فقط مسیرِ کم‌رنگ و یک داشِ ساکن می‌ماند */
+/* با کاهش حرکت، فقط مسیر کم‌رنگ و یک داش ساکن می‌ماند */
 @media(prefers-reduced-motion:reduce){
   .lis-rig,.lis-head,.lis-mid,.lis-tail{animation:none}
 }
-/* نامِ مدلِ در‌حالِ بارگذاری — خطِ دوم، لاتین و LTR */
+/* نام مدل در‌حال بارگذاری — خط دوم، لاتین و LTR */
 .mv-load-name{margin-top:5px;font-size:12.5px;font-weight:600;color:var(--muted);
   direction:ltr;letter-spacing:.02em}
 .mv-empty-t{font-size:13px;font-weight:700;color:var(--txt)}
@@ -325,7 +325,7 @@ button.doc-ic:disabled{cursor:default}
 .mv-acts{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
 .dm-loading{display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--muted);font-size:12.5px}
 
-/* منوی ابزارِ همبرگری — یک کارتِ شیشه‌ای در گوشهٔ راست */
+/* منوی ابزار همبرگری — یک کارت شیشه‌ای در گوشهٔ راست */
 .mv-tools{position:absolute;top:12px;right:12px;z-index:5;direction:ltr;display:flex;flex-direction:column;
   align-items:flex-end;gap:2px;padding:4px;background:#ffffffe8;backdrop-filter:blur(6px);
   border:1px solid var(--line);border-radius:11px;box-shadow:0 3px 14px #0000001f}
@@ -339,12 +339,12 @@ button.doc-ic:disabled{cursor:default}
 .mv-tools.expanded .mv-tool{align-self:stretch}
 .mv-tool:hover{background:#fff2e2;color:var(--brand2)}
 .mv-tool.on{color:var(--brand2)}
-/* فقط رنگ کند می‌شود؛ پس‌زمینهٔ هاور همان ۰٫۱۴ ثانیه می‌ماند تا هنگامِ خروجِ موس نماند */
+/* فقط رنگ کند می‌شود؛ پس‌زمینهٔ هاور همان ۰٫۱۴ ثانیه می‌ماند تا هنگام خروج موس نماند */
 .mv-tool.on,.mv-tool.xf-out{transition:background .14s,color var(--xf-t)}
 .mv-burger{align-self:stretch;border-bottom:1px solid var(--line);border-radius:0}
 
-/* منوی انتخابِ قطعه — قرینهٔ تولباکس در گوشهٔ چپ؛ همان شیشه/سایز/فونت، فقط جهت آینه‌ای.
-   خانهٔ ثابت (شمارهٔ قطعه) همیشه سمتِ چپ می‌ماند و برچسبِ نامِ قطعه هنگام باز شدن به راست باز می‌شود. */
+/* منوی انتخاب قطعه — قرینهٔ تولباکس در گوشهٔ چپ؛ همان شیشه/سایز/فونت، فقط جهت آینه‌ای.
+   خانهٔ ثابت (شمارهٔ قطعه) همیشه سمت چپ می‌ماند و برچسب نام قطعه هنگام باز شدن به راست باز می‌شود. */
 .mv-picker{position:absolute;top:12px;left:12px;z-index:5;direction:ltr;display:flex;flex-direction:column;
   align-items:flex-start;gap:2px;padding:4px;background:#ffffffe8;backdrop-filter:blur(6px);
   border:1px solid var(--line);border-radius:11px;box-shadow:0 3px 14px #0000001f}
@@ -352,11 +352,11 @@ button.doc-ic:disabled{cursor:default}
   background:none;border:none;border-radius:8px;cursor:pointer;transition:background .14s,color .14s;
   white-space:nowrap;color:var(--txt);font-family:inherit}
 .mv-pick svg{width:16px;height:16px;flex-shrink:0;margin:0 8.5px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-/* خانهٔ ثابتِ شمارهٔ قطعه (هم‌عرضِ خانهٔ آیکنِ تولباکس = ۳۳px) */
-/* شمارهٔ قطعه — عیناً فونتِ «پاسخِ پارامترها» در مشخصاتِ پروژه (.spec-val.ltr) */
+/* خانهٔ ثابت شمارهٔ قطعه (هم‌عرض خانهٔ آیکن تولباکس = ۳۳px) */
+/* شمارهٔ قطعه — عیناً فونت «پاسخ پارامترها» در مشخصات پروژه (.spec-val.ltr) */
 .mv-pk-no{min-width:33px;text-align:center;flex-shrink:0;font-size:11.5px;font-weight:500;color:inherit;
   direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.5px}
-/* نامِ قطعه — عیناً فونتِ «پاسخِ پارامترها» (.spec-val.ltr): ۱۱٫۵px، وزن ۵۰۰، tabular-nums، فاصله‌حروف ۰٫۵ */
+/* نام قطعه — عیناً فونت «پاسخ پارامترها» (.spec-val.ltr): ۱۱٫۵px، وزن ۵۰۰، tabular-nums، فاصله‌حروف ۰٫۵ */
 .mv-pick-lab{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-size:11.5px;font-weight:500;color:inherit;
   font-variant-numeric:tabular-nums;letter-spacing:.5px;
   transition:max-width .18s,opacity .18s,padding .18s}
@@ -367,18 +367,18 @@ button.doc-ic:disabled{cursor:default}
 .mv-pick.on,.mv-pick.xf-out{transition:background-color var(--xf-t),color var(--xf-t)}
 @media(prefers-reduced-motion:reduce){.mv-tool.on,.mv-tool.xf-out,.mv-pick.on,.mv-pick.xf-out{transition:none}}
 .mv-pick-hd{align-self:stretch;border-bottom:1px solid var(--line);border-radius:0}
-/* برچسبِ نامِ انگلیسیِ قطعه در مودالِ سند (گوشهٔ بالا-چپ) — هم‌سبکِ منوی شیشه‌ایِ ابزار/انتخاب */
+/* برچسب نام انگلیسی قطعه در مودال سند (گوشهٔ بالا-چپ) — هم‌سبک منوی شیشه‌ای ابزار/انتخاب */
 .mv-partbadge{position:absolute;top:12px;left:12px;z-index:5;direction:ltr;display:flex;align-items:center;gap:7px;
   padding:6px 11px 6px 9px;background:#ffffffe8;backdrop-filter:blur(6px);border:1px solid var(--line);
   border-radius:11px;box-shadow:0 3px 14px #0000001f}
 .mv-partbadge svg{width:16px;height:16px;stroke:var(--txt);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin:0 1px}
 .mv-pb-t{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.5px;white-space:nowrap}
-.mv-retry{margin-top:14px}   /* دکمهٔ «تلاش مجدد» بارگذاریِ مدل روی خطا */
-/* دکمهٔ پیش‌فرضِ AR سرکوب می‌شود؛ فعال‌سازی از طریقِ دکمهٔ «واقعیت افزوده» در تولباکس انجام می‌شود */
+.mv-retry{margin-top:14px}   /* دکمهٔ «تلاش مجدد» بارگذاری مدل روی خطا */
+/* دکمهٔ پیش‌فرض AR سرکوب می‌شود؛ فعال‌سازی از طریق دکمهٔ «واقعیت افزوده» در تولباکس انجام می‌شود */
 .mv-ar{display:none}
-/* پاپ‌آپِ کدِ QRِ واقعیت افزوده (درونِ مودالِ استانداردِ سایت) */
+/* پاپ‌آپ کد QR واقعیت افزوده (درون مودال استاندارد سایت) */
 .qr-body{padding:20px 22px;text-align:center}
-/* هشدارِ کمبودِ فایلِ AR — هم‌الگو با .ed-req-note ولی قرمز: آیکونِ اخطار پیش از متن */
+/* هشدار کمبود فایل AR — هم‌الگو با .ed-req-note ولی قرمز: آیکون اخطار پیش از متن */
 .ar-warn{display:flex;align-items:flex-start;gap:8px;text-align:right;
   margin:0 0 16px;padding:10px 12px;border-radius:var(--radius-sm);
   background:var(--err-bg);border:1px solid var(--err-line);
@@ -389,13 +389,13 @@ button.doc-ic:disabled{cursor:default}
 .qr-sub{font-size:11.5px;color:var(--muted);line-height:1.9;margin-bottom:16px}
 .qr-code{width:200px;height:200px;margin:0 auto;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff}
 .qr-code svg{width:100%;height:100%;display:block}
-/* تا وقتی مدلی انتخاب نشده، منوی انتخابِ قطعه آرام «تنفس» می‌کند تا نشان دهد شروعِ کار از همین‌جاست */
+/* تا وقتی مدلی انتخاب نشده، منوی انتخاب قطعه آرام «تنفس» می‌کند تا نشان دهد شروع کار از همین‌جاست */
 @keyframes mvBreath{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
 .mv-picker.attn:not(.expanded){animation:mvBreath 3s ease-in-out infinite}
 @media(prefers-reduced-motion:reduce){.mv-picker.attn:not(.expanded){animation:none}}
 
-/* نوارِ لودینگِ درون‌بخشی — کارتِ شیشه‌ای؛ خطِ سوییپِ پیوسته + چیپِ درصد در وسطِ خط.
-   حالتِ پیش‌فرض: چسبیده به پایینِ ویوئر. حالتِ inline: وسطِ یک بخش (مثلِ پیش‌نمایشِ مودالِ سند). */
+/* نوار لودینگ درون‌بخشی — کارت شیشه‌ای؛ خط سوییپ پیوسته + چیپ درصد در وسط خط.
+   حالت پیش‌فرض: چسبیده به پایین ویوئر. حالت inline: وسط یک بخش (مثل پیش‌نمایش مودال سند). */
 .mv-load{position:absolute;left:12px;right:12px;bottom:12px;z-index:6;direction:ltr;
   padding:9px 12px;background:#ffffffe8;backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:11px;
   box-shadow:0 3px 14px #0000001f;transition:opacity .22s}
@@ -404,16 +404,16 @@ button.doc-ic:disabled{cursor:default}
 .mv-load-fill{position:absolute;top:0;height:100%;width:42%;left:-42%;background:var(--brand);border-radius:4px;
   animation:mvSweep 1.15s ease-in-out infinite}
 @keyframes mvSweep{0%{left:-45%}100%{left:100%}}
-/* چیپِ درصد روی وسطِ خط با پس‌زمینهٔ سفید (انگار خط دو تکه شده)؛ سوییپ از پشتِ آن پیوسته رد می‌شود */
+/* چیپ درصد روی وسط خط با پس‌زمینهٔ سفید (انگار خط دو تکه شده)؛ سوییپ از پشت آن پیوسته رد می‌شود */
 .mv-load-pct{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
   background:#fff;padding:1px 9px;border-radius:20px;border:1px solid var(--line);
   font-size:10.5px;font-weight:700;color:var(--txt);direction:ltr;font-variant-numeric:tabular-nums;line-height:1.6;
   box-shadow:0 1px 3px #0000000f;white-space:nowrap}
 @media(prefers-reduced-motion:reduce){.mv-load-fill{animation:none;left:0;width:100%;opacity:.4}}
 
-/* ---- پنلِ ویرایشِ مشخصات (داخلِ مودالِ سایت) ---- */
+/* ---- پنل ویرایش مشخصات (داخل مودال سایت) ---- */
 .sp-ed{display:flex;flex-direction:column;gap:2px;padding:4px 2px}
-/* راست→چپ: کلید · نامِ ماژول · مقدار · حذف · دستهٔ کشیدن */
+/* راست→چپ: کلید · نام ماژول · مقدار · حذف · دستهٔ کشیدن */
 .sp-row{display:grid;grid-template-columns:30px 150px 1fr 30px 22px;align-items:center;gap:var(--sp-3);
   padding:var(--sp-2) 0;border-bottom:1px solid #f2f1ee}
 .sp-row:last-of-type{border-bottom:none}
@@ -427,10 +427,10 @@ button.doc-ic:disabled{cursor:default}
 .sp-row>input{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.3px}
 .sp-row input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #f7941f1a}
 .sp-row input::placeholder{color:#b0afa9}
-/* کلیدِ روشن/خاموشِ استاندارد (دایرهٔ برند) */
+/* کلید روشن/خاموش استاندارد (دایرهٔ برند) */
 .sp-dot{position:relative;width:20px;height:20px;border-radius:50%;border:2px solid #d4d3ce;background:#fff;
   cursor:pointer;flex-shrink:0;padding:0;justify-self:center;transition:.15s}
-.sp-dot::after{content:"";position:absolute;inset:0;margin:auto;transform:scale(0);   /* مرکزیابی مثلِ .ed-check */
+.sp-dot::after{content:"";position:absolute;inset:0;margin:auto;transform:scale(0);   /* مرکزیابی مثل .ed-check */
   width:8px;height:8px;border-radius:50%;background:#fff;transition:transform .15s}
 .sp-dot:hover:not(.on){border-color:var(--brand);background:#fff2e2}
 .sp-dot.on{border-color:var(--brand);background:var(--brand)}
@@ -447,7 +447,7 @@ button.doc-ic:disabled{cursor:default}
 .sp-foot{display:flex;justify-content:flex-end;gap:var(--sp-2);padding-top:14px;margin-top:12px;border-top:1px solid var(--line)}
 .sp-foot .btn{min-width:92px;justify-content:center}
 
-/* ---- ویرایشِ درجای مقدارِ اطلاعاتِ قطعه (کلیک روی مقدار) ---- */
+/* ---- ویرایش درجای مقدار اطلاعات قطعه (کلیک روی مقدار) ---- */
 .unit{color:var(--muted);margin-inline-start:3px;font-size:11px}
 .spec-val.editable{cursor:pointer}
 .spec-val.editable:hover{color:var(--brand)}
@@ -456,15 +456,15 @@ button.doc-ic:disabled{cursor:default}
 .spec-inline:focus{outline:none;box-shadow:0 0 0 3px #f7941f1a}
 .pd-nodoc{font-size:11px;color:var(--muted);padding:6px 0}
 
-/* ============ پنلِ ویرایشِ قطعات (چک‌لیستِ استانداردِ سایت) ============ */
+/* ============ پنل ویرایش قطعات (چک‌لیست استاندارد سایت) ============ */
 .ed-body{padding:20px 22px;display:flex;flex-direction:column;gap:var(--sp-5)}
 .ed-card{background:#fcfcfb;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
 .ed-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .ed-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .ed-count{margin-inline-start:auto;font-size:11.5px;font-weight:500;color:var(--muted)}
-/* «ترتیب پیش‌فرض» — دکمهٔ آیکونیِ هم‌اندازهٔ .icon-btn.sm در انتهای عنوانِ کارت.
-   خاکستریِ کم‌رنگ = ترتیب همان پیش‌فرض است (بی‌اثر)؛ .is-on = ترتیبِ اختصاصی دارد و قابلِ کلیک است. */
+/* «ترتیب پیش‌فرض» — دکمهٔ آیکونی هم‌اندازهٔ .icon-btn.sm در انتهای عنوان کارت.
+   خاکستری کم‌رنگ = ترتیب همان پیش‌فرض است (بی‌اثر)؛ .is-on = ترتیب اختصاصی دارد و قابل کلیک است. */
 .ed-reset{display:inline-grid;place-items:center;width:26px;height:26px;padding:0;margin-inline-start:auto;flex-shrink:0;
   border:1px solid #eeede9;border-radius:7px;background:#fff;color:#cfcdc8;cursor:default;
   transition:color .12s,border-color .12s,background .12s}
@@ -473,41 +473,41 @@ button.doc-ic:disabled{cursor:default}
 .ed-reset.is-on{border-color:var(--line);color:var(--txt);cursor:pointer}
 .ed-reset.is-on:hover{color:var(--brand);border-color:var(--brand);background:#fff8f0}
 .ed-reset svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* ردیفِ چک‌لیست: دایرهٔ روشن/خاموش + نامِ فارسی + کدِ لاتین (+ حذف در ماژول‌ها) */
+/* ردیف چک‌لیست: دایرهٔ روشن/خاموش + نام فارسی + کد لاتین (+ حذف در ماژول‌ها) */
 .ed-doc-row{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) 0;border-bottom:1px solid #f2f1ee}
 .ed-doc-row:last-child{border-bottom:none}
 .ed-name{font-size:11.5px;color:var(--txt);font-weight:500;flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
 .ed-name span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ed-doc-code{font-size:11.5px;font-weight:600;color:var(--muted);direction:ltr;text-align:left;letter-spacing:.02em;flex-shrink:0}
 .ed-doc-row.off .ed-name,.ed-doc-row.off .ed-doc-code{opacity:.45}
-/* دستهٔ کشیدن برای تغییرِ ترتیبِ نمایشِ اسناد (سمتِ چپ = فرزندِ آخر در RTL). ۶‌نقطه‌ایِ دیزاین‌سیستم، مثلِ فهرستِ مشتری‌ها. */
+/* دستهٔ کشیدن برای تغییر ترتیب نمایش اسناد (سمت چپ = فرزند آخر در RTL). ۶‌نقطه‌ای دیزاین‌سیستم، مثل فهرست مشتری‌ها. */
 .ed-grip{flex-shrink:0;display:grid;place-items:center;width:20px;align-self:stretch;color:#c9c7c2;cursor:grab;
   border-radius:6px;transition:.12s;user-select:none;touch-action:none}
 .ed-grip:hover{color:var(--brand);background:#fff3e6}
 .ed-grip:active{cursor:grabbing}
 .ed-grip svg{width:14px;height:14px;fill:currentColor}
 .ed-doc-row.ed-dragging{opacity:.4;background:#fff8f0;border-radius:6px}
-/* دایرهٔ حالت‌دارِ استاندارد (برند) */
+/* دایرهٔ حالت‌دار استاندارد (برند) */
 .ed-check{position:relative;width:16px;height:16px;border-radius:50%;border:2px solid #d4d3ce;background:#fff;
   cursor:pointer;flex-shrink:0;padding:0;transition:border-color .15s,background .15s,box-shadow .15s}
-/* ⚠ مرکزیابی با inset:0 + margin:auto، نه top:50% + translate(-50%): در دایرهٔ ۱۳پیکسلیِ منوی فیلتر
+/* ⚠ مرکزیابی با inset:0 + margin:auto، نه top:50% + translate(-50%): در دایرهٔ ۱۳پیکسلی منوی فیلتر
    top:50% به ۴٫۵px می‌رسید و translate به −۲٫۵px؛ مرورگر این دو نیم‌پیکسل را جدا گرد می‌کرد و نقطهٔ
-   سفید یک پیکسل از مرکز می‌لغزید. با margin:auto جای نقطه در خودِ چیدمان حل می‌شود و فقط scale می‌ماند. */
+   سفید یک پیکسل از مرکز می‌لغزید. با margin:auto جای نقطه در خود چیدمان حل می‌شود و فقط scale می‌ماند. */
 .ed-check::after{content:"";position:absolute;inset:0;margin:auto;transform:scale(0);
   width:6px;height:6px;border-radius:50%;background:#fff;transition:transform .15s}
 .ed-check:hover:not(.on),.ed-check.xf-hov:not(.on){border-color:var(--brand);background:#fff2e2}
 .ed-check:focus-visible{outline:none;box-shadow:0 0 0 4px #f7941f40}
 .ed-check.on{border-color:var(--brand);background:var(--brand)}
 .ed-check.on::after{transform:scale(1)}
-/* دکمهٔ حذفِ ماژول */
+/* دکمهٔ حذف ماژول */
 .ed-del{width:26px;height:26px;border-radius:7px;border:1px solid var(--line);background:#fff;color:var(--muted);
   display:grid;place-items:center;cursor:pointer;transition:.12s;padding:0;flex-shrink:0}
 .ed-del:hover{border-color:var(--err);color:var(--err);background:var(--err-bg)}
 .ed-del svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
-/* شرطِ حداقل — پیامِ محو با آیکن */
+/* شرط حداقل — پیام محو با آیکن */
 .ed-req-note{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:11.5px;font-weight:500;line-height:1.6;color:var(--muted)}
 .ed-req-note svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-/* ردیفِ افزودنِ ماژولِ جدید */
+/* ردیف افزودن ماژول جدید */
 .ed-doc-add{display:flex;align-items:center;gap:var(--sp-3);padding-top:var(--sp-3);margin-top:4px}
 .ed-plus{width:20px;flex-shrink:0;display:grid;place-items:center}
 .ed-plus svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round}
@@ -516,15 +516,15 @@ button.doc-ic:disabled{cursor:default}
 .ed-doc-add input[dir=ltr]{max-width:80px;flex:0 0 auto;text-align:left;font-variant-numeric:tabular-nums}
 .ed-doc-add input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #f7941f1a}
 .ed-doc-add .btn{flex-shrink:0}
-/* فهرست‌های بلندِ پنل: ارتفاعِ سقف‌دار + اسکرولِ داخلی تا پنجره با رشدِ داده بلند نشود.
-   به‌صورتِ «قابِ فرورفته» تا مرزِ ناحیهٔ اسکرول از توضیحِ زیرش جدا باشد. */
+/* فهرست‌های بلند پنل: ارتفاع سقف‌دار + اسکرول داخلی تا پنجره با رشد داده بلند نشود.
+   به‌صورت «قاب فرورفته» تا مرز ناحیهٔ اسکرول از توضیح زیرش جدا باشد. */
 .ed-scroll{max-height:240px;overflow-y:auto;overflow-x:hidden;padding:2px 8px;
   border:1px solid var(--line);border-radius:8px;background:#fff;box-shadow:inset 0 1px 3px rgba(0,0,0,.04)}
 .ed-scroll::-webkit-scrollbar{width:8px}
 .ed-scroll::-webkit-scrollbar-thumb{background:#d9d8d4;border-radius:6px}
 .ed-scroll::-webkit-scrollbar-thumb:hover{background:#c4c2bd}
 .ed-scroll::-webkit-scrollbar-track{background:transparent}
-/* منوی انتخابِ قطعه (سفارشی) در هدرِ کارت‌های per-part — تریگر و گزینه‌ها دقیقاً هم‌رنگ/هم‌فونت/هم‌اندازه، بدونِ نارنجی */
+/* منوی انتخاب قطعه (سفارشی) در هدر کارت‌های per-part — تریگر و گزینه‌ها دقیقاً هم‌رنگ/هم‌فونت/هم‌اندازه، بدون نارنجی */
 .ed-part-dd{position:relative;margin-inline-start:auto;direction:rtl}
 .ed-part-trig{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;
   color:var(--txt);background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;white-space:nowrap;transition:.15s}
@@ -540,24 +540,24 @@ button.doc-ic:disabled{cursor:default}
 .ed-part-opt:hover{background:#f2f1ee}
 .ed-part-opt.on{background:var(--charcoal);color:#fff}
 @media(prefers-reduced-motion:reduce){.ed-part-menu{transition:none}}
-/* پیامِ توجهِ نارنجی — هم‌فونت/هم‌ضخامتِ بقیهٔ توضیحات، فقط رنگ نارنجی (آیکون هم با currentColor نارنجی می‌شود) */
+/* پیام توجه نارنجی — هم‌فونت/هم‌ضخامت بقیهٔ توضیحات، فقط رنگ نارنجی (آیکون هم با currentColor نارنجی می‌شود) */
 .ed-req-note.attn{color:var(--brand)}
-/* آیکونِ قفلِ نوعِ سندی که سند دارد (به‌جای کلمهٔ «قفل»)؛ نارنجیِ برند */
+/* آیکون قفل نوع سندی که سند دارد (به‌جای کلمهٔ «قفل»)؛ نارنجی برند */
 .ed-lock-ic{display:inline-flex;align-items:center;flex-shrink:0}
 .ed-lock-ic svg{width:13px;height:13px;fill:none;stroke:var(--brand);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* قفلِ ردیفِ اجباری («کد قطعه») درست جای دستهٔ کشیدن می‌نشیند تا ستون‌ها هم‌تراز بمانند */
+/* قفل ردیف اجباری («کد قطعه») درست جای دستهٔ کشیدن می‌نشیند تا ستون‌ها هم‌تراز بمانند */
 .ed-fixed-lock{width:20px;justify-content:center;align-self:stretch}
 .ed-fixed .ed-check[disabled]{opacity:.7}
 .ed-fixed .ed-doc-code{direction:ltr}
 .ed-check[disabled]{opacity:.55;cursor:not-allowed}
-/* پاورقیِ پنل — همیشه به کفِ ناحیهٔ اسکرول چسبیده (مثلِ هدر که بالا ثابت است)،
-   تا دکمه‌های ذخیره/انصراف در هر وضعیتِ اسکرول در دسترس بمانند. پس‌زمینهٔ کدر + خطِ بالایی
+/* پاورقی پنل — همیشه به کف ناحیهٔ اسکرول چسبیده (مثل هدر که بالا ثابت است)،
+   تا دکمه‌های ذخیره/انصراف در هر وضعیت اسکرول در دسترس بمانند. پس‌زمینهٔ کدر + خط بالایی
    تا محتوای اسکرول‌شونده از زیرش عبور کند بدون دیده‌شدن. */
 .ed-foot{position:sticky;bottom:0;z-index:2;display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-4);padding:14px 20px;
   border-top:1px solid var(--line);background:#f8f8f6}
 .ed-foot .btn-row{display:flex;gap:var(--sp-2)}
 .ed-foot .btn{min-width:96px;justify-content:center}
-/* ردیفِ قالبِ ثابتِ مشخصاتِ پروژه: برچسب (راست) + مقدار/ورودی (چپ) */
+/* ردیف قالب ثابت مشخصات پروژه: برچسب (راست) + مقدار/ورودی (چپ) */
 .ed-fld-row{display:flex;align-items:center;gap:var(--sp-4);padding:9px 0;border-bottom:1px solid #f2f1ee}
 .ed-fld-row:last-child{border-bottom:none}
 .ed-fld-lab{font-size:12px;color:var(--muted);font-weight:500;width:140px;flex-shrink:0}
@@ -566,7 +566,7 @@ button.doc-ic:disabled{cursor:default}
 .ed-fld-val.auto{color:var(--muted);font-weight:500}
 .ed-fld-row input{flex:1;min-width:0;font-size:13px;padding:8px 11px;border:1px solid #d4d3ce;border-radius:8px;
   background:#fff;font-family:inherit;color:var(--txt);direction:rtl;text-align:right}
-/* فیلدهایی که صراحتاً dir=ltr دارند (مثلِ «دسته‌بندی محصول» لاتین) چپ‌چین می‌مانند */
+/* فیلدهایی که صراحتاً dir=ltr دارند (مثل «دسته‌بندی محصول» لاتین) چپ‌چین می‌مانند */
 .ed-fld-row input[dir="ltr"]{direction:ltr;text-align:left}
 .ed-fld-row input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px #f7941f1a}
 .ed-fld-row input::placeholder{color:#b0afa9}

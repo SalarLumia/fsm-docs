@@ -6,12 +6,12 @@ var _projView = { mode:"list", c:"", o:"", pr:"" };
 function val(id){ var el=document.getElementById(id); return el?el.value:""; }
 function renderProjectTab(){ renderClientPanel(); }
 
-/* ============ درختِ ناوبریِ سایدبار: «مشتریان و پروژه‌ها» (اکسپندشونده) ============
-   کلیکِ عنوان → رفتن به همان بخش؛ کلیکِ فلش → باز/بستنِ زیرمجموعه (بدونِ ناوبری).
-   ریشه ← مشتری‌ها؛ هر مشتری: کلیکِ نام → پنلِ آن مشتری، کلیکِ فلش → پروژه‌هایش.
-   پروژه‌ها به‌ترتیبِ سفارش‌ها (اولین تا آخرین) می‌آیند — projectsOf از پیش همین ترتیب را می‌دهد. */
+/* ============ درخت ناوبری سایدبار: «مشتریان و پروژه‌ها» (اکسپندشونده) ============
+   کلیک عنوان → رفتن به همان بخش؛ کلیک فلش → باز/بستن زیرمجموعه (بدون ناوبری).
+   ریشه ← مشتری‌ها؛ هر مشتری: کلیک نام → پنل آن مشتری، کلیک فلش → پروژه‌هایش.
+   پروژه‌ها به‌ترتیب سفارش‌ها (اولین تا آخرین) می‌آیند — projectsOf از پیش همین ترتیب را می‌دهد. */
 var _nav = { open:false, clients:{}, built:false };
-/* بازکردن/بستنِ نرمِ یک ظرفِ آکاردئونی (ترفندِ گرید 0fr↔1fr) + پخشِ آبشاریِ آیتم‌های تازه‌نمایان (nav-anim موقتی). */
+/* بازکردن/بستن نرم یک ظرف آکاردئونی (ترفند گرید 0fr↔1fr) + پخش آبشاری آیتم‌های تازه‌نمایان (nav-anim موقتی). */
 function navAnimOpen(el, open){
   if(!el) return;
   el.classList.toggle("open", open);
@@ -23,8 +23,8 @@ function navToggleRoot(e){
   if(!_nav.built){ renderNavTree(); return; }           // اولین‌بار: بساز (درخت هنوز در DOM نیست)
   var exp=document.getElementById("navRootExp");
   if(exp){ exp.classList.toggle("open",_nav.open); exp.setAttribute("aria-expanded",_nav.open?"true":"false"); }
-  if(document.body) document.body.classList.toggle("sb-wide",_nav.open); // پهن‌شدنِ سایدبار
-  navAnimOpen(document.getElementById("navTreeChildren"), _nav.open);    // انیمیشنِ درجا، بدونِ بازسازی
+  if(document.body) document.body.classList.toggle("sb-wide",_nav.open); // پهن‌شدن سایدبار
+  navAnimOpen(document.getElementById("navTreeChildren"), _nav.open);    // انیمیشن درجا، بدون بازسازی
 }
 function navToggleClient(e,code){
   if(e&&e.stopPropagation)e.stopPropagation();
@@ -37,8 +37,8 @@ function navToggleClient(e,code){
 }
 function navGoClient(code){ _nav.open=true; switchTab("project"); selectClient(code); }
 function navGoProject(c,o,pr){ _nav.open=true; _nav.clients[c]=true; openProject(c,o,pr); }
-/* ناوبری به «پنلِ قطعه»: به جزئیاتِ پروژه می‌رود و به سکشنِ همان قطعه اسکرول + یک فلاشِ کوتاه می‌زند.
-   برای اسنادِ سطحِ پروژه (قطعهٔ ۰۰) سکشنی نیست، پس فقط روی خودِ پروژه می‌ماند. */
+/* ناوبری به «پنل قطعه»: به جزئیات پروژه می‌رود و به سکشن همان قطعه اسکرول + یک فلاش کوتاه می‌زند.
+   برای اسناد سطح پروژه (قطعهٔ ۰۰) سکشنی نیست، پس فقط روی خود پروژه می‌ماند. */
 function navGoPart(c,o,pr,pn){
   navGoProject(c,o,pr);
   var el=document.getElementById("pdpart-"+c+"-"+pad2(o)+"-"+pad2(pr)+"-"+pad2(pn));
@@ -50,13 +50,13 @@ function navClientLogo(c){
   if(c&&c.logo) return '<img class="nav-ci-logo" src="'+esc(c.logo)+'" alt="">';
   return '<span class="nav-ci-ph">'+esc((c&&c.code?String(c.code):"?").slice(0,2).toUpperCase())+'</span>';
 }
-/* درخت را همیشه به‌طورِ کامل می‌سازد (همهٔ مشتری‌ها و همهٔ پروژه‌ها در DOM می‌مانند، فقط با کلاسِ open
-   جمع/باز می‌شوند تا انیمیشنِ گرید 0fr↔1fr کار کند). فقط این تابع innerHTML را عوض می‌کند؛
-   باز/بسته‌کردنِ کاربر از راهِ navToggle* فقط کلاس را جابه‌جا می‌کند (بدونِ بازسازی، تا نرم بماند). */
-/* فقط کلاسِ «موردِ جاری» را درجا عوض می‌کند، بدونِ بازساختِ DOM.
-   ⚠ چرا لازم است: renderNavTree با innerHTML کلِ درخت را از نو می‌سازد؛
-   ردیفِ تازه از همان اول در حالتِ نهایی متولد می‌شود، پس تغییری رخ نمی‌دهد که CSS
-   بتواند انیمیشنش کند و نوارِ لبه بی‌انیمیشن ظاهر/محو می‌شد. */
+/* درخت را همیشه به‌طور کامل می‌سازد (همهٔ مشتری‌ها و همهٔ پروژه‌ها در DOM می‌مانند، فقط با کلاس open
+   جمع/باز می‌شوند تا انیمیشن گرید 0fr↔1fr کار کند). فقط این تابع innerHTML را عوض می‌کند؛
+   باز/بسته‌کردن کاربر از راه navToggle* فقط کلاس را جابه‌جا می‌کند (بدون بازسازی، تا نرم بماند). */
+/* فقط کلاس «مورد جاری» را درجا عوض می‌کند، بدون بازساخت DOM.
+   ⚠ چرا لازم است: renderNavTree با innerHTML کل درخت را از نو می‌سازد؛
+   ردیف تازه از همان اول در حالت نهایی متولد می‌شود، پس تغییری رخ نمی‌دهد که CSS
+   بتواند انیمیشنش کند و نوار لبه بی‌انیمیشن ظاهر/محو می‌شد. */
 function navSyncSelection(){
   var host=document.getElementById("navTreeChildren"); if(!host||!_nav.built) return false;
   var projActive=(typeof window!=="undefined" && window._activeTab==="project");
@@ -78,7 +78,7 @@ function navSyncSelection(){
   }
   return true;
 }
-/* اگر فقط انتخاب عوض شده (نه فهرستِ مشتری/پروژه)، درجا به‌روز کن تا انیمیشن بماند */
+/* اگر فقط انتخاب عوض شده (نه فهرست مشتری/پروژه)، درجا به‌روز کن تا انیمیشن بماند */
 function navRefreshSelection(){
   if(navSyncSelection()) return;
   renderNavTree();
@@ -87,9 +87,9 @@ function renderNavTree(){
   var host=document.getElementById("navTreeChildren"); if(!host) return;
   var exp=document.getElementById("navRootExp");
   if(exp){ exp.classList.toggle("open",_nav.open); exp.setAttribute("aria-expanded",_nav.open?"true":"false"); }
-  if(document.body) document.body.classList.toggle("sb-wide",_nav.open); // پهن‌شدنِ سایدبار هنگامِ باز بودن
-  host.classList.toggle("open",_nav.open);                               // ظرفِ ریشه (خودِ #navTreeChildren)
-  // نارنجیِ مشتری/پروژه فقط وقتی که واقعاً روی تبِ پروژه هستیم (وگرنه در داشبورد نارنجی می‌ماند)
+  if(document.body) document.body.classList.toggle("sb-wide",_nav.open); // پهن‌شدن سایدبار هنگام باز بودن
+  host.classList.toggle("open",_nav.open);                               // ظرف ریشه (خود #navTreeChildren)
+  // نارنجی مشتری/پروژه فقط وقتی که واقعاً روی تب پروژه هستیم (وگرنه در داشبورد نارنجی می‌ماند)
   var projActive=(typeof window!=="undefined" && window._activeTab==="project");
   var clients=clientsSorted(), inner;
   if(!clients.length){
@@ -97,7 +97,7 @@ function renderNavTree(){
   } else {
     inner='<div class="nav-children">'+clients.map(function(c){
       var cOpen=!!_nav.clients[c.code], projs=projectsOf(c.code);
-      // موردِ جاری (روی پنلِ همین مشتری) در برابرِ «مسیر» (یکی از پروژه‌هایش باز است) — فقط یک نشانِ قوی
+      // مورد جاری (روی پنل همین مشتری) در برابر «مسیر» (یکی از پروژه‌هایش باز است) — فقط یک نشان قوی
       var cIsCur=(projActive && _cp.client===c.code && _projView.mode!=="detail");
       var cIsPath=(projActive && _projView.mode==="detail" && _projView.c===c.code);
       var cCls=cIsCur?' cur':(cIsPath?' path':'');
@@ -111,7 +111,7 @@ function renderNavTree(){
             return '<button class="nav-leaf nav-pleaf'+(pCur?' cur':'')+'" data-prj="'+esc(c.code)+'/'+esc(o)+'/'+esc(pr)+'" onclick="navGoProject(\''+esc(c.code)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')"><span class="nav-dot"></span><span class="nav-lb">'+esc(p.description||("پروژهٔ "+pr))+'</span></button>';
           }).join("")
         : '<div class="nav-empty">پروژه‌ای نیست.</div>';
-      // ظرفِ آکاردئونیِ پروژه‌ها (همیشه در DOM؛ open آن مستقل از ریشه است)
+      // ظرف آکاردئونی پروژه‌ها (همیشه در DOM؛ open آن مستقل از ریشه است)
       var projCollapse='<div class="nav-collapse nav-projcollapse'+(cOpen?' open':'')+'" id="navc-'+esc(c.code)+'"><div class="nav-collapse-inner"><div class="nav-projwrap">'+projItems+'</div></div></div>';
       return '<div class="nav-cnode"><div class="nav-trow'+cCls+'" data-cli="'+esc(c.code)+'">'+
         '<button class="nav-leaf nav-cleaf" onclick="navGoClient(\''+esc(c.code)+'\')">'+navClientLogo(c)+'<span class="nav-lb">'+esc(c.name)+'</span></button>'+
@@ -133,12 +133,12 @@ function cpLogo(c,size){
   return '<div class="cp-logo cp-logo-ph" style="width:'+s+'px;height:'+s+'px;font-size:'+Math.round(s*0.36)+'px">'+esc(initials)+'</div>';
 }
 
-/* فقط مدیر مجاز به مدیریتِ مشتری/سفارش/پروژه است (بیننده و بازبین: فقط مشاهده).
-   بک‌اند هم این نوشتن‌ها را adminOnly می‌کند؛ این گارد برای بستنِ UI و پیامِ روشن است. */
+/* فقط مدیر مجاز به مدیریت مشتری/سفارش/پروژه است (بیننده و بازبین: فقط مشاهده).
+   بک‌اند هم این نوشتن‌ها را adminOnly می‌کند؛ این گارد برای بستن UI و پیام روشن است. */
 function cpIsAdmin(){ return (typeof ME!=="undefined" && ME && ME.role==="admin"); }
 function requireAdmin(){ if(!cpIsAdmin()){ toast("فقط مدیر مجاز به این کار است.",true); return false; } return true; }
 
-/* ---- نمای اصلی: ریل مشتریان + تبِ مشتری انتخاب‌شده ---- */
+/* ---- نمای اصلی: ریل مشتریان + تب مشتری انتخاب‌شده ---- */
 function renderClientPanel(){
   var cpView=document.getElementById("cpView"); if(!cpView) return;
   document.getElementById("projectDetailView").classList.add("hidden");
@@ -162,7 +162,7 @@ function renderClientPanel(){
     '</div>';
   xfPlay(cpView, ".cp-client-item", "sel", _xfC);
   xfPlay(cpView, ".cp-order-card", "sel", _xfO);
-  navRefreshSelection();   // فقط انتخاب عوض شده؛ بازسازیِ درخت انیمیشنِ نوارِ لبه را از بین می‌برد
+  navRefreshSelection();   // فقط انتخاب عوض شده؛ بازسازی درخت انیمیشن نوار لبه را از بین می‌برد
 }
 
 function railHTML(clients){
@@ -185,13 +185,13 @@ function clientItemHTML(c){
     cpLogo(c,34)+
     '<div class="cp-ci-body"><span class="cp-ci-name">'+esc(c.name)+'</span>'+
       (en?'<span class="cp-ci-meta cmeta-en">'+esc(en)+'</span>':'')+'</div>'+
-    (admin?'<span class="cp-grip" title="بکشید تا ترتیب عوض شود" aria-label="جابجاییِ ترتیب" onmousedown="cliGripDown()" onclick="event.stopPropagation()">'+
+    (admin?'<span class="cp-grip" title="بکشید تا ترتیب عوض شود" aria-label="جابجایی ترتیب" onmousedown="cliGripDown()" onclick="event.stopPropagation()">'+
       '<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></span>':'')+
     '</div>';
 }
-/* ============ جابجاییِ ترتیبِ مشتری‌ها (drag & drop از روی دستهٔ ۶‌نقطه‌ای + انیمیشنِ FLIP) ============
-   ترتیب در فیلدِ order هر مشتری ذخیره می‌شود؛ clientsSorted بر اساسِ همان مرتب می‌کند، پس
-   هم در این ریل و هم در درختِ سایدبار یکسان دیده می‌شود. */
+/* ============ جابجایی ترتیب مشتری‌ها (drag & drop از روی دستهٔ ۶‌نقطه‌ای + انیمیشن FLIP) ============
+   ترتیب در فیلد order هر مشتری ذخیره می‌شود؛ clientsSorted بر اساس همان مرتب می‌کند، پس
+   هم در این ریل و هم در درخت سایدبار یکسان دیده می‌شود. */
 var _cliGripArmed=false, _cliDrag={code:null};
 function cliGripDown(){ _cliGripArmed=true; }            // فقط کشیدن از روی دسته مجاز است
 function clientDragStart(e,code){
@@ -218,7 +218,7 @@ function cliAfterElement(list,y){
     if(off<0 && off>closestOffset){ closestOffset=off; closest=el; } });
   return closest;
 }
-/* FLIP: موقعیتِ پیش از جابجایی را بگیر، DOM را عوض کن، سپس هر سلول را از موقعیتِ قبلی به جدید نرم بلغزان */
+/* FLIP: موقعیت پیش از جابجایی را بگیر، DOM را عوض کن، سپس هر سلول را از موقعیت قبلی به جدید نرم بلغزان */
 function cliFlip(list,mutate){
   var items=[].slice.call(list.querySelectorAll(".cp-client-item"));
   var firsts=items.map(function(el){ return el.getBoundingClientRect().top; });
@@ -233,7 +233,7 @@ function clientDragEnd(e){
   var item=e.currentTarget; if(item&&item.classList) item.classList.remove("cli-dragging");
   commitClientOrder();
 }
-/* ترتیبِ جدید را از DOM بخوان، در DB.clients بنویس، سایدبار را تازه کن و برای هر مشتریِ تغییرکرده ذخیره کن */
+/* ترتیب جدید را از DOM بخوان، در DB.clients بنویس، سایدبار را تازه کن و برای هر مشتری تغییرکرده ذخیره کن */
 function commitClientOrder(){
   var list=document.getElementById("cpClientList"); if(!list) return;
   var codes=[].slice.call(list.querySelectorAll(".cp-client-item")).map(function(el){ return el.getAttribute("data-code"); });
@@ -253,7 +253,7 @@ function clientDetailHTML(){
   return identityHTML(c,orders,projects)+ordersSectionHTML(c,orders)+projectsSectionHTML(c,orders);
 }
 
-/* هویت مشتری (تبِ اختصاصی) */
+/* هویت مشتری (تب اختصاصی) */
 function identityHTML(c,orders,projects){
   return '<div class="cp-identity">'+cpLogo(c,60)+
     '<div class="cp-id-body"><h2 class="cp-id-name">'+esc(c.name)+'</h2>'+
@@ -280,8 +280,8 @@ function ordersSectionHTML(c,orders){
       '<div class="coc-meta"><bdi>'+faN(np)+' پروژه</bdi>'+(o.date?' · <bdi>'+fmtDate(o.date)+'</bdi>':'')+'</div>'+
     '</div>';
   }).join("");
-  /* ردیفِ پُر (۵، ۱۰، ۱۵… سفارش): باکسِ «سفارش جدید» ردیفِ تازه‌ای با یک کارتِ تنها باز می‌کرد.
-     پس در این حالت باکس حذف و دکمهٔ + کنارِ تیتر می‌آید (هم‌الگوی بقیهٔ بخش‌ها)؛ با سفارشِ ششم باکس برمی‌گردد. */
+  /* ردیف پر (۵، ۱۰، ۱۵… سفارش): باکس «سفارش جدید» ردیف تازه‌ای با یک کارت تنها باز می‌کرد.
+     پس در این حالت باکس حذف و دکمهٔ + کنار تیتر می‌آید (هم‌الگوی بقیهٔ بخش‌ها)؛ با سفارش ششم باکس برمی‌گردد. */
   var rowFull=orders.length>0 && orders.length%5===0;
   var addCard=(admin&&!rowFull)?'<button class="cp-order-add" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'<span>سفارش جدید</span></button>':'';
   var addHd=(admin&&rowFull)?'<span class="sec-act"><button class="icon-btn" title="سفارش جدید" onclick="cpToggleOrderForm(\'\')">'+ICON.plus+'</button></span>':'';
@@ -289,7 +289,7 @@ function ordersSectionHTML(c,orders){
     '<div class="cp-order-strip">'+cards+addCard+'</div></div>';
 }
 
-/* پروژه‌های سفارشِ انتخاب‌شده (ردیف‌های تک‌خطی) */
+/* پروژه‌های سفارش انتخاب‌شده (ردیف‌های تک‌خطی) */
 function projectsSectionHTML(c,orders){
   var admin=cpIsAdmin();
   if(!orders.length) return '<div class="cp-section"><div class="cp-empty-hint">'+(admin?'برای افزودن پروژه، ابتدا یک سفارش بسازید.':'سفارشی ثبت نشده.')+'</div></div>';
@@ -310,10 +310,10 @@ function projectRowHTML(c,p){
   return '<div class="cp-proj-row" tabindex="0" role="button" onclick="showProjectDetail(\''+esc(c.code)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')">'+
     '<span class="cpr-name">'+esc(s.name)+'</span>'+
     '<span class="cpr-code mono">'+code+'</span>'+
-    /* درصد اول می‌آید تا در چیدمان راست‌به‌چپ سمت راستِ نوار بنشیند */
+    /* درصد اول می‌آید تا در چیدمان راست‌به‌چپ سمت راست نوار بنشیند */
     '<div class="cpr-prog"><span class="cpr-pct">'+s.pct+'٪</span>'+
       '<div class="proj-bar-bg"><div class="proj-bar-fill" style="width:'+s.pct+'%;background:'+s.status.bar+'"></div></div></div>'+
-    '<span class="cpr-count" title="اسنادِ ثبت‌شده از کل">'+s.reg+'/'+s.total+'</span>'+
+    '<span class="cpr-count" title="اسناد ثبت‌شده از کل">'+s.reg+'/'+s.total+'</span>'+
     (cpIsAdmin()?'<div class="cpr-acts" onclick="event.stopPropagation()">'+
       editIconBtn("cpToggleProjForm('"+esc(o)+"/"+esc(pr)+"')","ویرایش پروژه")+
       delIconBtn("del('deleteProject',{clientCode:'"+esc(c.code)+"',orderNo:'"+esc(o)+"',projectNo:'"+esc(pr)+"'})","حذف پروژه")+
@@ -322,13 +322,13 @@ function projectRowHTML(c,p){
 
 /* ---- تعامل‌ها ---- */
 function selectClient(code){ _cp.client=code; _cp.order=""; _cp.orderFormOpen=false; _cp.editingOrder=""; _cp.projFormOpen=false; _cp.editingProject=""; renderClientPanel();
-  // سوئیچِ مشتری: فقط سمتِ راست (هویت ← سفارش‌ها ← پروژه‌ها) پلکانی وارد می‌شود؛ ریلِ مشتریان ثابت می‌ماند
+  // سوئیچ مشتری: فقط سمت راست (هویت ← سفارش‌ها ← پروژه‌ها) پلکانی وارد می‌شود؛ ریل مشتریان ثابت می‌ماند
   if(typeof revealCascade==="function") revealCascade(document.getElementById("cpDetail")); }
 function selectOrder(o){ _cp.order=pad2(o); _cp.orderFormOpen=false; _cp.editingOrder=""; _cp.projFormOpen=false; _cp.editingProject=""; renderClientPanel();
-  // سوئیچِ سفارش: فقط بخشِ «پروژه‌های سفارش» (عنوان ← ردیف‌های پروژه) پلکانی وارد می‌شود
+  // سوئیچ سفارش: فقط بخش «پروژه‌های سفارش» (عنوان ← ردیف‌های پروژه) پلکانی وارد می‌شود
   if(typeof revealCascade==="function") revealCascade(document.getElementById("cpProjSection")); }
 
-/* افزودن/ویرایش سفارش — مودال کوچکِ روی‌هم (روی پنل ثبت‌سند هم می‌نشیند) */
+/* افزودن/ویرایش سفارش — مودال کوچک روی‌هم (روی پنل ثبت‌سند هم می‌نشیند) */
 function cpToggleOrderForm(o){ cpOpenOrderModal(o); }
 function cpOpenOrderModal(o){
   if(!requireAdmin()) return;
@@ -346,7 +346,7 @@ function cpOpenOrderModal(o){
   var t=document.getElementById("cpOTitle"); if(t) try{ t.focus(); }catch(e){}
 }
 
-/* افزودن/ویرایش پروژه — مودال کوچکِ روی‌هم */
+/* افزودن/ویرایش پروژه — مودال کوچک روی‌هم */
 function cpToggleProjForm(op){ cpOpenProjectModal(op); }
 function cpOpenProjectModal(op){
   if(!requireAdmin()) return;
@@ -371,7 +371,7 @@ function cpOpenProjectModal(op){
 async function cpSaveOrder(){
   if(!_cp.client){ toast("ابتدا مشتری را انتخاب کنید.",true); return; }
   var title=val("cpOTitle").trim();
-  /* در حالت ویرایش، سفارشِ موجود را برمی‌داریم تا «تاریخ ایجاد» و «ثبت‌کنندهٔ» اولیه حفظ شود
+  /* در حالت ویرایش، سفارش موجود را برمی‌داریم تا «تاریخ ایجاد» و «ثبت‌کنندهٔ» اولیه حفظ شود
      (ارسال date به بک‌اند باعث می‌شود حتی نسخهٔ منتشرنشدهٔ قبلی هم تاریخ را بازننویسد). */
   var prev=_cp.editingOrder ? DB.orders.find(function(x){
     return x.clientCode===_cp.client && pad2(x.orderNo)===pad2(_cp.editingOrder); }) : null;
@@ -402,10 +402,10 @@ async function cpSaveProject(){
   if(!r.ok){ toast(r.message||"ذخیره ناموفق",true); return; }
   var pn=r.projectNo;
   var prev=DB.projects.find(function(x){return x.clientCode===_cp.client&&pad2(x.orderNo)===pad2(orderNo)&&pad2(x.projectNo)===pad2(pn);});
-  /* ⚠ localUpsert جایگزینِ کامل است (arr[i]=newItem)، نه ادغام. پس اگر شیءِ تازه را از صفر
-     بسازیم هر فیلدی که در آن نیاوریم از نسخهٔ داخلِ مرورگر پاک می‌شود — از جمله specs که
+  /* ⚠ localUpsert جایگزین کامل است (arr[i]=newItem)، نه ادغام. پس اگر شیء تازه را از صفر
+     بسازیم هر فیلدی که در آن نیاوریم از نسخهٔ داخل مرورگر پاک می‌شود — از جمله specs که
      همهٔ ماژول‌ها، قطعات و پارامترهای پروژه در آن است. بک‌اند دست‌نخورده می‌ماند (فقط
-     description فرستاده می‌شود)، ولی پنل تا رفرشِ بعدی خالی دیده می‌شد.
+     description فرستاده می‌شود)، ولی پنل تا رفرش بعدی خالی دیده می‌شد.
      راه‌حل: از نسخهٔ قبلی شروع کن و فقط چیزی را که واقعاً عوض شده بنویس. */
   var next={}; if(prev){ for(var k in prev){ if(prev.hasOwnProperty(k)) next[k]=prev[k]; } }
   next.clientCode=_cp.client; next.orderNo=orderNo; next.projectNo=pn; next.description=desc;
@@ -416,8 +416,8 @@ async function cpSaveProject(){
   if(newDocOpen()) syncNewDocAfterProject(orderNo,pn); // اگر از پنل ثبت‌سند آمده‌ایم، خودکار انتخاب کن
 }
 
-/* همگام‌سازیِ ویزاردِ ثبت سند پس از افزودنِ مشتری/سفارش/پروژه: توابعِ
-   syncNewDocAfterClient/Order/Project اکنون در documents.js (ویزاردِ ریلِ شماره) تعریف شده‌اند. */
+/* همگام‌سازی ویزارد ثبت سند پس از افزودن مشتری/سفارش/پروژه: توابع
+   syncNewDocAfterClient/Order/Project اکنون در documents.js (ویزارد ریل شماره) تعریف شده‌اند. */
 
 /* ---- مودال افزودن/ویرایش مشتری (با لوگو) ---- */
 function cpOpenClientModal(code){
@@ -439,7 +439,7 @@ function cpOpenClientModal(code){
     '<div class="clm-row"><label class="fld">نام لاتین مشتری</label>'+
       '<input id="clmNameEn" placeholder="Full company name (English)" dir="ltr" style="direction:ltr;text-align:left" '+
         'oninput="this.value=this.value.replace(/[^A-Za-z0-9 .,&()-]/g,\'\')" value="'+esc(rec?(rec.nameEn||""):"")+'">'+
-      '<div class="hint">فقط حروف و اعدادِ انگلیسی؛ در قالبِ «مشخصات پروژه» به‌عنوانِ «نام مشتری» نمایش داده می‌شود.</div></div>'+
+      '<div class="hint">فقط حروف و اعداد انگلیسی؛ در قالب «مشخصات پروژه» به‌عنوان «نام مشتری» نمایش داده می‌شود.</div></div>'+
     '<div class="clm-row"><label class="fld">لوگوی مشتری (اختیاری)</label>'+
       '<div class="logo-up">'+
         '<label class="logo-up-box'+(hasLogo?" has":"")+'" id="clmLogoBox">'+clmBoxInner(_cp.logoEditSrc)+'</label>'+
@@ -453,7 +453,7 @@ function cpOpenClientModal(code){
   '</div>';
   showModal((editing?"ویرایش مشتری":"مشتری جدید"), body, "box-narrow");
 }
-/* محتوای داخل کادر لوگو: ورودی فایل + (تصویر یا حالت خالیِ «انتخاب تصویر») */
+/* محتوای داخل کادر لوگو: ورودی فایل + (تصویر یا حالت خالی «انتخاب تصویر») */
 function clmBoxInner(src){
   return '<input type="file" accept="image/*" style="display:none" onchange="cpPickLogo(this)">'+
     (src ? '<img src="'+esc(src)+'" alt="لوگو"><span class="logo-up-hint">تغییر تصویر</span>'
@@ -524,34 +524,34 @@ function backToClients(){
   _projView.mode="list"; renderClientPanel();
   if(typeof revealCascade==="function") revealCascade(document.getElementById("cpView"));   // بازگشت هم آبشاری وارد شود
 }
-/* ================= نوارِ شاخص — عیناً پروتوتایپ ================= */
-/* دوناتِ دولایه: کمانِ کم‌رنگ = ثبت‌شده (زیر)، کمانِ پررنگ = تأییدشده (رو). عدد = تأییدشده٪ */
-/* حلقهٔ درصد — قوس مستقیم با دستورِ A رسم می‌شود، نه با stroke-dashoffset.
-   دلیل: با dashoffset، نقطهٔ شروعِ قوسِ مرئی به علامتِ offset و به transformِ
-   ظرف وابسته می‌شد و هر اصلاحِ جهت، شروع را از بالا جدا می‌کرد. اینجا مختصاتِ
+/* ================= نوار شاخص — عیناً پروتوتایپ ================= */
+/* دونات دولایه: کمان کم‌رنگ = ثبت‌شده (زیر)، کمان پررنگ = تأییدشده (رو). عدد = تأییدشده٪ */
+/* حلقهٔ درصد — قوس مستقیم با دستور A رسم می‌شود، نه با stroke-dashoffset.
+   دلیل: با dashoffset، نقطهٔ شروع قوس مرئی به علامت offset و به transform
+   ظرف وابسته می‌شد و هر اصلاح جهت، شروع را از بالا جدا می‌کرد. اینجا مختصات
    شروع و پایان صریح نوشته می‌شوند، پس جهت و شروع هر دو قطعی‌اند:
    شروع از بالا، حرکت پادساعت‌گرد. */
-/* حلقهٔ درصد — مسیرِ کاملِ دایره یک‌بار رسم می‌شود و مقدارِ نمایش با
-   stroke-dasharray کنترل می‌شود، نه با تغییرِ خودِ مسیر.
+/* حلقهٔ درصد — مسیر کامل دایره یک‌بار رسم می‌شود و مقدار نمایش با
+   stroke-dasharray کنترل می‌شود، نه با تغییر خود مسیر.
    دو دلیل:
-   ۱) ویژگیِ d با transition در همهٔ مرورگرها انیمیت نمی‌شود، ولی dasharray
-      همه‌جا می‌شود؛ پس پرشدنِ نرمِ حلقه برمی‌گردد.
-   ۲) جهت و نقطهٔ شروع در خودِ مسیر ثابت‌اند (شروع از بالا، پادساعت‌گرد با
-      sweep-flag=0)، پس هیچ transformی روی ظرف لازم نیست و آن باگِ قبلی که
-      شروعِ قوس را از بالا جدا می‌کرد برنمی‌گردد.
-   pathLength=100 مسیر را روی مقیاسِ ۰..۱۰۰ نرمال می‌کند، پس درصد مستقیم
+   ۱) ویژگی d با transition در همهٔ مرورگرها انیمیت نمی‌شود، ولی dasharray
+      همه‌جا می‌شود؛ پس پرشدن نرم حلقه برمی‌گردد.
+   ۲) جهت و نقطهٔ شروع در خود مسیر ثابت‌اند (شروع از بالا، پادساعت‌گرد با
+      sweep-flag=0)، پس هیچ transformی روی ظرف لازم نیست و آن باگ قبلی که
+      شروع قوس را از بالا جدا می‌کرد برنمی‌گردد.
+   pathLength=100 مسیر را روی مقیاس ۰..۱۰۰ نرمال می‌کند، پس درصد مستقیم
    در dasharray می‌نشیند و محاسبهٔ محیط لازم نیست. */
 function donutHTML(solidPct, regPct, tips){
   var CX=29, CY=29, R=24;
-  /* دایرهٔ کامل با دو نیم‌قوس (یک قوسِ تنها نمی‌تواند دایره را ببندد).
+  /* دایرهٔ کامل با دو نیم‌قوس (یک قوس تنها نمی‌تواند دایره را ببندد).
      شروع از بالا و sweep-flag=0 ⇒ پادساعت‌گرد. */
   var FULL="M"+CX+","+(CY-R)+
     "A"+R+","+R+" 0 1 0 "+CX+","+(CY+R)+
     "A"+R+","+R+" 0 1 0 "+CX+","+(CY-R);
   var col = solidPct===100 ? "var(--ok)" : "var(--brand)";
-  /* ⚠ مقدارِ واقعی روی data-v می‌نشیند و dasharray از صفر شروع می‌شود؛
-     playDonutsIn پس از رندر آن را اعمال می‌کند تا گذارِ CSS اجرا شود.
-     بدونِ این، عنصرِ تازه‌ساخته‌شده با innerHTML در حالتِ نهایی متولد می‌شود
+  /* ⚠ مقدار واقعی روی data-v می‌نشیند و dasharray از صفر شروع می‌شود؛
+     playDonutsIn پس از رندر آن را اعمال می‌کند تا گذار CSS اجرا شود.
+     بدون این، عنصر تازه‌ساخته‌شده با innerHTML در حالت نهایی متولد می‌شود
      و هیچ انیمیشنی دیده نمی‌شود. */
   var seg=function(pct,stroke,extra){
     var v=Math.max(0,Math.min(100,pct));
@@ -565,10 +565,10 @@ function donutHTML(solidPct, regPct, tips){
     (tips?mbDonutHits(FULL, solidPct, regPct, tips):'')+
     '</svg><span class="dtxt">'+solidPct+'٪</span>'+(tips?mbTipsHTML(tips):'')+'</div>';
 }
-/* ===== تولتیپِ گراف‌های نوارِ شاخص — همان رفتار و ظاهرِ نوارِ پیشرفتِ داشبورد (.sgt) =====
+/* ===== تولتیپ گراف‌های نوار شاخص — همان رفتار و ظاهر نوار پیشرفت داشبورد (.sgt) =====
    هر گراف سه بخش دارد: تأییدشده (پررنگ)، ثبت‌شده ولی تأییدنشده (کم‌رنگ)، بارگذاری‌نشده (زمینه).
-   با رفتنِ موس روی هر بخش، جعبهٔ آمارِ همان بخش باز می‌شود و خودِ بخش کمی برجسته می‌شود.
-   tips = {apr:{t,c,rows}, reg:{…}, none:{…}} — rows = [[برچسب, مقدار], …]؛ بخشِ خالی (null) ناحیهٔ هاور ندارد. */
+   با رفتن موس روی هر بخش، جعبهٔ آمار همان بخش باز می‌شود و خود بخش کمی برجسته می‌شود.
+   tips = {apr:{t,c,rows}, reg:{…}, none:{…}} — rows = [[برچسب, مقدار], …]؛ بخش خالی (null) ناحیهٔ هاور ندارد. */
 function mbTipHTML(key, tp){
   return '<span class="sgt mtip-'+key+'"><div class="sgt-h"><i class="sgt-sw" style="background:'+tp.c+'"></i>'+
     '<span class="sgt-t">'+esc(tp.t)+'</span></div>'+
@@ -577,23 +577,23 @@ function mbTipHTML(key, tp){
 function mbTipsHTML(tips){
   return ["apr","reg","none"].map(function(k){ return tips[k]?mbTipHTML(k,tips[k]):""; }).join("");
 }
-/* ناحیه‌های هاورِ دونات: مسیرهای شفافِ پهن روی همان دایره، تا هدف‌گیریِ حلقهٔ باریک آسان باشد.
-   ترتیب مهم است — بالاترین لایه برنده است: کلِ دایره (بارگذاری‌نشده) ← ثبت‌شده ← تأییدشده. */
+/* ناحیه‌های هاور دونات: مسیرهای شفاف پهن روی همان دایره، تا هدف‌گیری حلقهٔ باریک آسان باشد.
+   ترتیب مهم است — بالاترین لایه برنده است: کل دایره (بارگذاری‌نشده) ← ثبت‌شده ← تأییدشده. */
 function mbDonutHits(FULL, sp, rp, tips){
   var hit=function(k, v){ if(!tips[k] || v<=0) return "";
     return '<path class="d-hit dh-'+k+'" d="'+FULL+'" pathLength="100" stroke-dasharray="'+(v>=100?"100 0":v+" "+(100-v))+'"/>'; };
   return hit("none",100)+hit("reg",rp)+hit("apr",sp);
 }
-/* سطرهای استاندارد: تعداد + سهم از کل (+ سطرهای اختیاریِ بیشتر) */
+/* سطرهای استاندارد: تعداد + سهم از کل (+ سطرهای اختیاری بیشتر) */
 function mbRows(n, total, unit, extra){
   var r=[["تعداد", faN(n)+" "+unit], ["سهم از کل", faN(total?Math.round(n/total*100):0)+"٪"]];
   return r.concat(extra||[]);
 }
 
-/* پرشدنِ حلقه‌ها پس از رندر — مقدار از data-v خوانده و روی dasharray نشانده
-   می‌شود. یک فریم صبر می‌کنیم تا مرورگر حالتِ اولیه (صفر) را ثبت کند، وگرنه
+/* پرشدن حلقه‌ها پس از رندر — مقدار از data-v خوانده و روی dasharray نشانده
+   می‌شود. یک فریم صبر می‌کنیم تا مرورگر حالت اولیه (صفر) را ثبت کند، وگرنه
    هر دو مقدار در یک فریم اعمال می‌شوند و گذار اجرا نمی‌شود. */
-/* instant=true: مقدارِ نهایی همین حالا و پیش از اولین رسمِ مرورگر نشانده می‌شود، پس گذاری اجرا نمی‌شود. */
+/* instant=true: مقدار نهایی همین حالا و پیش از اولین رسم مرورگر نشانده می‌شود، پس گذاری اجرا نمی‌شود. */
 function playDonutsIn(root, instant){
   var sc=root||document;
   var rings=sc.querySelectorAll(".d-fg[data-v]");
@@ -606,12 +606,12 @@ function playDonutsIn(root, instant){
       el.setAttribute("stroke-dasharray",(el.getAttribute("data-v")||0)+" 100");
       el.removeAttribute("data-v");
     });
-    // نوارِ «مستندات پروژه» — همان گذارِ .6s که در CSS تعریف شده
+    // نوار «مستندات پروژه» — همان گذار .6s که در CSS تعریف شده
     [].forEach.call(bars, function(el){
       el.style.width=(parseFloat(el.getAttribute("data-w"))||0)+"%";
       el.removeAttribute("data-w");
     });
-    // شمارشِ عددِ درصد، هم‌آهنگ با پرشدنِ نوار
+    // شمارش عدد درصد، هم‌آهنگ با پرشدن نوار
     if(pctEl){
       var t=parseInt(pctEl.getAttribute("data-p"),10)||0;
       pctEl.removeAttribute("data-p");
@@ -630,7 +630,7 @@ function cellDonut(label,appr,reg,total,unit,tips){
       '<div class="mtext"><div class="mlabel">'+esc(label)+'</div>'+leg+'</div>'+
     '</div></div>';
 }
-/* نوارِ شاخصِ پروژه — از دادهٔ واقعی؛ ساختار عیناً پروتوتایپ:
+/* نوار شاخص پروژه — از دادهٔ واقعی؛ ساختار عیناً پروتوتایپ:
    سرتیتر (مستندات پروژه) + سه دونات (قطعات · نقشه‌ها · مدارک عمومی) */
 function mbandHTML(p,s){
   var pdocs=projectDocs(p);
@@ -643,14 +643,14 @@ function mbandHTML(p,s){
   var dTot=partMods.length, dReg=partMods.filter(hasDoc).length, dApp=partMods.filter(hasApp).length;
   var parts=projectPartsList(p);
   var modsOf=function(pn){ return partMods.filter(function(m){ return m.part===pn; }); };
-  /* حلقهٔ کم‌رنگ = «کار شروع شده»: قطعه‌ای که دستِ‌کم یک سند دارد (some).
-     پیش‌تر every بود، یعنی همان شرطِ سخت‌گیرانهٔ حلقهٔ پررنگ؛ نتیجه این می‌شد
+  /* حلقهٔ کم‌رنگ = «کار شروع شده»: قطعه‌ای که دست‌کم یک سند دارد (some).
+     پیش‌تر every بود، یعنی همان شرط سخت‌گیرانهٔ حلقهٔ پررنگ؛ نتیجه این می‌شد
      که هر دو حلقه با هم صفر می‌ماندند و کاربر هیچ حرکتی نمی‌دید. */
   var partsReg=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.some(hasDoc); }).length;
   var partsApp=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.every(hasApp); }).length;
   var total=pTot+dTot, reg=pReg+dReg, apr=pApp+dApp;
   var regPct=total?Math.round(reg/total*100):0, aprPct=total?Math.round(apr/total*100):0;
-  /* تفکیکِ «ثبت‌شده ولی تأییدنشده» بر اساسِ وضعیتِ آخرین ریویژنِ هر ماژول (برای تولتیپ) */
+  /* تفکیک «ثبت‌شده ولی تأییدنشده» بر اساس وضعیت آخرین ریویژن هر ماژول (برای تولتیپ) */
   var latestSt=function(m){ var d=pdocs.filter(function(x){ return pad2(x.partNo)===m.part && String(x.typeCode).toUpperCase()===m.type &&
       String(x.isLatest).toLowerCase()==="true"; })[0]; return d?String(d.status||"").toLowerCase():""; };
   var waiting=s.modules.filter(function(m){ return hasDoc(m) && !hasApp(m); });
@@ -664,17 +664,17 @@ function mbandHTML(p,s){
       [["در انتظار بازبینی",faN(nPend)],["ایجادشده",faN(nDraft)]].concat(nRej?[["ردشده",faN(nRej)]]:[]))} : null,
     none: (total-reg) ? {t:"بارگذاری‌نشده", c:noneC, rows:mbRows(total-reg,total,"سند",[["نقشه‌های پروژه",faN(dTot-dReg)],["مدارک عمومی",faN(pTot-pReg)]])} : null
   };
-  /* ناحیه‌های هاورِ نوار: سه نوارِ شفاف کنارِ هم (چپ‌به‌راست، هم‌جهتِ پرشدنِ نوار) با ارتفاعِ بیشتر از خودِ نوار.
-     بیرونِ .bar قرار می‌گیرند چون .bar برای گوشه‌های گرد overflow:hidden دارد و تولتیپ را می‌بُرید. */
+  /* ناحیه‌های هاور نوار: سه نوار شفاف کنار هم (چپ‌به‌راست، هم‌جهت پرشدن نوار) با ارتفاع بیشتر از خود نوار.
+     بیرون .bar قرار می‌گیرند چون .bar برای گوشه‌های گرد overflow:hidden دارد و تولتیپ را می‌برید. */
   var bh=function(k,from,w){ return (heroTips[k] && w>0) ? '<span class="mhit bh-'+k+'" style="left:'+from+'%;width:'+w+'%">'+mbTipHTML(k,heroTips[k])+'</span>' : ""; };
   var barHits='<div class="bar-hits">'+bh("apr",0,aprPct)+bh("reg",aprPct,regPct-aprPct)+bh("none",regPct,100-regPct)+'</div>';
-  /* تولتیپِ دونات‌ها: همان سه بخش؛ برای دوناتِ قطعات «تکمیل‌شده/شروع‌شده/شروع‌نشده» */
+  /* تولتیپ دونات‌ها: همان سه بخش؛ برای دونات قطعات «تکمیل‌شده/شروع‌شده/شروع‌نشده» */
   var dTips=function(a,r,t,unit,aprT,regT,noneT,names){
     return { apr: a ? {t:aprT, c:(t&&a===t)?"var(--ok)":"var(--brand)", rows:mbRows(a,t,unit,names&&names.apr)} : null,
              reg: (r-a)>0 ? {t:regT, c:faintC, rows:mbRows(r-a,t,unit,names&&names.reg)} : null,
              none: (t-r)>0 ? {t:noneT, c:noneC, rows:mbRows(t-r,t,unit,names&&names.none)} : null };
   };
-  /* برای دوناتِ قطعات، نامِ قطعه‌های هر بخش هم می‌آید (حداکثر ۳ نام + «و n قطعهٔ دیگر») */
+  /* برای دونات قطعات، نام قطعه‌های هر بخش هم می‌آید (حداکثر ۳ نام + «و n قطعهٔ دیگر») */
   var nameRow=function(list){ if(!list.length) return [];
     var nm=list.slice(0,3).map(function(pn){ return partNameFa(pn); }).join("، ");
     if(list.length>3) nm+=" و "+faN(list.length-3)+" قطعهٔ دیگر";
@@ -683,58 +683,58 @@ function mbandHTML(p,s){
   var pStart=parts.filter(function(pn){ var mm=modsOf(pn); return mm.length && mm.some(hasDoc) && !mm.every(hasApp); });
   var pIdle=parts.filter(function(pn){ return pDone.indexOf(pn)<0 && pStart.indexOf(pn)<0; });
   var hero='<div class="mcell"><div class="mdonut">'+
-      /* ⚠ عرض از صفر شروع می‌شود و مقدارِ واقعی روی data-w می‌نشیند؛ playDonutsIn
-         پس از رندر اعمالش می‌کند. مثلِ حلقه‌ها: عنصرِ ساخته‌شده با innerHTML در
-         حالتِ نهایی متولد می‌شود و بدونِ این کار هیچ گذاری اجرا نمی‌شود. */
+      /* ⚠ عرض از صفر شروع می‌شود و مقدار واقعی روی data-w می‌نشیند؛ playDonutsIn
+         پس از رندر اعمالش می‌کند. مثل حلقه‌ها: عنصر ساخته‌شده با innerHTML در
+         حالت نهایی متولد می‌شود و بدون این کار هیچ گذاری اجرا نمی‌شود. */
       '<div class="mhero-vis"><span class="mhero-pct" data-p="'+aprPct+'">۰٪</span>'+
         '<div class="bar-wrap"><div class="bar"><i class="faint" data-w="'+regPct+'" style="width:0;background:var(--brand)"></i>'+
           '<i class="sol" data-w="'+aprPct+'" style="width:0;background:'+(aprPct===100?"var(--ok)":"var(--brand)")+'"></i></div>'+barHits+'</div>'+
       '</div>'+
-      /* لایهٔ کم‌رنگِ نوار همچنان «ثبت‌شده» است (نوار باید پیشرفت را نشان دهد، نه کمبود)؛
-         ولی راهنمای دوم به تعدادِ ماژول‌هایِ بدونِ سند تغییر کرد — همان عددی که می‌گوید چقدر کار مانده. */
+      /* لایهٔ کم‌رنگ نوار همچنان «ثبت‌شده» است (نوار باید پیشرفت را نشان دهد، نه کمبود)؛
+         ولی راهنمای دوم به تعداد ماژول‌های بدون سند تغییر کرد — همان عددی که می‌گوید چقدر کار مانده. */
       '<div class="mtext"><div class="mlabel">مستندات پروژه</div>'+
         '<div class="mleg"><i></i>تأییدشده <b>'+faN(apr)+'</b> از <b>'+faN(total)+'</b></div>'+
         '<div class="mleg faint"><i></i>بارگذاری‌نشده <b>'+faN(total-reg)+'</b></div></div>'+
     '</div></div>';
   return hero+
-    cellDonut("پیشرفتِ قطعات", partsApp, partsReg, parts.length, "قطعه",
+    cellDonut("پیشرفت قطعات", partsApp, partsReg, parts.length, "قطعه",
       dTips(partsApp, partsReg, parts.length, "قطعه", "تکمیل‌شده", "شروع‌شده", "شروع‌نشده",
         {apr:nameRow(pDone), reg:nameRow(pStart), none:nameRow(pIdle)}))+
     cellDonut("نقشه‌های پروژه", dApp, dReg, dTot, undefined, dTips(dApp, dReg, dTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"))+
     cellDonut("مدارک عمومی پروژه", pApp, pReg, pTot, undefined, dTips(pApp, pReg, pTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"));
 }
-/* آیکن‌های سربرگِ کارت‌ها (خطی، هم‌زبانِ نظام طراحی) */
+/* آیکن‌های سربرگ کارت‌ها (خطی، هم‌زبان نظام طراحی) */
 var SEC_IC_DOC='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>';
 var SEC_IC_PART='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
 var SEC_IC_SPEC='<svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>';
 var SEC_IC_INFO='<svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>';
-/* آیکونِ سفارش عمداً «سبدِ خرید» شد تا با آیکونِ سندِ (SEC_IC_DOC) یکسان به‌نظر نرسد */
+/* آیکون سفارش عمداً «سبد خرید» شد تا با آیکون سند (SEC_IC_DOC) یکسان به‌نظر نرسد */
 var SEC_IC_ORDERS='<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
 var SEC_IC_PROJ='<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
-/* آیکونِ مشتری (ساختمان) — تک‌منبع؛ در ریلِ مشتریان و در ویزاردِ ثبت سند استفاده می‌شود */
+/* آیکون مشتری (ساختمان) — تک‌منبع؛ در ریل مشتریان و در ویزارد ثبت سند استفاده می‌شود */
 var SEC_IC_CLIENT='<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 21v-7h4v7"/><line x1="8" y1="7" x2="10" y2="7"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/></svg>';
 
 function showProjectDetail(c,o,pr){
   c=String(c); o=pad2(o); pr=pad2(pr);
-  /* بازرسمِ همان پروژه‌ای که الان روی صفحه است (ویرایشِ یک مقدار، رسیدنِ دادهٔ تازه):
-     انیمیشنِ ورود و پرشدنِ حلقه‌ها از صفر تکرار نمی‌شود، وگرنه هر به‌روزرسانی پنل را می‌لرزاند. */
+  /* بازرسم همان پروژه‌ای که الان روی صفحه است (ویرایش یک مقدار، رسیدن دادهٔ تازه):
+     انیمیشن ورود و پرشدن حلقه‌ها از صفر تکرار نمی‌شود، وگرنه هر به‌روزرسانی پنل را می‌لرزاند. */
   var hostPrev=document.getElementById("projectDetailView");
   var sameView=_projView.mode==="detail" && _projView.c===c && _projView.o===o && _projView.pr===pr &&
     hostPrev && !hostPrev.classList.contains("hidden") &&
     !document.getElementById("tab-project").classList.contains("hidden");
   _projView={mode:"detail",c:c,o:o,pr:pr}; _cp.client=c; _cp.order=o;
-  navRefreshSelection();   // همان دلیل: تغییرِ انتخاب، نه تغییرِ فهرست
+  navRefreshSelection();   // همان دلیل: تغییر انتخاب، نه تغییر فهرست
   var p=findProject(c,o,pr);
   var host=document.getElementById("projectDetailView");
   document.getElementById("cpView").classList.add("hidden");
   host.classList.remove("hidden");
   if(!p){ host.innerHTML='<p class="muted">پروژه یافت نشد.</p>'; return; }
-  var keptMv=mvDetachForRerender(c,o,pr);   // بازسازیِ همین پروژه → ویوئرِ زنده کنار گذاشته می‌شود
+  var keptMv=mvDetachForRerender(c,o,pr);   // بازسازی همین پروژه → ویوئر زنده کنار گذاشته می‌شود
   var s=projectStats(p);
   var admin=ME.role==="admin";
   var stCls=s.status.cls==="badge-approved"?"s-done":(s.status.cls==="badge-pending"?"s-run":"s-idle");
   var specEdit=admin?'<span class="sec-act"><button class="icon-btn" title="ویرایش مشخصات پروژه" onclick="openProjectSpecs(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')">'+ICON.edit+'</button></span>':'';
-  var partsEdit=admin?'<span class="sec-act"><button class="icon-btn" title="افزودنِ قطعه به پروژه" onclick="openPartsPanel(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')">'+ICON.plus+'</button></span>':'';
+  var partsEdit=admin?'<span class="sec-act"><button class="icon-btn" title="افزودن قطعه به پروژه" onclick="openPartsPanel(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')">'+ICON.plus+'</button></span>':'';
 
   host.innerHTML=''+
     '<section class="ppanel">'+
@@ -749,12 +749,12 @@ function showProjectDetail(c,o,pr){
       '</header>'+
       '<div class="mband">'+mbandHTML(p,s)+'</div>'+
       '<div class="pp-content rv-group">'+
-        /* کارتِ مشخصات: ستونِ راست = هویت+مشخصات+اسنادِ عمومی · ستونِ چپ = ویوئرِ سه‌بعدی */
+        /* کارت مشخصات: ستون راست = هویت+مشخصات+اسناد عمومی · ستون چپ = ویوئر سه‌بعدی */
         '<section class="spec-card spec-main">'+
           '<div class="spec3d">'+
             '<div class="spec-col">'+
               '<h3 class="spec-sec-t">'+SEC_IC_DOC+'مشخصات پروژه'+specEdit+'</h3>'+
-              /* قالبِ ثابتِ مشخصات (۶ فیلد) + اسنادِ سطح‌پروژه، همه پشتِ سرِ هم */
+              /* قالب ثابت مشخصات (۶ فیلد) + اسناد سطح‌پروژه، همه پشت سر هم */
               '<div class="spec-general">'+
                 projectSpecTemplateRows(c,o,pr,s,p)+
                 projectGeneralDocsHTML(p)+
@@ -763,19 +763,19 @@ function showProjectDetail(c,o,pr){
             '<div class="model-col">'+projectModelHTML(p,admin,c,o,pr)+'</div>'+
           '</div>'+
         '</section>'+
-        /* کارتِ قطعات: گریدِ دو‌ستونه، هر قطعه یک جعبه با اسنادِ خودش */
+        /* کارت قطعات: گرید دو‌ستونه، هر قطعه یک جعبه با اسناد خودش */
         '<section class="spec-card">'+
           '<h3 class="spec-sec-t">'+SEC_IC_PART+'قطعات پروژه'+partsEdit+'</h3>'+
           projectPartsDocsHTML(p)+
         '</section>'+
       '</div>'+
     '</section>';
-  // ورودِ آبشاریِ بالا‌به‌پایین: هدر ← نوارِ شاخص ← کارتِ مشخصات ← کارتِ قطعات
+  // ورود آبشاری بالا‌به‌پایین: هدر ← نوار شاخص ← کارت مشخصات ← کارت قطعات
   if(!sameView && typeof revealCascade==="function") revealCascade(host.querySelector(".ppanel"));
-  playDonutsIn(host, sameView);   // حلقه‌ها، نوارِ «مستندات پروژه» و عددِ درصد از صفر پر می‌شوند (بازرسم: بی‌درنگ)
-  /* اولین مدلِ فهرست (مونتاژ اگر باشد، وگرنه قطعهٔ اول) خودکار بار می‌شود تا پنل
-     با ویوئرِ خالی باز نشود. پس از رندرِ DOM اجرا می‌شود چون mvLoadPart به #mvShell نیاز دارد. */
-  if(mvReattach(keptMv)) return;   // ویوئرِ قبلی سرِ جایش برگشت؛ بارگذاریِ دوباره لازم نیست
+  playDonutsIn(host, sameView);   // حلقه‌ها، نوار «مستندات پروژه» و عدد درصد از صفر پر می‌شوند (بازرسم: بی‌درنگ)
+  /* اولین مدل فهرست (مونتاژ اگر باشد، وگرنه قطعهٔ اول) خودکار بار می‌شود تا پنل
+     با ویوئر خالی باز نشود. پس از رندر DOM اجرا می‌شود چون mvLoadPart به #mvShell نیاز دارد. */
+  if(mvReattach(keptMv)) return;   // ویوئر قبلی سر جایش برگشت؛ بارگذاری دوباره لازم نیست
   var first=(_mvParts||[]).filter(function(x){ return x.fileId; })[0];
   if(first) setTimeout(function(){
     if(document.getElementById("mvShell")) mvLoadPart(first.fileId, first.part);
@@ -783,14 +783,14 @@ function showProjectDetail(c,o,pr){
 }
 
 /* کارت «اسناد عمومی پروژه»: ماژول‌های سطح‌پروژه (scope=project روی قطعهٔ 00).
-   طراحی فشرده: فقط ماژول‌های فعال ردیف می‌گیرند؛ خاموش‌ها چیپِ «افزودن» می‌شوند. */
+   طراحی فشرده: فقط ماژول‌های فعال ردیف می‌گیرند؛ خاموش‌ها چیپ «افزودن» می‌شوند. */
 function projectGeneralDocsHTML(p){
   var c=p.clientCode, o=pad2(p.orderNo), pr=pad2(p.projectNo);
   var admin=ME.role==="admin";
   var latest=projectDocs(p).filter(function(d){ return String(d.isLatest).toLowerCase()==="true"; });
   var enabled={}; projDocTypesOf(p).forEach(function(T){ enabled[T]=1; });
   latest.forEach(function(d){ if(pad2(d.partNo)==="00") enabled[String(d.typeCode).toUpperCase()]=1; });
-  // ترتیبِ دلخواهِ همین پروژه (orderedProjectTypesFor)؛ فقط انواعِ فعال + هر نوعی که سند دارد
+  // ترتیب دلخواه همین پروژه (orderedProjectTypesFor)؛ فقط انواع فعال + هر نوعی که سند دارد
   return orderedProjectTypesFor(p).filter(function(t){ return enabled[String(t.code).toUpperCase()]; }).map(function(t){
     var T=String(t.code).toUpperCase();
     var doc=latest.filter(function(d){ return pad2(d.partNo)==="00" && String(d.typeCode).toUpperCase()===T; })
@@ -799,13 +799,13 @@ function projectGeneralDocsHTML(p){
   }).join("");
 }
 
-/* کارت «قطعات پروژه»: گریدِ دو‌ستونه — هر قطعه یک جعبه با «اطلاعاتِ قطعه» (ماژول‌ها) + اسنادِ آن. */
+/* کارت «قطعات پروژه»: گرید دو‌ستونه — هر قطعه یک جعبه با «اطلاعات قطعه» (ماژول‌ها) + اسناد آن. */
 function projectPartsDocsHTML(p){
   var admin=ME.role==="admin";
   var latest=projectDocs(p).filter(function(d){ return String(d.isLatest).toLowerCase()==="true"; });
   var partTypes=docTypesSorted().filter(function(t){ return t.scope==="part"; });
   var parts=projectPartsList(p);
-  if(!parts.length) return '<div class="cp-empty-hint">هنوز قطعه‌ای به این پروژه اضافه نشده. با دکمهٔ + کنارِ عنوان، قطعه اضافه کنید.</div>';
+  if(!parts.length) return '<div class="cp-empty-hint">هنوز قطعه‌ای به این پروژه اضافه نشده. با دکمهٔ + کنار عنوان، قطعه اضافه کنید.</div>';
   var pc=p.clientCode, po=pad2(p.orderNo), ppr=pad2(p.projectNo);
   var groups=parts.map(function(pn){
     var rec=partRec(pn);
@@ -813,71 +813,71 @@ function projectPartsDocsHTML(p){
       '<div class="spec-hd">'+
         '<span class="spec-dot" aria-hidden="true"></span>'+
         '<span class="spec-name">'+esc(partNameFa(pn))+'</span>'+
-        (admin?'<button class="icon-btn sm spec-edit" title="ویرایشِ اسناد و پارامترهای این قطعه" onclick="openPartEditPanel(\''+esc(pc)+'\',\''+esc(po)+'\',\''+esc(ppr)+'\',\''+esc(pad2(pn))+'\')">'+ICON.edit+'</button>':'')+
+        (admin?'<button class="icon-btn sm spec-edit" title="ویرایش اسناد و پارامترهای این قطعه" onclick="openPartEditPanel(\''+esc(pc)+'\',\''+esc(po)+'\',\''+esc(ppr)+'\',\''+esc(pad2(pn))+'\')">'+ICON.edit+'</button>':'')+
       '</div>'+
       '<div class="spec-body">'+
         partSpecRowsHTML(p,pn,admin)+
         partDocRowsHTML(p,pn,partTypes,latest,admin)+
       '</div></div>';
   }).join("");
-  /* گریدِ دو‌ستونه است، پس تعدادِ فردِ قطعه یک جای خالیِ سفید می‌گذارد. آن جای خالی با
-     یک باکسِ هم‌اندازهٔ «افزودنِ قطعه» پر می‌شود (هم‌سبکِ باکسِ «سفارش جدید»): هم چیدمان
-     متقارن می‌ماند، هم افزودنِ قطعهٔ بعدی یک کلیک است. برای ۳ قطعه هم همین‌طور کار
+  /* گرید دو‌ستونه است، پس تعداد فرد قطعه یک جای خالی سفید می‌گذارد. آن جای خالی با
+     یک باکس هم‌اندازهٔ «افزودن قطعه» پر می‌شود (هم‌سبک باکس «سفارش جدید»): هم چیدمان
+     متقارن می‌ماند، هم افزودن قطعهٔ بعدی یک کلیک است. برای ۳ قطعه هم همین‌طور کار
      می‌کند، چون شرط «فرد بودن» است نه «یک بودن». */
   var canAdd = admin && partsSorted().some(function(pt){ return parts.indexOf(pad2(pt.partNo))<0; });
   if(canAdd && (parts.length%2)===1){
     groups+='<button type="button" class="spec-group spec-add" '+
       'onclick="openPartsPanel(\''+esc(pc)+'\',\''+esc(po)+'\',\''+esc(ppr)+'\')" '+
-      'title="افزودنِ قطعه به این پروژه">'+ICON.plus+'<span>افزودنِ قطعه</span></button>';
+      'title="افزودن قطعه به این پروژه">'+ICON.plus+'<span>افزودن قطعه</span></button>';
   }
   return '<div class="spec-groups">'+groups+'</div>';
 }
-/* ═══ کدِ قطعه — ماژولِ اجباری و خودکارِ هر قطعه ═══
+/* ═══ کد قطعه — ماژول اجباری و خودکار هر قطعه ═══
    هم‌الگوی «کد پروژه» (MNK-01-01): همان کد + شمارهٔ قطعه ← MNK-01-01-03.
    از داده ساخته می‌شود و ذخیره نمی‌شود، پس همیشه با مشتری/سفارش/پروژه/قطعه هم‌خوان است،
-   قابلِ خاموش‌کردن یا جابه‌جایی نیست و همیشه ردیفِ اول است. */
+   قابل خاموش‌کردن یا جابه‌جایی نیست و همیشه ردیف اول است. */
 var PART_CODE_LABEL="کد قطعه";
 function partCode(c,o,pr,pn){ return String(c||"").toUpperCase()+"-"+pad2(o)+"-"+pad2(pr)+"-"+pad2(pn); }
-/* ردیف‌های اطلاعاتِ قطعه (کدِ قطعه + وزن/جنس/…)؛ مقدارِ پارامترها برای مدیر با کلیک قابلِ ویرایش است. */
+/* ردیف‌های اطلاعات قطعه (کد قطعه + وزن/جنس/…)؛ مقدار پارامترها برای مدیر با کلیک قابل ویرایش است. */
 function partSpecRowsHTML(p,pn,admin){
-  var mods=partModsForPart(p,pn).filter(function(m){ return m.on && m.label; });   // فقط پارامترهای فعالِ همین قطعه
+  var mods=partModsForPart(p,pn).filter(function(m){ return m.on && m.label; });   // فقط پارامترهای فعال همین قطعه
   var vals=partValsOf(p,pn), c=p.clientCode, o=pad2(p.orderNo), pr=pad2(p.projectNo);
   var codeRow=pdMetaRow(PART_CODE_LABEL, esc(partCode(c,o,pr,pn)));   // اولین ردیف، همیشه
   var qtySeen=false;
   var rows=mods.map(function(m){
     var v=String(vals[m.label]==null?"":vals[m.label]);
     var cls=v?pdValClass(v):'spec-val ltr empty';
-    var unit=(typeof partModUnitOf==="function")?partModUnitOf(m.label):"";   // واحدِ خودکارِ این پارامتر
+    var unit=(typeof partModUnitOf==="function")?partModUnitOf(m.label):"";   // واحد خودکار این پارامتر
     var body=v?(esc(v)+(unit?' <span class="spec-unit">'+esc(unit)+'</span>':'')):'Not specified';
-    /* پارامترِ «تعداد» = سقفِ تولید، پس وضعیتِ قطعاتِ تولیدی در دنبالهٔ همین مقدار می‌آید:
-       «2 pcs (1 of 2 approved)». خودِ عدد مثلِ بقیهٔ پارامترها با کلیک ویرایش می‌شود و
-       فقط دنبالهٔ داخلِ پرانتز به بخشِ ردیابی می‌رود. */
+    /* پارامتر «تعداد» = سقف تولید، پس وضعیت قطعات تولیدی در دنبالهٔ همین مقدار می‌آید:
+       «2 pcs (1 of 2 approved)». خود عدد مثل بقیهٔ پارامترها با کلیک ویرایش می‌شود و
+       فقط دنبالهٔ داخل پرانتز به بخش ردیابی می‌رود. */
     if(m.label===PART_QTY_LABEL){ qtySeen=true; body+=partInstSuffix(c,o,pr,pn,v); }
     var edit=admin?' data-val="'+esc(v)+'" title="کلیک برای ویرایش" onclick="partSpecEdit(this,\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\',\''+esc(m.label)+'\')"':'';
     return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(m.label)+'</span></span>'+
       '<span class="'+cls+(admin?' editable':'')+'"'+edit+'>'+body+'</span></div>';
   }).join("");
-  /* اگر پارامترِ «تعداد» برای این قطعه خاموش باشد ولی قطعهٔ تولیدیِ ثبت‌شده داشته باشد، اطلاعات
-     نباید پنهان بماند: یک ردیفِ مستقل می‌آید تا مسیرِ ردیابی همچنان در دسترس باشد. */
+  /* اگر پارامتر «تعداد» برای این قطعه خاموش باشد ولی قطعهٔ تولیدی ثبت‌شده داشته باشد، اطلاعات
+     نباید پنهان بماند: یک ردیف مستقل می‌آید تا مسیر ردیابی همچنان در دسترس باشد. */
   return codeRow+rows+((!qtySeen && partInstTotal(c,o,pr,pn))?partInstRowHTML(p,c,o,pr,pn):"");
 }
-var PART_QTY_LABEL="تعداد";   // نامِ پارامترِ سقفِ تولید (هم‌نامِ QTY_LABEL در بک‌اند)
+var PART_QTY_LABEL="تعداد";   // نام پارامتر سقف تولید (هم‌نام QTY_LABEL در بک‌اند)
 function partInstTotal(c,o,pr,pn){
   if(typeof instCountsOf!=="function") return 0;
   var n=instCountsOf(c,o,pr,pn); return n.approved+n.producing+n.rejected;
 }
-/* دنبالهٔ وضعیتِ قطعاتِ تولیدی برای مقدارِ «تعداد»: «(1 of 2 approved)».
-   کلیک رویش به بخشِ ردیابیِ همان قطعه می‌رود و جلوی ویرایشِ درجای عدد را می‌گیرد. */
+/* دنبالهٔ وضعیت قطعات تولیدی برای مقدار «تعداد»: «(1 of 2 approved)».
+   کلیک رویش به بخش ردیابی همان قطعه می‌رود و جلوی ویرایش درجای عدد را می‌گیرد. */
 function partInstSuffix(c,o,pr,pn,qtyRaw){
   if(typeof instCountsOf!=="function") return "";
   var n=instCountsOf(c,o,pr,pn);
   var q=parseInt(String(qtyRaw||"").replace(/[^\d]/g,""),10); if(isNaN(q)) q=0;
   var txt=q?(n.approved+" of "+q+" approved"):(n.approved+" approved");
   var over=q && (n.approved+n.producing)>q;
-  return ' <button type="button" class="pi-chip'+(over?" warn":"")+'" title="مدیریتِ این قطعه در بخشِ ردیابی قطعات تولیدی"'+
+  return ' <button type="button" class="pi-chip'+(over?" warn":"")+'" title="مدیریت این قطعه در بخش ردیابی قطعات تولیدی"'+
     ' onclick="event.stopPropagation();openPartInstances(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\')">('+esc(txt)+')</button>';
 }
-/* ردیفِ مستقلِ «قطعاتِ تولیدی» — فقط وقتی پارامترِ «تعداد» خاموش است (وگرنه در دنبالهٔ آن می‌آید). */
+/* ردیف مستقل «قطعات تولیدی» — فقط وقتی پارامتر «تعداد» خاموش است (وگرنه در دنبالهٔ آن می‌آید). */
 function partInstRowHTML(p,c,o,pr,pn){
   if(typeof instCountsOf!=="function") return "";
   var n=instCountsOf(c,o,pr,pn), q=(typeof partQtyOf==="function")?partQtyOf(c,o,pr,pn):0;
@@ -889,25 +889,25 @@ function partInstRowHTML(p,c,o,pr,pn){
   var warn=(q && (n.approved+n.producing)>q);
   var val='<span class="pi-main'+(warn?" warn":"")+'">'+esc(main)+'</span>'+
     (extra.length?'<span class="pi-extra">'+esc(extra.join(" · "))+'</span>':'');
-  return '<div class="spec-row pi-row" role="button" tabindex="0" title="مدیریتِ این قطعه در بخشِ ردیابی قطعات تولیدی" '+
+  return '<div class="spec-row pi-row" role="button" tabindex="0" title="مدیریت این قطعه در بخش ردیابی قطعات تولیدی" '+
       'onclick="openPartInstances(\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\')">'+
-    '<span class="spec-label"><span class="lbl-t">قطعاتِ تولیدی</span></span>'+
+    '<span class="spec-label"><span class="lbl-t">قطعات تولیدی</span></span>'+
     '<span class="spec-val pi-val">'+val+'</span></div>';
 }
-/* ردیف‌های سندِ قطعه — انواعِ فعالِ سراسری + هر نوعی که سند دارد؛ تمیز و بدونِ چیپ. */
+/* ردیف‌های سند قطعه — انواع فعال سراسری + هر نوعی که سند دارد؛ تمیز و بدون چیپ. */
 function partDocRowsHTML(p,pn,partTypes,latest,admin){
   var c=p.clientCode, o=pad2(p.orderNo), pr=pad2(p.projectNo);
   var by={}; partTypes.forEach(function(t){ by[String(t.code).toUpperCase()]=t; });
-  // ترتیبِ نمایش = ترتیبِ دلخواهِ ذخیره‌شدهٔ همین قطعه (partDocTypesForPart از partDocsByPart می‌خواند و ترتیب را حفظ می‌کند)
+  // ترتیب نمایش = ترتیب دلخواه ذخیره‌شدهٔ همین قطعه (partDocTypesForPart از partDocsByPart می‌خواند و ترتیب را حفظ می‌کند)
   var rows=partDocTypesForPart(p,pn).map(function(T){ T=String(T).toUpperCase(); var t=by[T]; if(!t) return "";
     var doc=latest.filter(function(d){ return pad2(d.partNo)===pn && String(d.typeCode).toUpperCase()===T; })
       .sort(function(a,b){ return (parseInt(b.rev)||0)-(parseInt(a.rev)||0); })[0]||null;
     return docRowClean(c,o,pr,pn,t,doc,admin);
   }).join("");
-  if(!rows) return admin?'<div class="pd-nodoc">نوعِ سندی انتخاب نشده — از دکمهٔ ویرایش اضافه کنید.</div>':'';
+  if(!rows) return admin?'<div class="pd-nodoc">نوع سندی انتخاب نشده — از دکمهٔ ویرایش اضافه کنید.</div>':'';
   return '<div class="pd-docs">'+rows+'</div>';
 }
-/* ویرایشِ درجای مقدارِ یک ماژولِ قطعه (بدونِ دکمهٔ جدا؛ کلیک روی مقدار) */
+/* ویرایش درجای مقدار یک ماژول قطعه (بدون دکمهٔ جدا؛ کلیک روی مقدار) */
 function partSpecEdit(el,c,o,pr,pn,label){
   if(!el || el.getAttribute("data-editing")==="1") return;
   el.setAttribute("data-editing","1");
@@ -928,7 +928,7 @@ async function partSpecSave(inp,c,o,pr,pn,label){
   await saveSpecs(c,o,pr,root);
 }
 
-/* یک بخش: ردیف‌های تمیزِ سند (سبکِ پروتوتایپ) + نوارِ افزودنِ سریع برای انواعِ خاموش */
+/* یک بخش: ردیف‌های تمیز سند (سبک پروتوتایپ) + نوار افزودن سریع برای انواع خاموش */
 function sectionModulesHTML(c,o,pr,types,part,proj,onSet,slotOn,admin,latest){
   var active=[], off=[];
   types.forEach(function(t){
@@ -953,29 +953,29 @@ function sectionModulesHTML(c,o,pr,types,part,proj,onSet,slotOn,admin,latest){
   return '<div class="pd-docs">'+rows+'</div>'+add;
 }
 
-/* ردیفِ تمیزِ سند — عیناً پروتوتایپ: آیکن + نامِ کامل (راست) · شمارهٔ سند (چپ).
-   بدونِ بجِ وضعیت، بدونِ «بارگذاری نشده» و بدونِ دکمهٔ حذف — همان دو ستونِ ردیفِ مشخصات. */
-/* «المانِ» نوعِ سند: به‌صورتِ خودکار از روی کد ساخته می‌شود — علامتِ اصلیِ سند با «کدِ سند»
-   (MC/AS/…) در مرکزِ آن؛ برای نوعِ «3D» همان المانِ مکعبی. محتوای داخلِ کادرِ .doc-ic / .el-badge
-   را برمی‌گرداند و در جدولِ تنظیمات و پنلِ پروژه یکی است. */
+/* ردیف تمیز سند — عیناً پروتوتایپ: آیکن + نام کامل (راست) · شمارهٔ سند (چپ).
+   بدون بج وضعیت، بدون «بارگذاری نشده» و بدون دکمهٔ حذف — همان دو ستون ردیف مشخصات. */
+/* «المان» نوع سند: به‌صورت خودکار از روی کد ساخته می‌شود — علامت اصلی سند با «کد سند»
+   (MC/AS/…) در مرکز آن؛ برای نوع «3D» همان المان مکعبی. محتوای داخل کادر .doc-ic / .el-badge
+   را برمی‌گرداند و در جدول تنظیمات و پنل پروژه یکی است. */
 function docTypeIconInner(t){
   var rawCode=String(t&&t.code!=null?t.code:"").toUpperCase();
-  if(rawCode.indexOf("3D")===0) return MODEL_IC;   // هر نوعِ مدلِ سه‌بعدی (3D، 3DA، …): المانِ مکعبی، نه نمادِ سند
+  if(rawCode.indexOf("3D")===0) return MODEL_IC;   // هر نوع مدل سه‌بعدی (3D، 3DA، …): المان مکعبی، نه نماد سند
   var code=esc(rawCode);
-  var fs=code.length>=3?6:8;   // کدِ ۳ حرفی کوچک‌تر تا داخلِ نمادِ سند جا شود
+  var fs=code.length>=3?6:8;   // کد ۳ حرفی کوچک‌تر تا داخل نماد سند جا شود
   return '<svg class="el-doc" viewBox="0 0 24 24">'+
     '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'+
     '<polyline points="14 2 14 8 20 8"/>'+
     '<text x="12" y="16.5" text-anchor="middle" fill="currentColor" stroke="none" font-size="'+fs+'">'+code+'</text>'+
     '</svg>';
 }
-/* «المانِ» قطعه: به‌صورتِ خودکار کدِ قطعه داخلِ همان کادر. */
+/* «المان» قطعه: به‌صورت خودکار کد قطعه داخل همان کادر. */
 function partIconInner(p){
   return '<span class="el-code">'+esc(pad2(p&&p.partNo))+'</span>';
 }
 function docRowClean(c,o,pr,part,t,doc,admin){
   var T=String(t.code).toUpperCase();
-  var ic=docTypeIconInner(t);   // آیکونِ سفارشی یا پیش‌فرض (مکعب برای 3D)
+  var ic=docTypeIconInner(t);   // آیکون سفارشی یا پیش‌فرض (مکعب برای 3D)
   if(doc){
     var num=esc(doc.drawingNumber), open="openDocDetail('"+num+"')";
     return '<div class="doc-row">'+
@@ -986,7 +986,7 @@ function docRowClean(c,o,pr,part,t,doc,admin){
         '<span class="doc-num" title="'+num+'" onclick="'+open+'">'+num+'</span>'+
       '</span></div>';
   }
-  // روشن ولی بدونِ سند: ردیفِ خاکستری با شمارهٔ آینده؛ کلیک → بارگذاری (فقط مدیر)
+  // روشن ولی بدون سند: ردیف خاکستری با شمارهٔ آینده؛ کلیک → بارگذاری (فقط مدیر)
   var expected="FSM-"+c+"-"+o+"-"+pr+"-"+part+"-"+T+"-0";
   var goFn="goNewDocForProject('"+esc(c)+"','"+esc(o)+"','"+esc(pr)+"','"+esc(T)+"','"+esc(part)+"')";
   var tip=admin?'برای بارگذاری کلیک کنید':'هنوز بارگذاری نشده';
@@ -1069,13 +1069,13 @@ async function removeProjectPart(c,o,pr,pn){
   if(!r||!r.ok){ toast((r&&r.message)||"حذف قطعه ناموفق بود",true); }
 }
 
-/* تابعِ goNewDocForProject (ثبت سند با پیش‌تنظیمِ پروژه/نوع/قطعه) اکنون در documents.js
-   (ویزاردِ ریلِ شماره) تعریف شده است. */
+/* تابع goNewDocForProject (ثبت سند با پیش‌تنظیم پروژه/نوع/قطعه) اکنون در documents.js
+   (ویزارد ریل شماره) تعریف شده است. */
 
-/* ============ مشخصاتِ پروژه و قطعات — همه در p.specs (JSON) ذخیره می‌شوند ============
+/* ============ مشخصات پروژه و قطعات — همه در p.specs (JSON) ذخیره می‌شوند ============
    ساختار: { project:[{label,value,on}], partMods:[{label,unit,on}],
              partVals:{"03":{"وزن":"96",...}}, partDocTypes:["MC","AC",...] }
-   سازگاریِ عقب‌رو: اگر p.specs یک آرایهٔ ساده بود، همان = ماژول‌های سطحِ پروژه. بدونِ تغییرِ بک‌اند. */
+   سازگاری عقب‌رو: اگر p.specs یک آرایهٔ ساده بود، همان = ماژول‌های سطح پروژه. بدون تغییر بک‌اند. */
 function specsRoot(p){
   var raw=p&&p.specs, root={project:[],partMods:null,partVals:{},partDocTypes:null,projDocTypes:null,projDocOrder:null,tpl:null,partModsByPart:null,partDocsByPart:null,
     ordProjDocs:null,ordPartDocs:null,ordPartMods:null};
@@ -1087,12 +1087,12 @@ function specsRoot(p){
       if(j.partVals&&typeof j.partVals==="object") root.partVals=j.partVals;
       if(Array.isArray(j.partDocTypes)) root.partDocTypes=j.partDocTypes;
       if(Array.isArray(j.projDocTypes)) root.projDocTypes=j.projDocTypes;
-      if(Array.isArray(j.projDocOrder)) root.projDocOrder=j.projDocOrder;   // ترتیبِ دلخواهِ نمایشِ اسنادِ سطحِ پروژه (شاملِ خاموش‌ها)
+      if(Array.isArray(j.projDocOrder)) root.projDocOrder=j.projDocOrder;   // ترتیب دلخواه نمایش اسناد سطح پروژه (شامل خاموش‌ها)
       if(j.tpl&&typeof j.tpl==="object") root.tpl=j.tpl;
       if(j.partModsByPart&&typeof j.partModsByPart==="object") root.partModsByPart=j.partModsByPart;   // پارامترهای per-part: {"03":["وزن",...]}
-      if(j.partDocsByPart&&typeof j.partDocsByPart==="object") root.partDocsByPart=j.partDocsByPart;   // انواعِ سندِ per-part: {"03":["MC",...]}
-      /* ترتیبِ اختصاصیِ همین پروژه — فقط وقتی کاربر در پنلِ پروژه واقعاً ردیفی را جابه‌جا کرده.
-         نبودنش یعنی «ترتیبِ پیش‌فرضِ تنظیمات». (projDocOrder و ترتیبِ درونِ partDocsByPart/partModsByPart
+      if(j.partDocsByPart&&typeof j.partDocsByPart==="object") root.partDocsByPart=j.partDocsByPart;   // انواع سند per-part: {"03":["MC",...]}
+      /* ترتیب اختصاصی همین پروژه — فقط وقتی کاربر در پنل پروژه واقعاً ردیفی را جابه‌جا کرده.
+         نبودنش یعنی «ترتیب پیش‌فرض تنظیمات». (projDocOrder و ترتیب درون partDocsByPart/partModsByPart
          از نسخه‌های قبل‌اند و دیگر برای ترتیب خوانده نمی‌شوند: همهٔ پروژه‌های قبلی پیش‌فرض می‌گیرند.) */
       if(Array.isArray(j.ordProjDocs)) root.ordProjDocs=j.ordProjDocs;
       if(j.ordPartDocs&&typeof j.ordPartDocs==="object") root.ordPartDocs=j.ordPartDocs;
@@ -1101,15 +1101,15 @@ function specsRoot(p){
   }catch(e){} }
   return root;
 }
-/* ماژول‌های سطحِ پروژه (دسته‌بندی محصول و…) */
+/* ماژول‌های سطح پروژه (دسته‌بندی محصول و…) */
 function projectSpecs(p){
   return specsRoot(p).project.map(function(m){ return {label:String(m.label||m.key||""),value:String(m.value==null?"":m.value),on:m.on!==false}; });
 }
 function projectSpecsSeed(){ return [{label:"دسته‌بندی محصول",value:"",on:true}]; }
-/* ماژول‌های پیش‌فرضِ اطلاعاتِ قطعه (fallback فقط وقتی فهرستِ اصلی خالی و پروژه هم چیزی ندارد) */
+/* ماژول‌های پیش‌فرض اطلاعات قطعه (fallback فقط وقتی فهرست اصلی خالی و پروژه هم چیزی ندارد) */
 function partModsSeed(){ return [{label:"وزن",on:true},{label:"جنس",on:true},{label:"نوع عملیات حرارتی",on:true}]; }
-/* ماژول‌های اطلاعاتِ قطعهٔ این پروژه = فهرستِ اصلیِ سراسری (DB.partMods) با روشن/خاموشِ per-project.
-   overlayِ پروژه در specs.partMods نگه‌داری می‌شود؛ ماژولِ قدیمیِ محلی که در فهرستِ اصلی نیست هم حفظ می‌شود. */
+/* ماژول‌های اطلاعات قطعهٔ این پروژه = فهرست اصلی سراسری (DB.partMods) با روشن/خاموش per-project.
+   overlay پروژه در specs.partMods نگه‌داری می‌شود؛ ماژول قدیمی محلی که در فهرست اصلی نیست هم حفظ می‌شود. */
 function partModsOf(p){
   var overlay={}, seen={}, out=[];
   (specsRoot(p).partMods||[]).forEach(function(x){ var l=String(x.label||""); if(l) overlay[l]=(x.on!==false); });
@@ -1119,7 +1119,7 @@ function partModsOf(p){
   return out.length?out:partModsSeed();
 }
 function partValsOf(p,part){ var v=specsRoot(p).partVals[pad2(part)]; return (v&&typeof v==="object")?v:{}; }
-/* انواعِ سندِ سطحِ قطعه که این پروژه فعال کرده؛ اگر تعریف نشده، از enabledSlotsِ قدیمی مهاجرت می‌شود */
+/* انواع سند سطح قطعه که این پروژه فعال کرده؛ اگر تعریف نشده، از enabledSlots قدیمی مهاجرت می‌شود */
 function partDocTypesOf(p){
   var r=specsRoot(p);
   if(r.partDocTypes) return r.partDocTypes.map(function(x){ return String(x).toUpperCase(); });
@@ -1127,12 +1127,12 @@ function partDocTypesOf(p){
   return Object.keys(set);
 }
 
-/* ============ پیکربندیِ per-part: پارامترها و انواعِ سند برای هر قطعهٔ خاص ============
-   داده‌ها در specs ذخیره می‌شوند (بدونِ تغییرِ بک‌اند):
+/* ============ پیکربندی per-part: پارامترها و انواع سند برای هر قطعهٔ خاص ============
+   داده‌ها در specs ذخیره می‌شوند (بدون تغییر بک‌اند):
      partModsByPart = {"03":["وزن","جنس"],...}   ·   partDocsByPart = {"03":["MC","AC"],...}
-   سازگاریِ عقب‌رو: اگر برای قطعه‌ای per-part تعریف نشده، از انتخابِ سطحِ پروژه (partMods/partDocTypes) پر می‌شود. */
+   سازگاری عقب‌رو: اگر برای قطعه‌ای per-part تعریف نشده، از انتخاب سطح پروژه (partMods/partDocTypes) پر می‌شود. */
 
-/* فهرستِ اصلیِ پارامترها برای این پروژه = سراسری (DB.partMods) + برچسب‌های قدیمیِ محلی */
+/* فهرست اصلی پارامترها برای این پروژه = سراسری (DB.partMods) + برچسب‌های قدیمی محلی */
 function partModMaster(p){
   var seen={}, out=[], r=specsRoot(p);
   partModsSorted().forEach(function(m){ var l=String(m.nameFa||""); if(!l||seen[l]) return; seen[l]=1; out.push({label:l,legacy:false}); });
@@ -1145,78 +1145,78 @@ function partModMaster(p){
 /* پارامترهای یک قطعهٔ خاص: [{label,on,legacy}] */
 function partModsForPart(p,part){
   var pn=pad2(part), r=specsRoot(p), bp=r.partModsByPart||{};
-  /* ترتیب: اختصاصیِ همین قطعه (ordPartMods) وگرنه پیش‌فرضِ «تنظیمات ◂ پارامترها».
-     روشن/خاموش جداست: از partModsByPart، وگرنه fallbackِ سطحِ پروژه. */
+  /* ترتیب: اختصاصی همین قطعه (ordPartMods) وگرنه پیش‌فرض «تنظیمات ◂ پارامترها».
+     روشن/خاموش جداست: از partModsByPart، وگرنه fallback سطح پروژه. */
   var master=mergeOrder((r.ordPartMods||{})[pn], partModMaster(p), function(m){ return m.label; });
   if(bp[pn]){
     var on={}; bp[pn].forEach(function(l){ on[String(l)]=1; });
     return master.map(function(m){ return {label:m.label,on:!!on[m.label],legacy:m.legacy}; });
   }
-  var proj={}; (r.partMods||[]).forEach(function(x){ if(x.label) proj[String(x.label)]=(x.on!==false); });   // fallbackِ پروژه‌ای
+  var proj={}; (r.partMods||[]).forEach(function(x){ if(x.label) proj[String(x.label)]=(x.on!==false); });   // fallback پروژه‌ای
   return master.map(function(m){ return {label:m.label,on: proj.hasOwnProperty(m.label)?proj[m.label]:true, legacy:m.legacy}; });
 }
-/* فهرستِ اصلیِ انواعِ سندِ سطحِ قطعه (از تنظیماتِ سراسری) */
+/* فهرست اصلی انواع سند سطح قطعه (از تنظیمات سراسری) */
 function partDocMaster(){
   return docTypesDefault("part")
     .map(function(t){ return {code:String(t.code).toUpperCase(), label:t.nameFa||String(t.code).toUpperCase()}; });
 }
-/* ترتیبِ مؤثرِ کدهای اسنادِ یک قطعه: اختصاصیِ همین پروژه/قطعه، وگرنه پیش‌فرض */
+/* ترتیب مؤثر کدهای اسناد یک قطعه: اختصاصی همین پروژه/قطعه، وگرنه پیش‌فرض */
 function partDocOrderFor(p,pn){
   var ord=((specsRoot(p).ordPartDocs||{})[pad2(pn)]||[]).map(function(cd){ return String(cd).toUpperCase(); });
   return mergeOrder(ord, partDocMaster(), function(x){ return x.code; }).map(function(x){ return x.code; });
 }
-/* انواعِ سندِ فعالِ یک قطعهٔ خاص (کد)؛ نوعی که برای همان قطعه سند دارد همیشه فعال است */
+/* انواع سند فعال یک قطعهٔ خاص (کد)؛ نوعی که برای همان قطعه سند دارد همیشه فعال است */
 function partDocTypesForPart(p,part){
   var pn=pad2(part), r=specsRoot(p), bp=r.partDocsByPart||{}, set={};
   if(bp[pn]){ bp[pn].forEach(function(T){ set[String(T).toUpperCase()]=1; }); }
   else {
     /* قطعه‌ای که هنوز پیکربندی نشده: «نقشهٔ رفرنس» پیش‌فرض و *اولین* ماژول است — در
-       لحظه‌ای که قطعه تعریف می‌شود تنها سندِ موجود همان نقشهٔ مشتری است، پس نباید
-       یادِ کاربر برود دستی اضافه‌اش کند. اول درج می‌شود تا در ترتیبِ نمایش هم اول
-       بیاید (کلیدهای رشته‌ایِ شیء به ترتیبِ درج برمی‌گردند).
+       لحظه‌ای که قطعه تعریف می‌شود تنها سند موجود همان نقشهٔ مشتری است، پس نباید
+       یاد کاربر برود دستی اضافه‌اش کند. اول درج می‌شود تا در ترتیب نمایش هم اول
+       بیاید (کلیدهای رشته‌ای شیء به ترتیب درج برمی‌گردند).
        ⚠ فقط برای قطعهٔ پیکربندی‌نشده: اگر کاربر قبلاً برای این قطعه انتخابی ذخیره
-       کرده (bp[pn])، همان مقدم است — وگرنه خاموش‌کردنِ این ماژول در پنل بی‌اثر
+       کرده (bp[pn])، همان مقدم است — وگرنه خاموش‌کردن این ماژول در پنل بی‌اثر
        می‌شد و قطعاتی مثل پروژه‌های داخلی/آزمایشگاهی که اصلاً نقشهٔ مشتری ندارند
-       برای همیشه یک سندِ الزامیِ برآورده‌نشدنی می‌گرفتند. */
+       برای همیشه یک سند الزامی برآورده‌نشدنی می‌گرفتند. */
     if(rdTypeReady()) set[RD_CODE]=1;
-    partDocTypesOf(p).forEach(function(T){ set[String(T).toUpperCase()]=1; });   // fallbackِ پروژه‌ای
+    partDocTypesOf(p).forEach(function(T){ set[String(T).toUpperCase()]=1; });   // fallback پروژه‌ای
   }
   projectDocs(p).forEach(function(d){ if(pad2(d.partNo)===pn) set[String(d.typeCode).toUpperCase()]=1; });
-  /* ترتیبِ نمایش مستقل از ترتیبِ ذخیرهٔ مجموعه است: ترتیبِ مؤثرِ همین قطعه (اختصاصی یا پیش‌فرض) */
+  /* ترتیب نمایش مستقل از ترتیب ذخیرهٔ مجموعه است: ترتیب مؤثر همین قطعه (اختصاصی یا پیش‌فرض) */
   var rank={}; partDocOrderFor(p,pn).forEach(function(cd,i){ rank[cd]=i; });
   var keys=Object.keys(set);
   return keys.map(function(k,i){ return {k:k,i:i}; })
     .sort(function(a,b){ var ra=rank.hasOwnProperty(a.k)?rank[a.k]:1e6, rb=rank.hasOwnProperty(b.k)?rank[b.k]:1e6; return ra!==rb?ra-rb:a.i-b.i; })
     .map(function(x){ return x.k; });
 }
-/* انواعِ سندی که برای یک قطعه سندِ ثبت‌شده دارند (قابلِ قفل‌شدن در پنل) */
+/* انواع سندی که برای یک قطعه سند ثبت‌شده دارند (قابل قفل‌شدن در پنل) */
 function partDocLockedTypes(p,part){
   var pn=pad2(part), set={}; projectDocs(p).forEach(function(d){ if(pad2(d.partNo)===pn) set[String(d.typeCode).toUpperCase()]=1; });
   return set;
 }
-/* نوشتنِ کاملِ ساختار به p.specs + ذخیرهٔ خوش‌بینانه در بک‌اند (بدونِ تغییرِ بک‌اند) */
+/* نوشتن کامل ساختار به p.specs + ذخیرهٔ خوش‌بینانه در بک‌اند (بدون تغییر بک‌اند) */
 async function saveSpecs(c,o,pr,root,extra){
   var json=JSON.stringify(root);
   var p=findProject(c,o,pr);
-  var before=p?p.specs:null;                // برای بازگرداندن اگر بک‌اند جلویِ ذخیره را گرفت
+  var before=p?p.specs:null;                // برای بازگرداندن اگر بک‌اند جلوی ذخیره را گرفت
   if(p) p.specs=json;
   var payload={clientCode:c,orderNo:o,projectNo:pr,specs:json};
   if(extra){ for(var k in extra){ if(extra.hasOwnProperty(k)) payload[k]=extra[k]; } }
   showProjectDetail(c,o,pr);
   var r=await api("saveProject",payload);
   if(!r||!r.ok){
-    /* تورِ ایمنیِ بک‌اند: این ذخیره می‌خواست specsِ پر را خالی کند و رد شد.
-       یعنی نسخهٔ داخلِ مرورگر ناقص است؛ تغییرِ محلی را برمی‌گردانیم تا روی صفحه هم دروغ نماند. */
+    /* تور ایمنی بک‌اند: این ذخیره می‌خواست specs پر را خالی کند و رد شد.
+       یعنی نسخهٔ داخل مرورگر ناقص است؛ تغییر محلی را برمی‌گردانیم تا روی صفحه هم دروغ نماند. */
     if(r && r.code==="EMPTY_SPECS" && p){ p.specs=before; showProjectDetail(c,o,pr); }
     toast((r&&r.message)||"ذخیره ناموفق بود",true);
   }
 }
 
-/* ترتیبِ ثابتِ اسنادِ سطحِ پروژه؛ انواعِ ناشناخته پس از این ترتیب می‌آیند (به ترتیبِ تنظیمات) */
+/* ترتیب ثابت اسناد سطح پروژه؛ انواع ناشناخته پس از این ترتیب می‌آیند (به ترتیب تنظیمات) */
 var PROJ_DOC_ORDER=["AS","PS","QP","MTC"];
-/* ═══ ترتیبِ پیش‌فرضِ انواعِ سند (از «تنظیمات ◂ انواع اسناد» با کشیدن) ═══
-   مبنا ستونِ order است. تا وقتی مدیر هنوز ترتیبی نچیده (order خالی)، ترتیبِ قدیمی حفظ می‌شود:
-   سطحِ پروژه → PROJ_DOC_ORDER؛ سطحِ قطعه → «نقشهٔ رفرنس» اول؛ سپس کد. */
+/* ═══ ترتیب پیش‌فرض انواع سند (از «تنظیمات ◂ انواع اسناد» با کشیدن) ═══
+   مبنا ستون order است. تا وقتی مدیر هنوز ترتیبی نچیده (order خالی)، ترتیب قدیمی حفظ می‌شود:
+   سطح پروژه → PROJ_DOC_ORDER؛ سطح قطعه → «نقشهٔ رفرنس» اول؛ سپس کد. */
 function docTypeOrderVal(t){ var v=t&&t.order; return (v===""||v==null||isNaN(Number(v)))?null:Number(v); }
 function docTypesDefault(scope){
   var types=docTypesSorted().filter(function(t){ return (t.scope==="project")===(scope==="project"); });
@@ -1231,8 +1231,8 @@ function docTypesDefault(scope){
     .map(function(x){ return x.t; });
 }
 function orderedProjectTypes(){ return docTypesDefault("project"); }
-/* ادغامِ یک ترتیبِ اختصاصی با فهرستِ پیش‌فرض: اول اقلامِ ترتیبِ اختصاصی (اگر هنوز وجود دارند)،
-   سپس هر قلمِ تازه به ترتیبِ پیش‌فرض. keyOf کلیدِ هر قلمِ پیش‌فرض را می‌دهد. */
+/* ادغام یک ترتیب اختصاصی با فهرست پیش‌فرض: اول اقلام ترتیب اختصاصی (اگر هنوز وجود دارند)،
+   سپس هر قلم تازه به ترتیب پیش‌فرض. keyOf کلید هر قلم پیش‌فرض را می‌دهد. */
 function mergeOrder(custom, base, keyOf){
   if(!custom||!custom.length) return base.slice();
   var by={}; base.forEach(function(x){ by[keyOf(x)]=x; });
@@ -1241,28 +1241,28 @@ function mergeOrder(custom, base, keyOf){
   base.forEach(function(x){ var k=keyOf(x); if(!seen[k]){ out.push(x); seen[k]=1; } });
   return out;
 }
-/* آیا ترتیب همان پیش‌فرض است؟ (ترتیبِ اختصاصیِ برابر با پیش‌فرض ذخیره نمی‌شود) */
+/* آیا ترتیب همان پیش‌فرض است؟ (ترتیب اختصاصی برابر با پیش‌فرض ذخیره نمی‌شود) */
 function sameOrder(a, b){ if(a.length!==b.length) return false; for(var i=0;i<a.length;i++) if(String(a[i])!==String(b[i])) return false; return true; }
-/* همان فهرست، ولی با ترتیبِ دلخواهِ همین پروژه (specs.projDocOrder) اگر تعریف شده باشد؛
-   نوع‌هایی که در ترتیبِ ذخیره‌شده نیستند (نوعِ تازه‌اضافه‌شده) پس از آن‌ها به ترتیبِ پیش‌فرض می‌آیند. */
+/* همان فهرست، ولی با ترتیب دلخواه همین پروژه (specs.projDocOrder) اگر تعریف شده باشد؛
+   نوع‌هایی که در ترتیب ذخیره‌شده نیستند (نوع تازه‌اضافه‌شده) پس از آن‌ها به ترتیب پیش‌فرض می‌آیند. */
 function orderedProjectTypesFor(p){
   var ord=(specsRoot(p).ordProjDocs||[]).map(function(cd){ return String(cd).toUpperCase(); });
   return mergeOrder(ord, orderedProjectTypes(), function(t){ return String(t.code).toUpperCase(); });
 }
-/* انواعِ سندِ سطحِ پروژه که این پروژه فعال کرده؛ اگر تعریف نشده، همه فعال‌اند */
+/* انواع سند سطح پروژه که این پروژه فعال کرده؛ اگر تعریف نشده، همه فعال‌اند */
 function projDocTypesOf(p){
   var r=specsRoot(p);
   if(r.projDocTypes) return r.projDocTypes.map(function(x){ return String(x).toUpperCase(); });
   return docTypesSorted().filter(function(t){ return t.scope==="project"; }).map(function(t){ return String(t.code).toUpperCase(); });
 }
-/* دسته‌بندیِ محصولِ پروژه (تنها فیلدِ متنیِ قالبِ ثابت)؛ از ساختارِ tpl یا ماژولِ قدیمی */
+/* دسته‌بندی محصول پروژه (تنها فیلد متنی قالب ثابت)؛ از ساختار tpl یا ماژول قدیمی */
 function projectCategory(p){
   var root=specsRoot(p);
   if(root.tpl && root.tpl.category!=null) return String(root.tpl.category);
   var m=(root.project||[]).filter(function(x){ return String(x.label||"").indexOf("دسته")>=0; })[0];
   return m?String(m.value||""):"";
 }
-/* قالبِ ثابتِ مشخصاتِ پروژه (۶ فیلد) برای نمایش در کارتِ «مشخصات پروژه» */
+/* قالب ثابت مشخصات پروژه (۶ فیلد) برای نمایش در کارت «مشخصات پروژه» */
 function projectSpecTemplateRows(c,o,pr,s,p){
   var dt=projectDates(p), cat=projectCategory(p), nParts=projectPartsList(p).length;
   return pdMetaRow("نام مشتری", '<span title="'+esc(clientName(c)||c)+'">'+esc(clientNameEn(c))+'</span>')+
@@ -1275,24 +1275,24 @@ function projectSpecTemplateRows(c,o,pr,s,p){
     '<div class="spec-row"><span class="spec-label"><span class="lbl-t">تعداد کل قطعات</span></span>'+
       '<span class="spec-val ltr">'+esc(String(nParts))+' <span class="unit">'+(nParts===1?"part":"parts")+'</span></span></div>';
 }
-/* ردیفِ فقط‌خواندنیِ قالب در پنلِ ویرایش (واحدِ اختیاری؛ چپ‌چینی از روی مقدار تعیین می‌شود) */
+/* ردیف فقط‌خواندنی قالب در پنل ویرایش (واحد اختیاری؛ چپ‌چینی از روی مقدار تعیین می‌شود) */
 function edFldRO(label,val,unit){
   var body=esc(val)+(unit?' <span class="unit">'+esc(unit)+'</span>':'');
   return '<div class="ed-fld-row"><span class="ed-fld-lab">'+esc(label)+'</span>'+
     '<span class="ed-fld-val auto'+(isLtrVal(val)?' ltr':'')+'">'+body+'</span></div>';
 }
 
-/* تشخیصِ جوابِ لاتین (عیناً پروتوتایپ): اگر پاسخ هیچ حرفِ فارسی/عربی نداشت و حرف/رقمِ لاتین
-   داشت، لاتین شمرده می‌شود و از سمتِ چپ نوشته می‌شود. ارقامِ فارسی هم داخلِ همین بازه‌اند،
-   پس تاریخ‌ها را با رقمِ لاتین می‌سازیم تا مثلِ پروتوتایپ چپ‌چین شوند. */
+/* تشخیص جواب لاتین (عیناً پروتوتایپ): اگر پاسخ هیچ حرف فارسی/عربی نداشت و حرف/رقم لاتین
+   داشت، لاتین شمرده می‌شود و از سمت چپ نوشته می‌شود. ارقام فارسی هم داخل همین بازه‌اند،
+   پس تاریخ‌ها را با رقم لاتین می‌سازیم تا مثل پروتوتایپ چپ‌چین شوند. */
 function isLtrVal(sv){ sv=String(sv==null?"":sv).replace(/<[^>]*>/g,""); return !/[؀-ۿ]/.test(sv) && /[A-Za-z0-9]/.test(sv); }
 function pdValClass(raw){ return 'spec-val'+(isLtrVal(raw)?' ltr':''); }
-/* ردیفِ برچسب/مقدار — جوابِ لاتین خودکار چپ‌چین، جوابِ فارسی راست‌چین (عیناً پروتوتایپ) */
+/* ردیف برچسب/مقدار — جواب لاتین خودکار چپ‌چین، جواب فارسی راست‌چین (عیناً پروتوتایپ) */
 function pdMetaRow(label,valHTML){
   return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(label)+'</span></span>'+
     '<span class="'+pdValClass(valHTML)+'">'+valHTML+'</span></div>';
 }
-/* تاریخِ شمسیِ عددی با رقمِ لاتین: «1405/04/29» تا مثلِ پروتوتایپ چپ‌چین شود */
+/* تاریخ شمسی عددی با رقم لاتین: «1405/04/29» تا مثل پروتوتایپ چپ‌چین شود */
 function fmtDateJalaliNum(ts){
   if(!ts) return "";
   var d=new Date(ts); if(isNaN(d.getTime())) return String(ts).slice(0,10);
@@ -1300,12 +1300,12 @@ function fmtDateJalaliNum(ts){
   catch(e){ try{ return d.toLocaleDateString("en-CA"); }catch(e2){ return ""; } }
 }
 function tsOf(v){ if(v==null||v==="")return null; var t=new Date(v).getTime(); return isNaN(t)?null:t; }
-/* تاریخِ سفارشِ والدِ پروژه (fallback برای پروژه‌های قدیمی) */
+/* تاریخ سفارش والد پروژه (fallback برای پروژه‌های قدیمی) */
 function orderTs(p){ var o=DB.orders.find(function(x){ return x.clientCode===p.clientCode && pad2(x.orderNo)===pad2(p.orderNo); }); return o?tsOf(o.date):null; }
-/* تاریخِ ایجاد/آخرین‌تغییرِ پروژه:
-   • پروژهٔ جدید (createdAt ذخیره‌شده دارد): ایجاد = createdAt؛ آخرین‌تغییر = جدیدترینِ (createdAt, updatedAt, جدیدترین سند)
+/* تاریخ ایجاد/آخرین‌تغییر پروژه:
+   • پروژهٔ جدید (createdAt ذخیره‌شده دارد): ایجاد = createdAt؛ آخرین‌تغییر = جدیدترین (createdAt, updatedAt, جدیدترین سند)
      ⇐ تا وقتی ویرایش/سندی نبوده، آخرین‌تغییر با ایجاد یکی است.
-   • پروژهٔ قدیمی (createdAt ندارد): هر دو = «اولین سند» یا «تاریخِ سفارش» (برابر)؛ فقط اگر بعداً ویرایش شده باشد،
+   • پروژهٔ قدیمی (createdAt ندارد): هر دو = «اولین سند» یا «تاریخ سفارش» (برابر)؛ فقط اگر بعداً ویرایش شده باشد،
      آخرین‌تغییرش با updatedAt جلو می‌رود. */
 function projectDates(p){
   var ns=projectDocs(p).map(function(d){ return tsOf(d.timestamp); }).filter(function(n){ return n!=null; });
@@ -1323,7 +1323,7 @@ function projectDates(p){
   return { created: created!=null?fmtDateJalaliNum(created):"",
            updated: updated!=null?fmtDateJalaliNum(updated):"" };
 }
-/* هویتِ پروژه — عیناً پروتوتایپ: مشتری · کد پروژه · تاریخ ایجاد · تاریخ آخرین تغییرات */
+/* هویت پروژه — عیناً پروتوتایپ: مشتری · کد پروژه · تاریخ ایجاد · تاریخ آخرین تغییرات */
 function pdIdentityRows(c,o,pr,s,p){
   var dt=projectDates(p);
   return pdMetaRow("مشتری", '<span title="'+esc(s.client||clientName(c))+'">'+esc(c)+'</span>')+
@@ -1336,7 +1336,7 @@ function metaRowOrDash(label,val){
   return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(label)+'</span></span>'+
     '<span class="spec-val empty">ثبت نشده</span></div>';
 }
-/* ردیف‌های ماژولِ مشخصات — جوابِ لاتین چپ‌چین؛ اگر پروژه مشخصاتی ندارد، پیش‌فرضِ «دسته‌بندی محصول» */
+/* ردیف‌های ماژول مشخصات — جواب لاتین چپ‌چین؛ اگر پروژه مشخصاتی ندارد، پیش‌فرض «دسته‌بندی محصول» */
 function projectSpecsRows(p){
   var specs=projectSpecs(p).filter(function(m){ return m.on && m.label; });
   if(!specs.length) specs=projectSpecsSeed().filter(function(m){ return m.on && m.label; });
@@ -1347,7 +1347,7 @@ function projectSpecsRows(p){
   }).join("");
 }
 
-/* --- پنلِ ویرایشِ مشخصاتِ پروژه: قالبِ ثابت (۶ فیلد) + اسنادِ پروژه (طرحِ .ed-* سایت) --- */
+/* --- پنل ویرایش مشخصات پروژه: قالب ثابت (۶ فیلد) + اسناد پروژه (طرح .ed-* سایت) --- */
 var PSED=null;
 function openProjectSpecs(c,o,pr){
   if(ME.role!=="admin"){ toast("فقط مدیر می‌تواند ویرایش کند.",true); return; }
@@ -1357,7 +1357,7 @@ function openProjectSpecs(c,o,pr){
     projDocs: orderedProjectTypesFor(p).map(function(t){ var T=String(t.code).toUpperCase(); return {code:T,label:t.nameFa||T,on:!!on[T]}; }),
     customOrd: false
   };
-  // ترتیبِ اختصاصی دارد؟ = ترتیبِ فعلی با پیش‌فرض فرق دارد
+  // ترتیب اختصاصی دارد؟ = ترتیب فعلی با پیش‌فرض فرق دارد
   PSED.customOrd=!sameOrder(PSED.projDocs.map(function(x){ return x.code; }), orderedProjectTypes().map(function(t){ return String(t.code).toUpperCase(); }));
   showModal("ویرایش مشخصات پروژه",
     '<div class="ed-body" id="psedBody"></div>'+
@@ -1369,30 +1369,30 @@ function openProjectSpecs(c,o,pr){
 }
 function drawProjectSpecsBody(c,o,pr){
   var host=document.getElementById("psedBody"); if(!host||!PSED) return;
-  var _sc=pedScrollSave(host);   // جای اسکرول پیش از بازسازیِ innerHTML
+  var _sc=pedScrollSave(host);   // جای اسکرول پیش از بازسازی innerHTML
   var p=findProject(c,o,pr); if(!p) return;
-  /* کارتِ ۱: فیلدهای قابلِ ویرایشِ کاربر — نامِ پروژه و دسته‌بندیِ محصول.
-     (مشتری/کد/تاریخ‌ها/تعدادِ قطعات را سامانه خودکار می‌سازد؛ در ویرایش نمایش داده نمی‌شوند.) */
+  /* کارت ۱: فیلدهای قابل ویرایش کاربر — نام پروژه و دسته‌بندی محصول.
+     (مشتری/کد/تاریخ‌ها/تعداد قطعات را سامانه خودکار می‌سازد؛ در ویرایش نمایش داده نمی‌شوند.) */
   var tplCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'مشخصات پروژه</h4>'+
     '<div class="ed-fld-row"><span class="ed-fld-lab">نام پروژه</span>'+
       '<input type="text" id="psedName" placeholder="مثلاً Roller W=700" value="'+esc(PSED.name)+'" oninput="PSED.name=this.value"></div>'+
     '<div class="ed-fld-row"><span class="ed-fld-lab">دسته‌بندی محصول</span>'+
       '<input type="text" dir="ltr" id="psedCategory" placeholder="e.g. Power Transmission Parts" value="'+esc(PSED.category)+'" oninput="PSED.category=this.value"></div>'+
   '</div>';
-  /* کارتِ ۲: اسناد پروژه — فقط روشن/خاموش؛ افزودنِ نوعِ جدید فقط در تنظیمات */
+  /* کارت ۲: اسناد پروژه — فقط روشن/خاموش؛ افزودن نوع جدید فقط در تنظیمات */
   var nOn=PSED.projDocs.filter(function(x){ return x.on; }).length;
   var docRows=PSED.projDocs.map(function(x,i){ return pedDragRow(x.on,x.label,x.code,"psedToggleDoc("+i+")"); }).join("");
   var docsCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'اسناد پروژه<span class="ed-count">'+faN(nOn)+' سند</span>'+
       edResetBtn("psedResetOrder()", PSED.customOrd)+'</h4>'+
-    (docRows?'<div class="ed-scroll" data-reorder="proj" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">نوعِ سندِ سطحِ پروژه‌ای تعریف نشده.</div>')+
-    '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودنِ نوعِ جدیدِ سند، به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
-    '<div class="ed-req-note"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>برای بارگذاریِ فایلِ هر سند، در پنلِ مدیریتِ پروژه روی آیکونِ همان سند کلیک کنید.</div>'+
+    (docRows?'<div class="ed-scroll" data-reorder="proj" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">نوع سند سطح پروژه‌ای تعریف نشده.</div>')+
+    '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودن نوع جدید سند، به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
+    '<div class="ed-req-note"><svg viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M7 9l5-5 5 5"/><path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>برای بارگذاری فایل هر سند، در پنل مدیریت پروژه روی آیکون همان سند کلیک کنید.</div>'+
   '</div>';
   host.innerHTML=tplCard+docsCard;
   pedScrollRestore(host,_sc);
 }
 function psedToggleDoc(i){ var x=PSED.projDocs[i]; if(x){ x.on=!x.on; drawProjectSpecsBody(PSED.c,PSED.o,PSED.pr); } }
-/* بازگشت به ترتیبِ پیش‌فرض: روشن/خاموش‌ها دست نمی‌خورند، فقط ترتیب */
+/* بازگشت به ترتیب پیش‌فرض: روشن/خاموش‌ها دست نمی‌خورند، فقط ترتیب */
 function psedResetOrder(){
   if(!PSED) return;
   PSED.projDocs=mergeOrder(null, PSED.projDocs, function(x){ return x.code; });
@@ -1407,43 +1407,43 @@ async function saveProjectSpecs(){
   var root=specsRoot(p);
   root.tpl=root.tpl||{}; root.tpl.category=String(PSED.category||"").trim();
   root.projDocTypes=PSED.projDocs.filter(function(x){ return x.on; }).map(function(x){ return x.code; });
-  /* ترتیبِ اختصاصی فقط اگر کاربر جابه‌جا کرده و با پیش‌فرض فرق دارد؛ وگرنه پروژه پیرو پیش‌فرض می‌ماند */
+  /* ترتیب اختصاصی فقط اگر کاربر جابه‌جا کرده و با پیش‌فرض فرق دارد؛ وگرنه پروژه پیرو پیش‌فرض می‌ماند */
   var _codes=PSED.projDocs.map(function(x){ return x.code; });
   var _def=orderedProjectTypes().map(function(t){ return String(t.code).toUpperCase(); });
   root.ordProjDocs=(PSED.customOrd && !sameOrder(_codes,_def))?_codes:null;
-  root.projDocOrder=null;   // کلیدِ قدیمی (پیش از ترتیبِ پیش‌فرض) پاک می‌شود
-  root.project=[];   // قالبِ ثابت جایگزینِ ماژول‌های پویا شد
+  root.projDocOrder=null;   // کلید قدیمی (پیش از ترتیب پیش‌فرض) پاک می‌شود
+  root.project=[];   // قالب ثابت جایگزین ماژول‌های پویا شد
   var desc=String(PSED.name||"").trim();
-  p.description=desc;                       // به‌روزرسانیِ محلی تا UI فوراً نامِ تازه را نشان دهد
+  p.description=desc;                       // به‌روزرسانی محلی تا UI فوراً نام تازه را نشان دهد
   closeModal();
   await saveSpecs(c,o,pr,root,{description:desc});
 }
 
-/* ============ پنلِ ویرایشِ قطعات پروژه: عضویتِ قطعات + انواعِ سند + ماژول‌های اطلاعاتِ قطعه ============ */
+/* ============ پنل ویرایش قطعات پروژه: عضویت قطعات + انواع سند + ماژول‌های اطلاعات قطعه ============ */
 var PED=null;
-/* ساختِ وضعیتِ مشترکِ پنلِ ویرایش — هم پنجرهٔ افزودنِ قطعه، هم ویرایشِ تک‌قطعه */
+/* ساخت وضعیت مشترک پنل ویرایش — هم پنجرهٔ افزودن قطعه، هم ویرایش تک‌قطعه */
 function pedInitState(c,o,pr,p){
-  var inProj={}; projectPartsList(p).forEach(function(pn){ inProj[pn]=1; });   // قطعاتی که الان عضوِ پروژه‌اند
+  var inProj={}; projectPartsList(p).forEach(function(pn){ inProj[pn]=1; });   // قطعاتی که الان عضو پروژه‌اند
   PED={ c:c,o:o,pr:pr,
     parts: partsSorted().map(function(pt){ var no=pad2(pt.partNo); return {no:no,fa:partNameFa(no),en:pt.name||"",on:!!inProj[no]}; }),
-    docMaster: partDocMaster(),          // فهرستِ اصلیِ انواعِ سندِ سطحِ قطعه [{code,label}]
-    paramMaster: partModMaster(p),       // فهرستِ اصلیِ پارامترها [{label,legacy}]
-    selPart: null,                       // قطعهٔ در حالِ پیکربندی
-    // وضعیتِ per-part برای همهٔ قطعاتِ سیستم؛ اگر ذخیره‌شده باشد از آن، وگرنه از fallbackِ پروژه‌ای پر می‌شود
+    docMaster: partDocMaster(),          // فهرست اصلی انواع سند سطح قطعه [{code,label}]
+    paramMaster: partModMaster(p),       // فهرست اصلی پارامترها [{label,legacy}]
+    selPart: null,                       // قطعهٔ در حال پیکربندی
+    // وضعیت per-part برای همهٔ قطعات سیستم؛ اگر ذخیره‌شده باشد از آن، وگرنه از fallback پروژه‌ای پر می‌شود
     docsByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
       var d={}; partDocTypesForPart(p,pn).forEach(function(T){ d[String(T).toUpperCase()]=true; }); out[pn]=d; }); return out; })(),
-    // ترتیبِ *اختصاصیِ* انواعِ سند برای هر قطعه (فقط اگر ذخیره شده)؛ نبودن = پیش‌فرض (ترتیبِ docMaster)
+    // ترتیب *اختصاصی* انواع سند برای هر قطعه (فقط اگر ذخیره شده)؛ نبودن = پیش‌فرض (ترتیب docMaster)
     docOrderByPart: (function(){ var src=specsRoot(p).ordPartDocs||{}, out={};
       Object.keys(src).forEach(function(k){ if(Array.isArray(src[k])) out[pad2(k)]=src[k].map(function(T){ return String(T).toUpperCase(); }); }); return out; })(),
     modsByPart: (function(){ var out={}; partsSorted().forEach(function(pt){ var pn=pad2(pt.partNo);
       var m={}; partModsForPart(p,pn).forEach(function(x){ m[x.label]=x.on; }); out[pn]=m; }); return out; })(),
-    // ترتیبِ *اختصاصیِ* پارامترها برای هر قطعه — هم‌الگوی docOrderByPart
+    // ترتیب *اختصاصی* پارامترها برای هر قطعه — هم‌الگوی docOrderByPart
     modOrderByPart: (function(){ var src=specsRoot(p).ordPartMods||{}, out={};
       Object.keys(src).forEach(function(k){ if(Array.isArray(src[k])) out[pad2(k)]=src[k].map(String); }); return out; })(),
     vals: (function(){ var src=specsRoot(p).partVals||{}, out={};
       Object.keys(src).forEach(function(k){ var r=src[k]||{}, kk=pad2(k); out[kk]={};
         Object.keys(r).forEach(function(l){ out[kk][l]=String(r[l]==null?"":r[l]); }); });
-      return out; })()   // کپیِ مقادیرِ per-part تا تا زمانِ ذخیره، محلی ویرایش شوند
+      return out; })()   // کپی مقادیر per-part تا تا زمان ذخیره، محلی ویرایش شوند
   };
   PED.single=false;
 }
@@ -1451,7 +1451,7 @@ function openPartsPanel(c,o,pr){
   if(ME.role!=="admin"){ toast("فقط مدیر می‌تواند ویرایش کند.",true); return; }
   var p=findProject(c,o,pr); if(!p) return;
   pedInitState(c,o,pr,p);
-  showModal("افزودنِ قطعه به پروژه",
+  showModal("افزودن قطعه به پروژه",
     '<div class="ed-body" id="pedBody"></div>'+
     '<div class="ed-foot"><div class="btn-row">'+
       '<button class="btn" onclick="closeModal()">انصراف</button>'+
@@ -1459,17 +1459,17 @@ function openPartsPanel(c,o,pr){
     '</div></div>', "edit-box");
   drawPartsBody();
 }
-/* ═══ ویرایشِ یک قطعهٔ مشخص ═══
-   همان دو کارتِ «انواعِ سند» و «پارامترها»، ولی بدونِ دراپ‌داونِ انتخابِ قطعه:
-   قطعه از همان کارتی می‌آید که کاربر دکمهٔ ویرایشِ آن را زده، پس یک مرحلهٔ انتخاب حذف می‌شود.
-   عضویتِ قطعات در این پنجره دست‌کاری نمی‌شود — آن کارِ دکمهٔ افزودنِ سربرگ است. */
+/* ═══ ویرایش یک قطعهٔ مشخص ═══
+   همان دو کارت «انواع سند» و «پارامترها»، ولی بدون دراپ‌داون انتخاب قطعه:
+   قطعه از همان کارتی می‌آید که کاربر دکمهٔ ویرایش آن را زده، پس یک مرحلهٔ انتخاب حذف می‌شود.
+   عضویت قطعات در این پنجره دست‌کاری نمی‌شود — آن کار دکمهٔ افزودن سربرگ است. */
 function openPartEditPanel(c,o,pr,pn){
   if(ME.role!=="admin"){ toast("فقط مدیر می‌تواند ویرایش کند.",true); return; }
   var p=findProject(c,o,pr); if(!p) return;
   pedInitState(c,o,pr,p);
   PED.selPart=pad2(pn);
-  PED.single=true;   // حالتِ تک‌قطعه‌ای: کارتِ عضویتِ قطعات رسم نمی‌شود
-  showModal("ویرایشِ قطعهٔ «"+esc(partNameFa(pn))+"»",
+  PED.single=true;   // حالت تک‌قطعه‌ای: کارت عضویت قطعات رسم نمی‌شود
+  showModal("ویرایش قطعهٔ «"+esc(partNameFa(pn))+"»",
     '<div class="ed-body" id="pedBody"></div>'+
     '<div class="ed-foot"><div class="btn-row">'+
       '<button class="btn" onclick="closeModal()">انصراف</button>'+
@@ -1479,9 +1479,9 @@ function openPartEditPanel(c,o,pr,pn){
 }
 function pedCountParts(){ return PED?PED.parts.filter(function(x){ return x.on; }).length:0; }
 function pedTogglePart(i){ var x=PED.parts[i]; if(x){ x.on=!x.on; drawPartsBody(); } }
-/* انتخابِ قطعه برای پیکربندیِ per-part */
+/* انتخاب قطعه برای پیکربندی per-part */
 function pedSelectPart(pn){ pedDDCloseAll(); PED.selPart=pad2(pn); drawPartsBody(); }
-/* منوی انتخابِ قطعه (سفارشی، هم‌شکلِ دکمه‌های سایت) — باز/بسته و بستن با کلیکِ بیرون */
+/* منوی انتخاب قطعه (سفارشی، هم‌شکل دکمه‌های سایت) — باز/بسته و بستن با کلیک بیرون */
 function pedDDCloseAll(){ var a=document.querySelectorAll(".ed-part-dd.open"); for(var i=0;i<a.length;i++) a[i].classList.remove("open");
   document.removeEventListener("click", pedDDOutside, true); }
 function pedDDOutside(e){ if(e.target && e.target.closest && e.target.closest(".ed-part-dd")) return; pedDDCloseAll(); }
@@ -1490,19 +1490,19 @@ function pedDDToggle(which){ var dd=document.getElementById("edDD-"+which); if(!
   if(willOpen){ dd.classList.add("open"); setTimeout(function(){ document.addEventListener("click", pedDDOutside, true); },0); } }
 function pedPartDD(which, onParts, sel){
   var selRec=onParts.filter(function(x){ return x.no===sel; })[0];
-  var label=selRec?selRec.fa:'انتخابِ قطعه';   // تا قطعه‌ای انتخاب نشده، جای‌گیرِ راهنما
+  var label=selRec?selRec.fa:'انتخاب قطعه';   // تا قطعه‌ای انتخاب نشده، جای‌گیر راهنما
   var opts=onParts.map(function(x){ return '<button type="button" class="ed-part-opt'+(x.no===sel?' on':'')+'" onclick="pedSelectPart(\''+esc(x.no)+'\')">'+esc(x.fa)+'</button>'; }).join("");
   return '<div class="ed-part-dd" id="edDD-'+which+'">'+
-    '<button type="button" class="ed-part-trig" onclick="pedDDToggle(\''+which+'\')" title="انتخابِ قطعه">'+
+    '<button type="button" class="ed-part-trig" onclick="pedDDToggle(\''+which+'\')" title="انتخاب قطعه">'+
       '<span>'+esc(label)+'</span>'+ED_CHEV_IC+'</button>'+
     '<div class="ed-part-menu">'+opts+'</div></div>';
 }
-/* روشن/خاموشِ یک نوعِ سند برای قطعهٔ انتخاب‌شده (نوعی که سند دارد قفل است) */
+/* روشن/خاموش یک نوع سند برای قطعهٔ انتخاب‌شده (نوعی که سند دارد قفل است) */
 function pedTogglePartDoc(code){ var pn=PED.selPart; code=String(code||"").toUpperCase(); if(!pn||!code) return;
   var p=findProject(PED.c,PED.o,PED.pr);
-  if(p && partDocLockedTypes(p,pn)[code]){ toast("این نوع برای این قطعه سندِ ثبت‌شده دارد و نمی‌توان غیرفعالش کرد.",true); return; }
+  if(p && partDocLockedTypes(p,pn)[code]){ toast("این نوع برای این قطعه سند ثبت‌شده دارد و نمی‌توان غیرفعالش کرد.",true); return; }
   var d=PED.docsByPart[pn]||(PED.docsByPart[pn]={}); d[code]=!d[code]; drawPartsBody(); }
-/* روشن/خاموشِ یک پارامتر برای قطعهٔ انتخاب‌شده */
+/* روشن/خاموش یک پارامتر برای قطعهٔ انتخاب‌شده */
 function pedTogglePartMod(mi){ var pn=PED.selPart, x=PED.paramMaster[mi]; if(!pn||!x) return;
   var m=PED.modsByPart[pn]||(PED.modsByPart[pn]={}); m[x.label]=!m[x.label]; drawPartsBody(); }
 function pedCheckRow(on,label,code,fn){
@@ -1511,19 +1511,19 @@ function pedCheckRow(on,label,code,fn){
     '<span class="ed-name"><span>'+esc(label)+'</span></span>'+
     '<span class="ed-doc-code">'+esc(code)+'</span>';
 }
-/* آیکونِ قفل (SVG) — برای نوعِ سندی که سندِ ثبت‌شده دارد و قابلِ غیرفعال‌سازی نیست */
+/* آیکون قفل (SVG) — برای نوع سندی که سند ثبت‌شده دارد و قابل غیرفعال‌سازی نیست */
 var ED_LOCK_IC='<svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
-/* آیکونِ فلشِ منوی کشویی */
+/* آیکون فلش منوی کشویی */
 var ED_CHEV_IC='<svg class="ed-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>';
-/* آیکونِ توجه — برای پیامِ نارنجیِ «اول قطعه را انتخاب کنید» */
+/* آیکون توجه — برای پیام نارنجی «اول قطعه را انتخاب کنید» */
 var ED_ALERT_IC='<svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
 
-/* ============ جابجاییِ ترتیبِ نمایشِ اسناد در پنل‌های ویرایش (دستهٔ ۶‌نقطه‌ای + انیمیشنِ FLIP) ============
-   دقیقاً مثلِ فهرستِ مشتری‌ها: فقط با کشیدن از روی دسته فعال می‌شود. قابِ اسکرول صفتِ data-reorder
-   دارد (proj برای اسنادِ سطحِ پروژه، part برای اسنادِ هر قطعه) تا در پایانِ کشیدن ترتیبِ جدید ثبت شود.
-   ترتیبِ سطحِ پروژه در specs.projDocOrder و ترتیبِ هر قطعه در specs.partDocsByPart ذخیره می‌شود. */
+/* ============ جابجایی ترتیب نمایش اسناد در پنل‌های ویرایش (دستهٔ ۶‌نقطه‌ای + انیمیشن FLIP) ============
+   دقیقاً مثل فهرست مشتری‌ها: فقط با کشیدن از روی دسته فعال می‌شود. قاب اسکرول صفت data-reorder
+   دارد (proj برای اسناد سطح پروژه، part برای اسناد هر قطعه) تا در پایان کشیدن ترتیب جدید ثبت شود.
+   ترتیب سطح پروژه در specs.projDocOrder و ترتیب هر قطعه در specs.partDocsByPart ذخیره می‌شود. */
 var ED_GRIP_IC='<svg viewBox="0 0 24 24"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg>';
-function edGripHTML(){ return '<span class="ed-grip" title="بکشید تا ترتیبِ نمایش عوض شود" aria-label="جابجاییِ ترتیب" onmousedown="edGripDown()" onclick="event.stopPropagation()">'+ED_GRIP_IC+'</span>'; }
+function edGripHTML(){ return '<span class="ed-grip" title="بکشید تا ترتیب نمایش عوض شود" aria-label="جابجایی ترتیب" onmousedown="edGripDown()" onclick="event.stopPropagation()">'+ED_GRIP_IC+'</span>'; }
 var _edGripArmed=false;
 function edGripDown(){ _edGripArmed=true; }            // فقط کشیدن از روی دسته مجاز است
 function edRowDragStart(e){
@@ -1544,7 +1544,7 @@ function edRowDragOver(e){
   edFlipRows(list,function(){ if(after===null) list.appendChild(dragging); else list.insertBefore(dragging,after); });
 }
 function edAfterRow(list,y){
-  var els=[].slice.call(list.querySelectorAll(".ed-doc-row:not(.ed-dragging):not(.ed-fixed)"));   // ردیفِ قفل‌شده هدفِ جابه‌جایی نیست
+  var els=[].slice.call(list.querySelectorAll(".ed-doc-row:not(.ed-dragging):not(.ed-fixed)"));   // ردیف قفل‌شده هدف جابه‌جایی نیست
   var closest=null, closestOffset=-Infinity;
   els.forEach(function(el){ var b=el.getBoundingClientRect(); var off=y-(b.top+b.height/2);
     if(off<0 && off>closestOffset){ closestOffset=off; closest=el; } });
@@ -1567,15 +1567,15 @@ function edRowDragEnd(e){
   var kind=list.getAttribute("data-reorder");
   if(kind==="proj") edCommitProjOrder(codes);
   else if(kind==="part") edCommitPartOrder(codes);
-  else if(kind==="mod") edCommitModOrder(codes);   // پارامترها: data-code همان برچسبِ پارامتر است
+  else if(kind==="mod") edCommitModOrder(codes);   // پارامترها: data-code همان برچسب پارامتر است
 }
 if(typeof document!=="undefined" && document.addEventListener) document.addEventListener("mouseup",function(){ _edGripArmed=false; });
-/* ترتیبِ جدیدِ DOM را در آرایهٔ وضعیت بنویس، سپس رندرِ دوباره تا اندیس‌های onclick درست بمانند */
+/* ترتیب جدید DOM را در آرایهٔ وضعیت بنویس، سپس رندر دوباره تا اندیس‌های onclick درست بمانند */
 function edCommitProjOrder(codes){
   if(!PSED) return;
   var by={}; PSED.projDocs.forEach(function(x){ by[x.code]=x; });
   var next=[]; codes.forEach(function(cd){ if(by[cd]){ next.push(by[cd]); delete by[cd]; } });
-  PSED.projDocs.forEach(function(x){ if(by[x.code]) next.push(x); });   // هر ردیفِ جامانده، ته
+  PSED.projDocs.forEach(function(x){ if(by[x.code]) next.push(x); });   // هر ردیف جامانده، ته
   PSED.projDocs=next;
   var def=orderedProjectTypes().map(function(t){ return String(t.code).toUpperCase(); });
   PSED.customOrd=!sameOrder(next.map(function(x){ return x.code; }), def);   // کشیدن و برگرداندن به همان جا = پیش‌فرض
@@ -1590,7 +1590,7 @@ function edCommitPartOrder(codes){
   PED.docOrderByPart[pn]=next;
   drawPartsBody();
 }
-/* فهرستِ انواعِ سندِ یک قطعه به ترتیبِ دلخواهِ همان قطعه؛ اگر ترتیبی نبود، ترتیبِ فهرستِ اصلی */
+/* فهرست انواع سند یک قطعه به ترتیب دلخواه همان قطعه؛ اگر ترتیبی نبود، ترتیب فهرست اصلی */
 function pedPartDocList(pn){
   var ord=PED.docOrderByPart?PED.docOrderByPart[pn]:null, by={};
   PED.docMaster.forEach(function(x){ by[x.code]=x; });
@@ -1599,7 +1599,7 @@ function pedPartDocList(pn){
   PED.docMaster.forEach(function(x){ if(!seen[x.code]){ out.push(x); seen[x.code]=1; } });
   return out;
 }
-/* فهرستِ پارامترهای یک قطعه به ترتیبِ دلخواهِ همان قطعه؛ اگر ترتیبی نبود، ترتیبِ فهرستِ اصلی */
+/* فهرست پارامترهای یک قطعه به ترتیب دلخواه همان قطعه؛ اگر ترتیبی نبود، ترتیب فهرست اصلی */
 function pedPartModList(pn){
   var ord=PED.modOrderByPart?PED.modOrderByPart[pn]:null, by={};
   PED.paramMaster.forEach(function(x){ by[x.label]=x; });
@@ -1608,7 +1608,7 @@ function pedPartModList(pn){
   PED.paramMaster.forEach(function(x){ if(!seen[x.label]){ out.push(x); seen[x.label]=1; } });
   return out;
 }
-/* ثبتِ ترتیبِ جدیدِ پارامترها پس از کشیدن */
+/* ثبت ترتیب جدید پارامترها پس از کشیدن */
 function edCommitModOrder(labels){
   if(!PED||!PED.selPart) return;
   var pn=PED.selPart, valid={};
@@ -1620,10 +1620,10 @@ function edCommitModOrder(labels){
   drawPartsBody();
 }
 
-/* ═══ بازگشت به ترتیبِ پیش‌فرض (کنارِ عنوانِ هر فهرستِ قابلِ جابه‌جایی) ═══
-   دکمهٔ آیکونیِ همیشه‌حاضر: تا ترتیب همان پیش‌فرض است خاکستری و بی‌اثر؛ با اولین جابه‌جایی
-   تیره و فعال می‌شود. ⚠ به‌جای صفتِ disabled از aria-disabled استفاده شده، چون برخی مرورگرها
-   روی دکمهٔ disabled تولتیپِ title («ترتیب پیش‌فرض») را نشان نمی‌دهند. */
+/* ═══ بازگشت به ترتیب پیش‌فرض (کنار عنوان هر فهرست قابل جابه‌جایی) ═══
+   دکمهٔ آیکونی همیشه‌حاضر: تا ترتیب همان پیش‌فرض است خاکستری و بی‌اثر؛ با اولین جابه‌جایی
+   تیره و فعال می‌شود. ⚠ به‌جای صفت disabled از aria-disabled استفاده شده، چون برخی مرورگرها
+   روی دکمهٔ disabled تولتیپ title («ترتیب پیش‌فرض») را نشان نمی‌دهند. */
 var ED_RESET_IC='<svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
 function edResetBtn(fn, active){
   return '<button type="button" class="ed-reset'+(active?' is-on':'')+'" title="ترتیب پیش‌فرض" aria-label="ترتیب پیش‌فرض"'+
@@ -1642,7 +1642,7 @@ function pedResetOrder(kind){
   drawPartsBody();
 }
 
-/* ردیفِ چک‌لیستِ قابلِ کشیدن: دایرهٔ روشن/خاموش + نام + (اکسترا مثلِ قفل) + کد + دستهٔ ۶‌نقطه‌ای (سمتِ چپ) */
+/* ردیف چک‌لیست قابل کشیدن: دایرهٔ روشن/خاموش + نام + (اکسترا مثل قفل) + کد + دستهٔ ۶‌نقطه‌ای (سمت چپ) */
 function pedDragRow(on,label,code,fn,extra,dis){
   return '<div class="ed-doc-row ed-drag'+(on?'':' off')+'" draggable="true" data-code="'+esc(code)+'" ondragstart="edRowDragStart(event)" ondragend="edRowDragEnd(event)">'+
     '<button type="button" class="ed-check'+(on?' on':'')+'"'+(dis?' disabled':'')+' role="checkbox" aria-checked="'+(on?'true':'false')+'" aria-label="'+esc(label)+'" onclick="'+fn+'"></button>'+
@@ -1652,10 +1652,10 @@ function pedDragRow(on,label,code,fn,extra,dis){
     edGripHTML()+
   '</div>';
 }
-/* موقعیتِ اسکرولِ ناحیه‌های فهرست را برمی‌دارد/برمی‌گرداند.
-   ⚠ لازم است چون drawPartsBody کلِ بدنه را با innerHTML از نو می‌سازد؛ بدونِ این،
-   با هر روشن/خاموش‌کردنِ ماژول فهرست به بالا می‌پرد و کاربر جای خودش را گم می‌کند.
-   کلید = مقدارِ data-reorder (یا اندیسِ ناحیه، برای فهرستِ قطعات که آن را ندارد). */
+/* موقعیت اسکرول ناحیه‌های فهرست را برمی‌دارد/برمی‌گرداند.
+   ⚠ لازم است چون drawPartsBody کل بدنه را با innerHTML از نو می‌سازد؛ بدون این،
+   با هر روشن/خاموش‌کردن ماژول فهرست به بالا می‌پرد و کاربر جای خودش را گم می‌کند.
+   کلید = مقدار data-reorder (یا اندیس ناحیه، برای فهرست قطعات که آن را ندارد). */
 function pedScrollSave(host){
   var m={};
   [].forEach.call(host.querySelectorAll(".ed-scroll"), function(el,i){
@@ -1671,41 +1671,41 @@ function pedScrollRestore(host,m){
   });
 }
 function drawPartsBody(){
-  pedDDCloseAll();   // هر بار رندر، منوهای بازِ قبلی و لیسنرِ کلیکِ بیرون پاک می‌شوند
+  pedDDCloseAll();   // هر بار رندر، منوهای باز قبلی و لیسنر کلیک بیرون پاک می‌شوند
   var host=document.getElementById("pedBody"); if(!host) return;
   var _sc=pedScrollSave(host);   // پیش از بازسازی، جای اسکرول نگه داشته شود
-  /* کراس‌فیدِ دایره‌ها: کلید با قطعهٔ رسم‌شدهٔ قبلی پیشوند می‌خورد تا عوض‌کردنِ قطعه
-     (که همهٔ دایره‌ها را یک‌جا عوض می‌کند) انیمیشنِ دسته‌جمعی نسازد. */
+  /* کراس‌فید دایره‌ها: کلید با قطعهٔ رسم‌شدهٔ قبلی پیشوند می‌خورد تا عوض‌کردن قطعه
+     (که همهٔ دایره‌ها را یک‌جا عوض می‌کند) انیمیشن دسته‌جمعی نسازد. */
   var _xf=xfSnap(host, ".ed-check", "on", host._xfPart||"");
   var nPart=pedCountParts();
-  var single=!!PED.single;   // حالتِ ویرایشِ یک قطعهٔ مشخص
-  /* کارتِ ۱: قطعاتِ پروژه (روشن/خاموش) — فقط در پنجرهٔ افزودن؛ در ویرایشِ تک‌قطعه معنا ندارد */
+  var single=!!PED.single;   // حالت ویرایش یک قطعهٔ مشخص
+  /* کارت ۱: قطعات پروژه (روشن/خاموش) — فقط در پنجرهٔ افزودن؛ در ویرایش تک‌قطعه معنا ندارد */
   var partRows=PED.parts.map(function(x,i){ return pedCheckRow(x.on,x.fa,x.en||"","pedTogglePart("+i+")")+'</div>'; }).join("");
   var partNote=(nPart>0)
     ? '<div class="ed-req-note"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'+faN(nPart)+' قطعه انتخاب شده.</div>'
     : '<div class="ed-req-note"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>دست‌کم یک قطعه انتخاب کنید.</div>';
   var partsCard=single?"":'<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_PART+'قطعات پروژه<span class="ed-count">'+faN(nPart)+' قطعه</span></h4>'+
     '<div class="ed-scroll">'+partRows+'</div>'+partNote+
-    '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودنِ قطعهٔ جدید، به «تنظیمات ◂ قطعات» بروید.</div>'+
+    '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای افزودن قطعهٔ جدید، به «تنظیمات ◂ قطعات» بروید.</div>'+
     '</div>';
 
-  /* ---- پیکربندیِ per-part: اول قطعه را انتخاب کن، سپس انواعِ سند و پارامترهایش را تنظیم کن ---- */
+  /* ---- پیکربندی per-part: اول قطعه را انتخاب کن، سپس انواع سند و پارامترهایش را تنظیم کن ---- */
   var onParts=PED.parts.filter(function(x){ return x.on; });
   var perPart="";
   if(!single){
-    /* پنجرهٔ افزودن فقط عضویتِ قطعات را دارد؛ تنظیماتِ هر قطعه در کارتِ خودش ویرایش می‌شود */
+    /* پنجرهٔ افزودن فقط عضویت قطعات را دارد؛ تنظیمات هر قطعه در کارت خودش ویرایش می‌شود */
     perPart="";
   } else if(!onParts.length){
-    perPart='<div class="ed-card"><div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>ابتدا از کارتِ بالا یک قطعه انتخاب کنید تا انواعِ سند و پارامترهایش را جداگانه تنظیم کنید.</div></div>';
+    perPart='<div class="ed-card"><div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>ابتدا از کارت بالا یک قطعه انتخاب کنید تا انواع سند و پارامترهایش را جداگانه تنظیم کنید.</div></div>';
   } else {
     if(PED.selPart && !onParts.some(function(x){ return x.no===PED.selPart; })) PED.selPart=null;   // قطعهٔ خاموش‌شده؟ انتخاب پاک شود
     var sel=PED.selPart;   // می‌تواند null باشد: هنوز قطعه‌ای انتخاب نشده
-    // پیامِ نارنجیِ توجه — تا وقتی قطعه‌ای از منو انتخاب نشده، جای توضیحاتِ عادی می‌نشیند
-    var promptNote='<div class="ed-req-note attn">'+ED_ALERT_IC+'برای اعمالِ تغییرات در این بخش، ابتدا قطعهٔ موردِنظر را از منو انتخاب کنید.</div>';
+    // پیام نارنجی توجه — تا وقتی قطعه‌ای از منو انتخاب نشده، جای توضیحات عادی می‌نشیند
+    var promptNote='<div class="ed-req-note attn">'+ED_ALERT_IC+'برای اعمال تغییرات در این بخش، ابتدا قطعهٔ موردنظر را از منو انتخاب کنید.</div>';
 
-    /* ---- کارتِ انواعِ سندِ قطعه ---- */
-    /* در حالتِ تک‌قطعه‌ای دراپ‌داون لازم نیست: قطعه از قبل مشخص است */
-    var docHead='<h4 class="ed-sec-t">'+SEC_IC_DOC+'انواعِ سندِ قطعه'+(single?'':pedPartDD('doc',onParts,sel))+
+    /* ---- کارت انواع سند قطعه ---- */
+    /* در حالت تک‌قطعه‌ای دراپ‌داون لازم نیست: قطعه از قبل مشخص است */
+    var docHead='<h4 class="ed-sec-t">'+SEC_IC_DOC+'انواع سند قطعه'+(single?'':pedPartDD('doc',onParts,sel))+
       (sel?edResetBtn("pedResetOrder('doc')", pedHasCustom('doc',sel)):'')+'</h4>';
     var docsCard;
     if(!sel){
@@ -1715,19 +1715,19 @@ function drawPartsBody(){
       var locked=(p2?partDocLockedTypes(p2,sel):{});
       var dmap=PED.docsByPart[sel]||(PED.docsByPart[sel]={});
       var docRows=pedPartDocList(sel).map(function(x){ var on=!!dmap[x.code], lock=!!locked[x.code];
-        var extra=lock?'<span class="ed-lock-ic" title="سندِ ثبت‌شده دارد؛ قابلِ غیرفعال‌سازی نیست">'+ED_LOCK_IC+'</span>':'';
+        var extra=lock?'<span class="ed-lock-ic" title="سند ثبت‌شده دارد؛ قابل غیرفعال‌سازی نیست">'+ED_LOCK_IC+'</span>':'';
         return pedDragRow(on,x.label,x.code,"pedTogglePartDoc('"+esc(x.code)+"')",extra,lock);
       }).join("");
       var hasLock=PED.docMaster.some(function(x){ return locked[x.code]; });
       var lockNote=hasLock?'<div class="ed-req-note">'+ED_LOCK_IC+'این ماژول بدلیل داشتن سند ثبت شده، امکان غیرفعال شدن ندارد.</div>':'';
       docsCard='<div class="ed-card">'+docHead+
-        (docRows?'<div class="ed-scroll" data-reorder="part" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">سندِ سطحِ قطعه‌ای تعریف نشده.</div>')+
+        (docRows?'<div class="ed-scroll" data-reorder="part" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+docRows+'</div>':'<div class="ed-req-note">سند سطح قطعه‌ای تعریف نشده.</div>')+
         lockNote+
-        '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>اسنادِ بالا مخصوصِ قطعهٔ انتخاب‌شده است؛ برای افزودنِ سندِ جدید به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
+        '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>اسناد بالا مخصوص قطعهٔ انتخاب‌شده است؛ برای افزودن سند جدید به «تنظیمات ◂ انواع اسناد» بروید.</div>'+
         '</div>';
     }
 
-    /* ---- کارتِ پارامترهای قطعه ---- */
+    /* ---- کارت پارامترهای قطعه ---- */
     var modHead='<h4 class="ed-sec-t">'+SEC_IC_INFO+'پارامترهای قطعه'+(single?'':pedPartDD('mod',onParts,sel))+
       (sel?edResetBtn("pedResetOrder('mod')", pedHasCustom('mod',sel)):'')+'</h4>';
     var modsCard;
@@ -1735,12 +1735,12 @@ function drawPartsBody(){
       modsCard='<div class="ed-card">'+modHead+promptNote+'</div>';
     } else {
       var mmap=PED.modsByPart[sel]||(PED.modsByPart[sel]={});
-      /* به ترتیبِ دلخواهِ همین قطعه رسم می‌شود (نه فهرستِ اصلی)، و مثلِ انواعِ سند قابلِ کشیدن است.
-         شناسهٔ ردیف برچسبِ پارامتر است، چون پارامتر کدِ کوتاه ندارد. */
+      /* به ترتیب دلخواه همین قطعه رسم می‌شود (نه فهرست اصلی)، و مثل انواع سند قابل کشیدن است.
+         شناسهٔ ردیف برچسب پارامتر است، چون پارامتر کد کوتاه ندارد. */
       var mIdx={}; PED.paramMaster.forEach(function(m,i){ mIdx[m.label]=i; });
       var modRows=pedPartModList(sel).map(function(x){ var on=!!mmap[x.label];
-        var mi=mIdx[x.label];   // اندیس در فهرستِ اصلی — مستقل از ترتیبِ نمایش
-        var extra=x.legacy?'<span class="ed-doc-code" title="در فهرستِ اصلی نیست">قدیمی</span>':'';
+        var mi=mIdx[x.label];   // اندیس در فهرست اصلی — مستقل از ترتیب نمایش
+        var extra=x.legacy?'<span class="ed-doc-code" title="در فهرست اصلی نیست">قدیمی</span>':'';
         return '<div class="ed-doc-row ed-drag'+(on?'':' off')+'" draggable="true" data-code="'+esc(x.label)+'" ondragstart="edRowDragStart(event)" ondragend="edRowDragEnd(event)">'+
           '<button type="button" class="ed-check'+(on?' on':'')+'" role="checkbox" aria-checked="'+(on?'true':'false')+'" aria-label="'+esc(x.label)+'" onclick="pedTogglePartMod('+mi+')"></button>'+
           '<span class="ed-name"><span>'+esc(x.label)+'</span></span>'+
@@ -1748,25 +1748,25 @@ function drawPartsBody(){
           edGripHTML()+
         '</div>';
       }).join("");
-      /* «کد قطعه» ردیفِ اولِ قفل‌شده است: روشن، بی‌دستهٔ کشیدن، و .ed-fixed تا در جابه‌جایی
+      /* «کد قطعه» ردیف اول قفل‌شده است: روشن، بی‌دستهٔ کشیدن، و .ed-fixed تا در جابه‌جایی
          هیچ ردیفی بالای آن ننشیند (edAfterRow آن را نادیده می‌گیرد). */
       var codeRow='<div class="ed-doc-row ed-fixed">'+
           '<button type="button" class="ed-check on" disabled role="checkbox" aria-checked="true" aria-label="'+PART_CODE_LABEL+'"></button>'+
           '<span class="ed-name"><span>'+PART_CODE_LABEL+'</span></span>'+
           '<span class="ed-doc-code">'+esc(partCode(PED.c,PED.o,PED.pr,sel))+'</span>'+
-          '<span class="ed-lock-ic ed-fixed-lock" title="ماژولِ اجباری؛ خودکار از روی کدِ پروژه و شمارهٔ قطعه ساخته می‌شود">'+ED_LOCK_IC+'</span>'+
+          '<span class="ed-lock-ic ed-fixed-lock" title="ماژول اجباری؛ خودکار از روی کد پروژه و شمارهٔ قطعه ساخته می‌شود">'+ED_LOCK_IC+'</span>'+
         '</div>';
       modsCard='<div class="ed-card">'+modHead+
         '<div class="ed-scroll" data-reorder="mod" ondragover="edRowDragOver(event)" ondrop="event.preventDefault()">'+codeRow+modRows+'</div>'+
-        (modRows?'':'<div class="ed-req-note">پارامترِ دیگری تعریف نشده.</div>')+
-        '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>پارامترهای بالا مخصوصِ قطعهٔ انتخاب‌شده است؛ برای افزودن/ویرایشِ پارامتر به «تنظیمات ◂ انواع پارامتر های قطعات» بروید.</div></div>';
+        (modRows?'':'<div class="ed-req-note">پارامتر دیگری تعریف نشده.</div>')+
+        '<div class="ed-req-note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>پارامترهای بالا مخصوص قطعهٔ انتخاب‌شده است؛ برای افزودن/ویرایش پارامتر به «تنظیمات ◂ انواع پارامتر های قطعات» بروید.</div></div>';
     }
 
     perPart=docsCard+modsCard;
   }
   var sv=document.getElementById("pedSave"); if(sv) sv.disabled=(nPart<1);
   host.innerHTML=partsCard+perPart;
-  pedScrollRestore(host,_sc);   // همان جای قبلیِ اسکرول برگردد
+  pedScrollRestore(host,_sc);   // همان جای قبلی اسکرول برگردد
   host._xfPart=PED.selPart||"";
   xfPlay(host, ".ed-check", "on", _xf, host._xfPart);
 }
@@ -1776,9 +1776,9 @@ async function savePartsPanel(){
   var parts=PED.parts.filter(function(x){ return x.on; }).map(function(x){ return x.no; });
   var keep={}; parts.forEach(function(pn){ keep[pad2(pn)]=1; });
 
-  /* قطعاتی که کاربر خاموش کرده ولی هنوز سندِ ثبت‌شده دارند.
-     چون «قطعاتِ پروژه» = ذخیره‌شده ∪ دارای‌سند، تا وقتی سندِ قطعه هست، خاموش‌کردنِ تنها اثری ندارد.
-     پس یا باید همهٔ اسنادِ قطعه هم حذف شود یا قطعه می‌ماند — با تأییدِ صریحِ کاربر. */
+  /* قطعاتی که کاربر خاموش کرده ولی هنوز سند ثبت‌شده دارند.
+     چون «قطعات پروژه» = ذخیره‌شده ∪ دارای‌سند، تا وقتی سند قطعه هست، خاموش‌کردن تنها اثری ندارد.
+     پس یا باید همهٔ اسناد قطعه هم حذف شود یا قطعه می‌ماند — با تأیید صریح کاربر. */
   var removed=[];   // [{pn, docs:[...]}]
   projectPartsList(p).forEach(function(pn){
     if(keep[pn]) return;
@@ -1789,40 +1789,40 @@ async function savePartsPanel(){
     var names=removed.map(function(x){ return "«"+partNameFa(x.pn)+"»"; }).join(" و ");
     var nDoc=removed.reduce(function(s,x){ return s+x.docs.length; },0);
     var ok=await uiConfirm(
-      "با حذفِ قطعهٔ "+names+" از این پروژه، همهٔ اسنادِ ثبت‌شدهٔ آن ("+nDoc+" سند شاملِ همهٔ ویرایش‌ها) هم "+
-      "به‌طورِ کامل حذف می‌شود و فایل‌هایشان از گوگل‌درایو پاک می‌گردد. این کار برگشت‌ناپذیر است. آیا ادامه می‌دهید؟",
-      { danger:true, okLabel:"حذفِ قطعه و اسنادش", cancelLabel:"انصراف", title:"حذفِ کاملِ قطعه" });
+      "با حذف قطعهٔ "+names+" از این پروژه، همهٔ اسناد ثبت‌شدهٔ آن ("+nDoc+" سند شامل همهٔ ویرایش‌ها) هم "+
+      "به‌طور کامل حذف می‌شود و فایل‌هایشان از گوگل‌درایو پاک می‌گردد. این کار برگشت‌ناپذیر است. آیا ادامه می‌دهید؟",
+      { danger:true, okLabel:"حذف قطعه و اسنادش", cancelLabel:"انصراف", title:"حذف کامل قطعه" });
     if(!ok) return;   // انصراف: پنل باز می‌ماند و هیچ‌چیز حذف نمی‌شود
     var delNums={};
     removed.forEach(function(x){ x.docs.forEach(function(d){ if(d.drawingNumber) delNums[d.drawingNumber]=1; }); });
     var nums=Object.keys(delNums), i;
     for(i=0;i<nums.length;i++){
       var dr=await api("deleteDocument",{drawingNumber:nums[i]});
-      if(!dr||!dr.ok){ toast((dr&&dr.message)||("حذفِ سندِ «"+nums[i]+"» ناموفق بود؛ عملیات متوقف شد."),true);
+      if(!dr||!dr.ok){ toast((dr&&dr.message)||("حذف سند «"+nums[i]+"» ناموفق بود؛ عملیات متوقف شد."),true);
         await refreshDocuments(); return; }
     }
-    // به‌روزرسانیِ خوش‌بینانهٔ محلی تا قطعه بی‌درنگ برود و از union دوباره برنگردد
+    // به‌روزرسانی خوش‌بینانهٔ محلی تا قطعه بی‌درنگ برود و از union دوباره برنگردد
     DB.documents=DB.documents.filter(function(d){ return !delNums[d.drawingNumber]; });
     var rmSet={}; removed.forEach(function(x){ rmSet[x.pn]=1; });
     p.enabledSlots=csv(p.enabledSlots||"").filter(function(s){ var m=parseSlot(s); return !(m && rmSet[m.part]); }).join(",");
     toast(nDoc+" سند حذف شد");
   }
 
-  /* پیکربندیِ per-part: برای هر قطعهٔ فعال، انواعِ سند و پارامترهایش جداگانه ذخیره می‌شود.
-     نوعی که برای قطعه سند دارد همیشه در فهرست می‌ماند (قابلِ حذف نیست). */
+  /* پیکربندی per-part: برای هر قطعهٔ فعال، انواع سند و پارامترهایش جداگانه ذخیره می‌شود.
+     نوعی که برای قطعه سند دارد همیشه در فهرست می‌ماند (قابل حذف نیست). */
   var docsByPart={}, modsByPart={};
   parts.forEach(function(pnRaw){ var pn=pad2(pnRaw);
     var d=PED.docsByPart[pn]||{}, arrD=[];
-    pedPartDocList(pn).forEach(function(x){ if(d[x.code]) arrD.push(x.code); });   // فقط فعال‌ها، به ترتیبِ دلخواهِ همین قطعه
+    pedPartDocList(pn).forEach(function(x){ if(d[x.code]) arrD.push(x.code); });   // فقط فعال‌ها، به ترتیب دلخواه همین قطعه
     var lock=partDocLockedTypes(p,pn); Object.keys(lock).forEach(function(T){ if(arrD.indexOf(T)<0) arrD.push(T); });
     docsByPart[pn]=arrD;
     var m=PED.modsByPart[pn]||{}, arrM=[];
-    pedPartModList(pn).forEach(function(x){ if(m[x.label]) arrM.push(x.label); });   // فقط فعال‌ها، به ترتیبِ دلخواهِ همین قطعه
+    pedPartModList(pn).forEach(function(x){ if(m[x.label]) arrM.push(x.label); });   // فقط فعال‌ها، به ترتیب دلخواه همین قطعه
     modsByPart[pn]=arrM;
   });
   var root=specsRoot(p);
   root.partDocsByPart=docsByPart; root.partModsByPart=modsByPart;
-  /* ترتیبِ اختصاصی فقط برای قطعه‌ای ذخیره می‌شود که ترتیبش با پیش‌فرض فرق دارد */
+  /* ترتیب اختصاصی فقط برای قطعه‌ای ذخیره می‌شود که ترتیبش با پیش‌فرض فرق دارد */
   var ordD={}, ordM={};
   parts.forEach(function(pnRaw){ var pn=pad2(pnRaw);
     if(pedHasCustom('doc',pn)) ordD[pn]=pedPartDocList(pn).map(function(x){ return x.code; });
@@ -1830,12 +1830,12 @@ async function savePartsPanel(){
   });
   root.ordPartDocs=Object.keys(ordD).length?ordD:null;
   root.ordPartMods=Object.keys(ordM).length?ordM:null;
-  /* union برای سازگاریِ عقب‌رو + حفظِ برچسب‌های قدیمی: قطعه‌ای که از بیرونِ پنل اضافه شود از این fallback پر می‌شود */
+  /* union برای سازگاری عقب‌رو + حفظ برچسب‌های قدیمی: قطعه‌ای که از بیرون پنل اضافه شود از این fallback پر می‌شود */
   var modUnion={}; Object.keys(modsByPart).forEach(function(pn){ modsByPart[pn].forEach(function(l){ modUnion[l]=1; }); });
   root.partMods=PED.paramMaster.map(function(x){ return {label:x.label,unit:"",on:!!modUnion[x.label]}; });
   var docUnion={}; Object.keys(docsByPart).forEach(function(pn){ docsByPart[pn].forEach(function(cd){ docUnion[cd]=1; }); });
   root.partDocTypes=Object.keys(docUnion);
-  /* مقادیرِ per-part از PED.vals: فقط قطعاتِ فعال و فقط مقادیرِ ناخالی نگه داشته می‌شوند */
+  /* مقادیر per-part از PED.vals: فقط قطعات فعال و فقط مقادیر ناخالی نگه داشته می‌شوند */
   var pv={};
   Object.keys(PED.vals||{}).forEach(function(pn){
     if(!keep[pad2(pn)]) return;
@@ -1846,52 +1846,52 @@ async function savePartsPanel(){
   root.partVals=pv;
   p.projectParts=parts.join(",");
   closeModal();
-  var extra={projectParts:p.projectParts, allowEmptySpecs:true};   // خالی‌شدن از این پنل خواستهٔ صریحِ کاربر است
+  var extra={projectParts:p.projectParts, allowEmptySpecs:true};   // خالی‌شدن از این پنل خواستهٔ صریح کاربر است
   if(removed.length) extra.enabledSlots=p.enabledSlots;
   await saveSpecs(c,o,pr,root,extra);
 }
 
-/* ============ مدلِ سه‌بعدیِ پروژه — نوعِ سندِ «3D» روی قطعهٔ 00 ============
-   بدونِ سازوکارِ ذخیرهٔ تازه: مدل مثلِ هر سندِ دیگر با همان جریانِ آپلود (createDocument)
+/* ============ مدل سه‌بعدی پروژه — نوع سند «3D» روی قطعهٔ 00 ============
+   بدون سازوکار ذخیرهٔ تازه: مدل مثل هر سند دیگر با همان جریان آپلود (createDocument)
    در Drive ذخیره می‌شود و ویوئر فایل را با همان api("getFile") می‌خواند. کتابخانهٔ
-   نمایش به‌صورتِ محلی و فقط هنگامِ نیاز بارگذاری می‌شود (بدونِ منبعِ بیرونی). */
+   نمایش به‌صورت محلی و فقط هنگام نیاز بارگذاری می‌شود (بدون منبع بیرونی). */
 var MODEL_IC='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
-/* اسپینرِ بارگذاریِ مدلِ سه‌بعدی: سه داشِ پشتِ‌هم روی مسیرِ بی‌نهایت (∞) می‌دوند
-   و کلِ مسیر آرام می‌چرخد. جایگزینِ مکعبِ نفس‌کشِ قبلی — حرکتِ پیوسته حسِ
+/* اسپینر بارگذاری مدل سه‌بعدی: سه داش پشت‌هم روی مسیر بی‌نهایت (∞) می‌دوند
+   و کل مسیر آرام می‌چرخد. جایگزین مکعب نفس‌کش قبلی — حرکت پیوسته حس
    «در جریان بودن» می‌دهد، در حالی که مکعب ساکن به‌نظر می‌رسید.
-   ⚠ pathLength=100 روی هر سه داش: طولِ واقعیِ مسیر (~140) نادیده گرفته و
-   مقیاسِ ۰..۱۰۰ می‌شود، پس داش‌ها با اعدادِ ثابتِ CSS هم‌جا می‌مانند. */
+   ⚠ pathLength=100 روی هر سه داش: طول واقعی مسیر (~140) نادیده گرفته و
+   مقیاس ۰..۱۰۰ می‌شود، پس داش‌ها با اعداد ثابت CSS هم‌جا می‌مانند. */
 var MV_LOAD_IC=(function(){
-  /* منحنیِ لیساژوی ۳:۲ —  x=32+23·cos(3t) ، y=32+23·sin(2t)
-     شکلِ تودرتو که خودش را چند بار قطع می‌کند؛ همین تقاطع‌ها هستند که به آن
-     عمقِ سه‌بعدی می‌دهند. با منحنیِ بزیه بازسازی نمی‌شود: سرعتِ حرکت در طولِ
-     مسیر به‌شدت تغییر می‌کند و نقاطِ کنترل روی خطِ راست می‌افتند. */
+  /* منحنی لیساژوی ۳:۲ —  x=32+23·cos(3t) ، y=32+23·sin(2t)
+     شکل تودرتو که خودش را چند بار قطع می‌کند؛ همین تقاطع‌ها هستند که به آن
+     عمق سه‌بعدی می‌دهند. با منحنی بزیه بازسازی نمی‌شود: سرعت حرکت در طول
+     مسیر به‌شدت تغییر می‌کند و نقاط کنترل روی خط راست می‌افتند. */
   var d="M55.00,32.00L54.94,33.11L54.76,34.22L54.46,35.32L54.04,36.42L53.51,37.50L52.86,38.58L52.10,39.63L51.24,40.67L50.28,41.69L49.22,42.69L48.07,43.66L46.83,44.60L45.52,45.52L44.14,46.40L42.69,47.25L41.19,48.07L39.63,48.84L38.04,49.58L36.42,50.28L34.77,50.93L33.11,51.54L31.44,52.10L29.78,52.62L28.13,53.09L26.50,53.51L24.89,53.87L23.33,54.19L21.81,54.46L20.34,54.67L18.93,54.83L17.60,54.94L16.34,54.99L15.16,54.99L14.07,54.94L13.07,54.83L12.17,54.67L11.38,54.46L10.70,54.19L10.13,53.87L9.67,53.51L9.33,53.09L9.11,52.62L9.01,52.10L9.03,51.54L9.17,50.93L9.43,50.28L9.81,49.58L10.30,48.84L10.91,48.07L11.63,47.25L12.46,46.40L13.39,45.52L14.42,44.60L15.54,43.66L16.75,42.69L18.04,41.69L19.40,40.67L20.82,39.63L22.31,38.58L23.84,37.50L25.42,36.42L27.04,35.32L28.68,34.22L30.33,33.11L32.00,32.00L33.67,30.89L35.32,29.78L36.96,28.68L38.58,27.58L40.16,26.50L41.69,25.42L43.18,24.37L44.60,23.33L45.96,22.31L47.25,21.31L48.46,20.34L49.58,19.40L50.61,18.48L51.54,17.60L52.37,16.75L53.09,15.93L53.70,15.16L54.19,14.42L54.57,13.72L54.83,13.07L54.97,12.46L54.99,11.90L54.89,11.38L54.67,10.91L54.33,10.49L53.87,10.13L53.30,9.81L52.62,9.54L51.83,9.33L50.93,9.17L49.93,9.06L48.84,9.01L47.66,9.01L46.40,9.06L45.07,9.17L43.66,9.33L42.19,9.54L40.67,9.81L39.11,10.13L37.50,10.49L35.87,10.91L34.22,11.38L32.56,11.90L30.89,12.46L29.23,13.07L27.58,13.72L25.96,14.42L24.37,15.16L22.81,15.93L21.31,16.75L19.86,17.60L18.48,18.48L17.17,19.40L15.93,20.34L14.78,21.31L13.72,22.31L12.76,23.33L11.90,24.37L11.14,25.42L10.49,26.50L9.96,27.58L9.54,28.68L9.24,29.78L9.06,30.89L9.00,32.00L9.06,33.11L9.24,34.22L9.54,35.32L9.96,36.42L10.49,37.50L11.14,38.58L11.90,39.63L12.76,40.67L13.72,41.69L14.78,42.69L15.93,43.66L17.17,44.60L18.48,45.52L19.86,46.40L21.31,47.25L22.81,48.07L24.37,48.84L25.96,49.58L27.58,50.28L29.23,50.93L30.89,51.54L32.56,52.10L34.22,52.62L35.87,53.09L37.50,53.51L39.11,53.87L40.67,54.19L42.19,54.46L43.66,54.67L45.07,54.83L46.40,54.94L47.66,54.99L48.84,54.99L49.93,54.94L50.93,54.83L51.83,54.67L52.62,54.46L53.30,54.19L53.87,53.87L54.33,53.51L54.67,53.09L54.89,52.62L54.99,52.10L54.97,51.54L54.83,50.93L54.57,50.28L54.19,49.58L53.70,48.84L53.09,48.07L52.37,47.25L51.54,46.40L50.61,45.52L49.58,44.60L48.46,43.66L47.25,42.69L45.96,41.69L44.60,40.67L43.18,39.63L41.69,38.58L40.16,37.50L38.58,36.42L36.96,35.32L35.32,34.22L33.67,33.11L32.00,32.00L30.33,30.89L28.68,29.78L27.04,28.68L25.42,27.58L23.84,26.50L22.31,25.42L20.82,24.37L19.40,23.33L18.04,22.31L16.75,21.31L15.54,20.34L14.42,19.40L13.39,18.48L12.46,17.60L11.63,16.75L10.91,15.93L10.30,15.16L9.81,14.42L9.43,13.72L9.17,13.07L9.03,12.46L9.01,11.90L9.11,11.38L9.33,10.91L9.67,10.49L10.13,10.13L10.70,9.81L11.38,9.54L12.17,9.33L13.07,9.17L14.07,9.06L15.16,9.01L16.34,9.01L17.60,9.06L18.93,9.17L20.34,9.33L21.81,9.54L23.33,9.81L24.89,10.13L26.50,10.49L28.13,10.91L29.78,11.38L31.44,11.90L33.11,12.46L34.77,13.07L36.42,13.72L38.04,14.42L39.63,15.16L41.19,15.93L42.69,16.75L44.14,17.60L45.52,18.48L46.83,19.40L48.07,20.34L49.22,21.31L50.28,22.31L51.24,23.33L52.10,24.37L52.86,25.42L53.51,26.50L54.04,27.58L54.46,28.68L54.76,29.78L54.94,30.89L55.00,32.00Z";
   function seg(cls){ return '<path class="'+cls+'" d="'+d+'" pathLength="100"/>'; }
   return '<svg class="lis" viewBox="0 0 64 64" role="img" aria-label="در حال بارگذاری">'+
     '<g class="lis-rig">'+seg("lis-track")+seg("lis-tail")+seg("lis-mid")+seg("lis-head")+'</g></svg>';
 })();
 var MODEL_PLAY_IC='<svg viewBox="0 0 24 24" class="ic"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><polyline points="21 3 21 9 15 9"/></svg>';
-/* آیا نوعِ سندِ 3D در سیستم تعریف شده؟ (کاربر از «تنظیمات ◂ انواع اسناد» با scope=پروژه اضافه می‌کند) */
+/* آیا نوع سند 3D در سیستم تعریف شده؟ (کاربر از «تنظیمات ◂ انواع اسناد» با scope=پروژه اضافه می‌کند) */
 function has3DType(){ return docTypesSorted().some(function(t){ return String(t.code).toUpperCase()==="3D"; }); }
-/* مدل حالا در سطحِ قطعه است: هر قطعه می‌تواند سندِ نوعِ «3D» خودش را داشته باشد
-   (FSM-...-PART-3D-REV). فهرستِ قطعاتِ دارای مدل برای منوی انتخابِ چپِ ویوئر ساخته می‌شود. */
-var _mvParts=[];            // [{part,name,fileId,num}] — قطعاتِ دارای مدلِ سه‌بعدی
-var _mvPickerExpanded=false; // وضعیتِ باز/بستهٔ منوی انتخابِ قطعه
-var _mvLoadSeq=0;           // توکنِ بارگذاری — فقط جدیدترین mvLoadPart اجازهٔ تغییرِ DOM دارد (ضدِ رقابت/تکرار)
-var _mvEst=null;            // برآوردگرِ نوارِ پیشرفتِ فعالِ ویوئر — تا تایمرِ بارگذاریِ قبلی با بارگذاریِ جدید روی یک المانِ درصد ننویسد
-var _mvCurFileId=null;      // شناسهٔ فایلِ GLBِ مدلِ درحال‌نمایش در پنلِ پروژه (برای منابعِ AR)
-var _mvCurPart="";          // قطعهٔ مدلِ درحال‌نمایش — برای بازسازیِ منوی انتخاب روی ویوئرِ حفظ‌شده
-var _mvKey="";              // «مشتری|سفارش|پروژه»ِ ویوئرِ فعلی — ویوئر فقط برای همان پروژه حفظ می‌شود
-/* هر تغییری در پنلِ پروژه (ویرایشِ مقدار، روشن‌کردنِ ماژول، رسیدنِ دادهٔ تازه) کلِ پنل را از نو می‌سازد.
-   ویوئرِ سه‌بعدی نباید با آن از بین برود: پیش از بازسازی از DOM جدا و پس از آن سرِ جایش برگردانده
+/* مدل حالا در سطح قطعه است: هر قطعه می‌تواند سند نوع «3D» خودش را داشته باشد
+   (FSM-...-PART-3D-REV). فهرست قطعات دارای مدل برای منوی انتخاب چپ ویوئر ساخته می‌شود. */
+var _mvParts=[];            // [{part,name,fileId,num}] — قطعات دارای مدل سه‌بعدی
+var _mvPickerExpanded=false; // وضعیت باز/بستهٔ منوی انتخاب قطعه
+var _mvLoadSeq=0;           // توکن بارگذاری — فقط جدیدترین mvLoadPart اجازهٔ تغییر DOM دارد (ضد رقابت/تکرار)
+var _mvEst=null;            // برآوردگر نوار پیشرفت فعال ویوئر — تا تایمر بارگذاری قبلی با بارگذاری جدید روی یک المان درصد ننویسد
+var _mvCurFileId=null;      // شناسهٔ فایل GLB مدل درحال‌نمایش در پنل پروژه (برای منابع AR)
+var _mvCurPart="";          // قطعهٔ مدل درحال‌نمایش — برای بازسازی منوی انتخاب روی ویوئر حفظ‌شده
+var _mvKey="";              // «مشتری|سفارش|پروژه» ویوئر فعلی — ویوئر فقط برای همان پروژه حفظ می‌شود
+/* هر تغییری در پنل پروژه (ویرایش مقدار، روشن‌کردن ماژول، رسیدن دادهٔ تازه) کل پنل را از نو می‌سازد.
+   ویوئر سه‌بعدی نباید با آن از بین برود: پیش از بازسازی از DOM جدا و پس از آن سر جایش برگردانده
    می‌شود — مدل، زاویهٔ دوربین و قطعهٔ انتخاب‌شده دست‌نخورده می‌مانند. */
 function mvDetachForRerender(c,o,pr){
   var sh=document.getElementById("mvShell");
   if(!sh || !sh.isConnected || !_mvCurFileId) return null;
-  if(_mvKey!==[c,o,pr].join("|")) return null;                    // پروژهٔ دیگر → ویوئرِ تازه
+  if(_mvKey!==[c,o,pr].join("|")) return null;                    // پروژهٔ دیگر → ویوئر تازه
   if(document.fullscreenElement && sh.contains(document.fullscreenElement)) return null;
-  if(!_blobUrls.mvModel && sh.querySelector("model-viewer")) return null;   // URL آزاد شده (ترکِ تب)
+  if(!_blobUrls.mvModel && sh.querySelector("model-viewer")) return null;   // URL آزاد شده (ترک تب)
   sh.parentNode.removeChild(sh);
   return sh;
 }
@@ -1899,33 +1899,33 @@ function mvReattach(old){
   if(!old) return false;
   var still=(_mvParts||[]).some(function(x){ return String(x.fileId)===String(_mvCurFileId); });
   var fresh=document.getElementById("mvShell");
-  if(!still || !fresh) return false;                              // مدل حذف/جایگزین شده → بارگذاریِ عادی
+  if(!still || !fresh) return false;                              // مدل حذف/جایگزین شده → بارگذاری عادی
   fresh.parentNode.replaceChild(old, fresh);
-  // فهرستِ قطعاتِ دارای مدل ممکن است عوض شده باشد؛ فقط منوی انتخاب از نو ساخته می‌شود
+  // فهرست قطعات دارای مدل ممکن است عوض شده باشد؛ فقط منوی انتخاب از نو ساخته می‌شود
   var pk=old.querySelector("#mvPicker");
   if(pk) pk.outerHTML=mvPickerHTML(_mvParts, _mvCurPart);
   return true;
 }
 function projectModelParts(p){
-  /* هر نوعِ سندی که با 3D شروع می‌شود مدلِ سه‌بعدی است (3D برای قطعه، 3DA برای مونتاژ). */
+  /* هر نوع سندی که با 3D شروع می‌شود مدل سه‌بعدی است (3D برای قطعه، 3DA برای مونتاژ). */
   var all=projectDocs(p).filter(function(d){ return String(d.typeCode).toUpperCase().indexOf("3D")===0 &&
     String(d.isLatest).toLowerCase()==="true"; });
   var byPart={}; all.forEach(function(d){ byPart[pad2(d.partNo)]=d; });
   var out=[];
-  /* مدلِ مونتاژِ سطحِ پروژه (قطعهٔ ۰۰) همیشه سلولِ اول است — کلِّ مجموعه پیش از اجزای آن. */
-  /* برچسب عمداً ثابتِ Assembly است، نه نامِ کاملِ نوعِ سند: ردیف‌های دیگرِ این منو
-     نامِ قطعه‌اند (Shaft، Drive Pinion)، پس این‌جا هم باید کوتاه و هم‌وزن باشد. */
+  /* مدل مونتاژ سطح پروژه (قطعهٔ ۰۰) همیشه سلول اول است — کلّ مجموعه پیش از اجزای آن. */
+  /* برچسب عمداً ثابت Assembly است، نه نام کامل نوع سند: ردیف‌های دیگر این منو
+     نام قطعه‌اند (Shaft، Drive Pinion)، پس این‌جا هم باید کوتاه و هم‌وزن باشد. */
   if(byPart["00"]) out.push({part:"00", name:"Assembly", fileId:byPart["00"].fileId||"", num:byPart["00"].drawingNumber});
-  // سپس قطعات، دقیقاً به ترتیبِ فهرستِ قطعاتِ پروژه
+  // سپس قطعات، دقیقاً به ترتیب فهرست قطعات پروژه
   var pns=projectPartsList(p).filter(function(pn){ return pn!=="00" && byPart[pn]; });
   Object.keys(byPart).forEach(function(pn){ if(pn!=="00" && pns.indexOf(pn)<0) pns.push(pn); });   // احتیاط: مدلی که در فهرست نیست
   pns.forEach(function(pn){ var d=byPart[pn];
     out.push({part:pn, name:partName(pn), fileId:d.fileId||"", num:d.drawingNumber}); });
-  // شماره‌گذاریِ متوالی از ۱ پس از چیدنِ کاملِ ترتیب
+  // شماره‌گذاری متوالی از ۱ پس از چیدن کامل ترتیب
   out.forEach(function(x,i){ x.idx=i+1; });
   return out;
 }
-/* منوی انتخابِ قطعه — عیناً هم‌طراحیِ تولباکسِ سمتِ راست (شیشه‌ای، ۳۳px، فونتِ ۱۲٫۵)، ولی سمتِ چپ */
+/* منوی انتخاب قطعه — عیناً هم‌طراحی تولباکس سمت راست (شیشه‌ای، ۳۳px، فونت ۱۲٫۵)، ولی سمت چپ */
 var MV_LAYERS_IC='<svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>';
 function mvPickerHTML(parts, selPart){
   var rows=(parts||[]).map(function(mp){
@@ -1934,9 +1934,9 @@ function mvPickerHTML(parts, selPart){
       '<span class="mv-pk-no">'+esc(String(mp.idx))+'</span>'+
       '<span class="mv-pick-lab">'+esc(mp.name)+'</span></button>';
   }).join("");
-  var attn = selPart ? '' : ' attn';   // تا وقتی مدلی انتخاب نشده، منو آرام «تنفس» می‌کند تا جلبِ توجه شود
+  var attn = selPart ? '' : ' attn';   // تا وقتی مدلی انتخاب نشده، منو آرام «تنفس» می‌کند تا جلب توجه شود
   return '<div class="mv-picker'+(_mvPickerExpanded?' expanded':'')+attn+'" id="mvPicker">'+
-    '<button class="mv-pick mv-pick-hd" onclick="mvPickerToggle()" title="انتخابِ مدلِ سه‌بعدی" aria-label="انتخابِ مدل">'+MV_LAYERS_IC+'</button>'+
+    '<button class="mv-pick mv-pick-hd" onclick="mvPickerToggle()" title="انتخاب مدل سه‌بعدی" aria-label="انتخاب مدل">'+MV_LAYERS_IC+'</button>'+
     rows+'</div>';
 }
 function projectModelHTML(p,admin,c,o,pr){
@@ -1944,22 +1944,22 @@ function projectModelHTML(p,admin,c,o,pr){
   if(!_mvParts.length){
     var can3D=has3DType();
     return '<div class="mv-empty"><div class="mv-empty-ic">'+MODEL_IC+'</div>'+
-      '<div class="mv-empty-t">مدلِ سه‌بعدیِ قطعه‌ای بارگذاری نشده است</div>'+
+      '<div class="mv-empty-t">مدل سه‌بعدی قطعه‌ای بارگذاری نشده است</div>'+
       (can3D
-        ? '<div class="mv-empty-s">'+(admin?'برای هر قطعه، در کارتِ «قطعات پروژه» نوعِ «مدل سه‌بعدی» را فعال و فایلِ GLB را آپلود کنید.':'هنوز برای هیچ قطعه‌ای مدلی ثبت نشده.')+'</div>'
-        : '<div class="mv-empty-s">'+(admin?'برای فعال‌سازی، نوعِ سندِ «3D» را در «تنظیمات ◂ انواع اسناد» با سطحِ «قطعه» بسازید.':'مدل سه‌بعدی هنوز فعال نشده.')+'</div>')+
+        ? '<div class="mv-empty-s">'+(admin?'برای هر قطعه، در کارت «قطعات پروژه» نوع «مدل سه‌بعدی» را فعال و فایل GLB را آپلود کنید.':'هنوز برای هیچ قطعه‌ای مدلی ثبت نشده.')+'</div>'
+        : '<div class="mv-empty-s">'+(admin?'برای فعال‌سازی، نوع سند «3D» را در «تنظیمات ◂ انواع اسناد» با سطح «قطعه» بسازید.':'مدل سه‌بعدی هنوز فعال نشده.')+'</div>')+
     '</div>';
   }
   return '<div class="mv-shell" id="mvShell">'+
     mvPickerHTML(_mvParts, "")+
     '<div class="mv-ph" id="mvPh">'+
       '<div class="mv-empty-ic">'+MODEL_IC+'</div>'+
-      '<div class="mv-empty-t">نمایشِ مدلِ سه‌بعدی</div>'+
-      '<div class="mv-empty-s">مدلی را از منوی سمتِ چپ انتخاب کنید.</div>'+
+      '<div class="mv-empty-t">نمایش مدل سه‌بعدی</div>'+
+      '<div class="mv-empty-s">مدلی را از منوی سمت چپ انتخاب کنید.</div>'+
     '</div>'+
   '</div>';
 }
-/* بارگذاریِ محلیِ کتابخانهٔ model-viewer — فقط یک‌بار و فقط هنگامِ اولین نمایش */
+/* بارگذاری محلی کتابخانهٔ model-viewer — فقط یک‌بار و فقط هنگام اولین نمایش */
 var _mvLibPromise=null;
 function ensureModelViewer(){
   if(window.customElements && customElements.get("model-viewer")) return Promise.resolve();
@@ -1968,11 +1968,11 @@ function ensureModelViewer(){
     var s=document.createElement("script"); s.type="module"; s.src="vendor/model-viewer.min.js";
     s.onload=function(){ resolve(); }; s.onerror=function(){ resolve(); };
     document.head.appendChild(s);
-    setTimeout(resolve,4000); // مهلتِ رجیسترشدنِ custom element
+    setTimeout(resolve,4000); // مهلت رجیسترشدن custom element
   });
   return _mvLibPromise;
 }
-/* انتخابِ قطعه از منوی چپ → بارگذاریِ مدلِ همان قطعه */
+/* انتخاب قطعه از منوی چپ → بارگذاری مدل همان قطعه */
 function mvSelectPart(part){
   var mp=(_mvParts||[]).filter(function(x){ return pad2(x.part)===pad2(part); })[0];
   if(!mp){ return; }
@@ -1982,9 +1982,9 @@ function mvSelectPart(part){
 function mvPickerToggle(){ _mvPickerExpanded=!_mvPickerExpanded;
   var el=document.getElementById("mvPicker"); if(!el) return;
   if(_mvPickerExpanded) el.classList.add("expanded"); else el.classList.remove("expanded"); }
-/* ============ نوارِ لودینگِ درون‌بخشیِ مشترک (ویوئرِ سه‌بعدی و پیش‌نمایشِ مودالِ سند) ============
-   خطِ سوییپِ پیوسته + چیپِ درصد در وسط. inline=true → وسطِ بخش؛ showPct=true → چیپِ درصد دارد.
-   کلاس‌محور است (نه id) تا چند نمونه هم‌زمان تداخل نکنند؛ عملیات درونِ یک scope انجام می‌شود. */
+/* ============ نوار لودینگ درون‌بخشی مشترک (ویوئر سه‌بعدی و پیش‌نمایش مودال سند) ============
+   خط سوییپ پیوسته + چیپ درصد در وسط. inline=true → وسط بخش؛ showPct=true → چیپ درصد دارد.
+   کلاس‌محور است (نه id) تا چند نمونه هم‌زمان تداخل نکنند؛ عملیات درون یک scope انجام می‌شود. */
 function loadBarHTML(inline, showPct){
   return '<div class="mv-load'+(inline?' inline':'')+'">'+
     '<div class="mv-load-track"><span class="mv-load-fill"></span></div>'+
@@ -1992,20 +1992,20 @@ function loadBarHTML(inline, showPct){
 }
 function loadBarPct(scope, p){ if(!scope) return; var el=scope.querySelector(".mv-load-pct"); if(!el) return;
   p=Math.max(0,Math.min(100,Math.round(p))); el.textContent=p+"٪"; }
-/* پیشرفتِ دریافتِ استریمی: درصد اگر total معلوم باشد، وگرنه حجمِ دریافتی (MB) */
+/* پیشرفت دریافت استریمی: درصد اگر total معلوم باشد، وگرنه حجم دریافتی (MB) */
 function loadBarProgress(scope, loaded, total){ if(!scope) return; var el=scope.querySelector(".mv-load-pct"); if(!el) return;
   el.textContent = total>0 ? (Math.min(99,Math.round(loaded/total*100))+"٪") : ((loaded/1048576).toFixed(1)+" MB"); }
-/* پیشرفتِ تخمینیِ نرم — چون بارِ سنگین روی Apps Script «پردازشِ سمتِ سرور» است (بدونِ بایت و بدونِ Content-Length)
-   و شمارشِ بایت روی صفر می‌ماند، یک تخمینِ نمایی نشان می‌دهیم تا کاربر حرکت ببیند؛ با real() سیگنالِ واقعی
+/* پیشرفت تخمینی نرم — چون بار سنگین روی Apps Script «پردازش سمت سرور» است (بدون بایت و بدون Content-Length)
+   و شمارش بایت روی صفر می‌ماند، یک تخمین نمایی نشان می‌دهیم تا کاربر حرکت ببیند؛ با real() سیگنال واقعی
    (اگر بود) جایش را می‌گیرد و با done() به ۱۰۰ می‌رسد. */
 function loadBarEstimate(getScope, cap){
-  // پیشرفتِ تخمینی آرام‌تر و واقع‌گرایانه‌تر: دیرتر به سقف می‌رسد و نزدیکِ سقف کند می‌خزد
-  // تا کاربر تا پایانِ دانلودِ واقعیِ مدل حسِ «گیرکردن روی ۹۲» نگیرد.
+  // پیشرفت تخمینی آرام‌تر و واقع‌گرایانه‌تر: دیرتر به سقف می‌رسد و نزدیک سقف کند می‌خزد
+  // تا کاربر تا پایان دانلود واقعی مدل حس «گیرکردن روی ۹۲» نگیرد.
   cap=cap||92; var p=0, useReal=false, timer=setInterval(tick,220);
   function tick(){ if(useReal) return; p += Math.max(0.3,(cap-p)*0.02); if(p>cap)p=cap;
     var s=getScope&&getScope(); if(s) loadBarPct(s, Math.round(p)); }
   function stop(){ if(timer){ clearInterval(timer); timer=null; } }
-  /* درصدِ واقعی ممکن است دیرتر از شروعِ دانلود برسد (حجم موازی گرفته می‌شود)؛ نوار هرگز عقب نمی‌رود */
+  /* درصد واقعی ممکن است دیرتر از شروع دانلود برسد (حجم موازی گرفته می‌شود)؛ نوار هرگز عقب نمی‌رود */
   return { real:function(v){ useReal=true; p=Math.max(p, v); var s=getScope&&getScope(); if(s) loadBarPct(s, p); },
            stop:stop, done:function(){ stop(); var s=getScope&&getScope(); if(s) loadBarPct(s, 100); } };
 }
@@ -2014,49 +2014,49 @@ function loadBarHide(scope){ if(!scope) return; var el=scope.querySelector(".mv-
 
 async function mvLoadPart(fileId, part){
   if(!fileId){ toast("این قطعه مدلی ندارد.",true); return; }
-  _mvCurFileId=fileId;   // برای دکمهٔ واقعیتِ افزوده (منابعِ عمومیِ AR از روی همین شناسه)
+  _mvCurFileId=fileId;   // برای دکمهٔ واقعیت افزوده (منابع عمومی AR از روی همین شناسه)
   _mvCurPart=part; _mvKey=[_projView.c,_projView.o,_projView.pr].join("|");
   var shell=document.getElementById("mvShell"); if(!shell) return;
-  var myToken=++_mvLoadSeq;   // اگر بارگذاریِ تازه‌تری شروع شود، این یکی باید بی‌سروصدا کنار برود
-  if(_mvEst){ _mvEst.stop(); _mvEst=null; }   // برآوردگرِ بارگذاریِ قبلی را متوقف کن تا دو تایمر روی یک المانِ درصد ننویسند
+  var myToken=++_mvLoadSeq;   // اگر بارگذاری تازه‌تری شروع شود، این یکی باید بی‌سروصدا کنار برود
+  if(_mvEst){ _mvEst.stop(); _mvEst=null; }   // برآوردگر بارگذاری قبلی را متوقف کن تا دو تایمر روی یک المان درصد ننویسند
   var scope=function(){ return document.getElementById("mvShell"); };
-  // به‌جای اورلیِ تمام‌صفحه، نوارِ لودینگِ درون‌ویوئری تا بقیهٔ سایت هم دیده شود
+  // به‌جای اورلی تمام‌صفحه، نوار لودینگ درون‌ویوئری تا بقیهٔ سایت هم دیده شود
   var _mp=(_mvParts||[]).filter(function(x){ return pad2(x.part)===pad2(part); })[0];
-  var _mnm=_mp?_mp.name:"";   // نامِ مدلِ در‌حالِ بارگذاری — تا کاربر بداند کدام قطعه دارد می‌آید
-  var _xf=xfSnap(shell, ".mv-pick", "on");   // کراس‌فیدِ مدلِ قبلی ← مدلِ تازه در منوی انتخاب
+  var _mnm=_mp?_mp.name:"";   // نام مدل در‌حال بارگذاری — تا کاربر بداند کدام قطعه دارد می‌آید
+  var _xf=xfSnap(shell, ".mv-pick", "on");   // کراس‌فید مدل قبلی ← مدل تازه در منوی انتخاب
   shell.innerHTML=mvPickerHTML(_mvParts, part)+
     '<div class="mv-ph" id="mvPh"><div class="mv-empty-ic mv-load-ic">'+MV_LOAD_IC+'</div>'+
       '<div class="mv-empty-t">در حال بارگذاری مدل</div>'+
-      /* نامِ لاتین خطِ جداگانه و LTR است؛ در یک خطِ فارسی ترتیبِ کلمات به‌هم می‌ریخت */
+      /* نام لاتین خط جداگانه و LTR است؛ در یک خط فارسی ترتیب کلمات به‌هم می‌ریخت */
       (_mnm?'<div class="mv-load-name">'+esc(_mnm)+'</div>':'')+'</div>'+
     loadBarHTML(false, true);
   xfPlay(shell, ".mv-pick", "on", _xf);
   await ensureModelViewer();
-  if(myToken!==_mvLoadSeq) return;   // بارگذاریِ جدیدتری جای این را گرفت؛ به DOM دست نزن
+  if(myToken!==_mvLoadSeq) return;   // بارگذاری جدیدتری جای این را گرفت؛ به DOM دست نزن
   if(!(window.customElements && customElements.get("model-viewer"))){
     loadBarHide(scope());
     var ph0=document.getElementById("mvPh");
-    if(ph0) ph0.innerHTML='<div class="mv-empty-ic">'+MODEL_IC+'</div><div class="mv-empty-t">نمایشِ درون‌صفحه در دسترس نیست</div>'+
-      '<div class="mv-empty-s">فایلِ <span class="mono">vendor/model-viewer.min.js</span> را در پوشهٔ vendor قرار دهید.</div>';
+    if(ph0) ph0.innerHTML='<div class="mv-empty-ic">'+MODEL_IC+'</div><div class="mv-empty-t">نمایش درون‌صفحه در دسترس نیست</div>'+
+      '<div class="mv-empty-s">فایل <span class="mono">vendor/model-viewer.min.js</span> را در پوشهٔ vendor قرار دهید.</div>';
     return;
   }
-  var est=loadBarEstimate(scope, 92);   // پیشرفتِ نرمِ تخمینی تا نوار روی صفر نماند
+  var est=loadBarEstimate(scope, 92);   // پیشرفت نرم تخمینی تا نوار روی صفر نماند
   _mvEst=est;
   try{
     // getFileRetry فایل‌های قبلاً دانلودشده را از حافظهٔ موقت (api.js) بی‌درنگ برمی‌گرداند
     var r=await getFileRetry(fileId, {onProgress: function(loaded,total){ if(myToken===_mvLoadSeq && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(myToken!==_mvLoadSeq){ est.stop(); return; }   // منسوخ شد — نتیجه را دور بریز
     if(!r||!r.ok){ est.stop(); loadBarHide(scope());
-      var fi=await fileFailInfo(r); if(myToken!==_mvLoadSeq) return;   // علتِ واقعی: سرور / اینترنت / فایلِ ناموجود
+      var fi=await fileFailInfo(r); if(myToken!==_mvLoadSeq) return;   // علت واقعی: سرور / اینترنت / فایل ناموجود
       var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML=mvFailHTML(fi,fileId,part); return; }
     var blob=b64toBlob(r.base64, r.mimeType||"model/gltf-binary");
     var url=previewBlobUrl("mvModel", blob);
     var sh=document.getElementById("mvShell"); if(!sh){ est.stop(); return; }
     // مدل را جای placeholder بگذار و تولباکس را اضافه کن؛ نوار و منو دست‌نخورده می‌مانند (تخمین ادامه دارد)
     var ph=document.getElementById("mvPh");
-    if(!ph){ est.stop(); return; }   // placeholder نیست ⇒ وضعیتِ غیرمنتظره؛ هرگز مدلِ دوم اضافه نکن
+    if(!ph){ est.stop(); return; }   // placeholder نیست ⇒ وضعیت غیرمنتظره؛ هرگز مدل دوم اضافه نکن
     var mvTag='<model-viewer id="mvEl" src="'+url+'" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="0.95" '+
-      'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" alt="مدلِ سه‌بعدیِ قطعهٔ '+esc(pad2(part))+'" style="width:100%;height:100%">'+
+      'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" alt="مدل سه‌بعدی قطعهٔ '+esc(pad2(part))+'" style="width:100%;height:100%">'+
       '<button slot="ar-button" class="mv-ar"></button></model-viewer>';
     ph.outerHTML=mvTag;
     if(!sh.querySelector(".mv-tools")) sh.insertAdjacentHTML("afterbegin", mvToolbarHTML());
@@ -2068,14 +2068,14 @@ async function mvLoadPart(fileId, part){
 function mvFailHTML(fi, fileId, part){
   return '<div class="mv-fail-ic">'+(fi.ic||"")+'</div><div class="mv-empty-t">'+esc(fi.t)+'</div><div class="mv-empty-s">'+esc(fi.d)+'</div>'+mvRetryBtn(fileId,part);
 }
-/* دکمهٔ «تلاش مجدد» بارگذاریِ مدلِ سه‌بعدی از ابتدا (روی خطا/عدمِ دریافت) */
+/* دکمهٔ «تلاش مجدد» بارگذاری مدل سه‌بعدی از ابتدا (روی خطا/عدم دریافت) */
 function mvRetryBtn(fileId, part){
   return '<button class="btn sm mv-retry" onclick="mvLoadPart(\''+esc(String(fileId))+'\',\''+esc(String(part))+'\')">'+
     '<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>تلاش مجدد</button>';
 }
-/* منوی ابزارِ ویوئر — همبرگر + واقعیت افزوده + تمام‌صفحه + چرخش + نمای اولیه.
-   ویوئر-مستقل است: هم در پنلِ پروژه (#mvEl داخلِ .mv-shell) و هم در مودالِ سند (#dmMv داخلِ .mv-toolwrap)
-   کار می‌کند؛ توابع ویوئر و ظرف را از روی خودِ دکمه پیدا می‌کنند (بدونِ id، تا تداخلِ id رخ ندهد). */
+/* منوی ابزار ویوئر — همبرگر + واقعیت افزوده + تمام‌صفحه + چرخش + نمای اولیه.
+   ویوئر-مستقل است: هم در پنل پروژه (#mvEl داخل .mv-shell) و هم در مودال سند (#dmMv داخل .mv-toolwrap)
+   کار می‌کند؛ توابع ویوئر و ظرف را از روی خود دکمه پیدا می‌کنند (بدون id، تا تداخل id رخ ندهد). */
 function mvToolbarHTML(){
   var burger='<svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>';
   var arIc='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
@@ -2090,7 +2090,7 @@ function mvToolbarHTML(){
     '<button class="mv-tool" onclick="mvReset(this)" title="نمای اولیه"><span class="mv-lab">نمای اولیه</span>'+reset+'</button>'+
   '</div>';
 }
-/* ظرفِ ویوئرِ همین دکمه (پنلِ پروژه یا مودالِ سند) و خودِ model-viewer درونش */
+/* ظرف ویوئر همین دکمه (پنل پروژه یا مودال سند) و خود model-viewer درونش */
 function mvBoxOf(btn){ return (btn&&btn.closest)?btn.closest(".mv-shell,.mv-toolwrap"):null; }
 function mvViewerOf(btn){ var box=mvBoxOf(btn); var m=box?box.querySelector("model-viewer"):null;
   return m||document.getElementById("mvEl")||document.getElementById("dmMv"); }
@@ -2102,10 +2102,10 @@ function mvSpin(btn){ var m=mvViewerOf(btn); if(!m) return;
   else { m.setAttribute("auto-rotate",""); xfSet(btn,"on",true); } }
 function mvReset(btn){ var m=mvViewerOf(btn); if(!m) return;
   try{ m.cameraOrbit="auto auto auto"; if(m.resetTurntableRotation) m.resetTurntableRotation(); if(m.jumpCameraToGoal) m.jumpCameraToGoal(); }catch(e){} }
-/* ============ واقعیتِ افزوده (AR) ============
-   دکمهٔ AR آگاه از دستگاه است: iPhone → AR Quick Look با فایلِ USDZ · Android → Scene Viewer با فایلِ GLB ·
-   دسکتاپ → کدِ QRِ واقعی که به صفحهٔ سبکِ ar.html اشاره می‌کند تا کاربر با موبایل اسکن و در AR باز کند.
-   فایل‌ها هنگامِ ثبت «عمومی (هرکس با لینک)» شده‌اند تا اپ‌های AR بتوانند واکشی‌شان کنند. */
+/* ============ واقعیت افزوده (AR) ============
+   دکمهٔ AR آگاه از دستگاه است: iPhone → AR Quick Look با فایل USDZ · Android → Scene Viewer با فایل GLB ·
+   دسکتاپ → کد QR واقعی که به صفحهٔ سبک ar.html اشاره می‌کند تا کاربر با موبایل اسکن و در AR باز کند.
+   فایل‌ها هنگام ثبت «عمومی (هرکس با لینک)» شده‌اند تا اپ‌های AR بتوانند واکشی‌شان کنند. */
 function driveDirectUrl(id){ return id ? "https://drive.google.com/uc?export=download&id="+id : ""; }
 function arPlatform(){
   var ua=navigator.userAgent||"";
@@ -2113,18 +2113,18 @@ function arPlatform(){
   if(/Android/i.test(ua)) return "android";
   return "desktop";
 }
-/* سندِ مربوط به ویوئرِ همین دکمه: مودالِ سند → از روی ریویژنِ انتخاب‌شده؛ پنلِ پروژه → از روی شناسهٔ GLBِ درحال‌نمایش */
+/* سند مربوط به ویوئر همین دکمه: مودال سند → از روی ریویژن انتخاب‌شده؛ پنل پروژه → از روی شناسهٔ GLB درحال‌نمایش */
 function mvArDoc(btn){
   var box=mvBoxOf(btn);
-  // ویوئرِ مودالِ سند: سند از روی ریویژنِ انتخاب‌شده مشخص می‌شود
+  // ویوئر مودال سند: سند از روی ریویژن انتخاب‌شده مشخص می‌شود
   if(box && box.querySelector("#dmMv")){
     if(typeof _dm!=="undefined" && _dm && _dm.selNum){
       var d=docByNumber(_dm.selNum); if(d) return d;
     }
-    return null;   // ⚠ به _mvCurFileId برنگرد: آن مالِ پنلِ پروژه است
+    return null;   // ⚠ به _mvCurFileId برنگرد: آن مال پنل پروژه است
   }
-  /* پنلِ پروژه: شناسهٔ مدلِ درحال‌نمایش. فقط وقتی معتبر است که همین ویوئر روی صفحه باشد،
-     وگرنه مقدارِ به‌جامانده از مدلِ قبلی باعث می‌شد AR سندِ اشتباهی را باز کند. */
+  /* پنل پروژه: شناسهٔ مدل درحال‌نمایش. فقط وقتی معتبر است که همین ویوئر روی صفحه باشد،
+     وگرنه مقدار به‌جامانده از مدل قبلی باعث می‌شد AR سند اشتباهی را باز کند. */
   if(_mvCurFileId && document.getElementById("mvShell")){
     var m=(DB.documents||[]).filter(function(x){ return String(x.fileId)===String(_mvCurFileId); })[0];
     if(m) return m;
@@ -2139,24 +2139,24 @@ function mvAR(btn){
   }
   var src={ glbId:d.fileId||"", usdzId:d.usdzFileId||"", drawingNumber:d.drawingNumber||"",
             glbUrl:driveDirectUrl(d.fileId), usdzUrl:driveDirectUrl(d.usdzFileId) };
-  // اطمینان از عمومی‌بودنِ فایل‌ها (اسنادِ جدید از قبل عمومی‌اند؛ این تضمینِ اسنادِ قدیمی است) — بدونِ انتظار تا ژستِ کلیک برای iOS حفظ شود
+  // اطمینان از عمومی‌بودن فایل‌ها (اسناد جدید از قبل عمومی‌اند؛ این تضمین اسناد قدیمی است) — بدون انتظار تا ژست کلیک برای iOS حفظ شود
   try{ var pr=api("arSources", d.drawingNumber?{drawingNumber:d.drawingNumber}:{fileId:d.fileId}); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){}
   arLaunch(src, mv);
 }
 function arLaunch(src, mv){
   var plat=arPlatform();
   if(plat==="ios"){
-    // نبودِ فایل → همان پنلِ هشدار (هم‌شکل با دسکتاپ)، نه فقط یک توستِ گذرا
+    // نبود فایل → همان پنل هشدار (هم‌شکل با دسکتاپ)، نه فقط یک توست گذرا
     if(!src.usdzUrl){ showARQr(src); return; }
     var a=document.createElement("a"); a.setAttribute("rel","ar"); a.href=src.usdzUrl;
-    var img=document.createElement("img"); img.style.display="none"; a.appendChild(img);   // Quick Look به یک فرزندِ img نیاز دارد
+    var img=document.createElement("img"); img.style.display="none"; a.appendChild(img);   // Quick Look به یک فرزند img نیاز دارد
     document.body.appendChild(a); a.click();
     setTimeout(function(){ if(a.parentNode) a.parentNode.removeChild(a); }, 1500);
   } else if(plat==="android"){
     if(!src.glbUrl){ showARQr(src); return; }
     var fb=arPageUrl(src);   // اگر ARCore نبود، به همان صفحهٔ ar.html برگردد
     window.location.href="intent://arvr.google.com/scene-viewer/1.0?file="+encodeURIComponent(src.glbUrl)+
-      "&mode=ar_preferred&title="+encodeURIComponent(src.drawingNumber||"مدلِ سه‌بعدی")+
+      "&mode=ar_preferred&title="+encodeURIComponent(src.drawingNumber||"مدل سه‌بعدی")+
       "#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;"+
       "S.browser_fallback_url="+encodeURIComponent(fb)+";end;";
   } else {
@@ -2164,7 +2164,7 @@ function arLaunch(src, mv){
     showARQr(src);   // دسکتاپ: QR برای اسکن با موبایل
   }
 }
-/* نشانیِ صفحهٔ سبکِ AR (کنارِ index.html، حتی در زیرمسیرِ GitHub Pages) با شناسه‌های فایل */
+/* نشانی صفحهٔ سبک AR (کنار index.html، حتی در زیرمسیر GitHub Pages) با شناسه‌های فایل */
 function arPageBase(){ return location.href.replace(/[?#].*$/,"").replace(/[^/]*$/,""); }
 function arPageUrl(src){
   var u=arPageBase()+"ar.html?g="+encodeURIComponent(src.glbId||"");
@@ -2172,8 +2172,8 @@ function arPageUrl(src){
   if(src.drawingNumber) u+="&n="+encodeURIComponent(src.drawingNumber);
   return u;
 }
-/* هشدارِ کمبودِ فایلِ AR — همان الگوی .ed-req-note: آیکون + متن، این‌بار قرمز.
-   GLB برای اندروید لازم است و USDZ برای آیفون؛ نبودِ هرکدام یک پلتفرم را از کار می‌اندازد. */
+/* هشدار کمبود فایل AR — همان الگوی .ed-req-note: آیکون + متن، این‌بار قرمز.
+   GLB برای اندروید لازم است و USDZ برای آیفون؛ نبود هرکدام یک پلتفرم را از کار می‌اندازد. */
 function arWarnHTML(src){
   var miss=[];
   if(!src || !src.glbId)  miss.push("GLB (برای اندروید)");
@@ -2182,33 +2182,33 @@ function arWarnHTML(src){
   var ic='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>'+
          '<line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
   var txt = miss.length===2
-    ? "برای این سند هیچ فایلِ واقعیتِ افزوده‌ای بارگذاری نشده است؛ نمایش در AR ممکن نیست."
-    : "فایلِ "+miss[0]+" برای این سند بارگذاری نشده است؛ روی آن دستگاه نمایش در AR ممکن نیست.";
+    ? "برای این سند هیچ فایل واقعیت افزوده‌ای بارگذاری نشده است؛ نمایش در AR ممکن نیست."
+    : "فایل "+miss[0]+" برای این سند بارگذاری نشده است؛ روی آن دستگاه نمایش در AR ممکن نیست.";
   return '<div class="ar-warn">'+ic+'<span>'+esc(txt)+'</span></div>';
 }
 function showARQr(src){
   var url=(src && (src.glbId||src.usdzId)) ? arPageUrl(src) : null;
   var warn=arWarnHTML(src);
-  /* ⚠ اگر هیچ فایلی نباشد، QR ساخته نمی‌شود. پیش‌تر این‌جا یک کدِ تصادفیِ بی‌معنی
+  /* ⚠ اگر هیچ فایلی نباشد، QR ساخته نمی‌شود. پیش‌تر این‌جا یک کد تصادفی بی‌معنی
      (fakeQrSvg) نمایش داده می‌شد که اسکن نمی‌شد و کاربر را سردرگم می‌کرد. */
   var code=url?qrSvg(url):"";
   var body='<div class="qr-body">'+warn;
   if(code){
-    body+='<div class="qr-sub">این کد را با دوربینِ موبایل اسکن کنید تا مدل به‌صورتِ واقعیتِ افزوده روی گوشی باز شود.</div>'+
+    body+='<div class="qr-sub">این کد را با دوربین موبایل اسکن کنید تا مدل به‌صورت واقعیت افزوده روی گوشی باز شود.</div>'+
           '<div class="qr-code">'+code+'</div>'+
           (src.drawingNumber?'<div class="qr-sub mono" style="direction:ltr;margin:14px 0 0">'+esc(src.drawingNumber)+'</div>':'');
   } else if(url){
-    // فایل هست ولی ساختِ QR ممکن نشد — نشانی را مستقیم بده تا کاربر بی‌راه‌حل نماند
-    body+='<div class="qr-sub">ساختِ کدِ QR ممکن نشد. این نشانی را روی موبایل باز کنید:</div>'+
+    // فایل هست ولی ساخت QR ممکن نشد — نشانی را مستقیم بده تا کاربر بی‌راه‌حل نماند
+    body+='<div class="qr-sub">ساخت کد QR ممکن نشد. این نشانی را روی موبایل باز کنید:</div>'+
           '<div class="qr-sub mono" style="direction:ltr;word-break:break-all">'+esc(url)+'</div>';
   }
   body+='</div>';
   showModal("مشاهده در واقعیت افزوده", body, "box-narrow");
 }
-/* کدِ QRِ واقعی از روی کتابخانهٔ vendor/qrcode.min.js (byte mode، سطحِ M). ماژول‌ها به‌صورتِ SVG با حاشیهٔ آرام (quiet zone).
+/* کد QR واقعی از روی کتابخانهٔ vendor/qrcode.min.js (byte mode، سطح M). ماژول‌ها به‌صورت SVG با حاشیهٔ آرام (quiet zone).
    ⚠ اگر کتابخانه در دسترس نباشد یا رمزگذاری شکست بخورد، رشتهٔ خالی برمی‌گردد.
-   قبلاً این‌جا یک کدِ تصادفی (fakeQrSvg) ساخته می‌شد که ظاهرِ QR داشت ولی اسکن نمی‌شد؛
-   کدِ بی‌معنی بدتر از نبودِ کد است، چون کاربر بیهوده تلاش می‌کند. */
+   قبلاً این‌جا یک کد تصادفی (fakeQrSvg) ساخته می‌شد که ظاهر QR داشت ولی اسکن نمی‌شد؛
+   کد بی‌معنی بدتر از نبود کد است، چون کاربر بیهوده تلاش می‌کند. */
 function qrSvg(text){
   var q;
   if(typeof qrcode==="undefined") return "";

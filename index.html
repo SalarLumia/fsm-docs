@@ -5,29 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>سامانهٔ مدیریت اسناد و پروژه‌ها | فولاد شرق ماهان</title>
 <link rel="icon" type="image/svg+xml" href="fsm-favicon.svg">
-<!-- ⚠ پیش‌بارگذاریِ دارایی‌هایِ صفحهٔ ورود.
-     بدونِ این، مرورگر تصویرِ پس‌زمینه و فونت‌ها را فقط پس از دانلود و پردازشِ کاملِ CSS
-     کشف می‌کند — پس دیر می‌رسند و چیدمان مقابلِ چشمِ کاربر مرتب می‌شود.
-     فقط دو وزنِ پرکاربرد (عادی و ضخیم) پیش‌بار می‌شوند؛ بقیه به‌وقتِ نیاز. -->
+<!-- ⚠ پیش‌بارگذاری دارایی‌های صفحهٔ ورود.
+     بدون این، مرورگر تصویر پس‌زمینه و فونت‌ها را فقط پس از دانلود و پردازش کامل CSS
+     کشف می‌کند — پس دیر می‌رسند و چیدمان مقابل چشم کاربر مرتب می‌شود.
+     فقط دو وزن پرکاربرد (عادی و ضخیم) پیش‌بار می‌شوند؛ بقیه به‌وقت نیاز. -->
 <link rel="preload" href="fonts/IRANSans.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/IRANSans_Bold.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="login-bg.webp" as="image" type="image/webp">
 <link rel="preload" href="fsm-brand-light.webp" as="image" type="image/webp">
-<link rel="stylesheet" href="styles/tokens.css?v=20261005.2">
-<link rel="stylesheet" href="styles/base.css?v=20261005.2">
-<link rel="stylesheet" href="styles/components.css?v=20261005.2">
-<link rel="stylesheet" href="styles/layout.css?v=20261005.2">
-<link rel="stylesheet" href="styles/dashboard.css?v=20261005.2">
-<link rel="stylesheet" href="styles/features.css?v=20261005.2">
-<link rel="stylesheet" href="styles/project.css?v=20261005.2">
-<link rel="stylesheet" href="styles/help.css?v=20261005.2">
-<link rel="stylesheet" href="styles/login.css?v=20261005.2">
+<link rel="stylesheet" href="styles/tokens.css?v=20261005.3">
+<link rel="stylesheet" href="styles/base.css?v=20261005.3">
+<link rel="stylesheet" href="styles/components.css?v=20261005.3">
+<link rel="stylesheet" href="styles/layout.css?v=20261005.3">
+<link rel="stylesheet" href="styles/dashboard.css?v=20261005.3">
+<link rel="stylesheet" href="styles/features.css?v=20261005.3">
+<link rel="stylesheet" href="styles/project.css?v=20261005.3">
+<link rel="stylesheet" href="styles/help.css?v=20261005.3">
+<link rel="stylesheet" href="styles/login.css?v=20261005.3">
 <script>
-/* ⚠ پیش از رندرِ صفحه اجرا می‌شود (عمداً در head و بدونِ defer).
-   اگر نشستِ معتبری ذخیره باشد، صفحهٔ ورود از همان اول پنهان می‌ماند.
-   بدونِ این، صفحهٔ ورود رندر و انیمیشن‌هایش پخش می‌شد و چند ثانیه بعد جایش را به
-   پنل می‌داد — کاربر شاهدِ یک «ورودِ خودکارِ نمایشی» بود که در هیچ سایتی مرسوم نیست.
-   اعتبارسنجیِ واقعی کارِ بک‌اند است؛ این‌جا فقط تصمیمِ نمایشی گرفته می‌شود. */
+/* ⚠ پیش از رندر صفحه اجرا می‌شود (عمداً در head و بدون defer).
+   اگر نشست معتبری ذخیره باشد، صفحهٔ ورود از همان اول پنهان می‌ماند.
+   بدون این، صفحهٔ ورود رندر و انیمیشن‌هایش پخش می‌شد و چند ثانیه بعد جایش را به
+   پنل می‌داد — کاربر شاهد یک «ورود خودکار نمایشی» بود که در هیچ سایتی مرسوم نیست.
+   اعتبارسنجی واقعی کار بک‌اند است؛ این‌جا فقط تصمیم نمایشی گرفته می‌شود. */
 (function(){
   try{
     var s=localStorage.getItem("fsm_session");
@@ -40,7 +40,7 @@
 })();
 </script>
 <style>
-  /* نشستِ معتبر: نه صفحهٔ ورود دیده می‌شود و نه انیمیشن‌هایش پخش می‌شوند */
+  /* نشست معتبر: نه صفحهٔ ورود دیده می‌شود و نه انیمیشن‌هایش پخش می‌شوند */
   html.has-session #loginView{display:none!important}
 </style>
 </head>
@@ -48,21 +48,21 @@
 
 <!-- ============ صفحهٔ ورود ============ -->
 <div id="loginView" class="login-wrap lg-premeasure">
-  <!-- گوهٔ تیره + دو نوارِ نارنجی/طلاییِ کاملاً موازی — پایین‌راست.
-       نوارها با <line> و stroke کشیده می‌شوند تا ضخامتشان در کلِ طول ثابت بماند
-       (مسیرِ چندضلعی + preserveAspectRatio=none باعثِ تغییرِ ضخامت در طول می‌شد). -->
+  <!-- گوهٔ تیره + دو نوار نارنجی/طلایی کاملاً موازی — پایین‌راست.
+       نوارها با <line> و stroke کشیده می‌شوند تا ضخامتشان در کل طول ثابت بماند
+       (مسیر چندضلعی + preserveAspectRatio=none باعث تغییر ضخامت در طول می‌شد). -->
   <svg class="lg-wedge br" viewBox="-330 -300 760 600" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
     <g class="lg-shift">
-      <!-- مثلثِ ذغالی: ضلعِ مورب هم‌شیبِ نوارها (شیبِ ‎-1.0625‎)، امتدادیافته تا بیرونِ کادر -->
+      <!-- مثلث ذغالی: ضلع مورب هم‌شیب نوارها (شیب ‎-1.0625‎)، امتدادیافته تا بیرون کادر -->
       <path d="M630 500 L630 0 L159 500 Z" fill="#4a4a4a"/>
       <line x1="1090.8" y1="-527.6" x2="-177.1" y2="819.6" stroke="#f7941f" stroke-width="34"/>
       <line x1="1069.0" y1="-548.1" x2="-198.9" y2="799.0" stroke="#fbcf88" stroke-width="11"/>
     </g>
   </svg>
-  <!-- همان مجموعه، قرینه در بالا-چپ (چرخشِ ۱۸۰ درجه) -->
+  <!-- همان مجموعه، قرینه در بالا-چپ (چرخش ۱۸۰ درجه) -->
   <svg class="lg-wedge tl" viewBox="-330 -300 760 600" preserveAspectRatio="xMaxYMax slice" aria-hidden="true">
     <g class="lg-shift">
-      <!-- مثلثِ ذغالی: ضلعِ مورب هم‌شیبِ نوارها (شیبِ ‎-1.0625‎)، امتدادیافته تا بیرونِ کادر -->
+      <!-- مثلث ذغالی: ضلع مورب هم‌شیب نوارها (شیب ‎-1.0625‎)، امتدادیافته تا بیرون کادر -->
       <path d="M630 500 L630 0 L159 500 Z" fill="#4a4a4a"/>
       <line x1="1090.8" y1="-527.6" x2="-177.1" y2="819.6" stroke="#f7941f" stroke-width="34"/>
       <line x1="1069.0" y1="-548.1" x2="-198.9" y2="799.0" stroke="#fbcf88" stroke-width="11"/>
@@ -70,33 +70,33 @@
   </svg>
   <div class="login-form">
     <div class="login-brand">
-      <!-- نشان + نامِ شرکت به‌صورتِ یک تصویرِ واحد (نسخهٔ روشن، برای زمینهٔ تیره).
-           متنِ واقعی زیرش با کلاسِ sr-only می‌ماند تا screen reader و جست‌وجوی مرورگر آن را بخوانند. -->
+      <!-- نشان + نام شرکت به‌صورت یک تصویر واحد (نسخهٔ روشن، برای زمینهٔ تیره).
+           متن واقعی زیرش با کلاس sr-only می‌ماند تا screen reader و جست‌وجوی مرورگر آن را بخوانند. -->
       <img class="mark" src="fsm-brand-light.webp" alt="فولاد شرق ماهان — FOOLAD SHARGH MAHAN (سهامی خاص)">
       <h2 class="sr-only">فولاد شرق ماهان</h2>
       <p class="en sr-only">FOOLAD SHARGH MAHAN</p>
-      <!-- ⚠ قابِ نارنجی و «خطِ زیرِ لوگو» یک چیزِ واحدند، نه دو عنصر.
-           دو مسیرِ قرینه که از بالا-وسط شروع می‌شوند: در مرحلهٔ ۱ فقط تکهٔ کوتاهی از
-           هرکدام آشکار است و همان خطِ کوتاه دیده می‌شود؛ در مرحلهٔ ۲ همان دو مسیر
-           جلو می‌روند، پایین می‌آیند و در وسطِ پایین به هم می‌رسند و قاب کامل می‌شود. -->
+      <!-- ⚠ قاب نارنجی و «خط زیر لوگو» یک چیز واحدند، نه دو عنصر.
+           دو مسیر قرینه که از بالا-وسط شروع می‌شوند: در مرحلهٔ ۱ فقط تکهٔ کوتاهی از
+           هرکدام آشکار است و همان خط کوتاه دیده می‌شود؛ در مرحلهٔ ۲ همان دو مسیر
+           جلو می‌روند، پایین می‌آیند و در وسط پایین به هم می‌رسند و قاب کامل می‌شود. -->
       <svg class="lg-frame" aria-hidden="true">
         <path class="r"/>
         <path class="l"/>
       </svg>
-      <!-- محتوای زیرِ خط: در مرحلهٔ ۲ به پایین می‌لغزد و زیرِ کارتِ در حالِ بازشدن ناپدید می‌شود -->
+      <!-- محتوای زیر خط: در مرحلهٔ ۲ به پایین می‌لغزد و زیر کارت در حال بازشدن ناپدید می‌شود -->
       <div class="lg-below">
         <p class="lg-tag">سامانهٔ مدیریت اسناد و پروژه‌ها<br>دفتر فنی، تحقیق و توسعه و کنترل کیفی</p>
-        <!-- مرحلهٔ ۱: دکمهٔ آغاز — با کلیک، برند جمع می‌شود و کارتِ ورود باز می‌شود -->
+        <!-- مرحلهٔ ۱: دکمهٔ آغاز — با کلیک، برند جمع می‌شود و کارت ورود باز می‌شود -->
         <button type="button" class="lg-start" onclick="lgOpen()">
           <span>ورود به سامانه</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
         </button>
       </div>
-      <!-- ⚠ کارت عمداً داخلِ همین بلوک است: بلوک در مرحلهٔ ۲ بالا می‌رود و کارت باید
-           همراهِ خطِ نارنجی بالا بیاید، وگرنه از آن جدا می‌افتد. -->
+      <!-- ⚠ کارت عمداً داخل همین بلوک است: بلوک در مرحلهٔ ۲ بالا می‌رود و کارت باید
+           همراه خط نارنجی بالا بیاید، وگرنه از آن جدا می‌افتد. -->
       <div class="login-card">
-      <!-- ⚠ فرمِ واقعی: مرورگر ذخیرهٔ رمز و پرکردنِ خودکار را درست می‌فهمد و
-           Enter در هر دو فیلد کار می‌کند. submit جلوی بارگذاریِ دوبارهٔ صفحه را می‌گیرد. -->
+      <!-- ⚠ فرم واقعی: مرورگر ذخیرهٔ رمز و پرکردن خودکار را درست می‌فهمد و
+           Enter در هر دو فیلد کار می‌کند. submit جلوی بارگذاری دوبارهٔ صفحه را می‌گیرد. -->
       <form class="lg-body" id="lgForm" onsubmit="event.preventDefault();doLogin(true);return false">
       <h1>ورود به سامانه</h1>
       <p class="sub">برای ادامه، نام کاربری و رمز عبور خود را وارد کنید.</p>
@@ -119,7 +119,7 @@
         <span class="lg-rem-box" aria-hidden="true"></span>
         <span class="lg-rem-txt">مرا به خاطر بسپار</span>
       </label>
-      <!-- توضیح هم‌سبکِ .ed-req-note: آیکونِ دایره‌ایِ اطلاع پیش از متن -->
+      <!-- توضیح هم‌سبک .ed-req-note: آیکون دایره‌ای اطلاع پیش از متن -->
       <p class="lg-note"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>برای دریافت نام کاربری و رمز عبور با مدیر سیستم تماس بگیرید.</p>
       <button id="lgBtn" type="submit" class="btn-login"><span class="lg-lbl">ورود</span><span class="lg-spin" aria-hidden="true"><i>.</i><i>.</i><i>.</i><i>.</i></span></button>
       </form><!-- /.lg-body -->
@@ -212,8 +212,8 @@
             </span>
             <span class="xfer-badge"></span>
           </button>
-          <!-- پنلِ مرکزِ انتقال عمداً اینجا نیست: در downloads.js ساخته و به body وصل می‌شود
-               تا از زمینهٔ چیدمانِ هدر (sticky + z-index) بیرون بماند و روی مودال دیده شود. -->
+          <!-- پنل مرکز انتقال عمداً اینجا نیست: در downloads.js ساخته و به body وصل می‌شود
+               تا از زمینهٔ چیدمان هدر (sticky + z-index) بیرون بماند و روی مودال دیده شود. -->
         </div>
       </div>
     </header>
@@ -221,10 +221,10 @@
     <main class="app-main">
 
     <!-- ---------- داشبورد ---------- -->
-    <!-- مثلِ بقیهٔ تب‌ها با hidden شروع می‌شود؛ switchTab("dashboard") در پایانِ startApp
-         آن را نشان می‌دهد. بدونِ این، پنل پیش از رسیدنِ داده دیده می‌شد و بعد با اسکلت و
-         سپس با دادهٔ واقعی دوباره رسم می‌شد — همان «رفرشِ چندباره». -->
-    <!-- وضعیتِ «داده نرسیده» (بوت‌استرپ ناموفق): جای همهٔ تب‌ها را می‌گیرد تا نماهای خالی، سامانه را «بی‌داده» نشان ندهند -->
+    <!-- مثل بقیهٔ تب‌ها با hidden شروع می‌شود؛ switchTab("dashboard") در پایان startApp
+         آن را نشان می‌دهد. بدون این، پنل پیش از رسیدن داده دیده می‌شد و بعد با اسکلت و
+         سپس با دادهٔ واقعی دوباره رسم می‌شد — همان «رفرش چندباره». -->
+    <!-- وضعیت «داده نرسیده» (بوت‌استرپ ناموفق): جای همهٔ تب‌ها را می‌گیرد تا نماهای خالی، سامانه را «بی‌داده» نشان ندهند -->
     <section id="bootFail" class="boot-fail" hidden></section>
     <section id="tab-dashboard" class="tabpane hidden">
       <div class="dash-hero">
@@ -300,31 +300,31 @@
     <!-- ---------- آرشیو ---------- -->
     <section id="tab-archive" class="tabpane hidden">
       <div class="card">
-        <!-- تیترِ بخش + خطِ جداکننده + دکمهٔ خروجیِ اکسل (هم‌سبکِ سایرِ بخش‌های سایت) -->
+        <!-- تیتر بخش + خط جداکننده + دکمهٔ خروجی اکسل (هم‌سبک سایر بخش‌های سایت) -->
         <h3 class="spec-sec-t">
           <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="4" rx="1"/><path d="M5 8v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
           آرشیو اسناد
           <span class="sec-act"><button type="button" class="icon-btn sm help-hint" aria-label="راهنمای این بخش" onclick="openHelp('search')"><svg viewBox="0 0 24 24" class="ic"><circle cx="12" cy="12" r="10"/><path d="M8.9 9.3a3.2 3.2 0 1 1 4.5 2.95c-.85.42-1.4 1.05-1.4 1.95v.55"/><circle cx="12" cy="17.4" r="1.05" fill="currentColor" stroke="none"/></svg></button></span>
         </h3>
 
-        <!-- نوارِ ابزار: جستجو (با دکمهٔ فیلترِ آیکونیِ داخلِ باکس) + خروجی -->
+        <!-- نوار ابزار: جستجو (با دکمهٔ فیلتر آیکونی داخل باکس) + خروجی -->
         <div class="arch-tools">
           <div class="arch-search">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="aSearch" placeholder="شماره سند، مشتری، نوع، عنوان خودکار…" oninput="renderArchive()">
-            <button type="button" class="icon-btn sm arch-filter-btn" id="archFilterBtn" title="افزودنِ فیلتر" onclick="filtToggleMenu(event,'archFilterBtn','arch')">
+            <button type="button" class="icon-btn sm arch-filter-btn" id="archFilterBtn" title="افزودن فیلتر" onclick="filtToggleMenu(event,'archFilterBtn','arch')">
               <svg viewBox="0 0 24 24" class="ic"><line x1="5" y1="7" x2="19" y2="7"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
             </button>
           </div>
           <div class="arch-tool-btns">
-            <button class="btn sm" onclick="exportCSV()" title="دانلودِ خروجیِ اکسل"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>خروجی</button>
+            <button class="btn sm" onclick="exportCSV()" title="دانلود خروجی اکسل"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>خروجی</button>
           </div>
         </div>
 
-        <!-- چیپ‌های فیلترِ فعال (+ دکمهٔ افزودنِ فیلترِ بعدی) -->
+        <!-- چیپ‌های فیلتر فعال (+ دکمهٔ افزودن فیلتر بعدی) -->
         <div id="archChips" class="arch-chips" hidden></div>
 
-        <!-- سلکت‌های مخفیِ فیلتر: منبعِ حقیقتِ filteredDocs؛ چیپ‌ها این‌ها را ست/پاک می‌کنند -->
+        <!-- سلکت‌های مخفی فیلتر: منبع حقیقت filteredDocs؛ چیپ‌ها این‌ها را ست/پاک می‌کنند -->
         <div class="arch-filters-hidden" aria-hidden="true">
           <select id="aClient" onchange="onArchiveClientChange()"><option value="">همه</option></select>
           <select id="aOrder" onchange="renderArchive()"><option value="">همه سفارش‌ها</option></select>
@@ -346,8 +346,8 @@
       </div>
     </section>
 
-    <!-- ---------- سطل زباله (اسنادِ حذف‌شده) ---------- -->
-    <!-- ---------- ردیابیِ قطعاتِ تولیدی ---------- -->
+    <!-- ---------- سطل زباله (اسناد حذف‌شده) ---------- -->
+    <!-- ---------- ردیابی قطعات تولیدی ---------- -->
     <section id="tab-instances" class="tabpane hidden">
       <div class="card">
         <h3 class="spec-sec-t">
@@ -384,7 +384,7 @@
           <div class="help-sbox">
             <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="helpSearch" type="text" autocomplete="off" placeholder="در راهنما بگردید — مثلاً: ثبت سند، تایید، ذره‌بین" oninput="hpOnSearch(this.value)">
-            <button class="help-clear" id="helpClear" style="display:none" onclick="hpClearSearch()" aria-label="پاک‌کردنِ جست‌وجو"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <button class="help-clear" id="helpClear" style="display:none" onclick="hpClearSearch()" aria-label="پاک‌کردن جست‌وجو"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
           </div>
         </div>
         <div class="help-body">
@@ -398,32 +398,32 @@
     <section id="tab-data" class="tabpane hidden">
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات<span class="sec-act"><button class="icon-btn" title="قطعه جدید" aria-label="قطعه جدید" onclick="openPartModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table parts-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی قطعه</th><th class="c-mid"><span class="en-shift">نام انگلیسی قطعه</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partsBody"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table parts-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی قطعه</th><th class="c-mid"><span class="en-shift">نام انگلیسی قطعه</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partsBody"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد<span class="sec-act"><button class="icon-btn" title="سند جدید" aria-label="سند جدید" onclick="openDocTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی سند</th><th class="c-mid"><span class="en-shift">نام انگلیسی سند</span></th><th class="c-mid"><span class="unit-shift">کد سند</span></th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th class="col-el"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button></th><th>نام فارسی سند</th><th class="c-mid"><span class="en-shift">نام انگلیسی سند</span></th><th class="c-mid"><span class="unit-shift">کد سند</span></th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات<span class="sec-act"><button class="icon-btn" title="پارامتر جدید" aria-label="پارامتر جدید" onclick="openPartModModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی پارامتر</span></th><th class="c-mid"><span class="unit-shift">واحد</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی پارامتر</span></th><th class="c-mid"><span class="unit-shift">واحد</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M16 3h1.5a2 2 0 0 1 1.7.95L22 8v8a1 1 0 0 1-1 1h-1"/><path d="M16 17H9"/><rect x="1" y="3" width="15" height="14" rx="2"/><circle cx="6.5" cy="19.5" r="2"/><circle cx="18.5" cy="19.5" r="2"/></svg>تأمین‌کنندگان مواد خام<span class="sec-act"><button class="icon-btn" title="تأمین‌کننده جدید" aria-label="تأمین‌کننده جدید" onclick="openSupplierModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table suppliers-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="suppliersBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table suppliers-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="suppliersBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/></svg>انواع مادهٔ خام<span class="sec-act"><button class="icon-btn" title="نوع مادهٔ خام جدید" aria-label="نوع مادهٔ خام جدید" onclick="openRawTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
-        <div class="tablewrap"><table class="mgmt-table rawtypes-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="rawtypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
+        <div class="tablewrap"><table class="mgmt-table rawtypes-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="rawtypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
       <div class="card">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران سامانه<span class="sec-act"><button class="icon-btn" title="کاربر جدید" aria-label="کاربر جدید" onclick="openUserModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
-        <div class="tablewrap"><table class="users-table"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردنِ جدول" title="جمع‌کردن یا بازکردنِ جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام و نام خانوادگی کاربر</span></th><th class="c-mid"><span class="en-shift">نام کاربری</span></th><th>سمت</th><th>نقش</th><th><span class="act-h">عملیات</span></th></tr></thead><tbody id="usersBody"></tbody></table></div>
+        <div class="tablewrap"><table class="users-table"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام و نام خانوادگی کاربر</span></th><th class="c-mid"><span class="en-shift">نام کاربری</span></th><th>سمت</th><th>نقش</th><th><span class="act-h">عملیات</span></th></tr></thead><tbody id="usersBody"></tbody></table></div>
       </div>
     </section>
     </main>
@@ -439,38 +439,38 @@
     <header><strong>ثبت سند / فایل جدید</strong>
       <button class="modal-x" onclick="closeNewDocModal()" aria-label="بستن" title="بستن">✕</button></header>
     <div class="body"><div class="newdoc-body">
-      <!-- ریلِ افقیِ شماره: بالای بدنه، ثابت (خارج از ناحیهٔ اسکرول) -->
+      <!-- ریل افقی شماره: بالای بدنه، ثابت (خارج از ناحیهٔ اسکرول) -->
       <div class="nd-rail" id="ndRail"></div>
-      <!-- ناحیهٔ اسکرول: فقط سکشن‌ها + بخشِ نهایی (نوارِ اسکرول همیشه اینجاست، نه کنارِ ریل) -->
+      <!-- ناحیهٔ اسکرول: فقط سکشن‌ها + بخش نهایی (نوار اسکرول همیشه اینجاست، نه کنار ریل) -->
       <div class="nd-scroll" id="ndScroll">
-        <!-- ایستگاهِ فعال (منوی سفارشیِ همان قدم) -->
+        <!-- ایستگاه فعال (منوی سفارشی همان قدم) -->
         <div class="nd-stage" id="ndStage"></div>
-        <!-- بخشِ نهایی: فایل + یادداشت + ثبت (پس از کاملِ‌شدنِ شماره) -->
+        <!-- بخش نهایی: فایل + یادداشت + ثبت (پس از کامل‌شدن شماره) -->
         <div class="nd-final" id="ndFinal" hidden></div>
-        <!-- فضای خالیِ پایین: تضمینِ جای کافی برای اسکرول تا سکشنِ فعال همیشه به بالا بیاید (ارتفاعش با JS = بلندیِ ناحیهٔ اسکرول) -->
+        <!-- فضای خالی پایین: تضمین جای کافی برای اسکرول تا سکشن فعال همیشه به بالا بیاید (ارتفاعش با JS = بلندی ناحیهٔ اسکرول) -->
         <div class="nd-spacer" id="ndSpacer" aria-hidden="true"></div>
       </div>
-      <!-- ورودی‌های مخفیِ مقدار: کدِ موجود nClient.value و… را همچنان می‌خوانَد -->
+      <!-- ورودی‌های مخفی مقدار: کد موجود nClient.value و… را همچنان می‌خواند -->
       <input type="hidden" id="nClient"><input type="hidden" id="nOrder"><input type="hidden" id="nProject">
       <input type="hidden" id="nPart"><input type="hidden" id="nType"><input type="hidden" id="nRev">
     </div></div>
   </div>
 </div>
 
-<!-- ============ مودال ثبت قطعهٔ تولیدیِ جدید (همان ویزاردِ ریلِ کد) ============ -->
+<!-- ============ مودال ثبت قطعهٔ تولیدی جدید (همان ویزارد ریل کد) ============ -->
 <div id="newInstModal" class="modal hidden" onclick="if(event.target===this)closeNewInstModal()">
   <div class="box newdoc-box">
-    <header><strong id="iwTitle">ثبت قطعهٔ تولیدیِ جدید</strong>
+    <header><strong id="iwTitle">ثبت قطعهٔ تولیدی جدید</strong>
       <button class="modal-x" onclick="closeNewInstModal()" aria-label="بستن" title="بستن">✕</button></header>
     <div class="body"><div class="newdoc-body">
-      <!-- ریلِ افقیِ کد: بالای بدنه، ثابت (خارج از ناحیهٔ اسکرول) -->
+      <!-- ریل افقی کد: بالای بدنه، ثابت (خارج از ناحیهٔ اسکرول) -->
       <div class="nd-rail" id="iwRail"></div>
       <div class="nd-scroll" id="iwScroll">
         <div class="nd-stage" id="iwStage"></div>
         <div class="nd-final" id="iwFinal" hidden></div>
         <div class="nd-spacer" id="iwSpacer" aria-hidden="true"></div>
       </div>
-      <!-- ورودی‌های مخفیِ مقدارِ ایستگاه‌ها (موتورِ ویزارد با همین idها کار می‌کند) -->
+      <!-- ورودی‌های مخفی مقدار ایستگاه‌ها (موتور ویزارد با همین idها کار می‌کند) -->
       <input type="hidden" id="iwC"><input type="hidden" id="iwO">
       <input type="hidden" id="iwP"><input type="hidden" id="iwPart">
     </div></div>
@@ -485,26 +485,26 @@
 </div>
 
 <!-- ===== اسکریپت‌ها (ترتیب وابستگی؛ app.js آخر) ===== -->
-<script src="vendor/qrcode.min.js?v=20261005.2"></script>
-<script src="scripts/config.js?v=20261005.2"></script>
-<script src="scripts/state.js?v=20261005.2"></script>
-<script src="scripts/api.js?v=20261005.2"></script>
-<script src="scripts/auth.js?v=20261005.2"></script>
-<script src="scripts/nav.js?v=20261005.2"></script>
-<script src="scripts/selects.js?v=20261005.2"></script>
-<script src="scripts/dashboard.js?v=20261005.2"></script>
-<script src="scripts/documents.js?v=20261005.2"></script>
-<script src="scripts/wizard.js?v=20261005.2"></script>
-<script src="scripts/filters.js?v=20261005.2"></script>
-<script src="scripts/archive.js?v=20261005.2"></script>
-<script src="scripts/downloads.js?v=20261005.2"></script>
-<script src="scripts/docmodal.js?v=20261005.2"></script>
-<script src="scripts/review.js?v=20261005.2"></script>
-<script src="scripts/projects.js?v=20261005.2"></script>
-<script src="scripts/help.js?v=20261005.2"></script>
-<script src="scripts/datepicker.js?v=20261005.2"></script>
-<script src="scripts/instances.js?v=20261005.2"></script>
-<script src="scripts/settings.js?v=20261005.2"></script>
-<script src="scripts/app.js?v=20261005.2"></script>
+<script src="vendor/qrcode.min.js?v=20261005.3"></script>
+<script src="scripts/config.js?v=20261005.3"></script>
+<script src="scripts/state.js?v=20261005.3"></script>
+<script src="scripts/api.js?v=20261005.3"></script>
+<script src="scripts/auth.js?v=20261005.3"></script>
+<script src="scripts/nav.js?v=20261005.3"></script>
+<script src="scripts/selects.js?v=20261005.3"></script>
+<script src="scripts/dashboard.js?v=20261005.3"></script>
+<script src="scripts/documents.js?v=20261005.3"></script>
+<script src="scripts/wizard.js?v=20261005.3"></script>
+<script src="scripts/filters.js?v=20261005.3"></script>
+<script src="scripts/archive.js?v=20261005.3"></script>
+<script src="scripts/downloads.js?v=20261005.3"></script>
+<script src="scripts/docmodal.js?v=20261005.3"></script>
+<script src="scripts/review.js?v=20261005.3"></script>
+<script src="scripts/projects.js?v=20261005.3"></script>
+<script src="scripts/help.js?v=20261005.3"></script>
+<script src="scripts/datepicker.js?v=20261005.3"></script>
+<script src="scripts/instances.js?v=20261005.3"></script>
+<script src="scripts/settings.js?v=20261005.3"></script>
+<script src="scripts/app.js?v=20261005.3"></script>
 </body>
 </html>

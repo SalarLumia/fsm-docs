@@ -1,19 +1,19 @@
-/* ================= مرکز دانلود (صفِ معلق و غیرمسدودکننده) =================
-   به‌جای اینکه دکمهٔ «دانلود» کلِ صفحه را مات کند و کاربر منتظر بماند، هر درخواست به یک
-   «کارت» در پنلِ شناورِ مرکز دانلود می‌رود. فایل در پس‌زمینه (به‌صورتِ استریمی، با نمایشِ
-   پیشرفت) آماده می‌شود و بقیهٔ سایت آزاد می‌ماند؛ به‌محضِ کامل‌شدن، فایل به‌صورتِ خودکار به
-   فهرستِ دانلودِ مرورگر سپرده می‌شود. صف تک‌کاره است (هر لحظه یک فایل) تا فایلِ حجیم سرویس را
-   قفل نکند؛ بقیه در حالتِ «در صف» منتظر می‌مانند. الگو: مرکزِ دانلودِ کنوا. */
+/* ================= مرکز دانلود (صف معلق و غیرمسدودکننده) =================
+   به‌جای اینکه دکمهٔ «دانلود» کل صفحه را مات کند و کاربر منتظر بماند، هر درخواست به یک
+   «کارت» در پنل شناور مرکز دانلود می‌رود. فایل در پس‌زمینه (به‌صورت استریمی، با نمایش
+   پیشرفت) آماده می‌شود و بقیهٔ سایت آزاد می‌ماند؛ به‌محض کامل‌شدن، فایل به‌صورت خودکار به
+   فهرست دانلود مرورگر سپرده می‌شود. صف تک‌کاره است (هر لحظه یک فایل) تا فایل حجیم سرویس را
+   قفل نکند؛ بقیه در حالت «در صف» منتظر می‌مانند. الگو: مرکز دانلود کنوا. */
 
 var _dlJobs = [];      // {id, fileId, label, name, status, pct, loaded, total, blobUrl, msg}
 var _dlSeq  = 0;       // شمارندهٔ یکتای کارها
-var _dlActive = false; // آیا کارگرِ صف مشغولِ یک دانلود است؟
-var _dlOpen = false;   // آیا دراپ‌داونِ مرکز انتقال باز است؟
-var _dlUnseen = false; // آیا کارِ تمام‌شده‌ای هست که کاربر هنوز پنل را برایش باز نکرده؟ (نشانِ سبز)
-var _dlLastKind = "download"; // نوعِ آخرین کارِ فعال/تمام‌شده — برای آیکونِ دکمه (آپلود/دانلود)
+var _dlActive = false; // آیا کارگر صف مشغول یک دانلود است؟
+var _dlOpen = false;   // آیا دراپ‌داون مرکز انتقال باز است؟
+var _dlUnseen = false; // آیا کار تمام‌شده‌ای هست که کاربر هنوز پنل را برایش باز نکرده؟ (نشان سبز)
+var _dlLastKind = "download"; // نوع آخرین کار فعال/تمام‌شده — برای آیکون دکمه (آپلود/دانلود)
 
-/* افزودنِ یک درخواست به صف. label = برچسبِ نمایشیِ اولیه (معمولاً شمارهٔ سند) تا پیش از رسیدنِ
-   نامِ واقعیِ فایل چیزی برای نشان‌دادن باشد. */
+/* افزودن یک درخواست به صف. label = برچسب نمایشی اولیه (معمولاً شمارهٔ سند) تا پیش از رسیدن
+   نام واقعی فایل چیزی برای نشان‌دادن باشد. */
 function dlEnqueue(fileId, label){
   if(!fileId){ toast("این مورد فایلی برای دانلود ندارد.",true); return; }
   var id = ++_dlSeq;
@@ -22,16 +22,16 @@ function dlEnqueue(fileId, label){
   xferAutoOpen();
   dlPump();
 }
-/* پنل در هر حالتی باز می‌شود — حتی وقتی مودال باز است. دکمهٔ هدر و پنل با کلاسِ
-   body.modal-open از زیرِ پوششِ تیره بیرون می‌آیند، پس پیشرفتِ دانلود دیده می‌شود
+/* پنل در هر حالتی باز می‌شود — حتی وقتی مودال باز است. دکمهٔ هدر و پنل با کلاس
+   body.modal-open از زیر پوشش تیره بیرون می‌آیند، پس پیشرفت دانلود دیده می‌شود
    و کاربر فکر نمی‌کند دکمهٔ دانلود کار نکرده است. */
 function xferAutoOpen(){
-  xferPlaceBtn();   // اول دکمه سرِ جایش بنشیند، بعد پنل مختصاتش را از روی همان بخواند
+  xferPlaceBtn();   // اول دکمه سر جایش بنشیند، بعد پنل مختصاتش را از روی همان بخواند
   xferOpen();
 }
 
-/* افزودنِ یک کارِ آپلود به همان صف/پنل. opts = { label, action, payload, onSuccess(r) }.
-   آپلود در پس‌زمینه انجام می‌شود (با پیشرفتِ واقعیِ XHR) و سایت آزاد می‌ماند. */
+/* افزودن یک کار آپلود به همان صف/پنل. opts = { label, action, payload, onSuccess(r) }.
+   آپلود در پس‌زمینه انجام می‌شود (با پیشرفت واقعی XHR) و سایت آزاد می‌ماند. */
 function dlEnqueueUpload(opts){
   opts=opts||{};
   var id = ++_dlSeq;
@@ -43,8 +43,8 @@ function dlEnqueueUpload(opts){
   return id;
 }
 
-/* کارگرِ صف: هر بار اولین کارِ «در صف» را برمی‌دارد و کاملش می‌کند، سپس سراغِ بعدی می‌رود.
-   دو نوعِ کار: دانلود (استریمِ فایل + سپردن به مرورگر) و آپلود (ارسالِ درخواست با پیشرفتِ واقعی). */
+/* کارگر صف: هر بار اولین کار «در صف» را برمی‌دارد و کاملش می‌کند، سپس سراغ بعدی می‌رود.
+   دو نوع کار: دانلود (استریم فایل + سپردن به مرورگر) و آپلود (ارسال درخواست با پیشرفت واقعی). */
 async function dlPump(){
   if(_dlActive) return;
   var job = _dlJobs.filter(function(j){ return j.status==="queued"; })[0];
@@ -55,7 +55,7 @@ async function dlPump(){
   try{
     if(job.kind==="upload"){
       var ru = await apiUpload(job.action, job.payload, function(loaded,total){
-        if(loaded<0){ job.processing=true; job.pct=100; dlProgress(job); return; }   // آپلود تمام → پردازشِ سرور
+        if(loaded<0){ job.processing=true; job.pct=100; dlProgress(job); return; }   // آپلود تمام → پردازش سرور
         job.loaded=loaded; job.total=total;
         if(total>0) job.pct=Math.min(99, Math.round(loaded/total*100));
         dlProgress(job);
@@ -67,10 +67,10 @@ async function dlPump(){
       var r = await getFileRetry(job.fileId, { onProgress:function(loaded,total){
         job.loaded=loaded; job.total=total;
         if(total>0) job.pct=Math.min(99, Math.round(loaded/total*100));
-        dlProgress(job);   // به‌روزرسانیِ سبکِ فقطِ همان کارت (بدونِ بازسازیِ کلِ فهرست)
+        dlProgress(job);   // به‌روزرسانی سبک فقط همان کارت (بدون بازسازی کل فهرست)
       }});
       if(!r || !r.ok){
-        job.status="error"; job.msg=(r&&r.message)||"دریافتِ فایل ناموفق بود.";
+        job.status="error"; job.msg=(r&&r.message)||"دریافت فایل ناموفق بود.";
         dlRender();
       } else {
         var blob = b64toBlob(r.base64, r.mimeType);
@@ -79,40 +79,40 @@ async function dlPump(){
         job.blobUrl = URL.createObjectURL(blob);
         job.pct = 100; job.status="done";
         dlRender();
-        dlHandOff(job);   // سپردن به دانلودِ مرورگر
+        dlHandOff(job);   // سپردن به دانلود مرورگر
       }
     }
   }catch(e){
-    job.status="error"; job.msg=(job.kind==="upload")?"خطا در ثبت.":"خطا در دریافتِ فایل.";
+    job.status="error"; job.msg=(job.kind==="upload")?"خطا در ثبت.":"خطا در دریافت فایل.";
     dlRender();
   } finally {
     if(job.status==="done" || job.status==="error"){
       _dlLastKind=job.kind;
-      if(!_dlOpen) _dlUnseen=true;   // اگر پنل باز نیست، نشانِ سبز/قرمز تا بازشدنِ پنل بماند
+      if(!_dlOpen) _dlUnseen=true;   // اگر پنل باز نیست، نشان سبز/قرمز تا بازشدن پنل بماند
       dlUpdateHeader();
     }
     _dlActive=false;
-    dlPump();   // کارِ بعدیِ صف (اگر باشد)
+    dlPump();   // کار بعدی صف (اگر باشد)
   }
 }
 
-/* سپردنِ فایلِ آماده‌شده به فهرستِ دانلودِ مرورگر (لینکِ نامرئیِ download). */
+/* سپردن فایل آماده‌شده به فهرست دانلود مرورگر (لینک نامرئی download). */
 function dlHandOff(job){
   if(!job || !job.blobUrl) return;
   var a=document.createElement("a");
   a.href=job.blobUrl; a.download=job.name||"file";
-  /* ⚠ این کلیکِ ساختگی روی body می‌نشیند و تا شنوندهٔ «کلیکِ بیرون» بالا می‌رود،
-     پس با تمام‌شدنِ هر دانلود، پنل خودبه‌خود بسته می‌شد. با این نشانه، آن شنونده
-     کلیکِ خودی را نادیده می‌گیرد و پنل تا کلیکِ واقعیِ کاربر باز می‌ماند. */
+  /* ⚠ این کلیک ساختگی روی body می‌نشیند و تا شنوندهٔ «کلیک بیرون» بالا می‌رود،
+     پس با تمام‌شدن هر دانلود، پنل خودبه‌خود بسته می‌شد. با این نشانه، آن شنونده
+     کلیک خودی را نادیده می‌گیرد و پنل تا کلیک واقعی کاربر باز می‌ماند. */
   a.dataset.dlInternal="1";
   document.body.appendChild(a); a.click(); a.remove();
-  // blobUrl را نگه می‌داریم تا «دانلودِ دوباره» ممکن باشد؛ با حذفِ کارت یا «پاک‌کردن» آزاد می‌شود.
+  // blobUrl را نگه می‌داریم تا «دانلود دوباره» ممکن باشد؛ با حذف کارت یا «پاک‌کردن» آزاد می‌شود.
 }
 
-/* ---------- رندرِ پنل (دراپ‌داونِ زیرِ دکمهٔ هدر) ---------- */
-/* ⚠ پنل باید فرزندِ مستقیمِ body باشد، نه داخلِ هدر.
+/* ---------- رندر پنل (دراپ‌داون زیر دکمهٔ هدر) ---------- */
+/* ⚠ پنل باید فرزند مستقیم body باشد، نه داخل هدر.
    دلیل: .top-bar یک «زمینهٔ چیدمان» می‌سازد (sticky + z-index) و هر چیزی داخلش —
-   حتی با position:fixed و z-index بالا — زیرِ سقفِ همان زمینه حبس می‌شود.
+   حتی با position:fixed و z-index بالا — زیر سقف همان زمینه حبس می‌شود.
    با انتقال به body، پنل مستقل از هدر روی مودال‌ها دیده می‌شود. */
 function dlHost(){
   var h=document.getElementById("dlCenter");
@@ -127,7 +127,7 @@ function dlRender(){
   var title = activeN ? ("در حال انتقال ("+faN(activeN)+")") : "انتقال‌ها";
   host.className="dl-center"+(_dlOpen?" open":"");
   /* تازه‌ترین رکورد بالاترین ردیف باشد. کارها با push اضافه می‌شوند، پس فقط
-     هنگامِ رسم معکوس می‌شود (نه خودِ آرایه، تا ترتیبِ داخلی دست‌نخورده بماند). */
+     هنگام رسم معکوس می‌شود (نه خود آرایه، تا ترتیب داخلی دست‌نخورده بماند). */
   var listHTML = _dlJobs.length
     ? '<div class="dl-list">'+_dlJobs.slice().reverse().map(dlItemHTML).join("")+'</div>'
     : '<div class="dl-empty">'+DL_IC.center+'<span>انتقالی وجود ندارد</span></div>';
@@ -135,20 +135,20 @@ function dlRender(){
     '<div class="dl-head">'+
       '<span class="dl-title">'+DL_IC.center+'<span>'+esc(title)+'</span></span>'+
       '<div class="dl-head-acts">'+
-        (doneN? '<button class="dl-textbtn" onclick="dlClearDone()" title="پاک‌کردنِ کامل‌شده‌ها">پاک‌کردن</button>':'')+
+        (doneN? '<button class="dl-textbtn" onclick="dlClearDone()" title="پاک‌کردن کامل‌شده‌ها">پاک‌کردن</button>':'')+
       '</div>'+
     '</div>'+listHTML;
   dlUpdateHeader();
 }
 
-/* متنِ وضعیتِ یک کار — بسته به نوع (آپلود/دانلود) و مرحله */
+/* متن وضعیت یک کار — بسته به نوع (آپلود/دانلود) و مرحله */
 function dlStateText(j){
   var up=(j.kind==="upload");
   if(j.status==="queued")  return "در صف…";
   if(j.status==="working"){
     if(up){ if(j.processing) return "در حال پردازش…";
             return j.total>0 ? ("در حال بارگذاری… "+faN(j.pct)+"٪")
-                             : "در حال بارگذاری…"; }   /* آپلود درصدِ واقعی ندارد (محدودیتِ Apps Script) → نوارِ نامعیّن */
+                             : "در حال بارگذاری…"; }   /* آپلود درصد واقعی ندارد (محدودیت Apps Script) → نوار نامعیّن */
     return j.total>0 ? ("در حال دریافت… "+faN(j.pct)+"٪")
                      : ("در حال دریافت… "+(j.loaded/1048576).toFixed(1)+" MB");
   }
@@ -159,19 +159,19 @@ function dlItemHTML(j){
   var up=(j.kind==="upload");
   var name = esc(j.name||j.label);
   var state=dlStateText(j), cls = j.status==="done"?"ok" : (j.status==="error"?"err":"");
-  // نوارِ نامعیّن وقتی درصدِ واقعی نداریم (یا مرحلهٔ پردازشِ سرور در آپلود)
+  // نوار نامعیّن وقتی درصد واقعی نداریم (یا مرحلهٔ پردازش سرور در آپلود)
   var indet=(j.status==="working" && ((up && j.processing) || !(j.total>0)));
   var bar=(j.status==="working"||j.status==="queued")
     ? '<div class="dl-bar'+(indet?" indet":"")+'"><span class="dl-fill"'+(indet?'':' style="width:'+j.pct+'%"')+'></span></div>'
     : '';
 
-  /* ⚠ آیکونِ «تکرار» است نه «دانلود»: این دکمه کارِ انجام‌شده را دوباره اجرا می‌کند
-     (چه دانلود، چه آپلود) و آیکونِ فلشِ دانلود با کارکردش جور نبود. */
+  /* ⚠ آیکون «تکرار» است نه «دانلود»: این دکمه کار انجام‌شده را دوباره اجرا می‌کند
+     (چه دانلود، چه آپلود) و آیکون فلش دانلود با کارکردش جور نبود. */
   var acts="";
-  if(j.status==="done" && !up) acts+='<button class="dl-iconbtn" onclick="dlRedownload('+j.id+')" title="دریافتِ دوباره" aria-label="دریافتِ دوباره">'+DL_IC.retry+'</button>';
-  else if(j.status==="error")  acts+='<button class="dl-iconbtn" onclick="dlRetry('+j.id+')" title="تلاشِ دوباره" aria-label="تلاشِ دوباره">'+DL_IC.retry+'</button>';
+  if(j.status==="done" && !up) acts+='<button class="dl-iconbtn" onclick="dlRedownload('+j.id+')" title="دریافت دوباره" aria-label="دریافت دوباره">'+DL_IC.retry+'</button>';
+  else if(j.status==="error")  acts+='<button class="dl-iconbtn" onclick="dlRetry('+j.id+')" title="تلاش دوباره" aria-label="تلاش دوباره">'+DL_IC.retry+'</button>';
 
-  // آیکونِ سرِ هر رکورد = نوعِ فایل (سند/تصویر/مدلِ سه‌بعدی)، نه جهتِ انتقال
+  // آیکون سر هر رکورد = نوع فایل (سند/تصویر/مدل سه‌بعدی)، نه جهت انتقال
   return '<div class="dl-item '+j.status+(up?" up":" down")+'" data-id="'+j.id+'">'+
     '<span class="dl-fileic'+(up?" up":" down")+'">'+dlFileIcon(j)+'</span>'+
     '<div class="dl-main">'+
@@ -183,7 +183,7 @@ function dlItemHTML(j){
   '</div>';
 }
 
-/* به‌روزرسانیِ سبکِ پیشرفت (فقط متنِ وضعیت + عرضِ نوار) تا با هر chunk کلِ فهرست بازسازی نشود. */
+/* به‌روزرسانی سبک پیشرفت (فقط متن وضعیت + عرض نوار) تا با هر chunk کل فهرست بازسازی نشود. */
 function dlProgress(j){
   var host=document.getElementById("dlCenter"); if(!host) return;
   var el=host.querySelector('.dl-item[data-id="'+j.id+'"]'); if(!el){ dlRender(); return; }
@@ -191,19 +191,19 @@ function dlProgress(j){
   var bar=el.querySelector(".dl-bar"), f=el.querySelector(".dl-fill");
   var indet=(j.kind==="upload" && j.processing) || !(j.total>0);
   if(bar) bar.classList.toggle("indet", indet);
-  if(f) f.style.width = indet ? "" : (j.pct+"%");   // نامعیّن: عرض را به CSS بسپار (sweepِ ۴۵٪)
+  if(f) f.style.width = indet ? "" : (j.pct+"%");   // نامعیّن: عرض را به CSS بسپار (sweep ۴۵٪)
   dlUpdateHeader();
 }
 
-/* ---------- نشانگرِ هدر (سمتِ چپِ نوارِ بالا) ---------- */
+/* ---------- نشانگر هدر (سمت چپ نوار بالا) ---------- */
 function dlUpdateHeader(){
   var btn=document.getElementById("xferBtn"); if(!btn) return;
   var activeN=_dlJobs.filter(function(j){ return j.status==="working"||j.status==="queued"; }).length;
   var errN  =_dlJobs.filter(function(j){ return j.status==="error"; }).length;
   var doneN =_dlJobs.filter(function(j){ return j.status==="done"; }).length;
   var badge=btn.querySelector(".xfer-badge");
-  // آیکونِ دکمه ثابت است (فلشِ بالا+پایینِ «انتقال»)؛ شکل هرگز عوض نمی‌شود، فقط رنگ (کلاس‌های زیر).
-  // نشانِ «تمام‌شدهٔ ندیده»: فقط رنگ (سبز برای موفق، قرمز برای خطا) — شکلِ آیکون همان می‌ماند
+  // آیکون دکمه ثابت است (فلش بالا+پایین «انتقال»)؛ شکل هرگز عوض نمی‌شود، فقط رنگ (کلاس‌های زیر).
+  // نشان «تمام‌شدهٔ ندیده»: فقط رنگ (سبز برای موفق، قرمز برای خطا) — شکل آیکون همان می‌ماند
   var notifyErr  = (activeN===0 && _dlUnseen && errN>0);
   var notifyDone = (activeN===0 && _dlUnseen && doneN>0 && !notifyErr);
   btn.classList.toggle("busy", activeN>0);
@@ -213,23 +213,23 @@ function dlUpdateHeader(){
   var n = activeN || (notifyErr ? errN : 0);
   if(badge) badge.textContent = n ? faN(n) : "";
   btn.setAttribute("title", activeN? ("در حال انتقال ("+faN(activeN)+")") : "انتقال‌ها");
-  // شرطِ بالا آمدنِ دکمه به وضعیتِ کارها وابسته است، پس با هر تغییرِ وضعیت بازبینی می‌شود
+  // شرط بالا آمدن دکمه به وضعیت کارها وابسته است، پس با هر تغییر وضعیت بازبینی می‌شود
   xferPlaceBtn();
 }
 
 /* ---------- اکشن‌ها ---------- */
 function _dlById(id){ return _dlJobs.filter(function(j){ return j.id===id; })[0]||null; }
-/* دراپ‌داونِ مرکز انتقال: باز/بست با انیمیشن، بستن با کلیکِ بیرون */
+/* دراپ‌داون مرکز انتقال: باز/بست با انیمیشن، بستن با کلیک بیرون */
 function xferToggle(){ if(_dlOpen) xferClose(); else xferOpen(); }
-/* پنل زیرِ دکمهٔ هدر جای می‌گیرد. چون position:fixed است، مختصات باید این‌جا
-   از روی جای واقعیِ دکمه حساب شود؛ این‌طور روی مودال هم درست می‌نشیند و با
-   اسکرول یا تغییرِ اندازهٔ صفحه از جای دکمه جدا نمی‌افتد. */
+/* پنل زیر دکمهٔ هدر جای می‌گیرد. چون position:fixed است، مختصات باید این‌جا
+   از روی جای واقعی دکمه حساب شود؛ این‌طور روی مودال هم درست می‌نشیند و با
+   اسکرول یا تغییر اندازهٔ صفحه از جای دکمه جدا نمی‌افتد. */
 function xferPlace(){
   var host=document.getElementById("dlCenter"), btn=document.getElementById("xferBtn");
   if(!host) return;
   var r=btn?btn.getBoundingClientRect():null;
   /* ⚠ اگر مودالی باز باشد، هدر دیده نمی‌شود (body با overflow:hidden قفل می‌شود و
-     هدرِ sticky زمینهٔ اسکرولش را از دست می‌دهد)، پس مختصاتِ دکمه بی‌معنی است.
+     هدر sticky زمینهٔ اسکرولش را از دست می‌دهد)، پس مختصات دکمه بی‌معنی است.
      در آن حالت پنل را مستقل از دکمه، به گوشهٔ بالای صفحه می‌چسبانیم تا دیده شود. */
   if(!r || r.width===0 || r.bottom<=0){
     host.style.top="16px";
@@ -237,20 +237,20 @@ function xferPlace(){
     return;
   }
   host.style.top=Math.round(r.bottom+10)+"px";
-  // در RTL دکمه سمتِ چپِ هدر است؛ پنل از همان لبه باز می‌شود ولی از کادر بیرون نزند
+  // در RTL دکمه سمت چپ هدر است؛ پنل از همان لبه باز می‌شود ولی از کادر بیرون نزند
   var left=Math.max(12, Math.min(r.left, window.innerWidth-330-12));
   host.style.left=Math.round(left)+"px";
 }
-/* دکمهٔ انتقال هنگامِ بازبودنِ مودال باید روی پوششِ تیره دیده شود.
-   ⚠ صرفِ position:fixed کافی نیست: .top-bar یک زمینهٔ چیدمان می‌سازد و هیچ
-   فرزندی (حتی fixed) نمی‌تواند از سقفِ آن بالاتر برود. پس دکمه موقتاً به body
-   منتقل می‌شود — دقیقاً همان کاری که برای خودِ پنل هم لازم بود — و با مختصاتِ
-   جای اصلی‌اش سرِ همان‌جا می‌نشیند. با بسته‌شدنِ مودال به هدر برمی‌گردد. */
+/* دکمهٔ انتقال هنگام بازبودن مودال باید روی پوشش تیره دیده شود.
+   ⚠ صرف position:fixed کافی نیست: .top-bar یک زمینهٔ چیدمان می‌سازد و هیچ
+   فرزندی (حتی fixed) نمی‌تواند از سقف آن بالاتر برود. پس دکمه موقتاً به body
+   منتقل می‌شود — دقیقاً همان کاری که برای خود پنل هم لازم بود — و با مختصات
+   جای اصلی‌اش سر همان‌جا می‌نشیند. با بسته‌شدن مودال به هدر برمی‌گردد. */
 function xferPlaceBtn(){
   var btn=document.getElementById("xferBtn"), wrap=document.getElementById("xferWrap");
   if(!btn||!wrap) return;
   /* بالا آمدن فقط وقتی معنا دارد که واقعاً انتقالی در جریان باشد یا پنل باز باشد؛
-     صرفِ بازبودنِ یک پنجره دلیلِ جداشدنِ دکمه از هدر نیست. */
+     صرف بازبودن یک پنجره دلیل جداشدن دکمه از هدر نیست. */
   var busy=_dlJobs.some(function(j){ return j.status==="queued"||j.status==="working"; });
   var lifted=document.body.classList.contains("modal-open") && (busy || _dlOpen);
   if(!lifted){
@@ -267,15 +267,15 @@ function xferPlaceBtn(){
   btn.style.left=Math.round(r.left)+"px";
 }
 function xferOpen(){
-  _dlUnseen=false;                 // بازکردنِ پنل = دیده‌شدن؛ نشانِ سبز/قرمز پاک می‌شود
-  /* ⚠ ترتیب مهم است: اول محتوا و مختصات در حالتِ بسته ست می‌شود، بعد در فریمِ
-     بعدی کلاسِ open می‌آید. اگر جای عنصر هم‌زمان با کلاس عوض شود، مرورگر گذار را
-     از موقعیتِ قبلی شروع می‌کند و پنل به‌جای بازشدنِ نرم، از جای دیگری می‌پرد. */
+  _dlUnseen=false;                 // بازکردن پنل = دیده‌شدن؛ نشان سبز/قرمز پاک می‌شود
+  /* ⚠ ترتیب مهم است: اول محتوا و مختصات در حالت بسته ست می‌شود، بعد در فریم
+     بعدی کلاس open می‌آید. اگر جای عنصر هم‌زمان با کلاس عوض شود، مرورگر گذار را
+     از موقعیت قبلی شروع می‌کند و پنل به‌جای بازشدن نرم، از جای دیگری می‌پرد. */
   if(!_dlOpen){
-    _dlOpen=false; dlRender();     // رندر در حالتِ بسته
-    xferPlace();                   // جای درست پیش از شروعِ انیمیشن
+    _dlOpen=false; dlRender();     // رندر در حالت بسته
+    xferPlace();                   // جای درست پیش از شروع انیمیشن
     var host=document.getElementById("dlCenter");
-    if(host) void host.offsetWidth; // اعمالِ فوریِ حالتِ اولیه (reflow)
+    if(host) void host.offsetWidth; // اعمال فوری حالت اولیه (reflow)
   }
   _dlOpen=true;
   dlRender();
@@ -290,16 +290,16 @@ function xferClose(){
   document.removeEventListener("click", xferOutside, true);
 }
 function xferOutside(e){
-  // کلیکِ ساختگیِ تحویلِ فایل به مرورگر، نه کلیکِ کاربر → پنل نباید بسته شود
+  // کلیک ساختگی تحویل فایل به مرورگر، نه کلیک کاربر → پنل نباید بسته شود
   if(e.target && e.target.dataset && e.target.dataset.dlInternal) return;
   var wrap=document.getElementById("xferWrap");
   if(wrap && wrap.contains(e.target)) return;   // کلیک روی دکمهٔ هدر → باز بماند
-  /* دکمه هنگامِ بازبودنِ مودال به body منتقل می‌شود و دیگر داخلِ wrap نیست،
-     پس جداگانه بررسی می‌شود؛ وگرنه کلیک روی خودِ دکمه پنل را می‌بست. */
+  /* دکمه هنگام بازبودن مودال به body منتقل می‌شود و دیگر داخل wrap نیست،
+     پس جداگانه بررسی می‌شود؛ وگرنه کلیک روی خود دکمه پنل را می‌بست. */
   var btn=document.getElementById("xferBtn");
   if(btn && btn.contains(e.target)) return;
-  /* ⚠ پنل فرزندِ body است نه xferWrap، پس باید جداگانه بررسی شود؛ وگرنه کلیک روی
-     دکمه‌های داخلِ خودِ پنل (تلاشِ دوباره، حذف، پاک‌کردن) آن را می‌بست. */
+  /* ⚠ پنل فرزند body است نه xferWrap، پس باید جداگانه بررسی شود؛ وگرنه کلیک روی
+     دکمه‌های داخل خود پنل (تلاش دوباره، حذف، پاک‌کردن) آن را می‌بست. */
   var host=document.getElementById("dlCenter");
   if(host && host.contains(e.target)) return;
   xferClose();
@@ -328,8 +328,8 @@ var DL_IC = {
   down:'<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>',
   up_badge:'<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>'
 };
-/* آیکونِ سرِ هر رکورد بر اساسِ نوعِ فایل (نه جهتِ انتقال).
-   رنگِ سبز/قرمزِ وضعیت روی همین آیکون می‌نشیند (قواعدِ .dl-item.done/.error). */
+/* آیکون سر هر رکورد بر اساس نوع فایل (نه جهت انتقال).
+   رنگ سبز/قرمز وضعیت روی همین آیکون می‌نشیند (قواعد .dl-item.done/.error). */
 function dlFileIcon(j){
   var m=String(j.mimeType||"").toLowerCase(), n=String(j.name||j.label||"").toLowerCase();
   if(m.indexOf("image/")===0 || /\.(png|jpe?g|gif|webp|bmp|svg)$/.test(n))

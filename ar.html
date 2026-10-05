@@ -35,7 +35,7 @@
     </div>
     <h1>مشاهده در واقعیت افزوده</h1>
     <div class="num" id="num"></div>
-    <div class="sub" id="sub">برای دیدنِ مدلِ سه‌بعدی در فضای واقعی، دکمهٔ زیر را بزنید.</div>
+    <div class="sub" id="sub">برای دیدن مدل سه‌بعدی در فضای واقعی، دکمهٔ زیر را بزنید.</div>
     <div id="launch"></div>
     <div class="note" id="note"></div>
   </div>
@@ -54,31 +54,31 @@
 
   if(isIOS){
     if(usdzUrl){
-      // AR Quick Look: لینکِ rel="ar" با فرزندِ img؛ تپ روی آن، AR را باز می‌کند (ژستِ کاربر لازم است)
+      // AR Quick Look: لینک rel="ar" با فرزند img؛ تپ روی آن، AR را باز می‌کند (ژست کاربر لازم است)
       var a=document.createElement("a"); a.className="btn"; a.setAttribute("rel","ar"); a.href=usdzUrl;
       var img=document.createElement("img"); a.appendChild(img);
       var lbl=document.createElement("span"); lbl.textContent="مشاهده در واقعیت افزوده"; a.appendChild(lbl);
       a.insertAdjacentHTML("afterbegin", arIc);
       launch.appendChild(a);
-      note.textContent="نیازمندِ iOS ۱۲ به بالا و مرورگرِ Safari است.";
+      note.textContent="نیازمند iOS ۱۲ به بالا و مرورگر Safari است.";
     } else {
-      document.getElementById("sub").textContent="برای این سند فایلِ USDZ (مخصوصِ iPhone) موجود نیست.";
+      document.getElementById("sub").textContent="برای این سند فایل USDZ (مخصوص iPhone) موجود نیست.";
     }
   } else if(isAndroid){
     if(glbUrl){
       var intent="intent://arvr.google.com/scene-viewer/1.0?file="+encodeURIComponent(glbUrl)+
-        "&mode=ar_preferred&title="+encodeURIComponent(name||"مدلِ سه‌بعدی")+
+        "&mode=ar_preferred&title="+encodeURIComponent(name||"مدل سه‌بعدی")+
         "#Intent;scheme=https;package=com.google.android.googlequicksearchbox;action=android.intent.action.VIEW;"+
         "S.browser_fallback_url="+encodeURIComponent("https://play.google.com/store/apps/details?id=com.google.ar.core")+";end;";
       var b=document.createElement("a"); b.className="btn"; b.href=intent; b.innerHTML=arIc+"<span>مشاهده در واقعیت افزوده</span>";
       launch.appendChild(b);
-      note.textContent="نیازمندِ «سرویس‌های Google Play برای AR» (ARCore) است.";
+      note.textContent="نیازمند «سرویس‌های Google Play برای AR» (ARCore) است.";
     } else {
-      document.getElementById("sub").textContent="برای این سند فایلِ GLB موجود نیست.";
+      document.getElementById("sub").textContent="برای این سند فایل GLB موجود نیست.";
     }
   } else {
-    document.getElementById("sub").textContent="این صفحه را روی گوشیِ موبایل (Android یا iPhone) باز کنید تا مدل در واقعیتِ افزوده نمایش داده شود.";
-    if(glbUrl){ var d=document.createElement("a"); d.className="btn"; d.href=glbUrl; d.innerHTML=arIc+"<span>دانلودِ مدلِ سه‌بعدی</span>"; launch.appendChild(d); }
+    document.getElementById("sub").textContent="این صفحه را روی گوشی موبایل (Android یا iPhone) باز کنید تا مدل در واقعیت افزوده نمایش داده شود.";
+    if(glbUrl){ var d=document.createElement("a"); d.className="btn"; d.href=glbUrl; d.innerHTML=arIc+"<span>دانلود مدل سه‌بعدی</span>"; launch.appendChild(d); }
   }
 })();
 </script>

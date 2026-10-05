@@ -1,14 +1,14 @@
-/* ================= هستهٔ عمومیِ ویزاردِ «ریلِ کد» =================
-   این فایل همان تجربه‌ای را که پنلِ «ثبت سند / فایل جدید» ساخته، به‌صورتِ یک موتورِ
-   پیکربندی‌پذیر در اختیارِ بخش‌های دیگر می‌گذارد: ریلِ افقیِ کد در بالا (هم مسیرِ
-   پیشرفت، هم پیش‌نمایشِ زندهٔ کد)، آکاردئونِ ایستگاه‌ها در پایین، و یک «بخشِ نهایی»
-   که پس از کاملِ‌شدنِ کد باز می‌شود.
+/* ================= هستهٔ عمومی ویزارد «ریل کد» =================
+   این فایل همان تجربه‌ای را که پنل «ثبت سند / فایل جدید» ساخته، به‌صورت یک موتور
+   پیکربندی‌پذیر در اختیار بخش‌های دیگر می‌گذارد: ریل افقی کد در بالا (هم مسیر
+   پیشرفت، هم پیش‌نمایش زندهٔ کد)، آکاردئون ایستگاه‌ها در پایین، و یک «بخش نهایی»
+   که پس از کامل‌شدن کد باز می‌شود.
 
-   ⚠ پنلِ ثبتِ سند (scripts/documents.js) عمداً دست‌نخورده مانده و کدِ خودش را دارد؛
+   ⚠ پنل ثبت سند (scripts/documents.js) عمداً دست‌نخورده مانده و کد خودش را دارد؛
    این موتور برای بخش‌های تازه است تا ظاهر و انیمیشن‌ها یکی بماند. کلاس‌های CSS هم
-   همان `nd-*` هستند (styles/features.css) — تک‌منبعِ ظاهر.
+   همان `nd-*` هستند (styles/features.css) — تک‌منبع ظاهر.
 
-   همیشه حداکثر یک ویزارد باز است (هر دو مودال‌اند)، پس یک وضعیتِ سراسری کافی است. */
+   همیشه حداکثر یک ویزارد باز است (هر دو مودال‌اند)، پس یک وضعیت سراسری کافی است. */
 
 var WZ = { cfg:null, active:"", timers:[], scrollRAF:null };
 
@@ -22,24 +22,24 @@ function wzSet(f,v){ var el=document.getElementById(f); if(el) el.value=(v==null
 function wzEl(k){ var c=WZ.cfg; return (c&&c.ids[k])?document.getElementById(c.ids[k]):null; }
 function wzCall(name,a,b){ var c=WZ.cfg; return (c&&typeof c[name]==="function")?c[name](a,b):undefined; }
 
-/* ---- منطقِ پیشرفت: اولین ایستگاهِ ناقص، ورودپذیری ---- */
+/* ---- منطق پیشرفت: اولین ایستگاه ناقص، ورودپذیری ---- */
 function wzFirstIncomplete(){ var o=WZ.cfg.order; for(var i=0;i<o.length;i++){ if(!wzVal(o[i])) return o[i]; } return null; }
 function wzComplete(){ return wzFirstIncomplete()===null; }
 function wzCanEnter(field){
-  if(WZ.cfg.readOnly) return false;                       // حالتِ ویرایش: هویتِ رکورد قفل است
+  if(WZ.cfg.readOnly) return false;                       // حالت ویرایش: هویت رکورد قفل است
   var idx=WZ.cfg.order.indexOf(field); if(idx<=0) return true;
   return !!wzVal(WZ.cfg.order[idx-1]);
 }
-/* ایستگاهی که هم‌اکنون در حالِ تکمیل است (بزرگ‌نمایی + نوارِ چرخانِ نارنجی) */
+/* ایستگاهی که هم‌اکنون در حال تکمیل است (بزرگ‌نمایی + نوار چرخان نارنجی) */
 function wzCurrentField(){ return (WZ.active && WZ.cfg.meta[WZ.active] && wzCanEnter(WZ.active)) ? WZ.active : wzFirstIncomplete(); }
 
 function wzClearTimers(){ for(var i=0;i<WZ.timers.length;i++) clearTimeout(WZ.timers[i]); WZ.timers=[];
   if(WZ.scrollRAF){ cancelAnimationFrame(WZ.scrollRAF); WZ.scrollRAF=null; } }
 
-/* انتخابِ یک گزینه: پایین‌دستی‌ها بی‌اعتبار می‌شوند و کوریوگرافیِ تأیید اجرا می‌شود */
+/* انتخاب یک گزینه: پایین‌دستی‌ها بی‌اعتبار می‌شوند و کوریوگرافی تأیید اجرا می‌شود */
 function wzPick(field,val){
   wzClearTimers();
-  if(wzVal(field)===String(val)){ WZ.active=wzFirstIncomplete(); wzRender(); return; }   // انتخابِ دوبارهٔ همان مقدار: آبشار پاک نشود
+  if(wzVal(field)===String(val)){ WZ.active=wzFirstIncomplete(); wzRender(); return; }   // انتخاب دوبارهٔ همان مقدار: آبشار پاک نشود
   wzSet(field,val);
   var o=WZ.cfg.order, idx=o.indexOf(field);
   for(var i=idx+1;i<o.length;i++) wzSet(o[i],"");
@@ -47,7 +47,7 @@ function wzPick(field,val){
   WZ.active=wzFirstIncomplete();
   wzAnimateConfirm(field);
 }
-/* کلیک روی یک سلولِ ریل = ریستِ همان سلول و پایین‌دستی‌هایش، سپس فعال‌شدنِ خودش */
+/* کلیک روی یک سلول ریل = ریست همان سلول و پایین‌دستی‌هایش، سپس فعال‌شدن خودش */
 function wzGoto(field){
   var c=WZ.cfg; if(!c) return;
   if(field==="FSM"||field===c.tail) return;      // ایستگاه‌های خودکار، کاربر‌ویرایش‌پذیر نیستند
@@ -58,16 +58,16 @@ function wzGoto(field){
   if(idx>=0) for(var i=idx;i<c.order.length;i++) wzSet(c.order[i],"");
   wzCall("recompute");
   WZ.active=field; wzRenderStage();
-  if(wasActive){ wzSyncStates(); return; }       // فقط ریست؛ رینگِ چرخان پیوسته می‌ماند
+  if(wasActive){ wzSyncStates(); return; }       // فقط ریست؛ رینگ چرخان پیوسته می‌ماند
   wzScrollToActive();
   var rail=wzEl("rail");
   var oldEl=rail?rail.querySelector(".nd-chip.active"):null, oldF=oldEl?oldEl.getAttribute("data-f"):null;
   var ring=wzEl("ring");
-  if(ring) ring.classList.remove("show");                                                   // ۱: محوِ رینگ
-  if(oldF && oldEl && oldF!==field) oldEl.className="nd-chip "+wzCellState(oldF, field);     // ۲: سلولِ قبلی به سایزِ اصلی
+  if(ring) ring.classList.remove("show");                                                   // ۱: محو رینگ
+  if(oldF && oldEl && oldF!==field) oldEl.className="nd-chip "+wzCellState(oldF, field);     // ۲: سلول قبلی به سایز اصلی
   WZ.timers.push(setTimeout(function(){
     wzSyncStates();                                                                          // ۳: سوئیچ
-    WZ.timers.push(setTimeout(function(){ wzPlaceRing(false); }, 380));                      // ۴: رینگِ جدید
+    WZ.timers.push(setTimeout(function(){ wzPlaceRing(false); }, 380));                      // ۴: رینگ جدید
   }, 340));
 }
 
@@ -108,7 +108,7 @@ function wzSyncStates(){
     var chip=rail.querySelector('.nd-chip[data-f="'+f+'"]'); if(!chip) return;
     chip.className="nd-chip "+wzCellState(f,curF);
     var val=chip.querySelector(".nd-chip-val"), v=wzSegVal(f); if(val) val.textContent=v||"—";
-    /* حالتِ ویرایش: هویتِ رکورد قفل است، پس هیچ سلولی کلیک‌پذیر نیست */
+    /* حالت ویرایش: هویت رکورد قفل است، پس هیچ سلولی کلیک‌پذیر نیست */
     chip.disabled=c.readOnly||!((f!=="FSM"&&f!==c.tail)&&!!(wzVal(f)||wzCanEnter(f)));
   });
   rail.querySelectorAll(".nd-cx").forEach(function(cx){
@@ -128,9 +128,9 @@ function wzPlaceRing(anim){
   if(!anim){ void ring.offsetWidth; ring.style.transition=""; }
   ring.classList.add("show");
 }
-/* کوریوگرافیِ تأییدِ یک سلول — عیناً هم‌زمان‌بندیِ پنلِ ثبتِ سند:
-   ۰) آکاردئونِ پایین + اسکرولِ دنباله‌رو + پالس ۱) نگه‌داشتنِ سلولِ تأییدشده
-   ۲) کوچک‌شدنِ آن و بزرگ‌شدنِ سلولِ بعدی ۳) نشستنِ رینگ روی سلولِ تازه. */
+/* کوریوگرافی تأیید یک سلول — عیناً هم‌زمان‌بندی پنل ثبت سند:
+   ۰) آکاردئون پایین + اسکرول دنباله‌رو + پالس ۱) نگه‌داشتن سلول تأییدشده
+   ۲) کوچک‌شدن آن و بزرگ‌شدن سلول بعدی ۳) نشستن رینگ روی سلول تازه. */
 function wzAnimateConfirm(fromF){
   var rail=wzEl("rail"); if(!rail){ wzRender(); wzScrollToActive(); return; }
   if(!rail.querySelector(".nd-rail-in")) wzBuildRail();
@@ -159,7 +159,7 @@ function wzAnimateConfirm(fromF){
   }, 560));
 }
 
-/* ============ آکاردئونِ ایستگاه‌ها ============ */
+/* ============ آکاردئون ایستگاه‌ها ============ */
 function wzBuildAcc(){
   var stage=wzEl("stage"); if(!stage) return;
   if(stage.querySelector(".nd-acc")) return;
@@ -203,7 +203,7 @@ function wzDoneCellHTML(f){
       (o.sub?'<span class="nd-opt-sub">'+esc(o.sub)+'</span>':'')+'</span>'+
     '<span class="nd-opt-ck">'+WZ_OK_IC+'</span></button></div>';
 }
-/* دکمهٔ «+» درونِ هدرِ ایستگاهِ فعال — فقط آیکون، هم‌سبکِ بقیهٔ سایت */
+/* دکمهٔ «+» درون هدر ایستگاه فعال — فقط آیکون، هم‌سبک بقیهٔ سایت */
 function wzAddSlotHTML(field){
   var t=(WZ.cfg.addTitles||{})[field]; if(!t) return "";
   return '<button type="button" class="icon-btn" title="'+esc(t)+'" onclick="event.stopPropagation();wzAddNew(\''+field+'\')">'+WZ_PLUS_IC+'</button>';
@@ -225,7 +225,7 @@ function wzOptHTML(field,o,on){
     (on?('<span class="nd-opt-ck">'+WZ_OK_IC+'</span>'):'')+'</button>';
 }
 
-/* ============ رندر + اسکرولِ خودکار ============ */
+/* ============ رندر + اسکرول خودکار ============ */
 function wzRenderStage(){
   wzBuildAcc(); wzSyncAcc();
   var fin=wzEl("final");
@@ -289,7 +289,7 @@ function wzFollowScrollBottom(sc){
   step();
 }
 
-/* ---- باز/بسته‌کردنِ یک ویزارد ---- */
+/* ---- باز/بسته‌کردن یک ویزارد ---- */
 function wzOpen(cfg){
   wzClearTimers();
   WZ.cfg=cfg; WZ.active=cfg.order[0];

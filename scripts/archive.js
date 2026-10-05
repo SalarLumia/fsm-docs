@@ -1,18 +1,18 @@
 /* ================= آرشیو ================= */
 var _arch = { sortKey:"date", sortDir:-1, openNum:"", perPage:10, page:1, pages:1, sig:"" };
-function faN(n){ return Number(n).toLocaleString("fa-IR"); }   // ارقامِ فارسی برای صفحه‌بندی
-/* ستون‌های آرشیو (راست→چپ): «نوع» به‌صورتِ المانِ سند در راست‌ترین ستون؛ ریویژن حذف شد. */
+function faN(n){ return Number(n).toLocaleString("fa-IR"); }   // ارقام فارسی برای صفحه‌بندی
+/* ستون‌های آرشیو (راست→چپ): «نوع» به‌صورت المان سند در راست‌ترین ستون؛ ریویژن حذف شد. */
 var ARCH_COLS = [
   {k:"type",label:"نوع"},{k:"number",label:"شماره سند"},{k:"client",label:"مشتری"},
   {k:"order",label:"سفارش"},{k:"project",label:"پروژه"},{k:"part",label:"قطعه"},
-  {k:"date",label:"",spacer:true},{k:"status",label:"وضعیت"}   // تاریخ در ستونِ وضعیت ادغام شد؛ این ستون فعلاً فاصله‌گذارِ خالی است
+  {k:"date",label:"",spacer:true},{k:"status",label:"وضعیت"}   // تاریخ در ستون وضعیت ادغام شد؛ این ستون فعلاً فاصله‌گذار خالی است
 ];
 var KEBAB_IC = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="12" cy="19" r="1.7"/></svg>';
 
 function filteredDocs(){
   var q=(document.getElementById("aSearch").value||"").trim().toLowerCase();
-  /* چندانتخابی: درونِ هر دسته «یا» (هر کدام از مقادیرِ روشن)، بینِ دسته‌ها «و».
-     دستهٔ خالی یعنی بدونِ محدودیت. */
+  /* چندانتخابی: درون هر دسته «یا» (هر کدام از مقادیر روشن)، بین دسته‌ها «و».
+     دستهٔ خالی یعنی بدون محدودیت. */
   var fc=filtVals("aClient"), ft=filtVals("aType"), fl=filtVals("aLatest"),
       fs=filtVals("aStatus"), fp=filtVals("aProject"), fo=filtVals("aOrder"), fpt=filtVals("aPart");
   return DB.documents.filter(function(d){
@@ -57,26 +57,26 @@ function archCompare(a,b){
 function sortArchive(key){
   if(_arch.sortKey===key) _arch.sortDir=-_arch.sortDir;
   else { _arch.sortKey=key; _arch.sortDir=(key==="date")?-1:1; }
-  archRerender();   // اگر ردیفی باز است، اول انیمیشنِ بسته‌شدن، سپس سورت/رندر
+  archRerender();   // اگر ردیفی باز است، اول انیمیشن بسته‌شدن، سپس سورت/رندر
 }
-/* سرستون‌ها قابلِ کلیک برای مرتب‌سازی‌اند؛ کنارِ هر ستونِ قابلِ‌سورت یک آیکونِ کوچکِ دوفلشه (بالا/پایین)
-   همیشه دیده می‌شود و در حالتِ فعال نارنجی می‌شود (بالا=صعودی، پایین=نزولی). */
+/* سرستون‌ها قابل کلیک برای مرتب‌سازی‌اند؛ کنار هر ستون قابل‌سورت یک آیکون کوچک دوفلشه (بالا/پایین)
+   همیشه دیده می‌شود و در حالت فعال نارنجی می‌شود (بالا=صعودی، پایین=نزولی). */
 var SORT_IC='<span class="sort-ic"><svg viewBox="0 0 24 24"><polyline class="s-up" points="7 9 12 4 17 9"/><polyline class="s-down" points="7 15 12 20 17 15"/></svg></span>';
-var SORTABLE={client:1,order:1,project:1,part:1};   // فقط این چهار ستون قابلِ مرتب‌سازی‌اند
+var SORTABLE={client:1,order:1,project:1,part:1};   // فقط این چهار ستون قابل مرتب‌سازی‌اند
 function buildArchiveHead(){
   var host=document.getElementById("archiveHead"); if(!host) return;
   host.innerHTML='<tr>'+ARCH_COLS.map(function(col){
-    if(col.spacer) return '<th aria-hidden="true"></th>';   // ستونِ فاصله‌گذارِ خالی (تاریخِ ادغام‌شده)
-    if(!SORTABLE[col.k]) return '<th><span class="th-lbl">'+esc(col.label)+'</span></th>';   // بدونِ آیکونِ سورت
+    if(col.spacer) return '<th aria-hidden="true"></th>';   // ستون فاصله‌گذار خالی (تاریخ ادغام‌شده)
+    if(!SORTABLE[col.k]) return '<th><span class="th-lbl">'+esc(col.label)+'</span></th>';   // بدون آیکون سورت
     var on=_arch.sortKey===col.k;
     var cls='sortable'+(on?(_arch.sortDir<0?' active desc':' active asc'):'');
     return '<th class="'+cls+'" onclick="sortArchive(\''+col.k+'\')" title="مرتب‌سازی"><span class="th-lbl">'+esc(col.label)+SORT_IC+'</span></th>';
-  }).join("")+'<th class="arch-actcol" aria-hidden="true"></th></tr>';   // ستونِ باریکِ فلش/اکشن در انتهای چپ
+  }).join("")+'<th class="arch-actcol" aria-hidden="true"></th></tr>';   // ستون باریک فلش/اکشن در انتهای چپ
 }
 
-/* ================= فیلترِ آرشیو =================
-   موتورِ چیپ‌محور مشترک است (scripts/filters.js) و اینجا فقط «مشخصاتِ» آرشیو ثبت می‌شود:
-   فیلدها، مخزنِ انتخاب‌ها، فهرستِ مقادیرِ هر فیلد و کاری که با هر تغییر باید انجام شود. */
+/* ================= فیلتر آرشیو =================
+   موتور چیپ‌محور مشترک است (scripts/filters.js) و اینجا فقط «مشخصات» آرشیو ثبت می‌شود:
+   فیلدها، مخزن انتخاب‌ها، فهرست مقادیر هر فیلد و کاری که با هر تغییر باید انجام شود. */
 var _filtSel={aClient:[],aOrder:[],aProject:[],aPart:[],aType:[],aStatus:[],aLatest:[]};
 function filtVals(id){ return _filtSel[id]||[]; }
 function filtHas(id,val){ return filtVals(id).indexOf(val)>=0; }
@@ -89,39 +89,39 @@ var FILT_FIELDS=[
   {id:"aStatus",  label:"وضعیت"},
   {id:"aLatest",  label:"ریویژن"}
 ];
-/* برچسبِ چیپ از سلکت‌های مخفیِ همین صفحه خوانده می‌شود (aClient/aOrder/…) */
+/* برچسب چیپ از سلکت‌های مخفی همین صفحه خوانده می‌شود (aClient/aOrder/…) */
 function filtOptLabel(id,val){
-  if(id==="aPart") return val==="00" ? "اسناد سطحِ پروژه" : (partNameFa(val)||partName(val));   // سلکتِ مخفی ندارد
+  if(id==="aPart") return val==="00" ? "اسناد سطح پروژه" : (partNameFa(val)||partName(val));   // سلکت مخفی ندارد
   var s=document.getElementById(id); if(!s) return val;
   for(var i=0;i<s.options.length;i++) if(s.options[i].value===val) return s.options[i].text;
   return val;
 }
-/* با تغییرِ مشتری‌ها، سفارش/پروژه‌ای که به هیچ مشتریِ روشنی تعلق ندارد کنار می‌رود
-   (به‌جای ریستِ کامل، تا انتخاب‌های سازگار از دست نروند). */
+/* با تغییر مشتری‌ها، سفارش/پروژه‌ای که به هیچ مشتری روشنی تعلق ندارد کنار می‌رود
+   (به‌جای ریست کامل، تا انتخاب‌های سازگار از دست نروند). */
 function filtPruneDeps(){
   var fc=_filtSel.aClient; if(!fc.length) return;
   ["aOrder","aProject"].forEach(function(k){
     _filtSel[k]=_filtSel[k].filter(function(v){ return fc.indexOf(String(v).split("|")[0])>=0; });
   });
 }
-/* مقادیرِ هر فیلد به‌صورتِ {value, fa (فارسی=راست), en (انگلیسی=چپ)} — مستقیم از داده */
+/* مقادیر هر فیلد به‌صورت {value, fa (فارسی=راست), en (انگلیسی=چپ)} — مستقیم از داده */
 function filtFieldValues(id){
   var fc=filtVals("aClient");
-  if(id==="aClient") return clientsSorted().map(function(c){ return {value:c.code, fa:c.name||c.code, en:clientNameEn(c.code)}; });   // انگلیسی = نام لاتینِ مشتری
+  if(id==="aClient") return clientsSorted().map(function(c){ return {value:c.code, fa:c.name||c.code, en:clientNameEn(c.code)}; });   // انگلیسی = نام لاتین مشتری
   if(id==="aType") return docTypesSorted().map(function(t){ return {value:String(t.code).toUpperCase(), fa:t.nameFa||t.code, en:t.nameEn||String(t.code).toUpperCase()}; });
-  if(id==="aPart") return [{value:"00", fa:"اسناد سطحِ پروژه", en:"Project-level"}].concat(   // ۰۰ = اسنادِ سطحِ پروژه (QP، PS…)
+  if(id==="aPart") return [{value:"00", fa:"اسناد سطح پروژه", en:"Project-level"}].concat(   // ۰۰ = اسناد سطح پروژه (QP، PS…)
       partsSorted().map(function(p){ return {value:pad2(p.partNo), fa:p.nameFa||p.name, en:p.name}; }));
-  if(id==="aStatus") return [   // سمتِ چپ = تگِ وضعیت (به‌جای معادلِ انگلیسی)
+  if(id==="aStatus") return [   // سمت چپ = تگ وضعیت (به‌جای معادل انگلیسی)
     {value:"draft",fa:"پیش‌نویس"},{value:"pending",fa:"در انتظار بازبینی"},
     {value:"approved",fa:"تأییدشده"},{value:"rejected",fa:"ردشده"}
   ].map(function(x){ var si=statusInfo(x.value); return {value:x.value, fa:x.fa, enHtml:badgeHTML(si.cls,si.label)}; });
   if(id==="aLatest") return [{value:"1",fa:"فقط آخرین",en:"Latest"}];
   if(id==="aOrder") return (DB.orders||[]).filter(function(o){ return !fc.length||fc.indexOf(o.clientCode)>=0; }).slice().sort(function(a,b){
       return String(a.clientCode).localeCompare(String(b.clientCode),"en")||(numOf(a.orderNo)-numOf(b.orderNo)); })
-    .map(function(o){ return {value:o.clientCode+"|"+pad2(o.orderNo), fa:(o.title||("سفارش "+pad2(o.orderNo)))}; });   // بدونِ انگلیسی
+    .map(function(o){ return {value:o.clientCode+"|"+pad2(o.orderNo), fa:(o.title||("سفارش "+pad2(o.orderNo)))}; });   // بدون انگلیسی
   if(id==="aProject") return DB.projects.filter(function(p){ return !fc.length||fc.indexOf(p.clientCode)>=0; }).slice().sort(function(a,b){
       return String(a.clientCode).localeCompare(String(b.clientCode),"en")||(numOf(a.orderNo)-numOf(b.orderNo))||(numOf(a.projectNo)-numOf(b.projectNo)); })
-    .map(function(p){ return {value:p.clientCode+"|"+pad2(p.orderNo)+"|"+pad2(p.projectNo), fa:(p.description||("پروژه "+pad2(p.projectNo)))}; });   // بدونِ انگلیسی
+    .map(function(p){ return {value:p.clientCode+"|"+pad2(p.orderNo)+"|"+pad2(p.projectNo), fa:(p.description||("پروژه "+pad2(p.projectNo)))}; });   // بدون انگلیسی
   return [];
 }
 filtRegister("arch", {
@@ -144,7 +144,7 @@ function populateArchiveProjects(){
     return '<option value="'+esc(val)+'">'+esc(label)+'</option>';
   }).join("");
 }
-/* فیلترِ سفارش (وابسته به مشتری) — value = «کدمشتری|شمارهٔ‌سفارش» */
+/* فیلتر سفارش (وابسته به مشتری) — value = «کدمشتری|شمارهٔ‌سفارش» */
 function populateArchiveOrders(){
   var el=document.getElementById("aOrder"); if(!el) return;
   var fc=filtVals("aClient");
@@ -164,24 +164,24 @@ function clearArchiveFilters(){
   renderArchive();
 }
 
-/* نامِ کاملِ سفارش (اگر عنوان داشته باشد) — برای نمایش در حالتِ اکسپند‌شده */
+/* نام کامل سفارش (اگر عنوان داشته باشد) — برای نمایش در حالت اکسپند‌شده */
 function archOrderTitle(d){
   var o=(DB.orders||[]).find(function(x){ return x.clientCode===d.clientCode && pad2(x.orderNo)===pad2(d.orderNo); });
   return (o&&o.title)?o.title:("سفارش "+pad2(d.orderNo));
 }
-/* ═══ رزروِ ارتفاع ═══
-   مسئله: صفحه با min-height:100vh دقیقاً به قدِ پنجره میخ شده و جدولِ آرشیو
-   اسکرولِ داخلی ندارد، پس هر بار که ردیفی باز می‌شود ارتفاعِ *کلِ صفحه* زیاد
-   می‌شود و اسکرول‌بار می‌آید — با اینکه پایینِ صفحه خالی به نظر می‌رسد (آن
+/* ═══ رزرو ارتفاع ═══
+   مسئله: صفحه با min-height:100vh دقیقاً به قد پنجره میخ شده و جدول آرشیو
+   اسکرول داخلی ندارد، پس هر بار که ردیفی باز می‌شود ارتفاع *کل صفحه* زیاد
+   می‌شود و اسکرول‌بار می‌آید — با اینکه پایین صفحه خالی به نظر می‌رسد (آن
    فضا پدینگ و حاشیهٔ ثابت است و چیزی را جذب نمی‌کند).
-   راه‌حل: همان‌قدر که باز شدنِ یک ردیف اضافه می‌کند، از قبل زیرِ کارت فضای
+   راه‌حل: همان‌قدر که باز شدن یک ردیف اضافه می‌کند، از قبل زیر کارت فضای
    خالی رزرو می‌شود؛ با باز شدن، رزرو صفر می‌شود و جمع ثابت می‌ماند.
-   ⚠ عددِ ثابت جواب نمی‌دهد: ارتفاعِ ردیفِ جزئیات به تعدادِ دکمه‌های همان سند
-   بستگی دارد (سندِ در انتظارِ بازبینی سه دکمه دارد، تأییدشده یکی) و به تعدادِ
-   خط‌های متن. پس بلندترینِ ردیف‌های همین صفحه اندازه‌گیری می‌شود.
-   .arch-det-pad حتی وقتی کانتینرش جمع است ارتفاعِ طبیعیِ خودش را دارد
+   ⚠ عدد ثابت جواب نمی‌دهد: ارتفاع ردیف جزئیات به تعداد دکمه‌های همان سند
+   بستگی دارد (سند در انتظار بازبینی سه دکمه دارد، تأییدشده یکی) و به تعداد
+   خط‌های متن. پس بلندترین ردیف‌های همین صفحه اندازه‌گیری می‌شود.
+   .arch-det-pad حتی وقتی کانتینرش جمع است ارتفاع طبیعی خودش را دارد
    (گرید فقط ظرف را صفر می‌کند، نه محتوا را). */
-var ARCH_ROW_GROW = 11;   // رشدِ پدینگِ ردیفِ اصلی هنگامِ باز شدن: (24+3) − (8+8)
+var ARCH_ROW_GROW = 11;   // رشد پدینگ ردیف اصلی هنگام باز شدن: (24+3) − (8+8)
 function archSyncReserve(){
   var pane=document.getElementById("tab-archive"); if(!pane) return;
   var pads=document.querySelectorAll("#archiveBody .arch-det-pad"), h=0;
@@ -196,10 +196,10 @@ function renderArchive(){
   var _pn=document.getElementById("tab-archive"); if(_pn) _pn.classList.remove("has-open");
   populateArchiveOrders();
   populateArchiveProjects();
-  buildArchChips();                 // ردیفِ چیپ‌های فیلترِ فعال
+  buildArchChips();                 // ردیف چیپ‌های فیلتر فعال
   buildArchiveHead();
   var rows=filteredDocs().slice().sort(archCompare);
-  // امضای فیلتر/سورت/تعدادِ صفحه — اگر تغییر کند به صفحهٔ ۱ برمی‌گردیم (ناوبریِ صفحه امضا را عوض نمی‌کند)
+  // امضای فیلتر/سورت/تعداد صفحه — اگر تغییر کند به صفحهٔ ۱ برمی‌گردیم (ناوبری صفحه امضا را عوض نمی‌کند)
   var sig=[_arch.sortKey,_arch.sortDir,_arch.perPage,
     document.getElementById("aSearch").value, JSON.stringify(_filtSel)].join("|");
   if(sig!==_arch.sig){ _arch.page=1; _arch.sig=sig; }
@@ -213,8 +213,8 @@ function renderArchive(){
   var html=pageRows.map(function(d){
     var si=statusInfo(d.status);
     var num=esc(d.drawingNumber);
-    var hov='';   // هاور کاملاً با CSS اداره می‌شود؛ توضیحش پایین‌تر، جای تابعِ حذف‌شده
-    // ---- ردیفِ اصلی (فشرده، کدمحور) — کلیک روی هر جای ردیف = اکسپند. آخرین ستونِ چپ = نوارِ کنترل (فلش) ----
+    var hov='';   // هاور کاملاً با CSS اداره می‌شود؛ توضیحش پایین‌تر، جای تابع حذف‌شده
+    // ---- ردیف اصلی (فشرده، کدمحور) — کلیک روی هر جای ردیف = اکسپند. آخرین ستون چپ = نوار کنترل (فلش) ----
     var main="<tr class=\"arch-row\" id=\"arow-"+num+"\" onclick=\"archToggleRow('"+num+"')\""+hov+">"+
       '<td><span class="el-badge" title="'+esc(typeName(d.typeCode))+'">'+docTypeIconInner({code:d.typeCode})+'</span></td>'+
       '<td><span class="arch-num" title="نمایش جزئیات سند" onclick="archCellNav(event,\''+num+'\',\'doc\')">'+num+'</span></td>'+
@@ -222,15 +222,15 @@ function renderArchive(){
       '<td class="arch-code"><span class="arch-anim">سفارش '+esc(pad2(d.orderNo))+'</span></td>'+
       '<td class="arch-code"><span class="arch-anim arch-lnk" title="'+esc(projectLabel(d))+'" onclick="archCellNav(event,\''+num+'\',\'project\')">پروژه '+esc(pad2(d.projectNo))+'</span></td>'+
       '<td class="arch-cell"><span class="arch-anim arch-lnk" title="'+esc(partNameFa(d.partNo))+'" onclick="archCellNav(event,\''+num+'\',\'part\')">'+esc(partName(d.partNo))+'</span></td>'+
-      '<td class="arch-date"><span class="arch-hide">'+fmtDate(d.timestamp)+'</span></td>'+   /* ستونِ تاریخ ادغام شد: محتوا مخفی، فقط عرضِ ستون حفظ می‌شود تا بقیه جابه‌جا نشوند */
-      '<td class="adg-c-status"><span class="arch-stat">'+badgeHTML(si.cls, si.label)+'</span></td>'+   /* وضعیت: تگ در حالتِ بسته و باز هم‌اندازه می‌ماند */
-      '<td class="arch-actcol"><button class="arch-exp" title="جزئیاتِ بیشتر" aria-label="جزئیاتِ بیشتر" onclick="event.stopPropagation();archToggleRow(\''+num+'\')">'+ARCH_CHEV+'</button></td>'+
+      '<td class="arch-date"><span class="arch-hide">'+fmtDate(d.timestamp)+'</span></td>'+   /* ستون تاریخ ادغام شد: محتوا مخفی، فقط عرض ستون حفظ می‌شود تا بقیه جابه‌جا نشوند */
+      '<td class="adg-c-status"><span class="arch-stat">'+badgeHTML(si.cls, si.label)+'</span></td>'+   /* وضعیت: تگ در حالت بسته و باز هم‌اندازه می‌ماند */
+      '<td class="arch-actcol"><button class="arch-exp" title="جزئیات بیشتر" aria-label="جزئیات بیشتر" onclick="event.stopPropagation();archToggleRow(\''+num+'\')">'+ARCH_CHEV+'</button></td>'+
     "</tr>";
-    // ---- ردیفِ جزئیات: زیرِ هر ستون، نامِ فارسیِ متناظر با نقطهٔ نارنجی؛ ۹ سلولِ واقعیِ هم‌عرض با ستون‌های جدول ----
+    // ---- ردیف جزئیات: زیر هر ستون، نام فارسی متناظر با نقطهٔ نارنجی؛ ۹ سلول واقعی هم‌عرض با ستون‌های جدول ----
     var faDoc=esc(typeName(d.typeCode)+(pad2(d.partNo)==="00"?"":" "+partNameFa(d.partNo)));
     var cName=esc(clientName(d.clientCode)), oTitle=esc(archOrderTitle(d)), pLabel=esc(projectLabel(d)), pFa=esc(partNameFa(d.partNo));
     function sub(t){ return t ? '<span class="arch-date" title="'+t+'"><i class="dot brand"></i>'+t+'</span>' : ""; }
-    function subND(t){ return t ? '<span class="arch-date" title="'+t+'">'+t+'</span>' : ""; }   // بدونِ نقطهٔ نارنجی (ستون‌های وسط‌چین)
+    function subND(t){ return t ? '<span class="arch-date" title="'+t+'">'+t+'</span>' : ""; }   // بدون نقطهٔ نارنجی (ستون‌های وسط‌چین)
     var acts=(d.fileId?downloadIconBtn("event.stopPropagation();downloadFile('"+esc(d.fileId)+"','"+num+"')","دانلود"):"")+
       (admin?delIconBtn("event.stopPropagation();delDocument('"+num+"')","حذف"):"");
     var detail="<tr class=\"arch-detail\" id=\"adet-"+num+"\""+hov+">"+
@@ -239,9 +239,9 @@ function renderArchive(){
       '<td class="adg-c-client">'+archWrap(subND(cName))+'</td>'+
       '<td class="adg-c-order">'+archWrap(subND(oTitle))+'</td>'+
       '<td class="adg-c-proj">'+archWrap(subND(pLabel))+'</td>'+
-      '<td class="adg-c-part">'+archWrap(pad2(d.partNo)==="00"?"":subND(pFa))+'</td>'+   /* قطعه: نامِ فارسی بدونِ نقطهٔ نارنجی */
+      '<td class="adg-c-part">'+archWrap(pad2(d.partNo)==="00"?"":subND(pFa))+'</td>'+   /* قطعه: نام فارسی بدون نقطهٔ نارنجی */
       '<td>'+archWrap("")+'</td>'+
-      '<td class="adg-c-status">'+archWrap('<span class="arch-date">'+fmtDate(d.timestamp)+'</span>')+'</td>'+   /* خط دوم زیرِ تگِ وضعیت = تاریخ (سبکِ زیرنویس، بدونِ نقطهٔ نارنجی) */
+      '<td class="adg-c-status">'+archWrap('<span class="arch-date">'+fmtDate(d.timestamp)+'</span>')+'</td>'+   /* خط دوم زیر تگ وضعیت = تاریخ (سبک زیرنویس، بدون نقطهٔ نارنجی) */
       '<td class="arch-actcol">'+archWrap('<div class="arch-det-actcol">'+acts+'</div>')+'</td>'+
     "</tr>";
     return main+detail;
@@ -249,7 +249,7 @@ function renderArchive(){
   document.getElementById("archiveBody").innerHTML = html || '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px">موردی با این فیلترها یافت نشد.</td></tr>';
   var endI=Math.min(startI+per, total);
   document.getElementById("archiveFoot").innerHTML = archFootHTML(total, startI, endI, _arch.page, pages);
-  archSyncReserve();   // فضای رزرو بر اساسِ بلندترین ردیفِ همین صفحه تنظیم می‌شود
+  archSyncReserve();   // فضای رزرو بر اساس بلندترین ردیف همین صفحه تنظیم می‌شود
 }
 
 /* ===== صفحه‌بندی (rows-per-page + بازه + ناوبری) و دکمهٔ خروجی ===== */
@@ -266,7 +266,7 @@ function archFootHTML(total,startI,endI,page,pages){
   var per=_arch.perPage;
   var menu=PG_PER.map(function(n){ return '<button type="button" class="pg-drop-opt'+(n===per?' selected':'')+'" role="option" aria-selected="'+(n===per?'true':'false')+'" onclick="pgPick('+n+')">'+faN(n)+'</button>'; }).join("");
   var drop='<span class="pg-drop" id="pgDrop">'+
-      '<button type="button" class="pg-drop-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="تعدادِ سطر در هر صفحه" onclick="pgToggle(event)">'+
+      '<button type="button" class="pg-drop-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="تعداد سطر در هر صفحه" onclick="pgToggle(event)">'+
         '<span class="pg-drop-val">'+faN(per)+'</span>'+
         '<svg class="pg-drop-chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>'+
       '</button>'+
@@ -274,7 +274,7 @@ function archFootHTML(total,startI,endI,page,pages){
     '</span>';
   var range = total ? (faN(startI+1)+"–"+faN(endI)+" از "+faN(total)+" سند") : "۰ سند";
   var atFirst=page<=1, atLast=page>=pages;
-  return '<div class="arch-pager">'+   /* دکمهٔ خروجی به تیترِ بالای بخش منتقل شد */
+  return '<div class="arch-pager">'+   /* دکمهٔ خروجی به تیتر بالای بخش منتقل شد */
       drop+
       '<span class="pg-lbl">سطر در هر صفحه</span>'+
       '<span class="pg-range">'+range+'</span>'+
@@ -287,7 +287,7 @@ function archFootHTML(total,startI,endI,page,pages){
       '</span>'+
     '</div>';
 }
-/* رندرِ دوباره با احترام به انیمیشنِ بسته‌شدنِ ردیفِ باز (مثلِ مرتب‌سازی) */
+/* رندر دوباره با احترام به انیمیشن بسته‌شدن ردیف باز (مثل مرتب‌سازی) */
 function archRerender(){
   var openNum=_arch.openNum;
   var reduce=window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -295,7 +295,7 @@ function archRerender(){
   else renderArchive();
 }
 function archSetPerPage(v){ _arch.perPage=parseInt(v,10)||10; _arch.page=1; archRerender(); }
-/* دراپ‌داونِ سفارشیِ «تعدادِ سطر»: باز/بست با انیمیشن، بستن با کلیکِ بیرون */
+/* دراپ‌داون سفارشی «تعداد سطر»: باز/بست با انیمیشن، بستن با کلیک بیرون */
 function pgToggle(ev){
   ev.stopPropagation();
   var d=document.getElementById("pgDrop"); if(!d) return;
@@ -317,16 +317,16 @@ function archPrev(){ archGoPage(_arch.page-1); }
 function archNext(){ archGoPage(_arch.page+1); }
 function archLast(){ archGoPage(_arch.pages||1); }
 
-/* هاورِ یکتا روی کلِ رکورد (سر + جزئیات به‌صورتِ یک تکه) — با guardِ relatedTarget تا جابه‌جایی درونِ رکورد فلیکر نکند */
+/* هاور یکتا روی کل رکورد (سر + جزئیات به‌صورت یک تکه) — با guard relatedTarget تا جابه‌جایی درون رکورد فلیکر نکند */
 /* ⚠ هاور دیگر با جاوااسکریپت اداره نمی‌شود.
-   نسخهٔ قبلی با mouseover/mouseout کلاسِ hov را می‌گذاشت و برمی‌داشت، ولی این
-   دو رویداد هنگامِ حرکتِ سریعِ موس (یا خروج از پنجره، یا رندرِ دوبارهٔ جدول
-   وسطِ حرکت) گاهی جفت نمی‌شدند و کلاس روی چند ردیف جا می‌ماند — همان چند
-   ردیفِ رنگی که هم‌زمان دیده می‌شد.
+   نسخهٔ قبلی با mouseover/mouseout کلاس hov را می‌گذاشت و برمی‌داشت، ولی این
+   دو رویداد هنگام حرکت سریع موس (یا خروج از پنجره، یا رندر دوبارهٔ جدول
+   وسط حرکت) گاهی جفت نمی‌شدند و کلاس روی چند ردیف جا می‌ماند — همان چند
+   ردیف رنگی که هم‌زمان دیده می‌شد.
    حالا فقط :hover در CSS است: مرورگر خودش تضمین می‌کند که هیچ‌وقت روی دو
-   عنصر هم‌زمان نماند. ردیفِ جزئیات در حالتِ بسته ارتفاعِ صفر دارد، پس نیازی
-   به هماهنگ‌کردنِ دستیِ دو ردیف نیست. */
-/* اکسپندِ آکاردئونیِ یک ردیف — هر لحظه فقط یکی باز می‌ماند */
+   عنصر هم‌زمان نماند. ردیف جزئیات در حالت بسته ارتفاع صفر دارد، پس نیازی
+   به هماهنگ‌کردن دستی دو ردیف نیست. */
+/* اکسپند آکاردئونی یک ردیف — هر لحظه فقط یکی باز می‌ماند */
 function archToggleRow(num){
   var row=document.getElementById("arow-"+num), det=document.getElementById("adet-"+num);
   if(!row||!det) return;
@@ -334,10 +334,10 @@ function archToggleRow(num){
   var body=document.getElementById("archiveBody");
   var op=body.querySelectorAll(".arch-detail.open,.arch-row.open");
   for(var i=0;i<op.length;i++){
-    /* ⚠ کلاسِ موقتِ closing تا پایانِ انیمیشن (۰٫۱۱ تأخیر + ۰٫۲۸ گذار) روی ردیف
-       می‌ماند. بدونِ آن، چون هنگامِ کلیک موس روی ردیف است، همان لحظه کارتِ
-       *هاور* فعال می‌شد و وسطِ بسته‌شدن با شکل و گوشه‌های خودش می‌پرید وسط.
-       تایمر روی خودِ عنصر است تا کلیک‌های پشتِ‌سرِ‌هم آن را لغو کنند. */
+    /* ⚠ کلاس موقت closing تا پایان انیمیشن (۰٫۱۱ تأخیر + ۰٫۲۸ گذار) روی ردیف
+       می‌ماند. بدون آن، چون هنگام کلیک موس روی ردیف است، همان لحظه کارت
+       *هاور* فعال می‌شد و وسط بسته‌شدن با شکل و گوشه‌های خودش می‌پرید وسط.
+       تایمر روی خود عنصر است تا کلیک‌های پشت‌سر‌هم آن را لغو کنند. */
     var el=op[i];
     el.classList.remove("open");
     el.classList.add("closing");
@@ -346,9 +346,9 @@ function archToggleRow(num){
       e._closeT=setTimeout(function(){ e.classList.remove("closing"); e._closeT=null; }, 300);
     })(el);
   }
-  var table=body.closest(".arch-table");                 // کلاسِ has-open روی جدول → جابه‌جاییِ تیترِ «نوع» هنگامِ اکسپند
+  var table=body.closest(".arch-table");                 // کلاس has-open روی جدول → جابه‌جایی تیتر «نوع» هنگام اکسپند
   if(willOpen){
-    // اگر همین ردیف نیمهٔ راهِ بسته‌شدن بود، حالتِ بسته‌شدن لغو می‌شود
+    // اگر همین ردیف نیمهٔ راه بسته‌شدن بود، حالت بسته‌شدن لغو می‌شود
     [row,det].forEach(function(e){ if(e._closeT){ clearTimeout(e._closeT); e._closeT=null; } e.classList.remove("closing"); });
     row.classList.add("open"); det.classList.add("open"); _arch.openNum=num; if(table) table.classList.add("has-open");
     var pane=document.getElementById("tab-archive"); if(pane) pane.classList.add("has-open");   // رزرو صفر می‌شود
@@ -360,7 +360,7 @@ function archToggleRow(num){
 }
 
 /* کلیک روی سلول‌های لینک‌دار (شماره/مشتری/پروژه/قطعه): فقط وقتی ردیف اکسپند است ناوبری می‌کند؛
-   در حالتِ کولپس هیچ نمی‌کند و می‌گذارد کلیک به ردیف برسد تا فقط باز شود. */
+   در حالت کولپس هیچ نمی‌کند و می‌گذارد کلیک به ردیف برسد تا فقط باز شود. */
 function archCellNav(ev, num, kind){
   var row=document.getElementById("arow-"+num);
   if(!row || !row.classList.contains("open")) return;   // کولپس → bubble می‌شود و ردیف باز می‌شود
@@ -372,9 +372,9 @@ function archCellNav(ev, num, kind){
   else if(kind==="part") navGoPart(d.clientCode, pad2(d.orderNo), pad2(d.projectNo), pad2(d.partNo));
 }
 
-/* ================= منوی سه‌نقطه‌ایِ عملیاتِ آرشیو =================
-   منو به body چسبانده و با position:fixed جای می‌گیرد تا overflowِ .tablewrap آن را نبُرد.
-   کلیکِ بیرون/اسکرول/تغییرِ اندازه ⟵ بسته می‌شود؛ کلیکِ دوباره روی همان دکمه = toggle. */
+/* ================= منوی سه‌نقطه‌ای عملیات آرشیو =================
+   منو به body چسبانده و با position:fixed جای می‌گیرد تا overflow .tablewrap آن را نبرد.
+   کلیک بیرون/اسکرول/تغییر اندازه ⟵ بسته می‌شود؛ کلیک دوباره روی همان دکمه = toggle. */
 var _archMenu=null;
 function archCloseKebab(){
   if(!_archMenu) return;
@@ -388,7 +388,7 @@ function archKebab(ev, num){
   ev.stopPropagation();
   var wasFor=_archMenu && _archMenu._num===num;
   archCloseKebab();
-  if(wasFor) return;                                   // toggle: کلیکِ دوباره ⟵ بستن
+  if(wasFor) return;                                   // toggle: کلیک دوباره ⟵ بستن
   var r=ev.currentTarget.getBoundingClientRect();
   var m=document.createElement("div"); m.className="kebab-pop"; m._num=num;
   m.innerHTML=
@@ -397,7 +397,7 @@ function archKebab(ev, num){
   document.body.appendChild(m);
   var mw=m.offsetWidth, mh=m.offsetHeight;
   var top=r.bottom+5; if(top+mh>window.innerHeight-8) top=r.top-mh-5;   // اگر پایین جا نبود، بالا باز شود
-  var left=r.right-mw; if(left<8) left=8;                              // در RTL راست‌ترازِ دکمه
+  var left=r.right-mw; if(left<8) left=8;                              // در RTL راست‌تراز دکمه
   m.style.top=Math.max(8,top)+"px"; m.style.left=left+"px";
   _archMenu=m;
   setTimeout(function(){
@@ -407,19 +407,19 @@ function archKebab(ev, num){
   },0);
 }
 async function delDocument(num){
-  if(!(await uiConfirm("حذف سند «"+num+"»؟ سند به «سطل زباله» می‌رود و تا ۳۰ روز قابلِ بازیابی است؛ پس از آن سامانه حذف دائمی‌اش می‌کند.",{danger:true,okLabel:"حذف"}))) return;
+  if(!(await uiConfirm("حذف سند «"+num+"»؟ سند به «سطل زباله» می‌رود و تا ۳۰ روز قابل بازیابی است؛ پس از آن سامانه حذف دائمی‌اش می‌کند.",{danger:true,okLabel:"حذف"}))) return;
   var r=await optimisticOp(function(){ localDeleteDoc(num); },
     function(){ return api("deleteDocument",{drawingNumber:num},{silent:true}); });
-  if(r.ok) toast("به سطلِ زباله منتقل شد"); else toast(r.message||"حذف ناموفق",true);
+  if(r.ok) toast("به سطل زباله منتقل شد"); else toast(r.message||"حذف ناموفق",true);
 }
 
-/* ================= سطلِ زباله (تبِ اسنادِ حذف‌شده — قابلِ بازیابی تا ۳۰ روز) ================= */
+/* ================= سطل زباله (تب اسناد حذف‌شده — قابل بازیابی تا ۳۰ روز) ================= */
 var RB_RESTORE_IC='<svg class="ic" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>';
 var RB_PURGE_IC='<svg class="ic" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>';
-var _rbDocs=[];   // آخرین فهرستِ دریافت‌شده (برای «خالی‌کردنِ سطل»)
-function renderTrash(){ rbRefresh(); }   // با سوییچ به تبِ «سطل زباله» صدا زده می‌شود
-/* اسکلتِ سطلِ زباله: قالبِ ردیف‌ها بی‌درنگ ساخته می‌شود و سلول‌ها با shimmer در حالِ لود می‌مانند
-   تا داده‌ها از سرور برسند — بدونِ اورلیِ تمام‌صفحه (مثلِ لودِ اولِ داشبورد). */
+var _rbDocs=[];   // آخرین فهرست دریافت‌شده (برای «خالی‌کردن سطل»)
+function renderTrash(){ rbRefresh(); }   // با سوییچ به تب «سطل زباله» صدا زده می‌شود
+/* اسکلت سطل زباله: قالب ردیف‌ها بی‌درنگ ساخته می‌شود و سلول‌ها با shimmer در حال لود می‌مانند
+   تا داده‌ها از سرور برسند — بدون اورلی تمام‌صفحه (مثل لود اول داشبورد). */
 function rbSkeletonHTML(n){
   var row='<div class="rb-item rb-skel">'+
       '<span class="el-badge rb-typeic"><span class="sk" style="width:26px;height:30px;border-radius:5px"></span></span>'+
@@ -439,15 +439,15 @@ async function rbRefresh(){
   host.innerHTML='<div class="rb-list">'+rbSkeletonHTML(4)+'</div>';
   var r=await api("listDeleted",{},{silent:true, quiet:true});
   var btnAll=document.getElementById("rbPurgeAll");
-  if(!r||!r.ok){ _rbDocs=[]; if(btnAll) btnAll.style.display="none"; host.innerHTML='<div class="rb-empty muted">خطا در دریافتِ فهرست.</div>'; return; }
+  if(!r||!r.ok){ _rbDocs=[]; if(btnAll) btnAll.style.display="none"; host.innerHTML='<div class="rb-empty muted">خطا در دریافت فهرست.</div>'; return; }
   var docs=r.documents||[]; _rbDocs=docs;
   if(btnAll) btnAll.style.display=docs.length?"":"none";
-  if(!docs.length){ host.innerHTML='<div class="rb-empty">'+emptyState("سطلِ زباله خالی است","اسنادی که حذف کنید تا ۳۰ روز اینجا می‌مانند و قابلِ بازیابی‌اند؛ پس از آن سامانه حذف دائمی‌شان می‌کند.")+'</div>'; return; }
+  if(!docs.length){ host.innerHTML='<div class="rb-empty">'+emptyState("سطل زباله خالی است","اسنادی که حذف کنید تا ۳۰ روز اینجا می‌مانند و قابل بازیابی‌اند؛ پس از آن سامانه حذف دائمی‌شان می‌کند.")+'</div>'; return; }
   host.innerHTML='<div class="rb-list">'+docs.map(rbRowHTML).join("")+'</div>';
 }
 function rbRowHTML(d){
   var num=esc(d.drawingNumber);
-  // ترتیب: نامِ فارسیِ سند ← قطعه ← پروژه ← مشتری؛ جداکننده = خطِ عمودیِ نازک و کم‌رنگ (rb-sep)
+  // ترتیب: نام فارسی سند ← قطعه ← پروژه ← مشتری؛ جداکننده = خط عمودی نازک و کم‌رنگ (rb-sep)
   var parts=[typeName(d.typeCode), partNameFa(d.partNo), projectLabel(d), clientName(d.clientCode)]
     .filter(Boolean).map(esc).map(function(x){ return '<span>'+x+'</span>'; }).join('<i class="rb-sep"></i>');
   var by=d.deletedBy?esc(userName(d.deletedBy)):"—";
@@ -464,7 +464,7 @@ function rbRowHTML(d){
     '</div>'+
     '<span class="rb-days'+(dl<=5?" low":"")+'">'+faN(dl)+' روز مانده</span>'+
     '<div class="rb-acts">'+
-      '<button class="icon-btn sm" onclick="rbRestore(\''+num+'\')" title="بازیابیِ سند" aria-label="بازیابیِ سند">'+RB_RESTORE_IC+'</button>'+
+      '<button class="icon-btn sm" onclick="rbRestore(\''+num+'\')" title="بازیابی سند" aria-label="بازیابی سند">'+RB_RESTORE_IC+'</button>'+
       '<button class="icon-btn sm danger" onclick="rbPurge(\''+num+'\')" title="حذف دائمی" aria-label="حذف دائمی">'+RB_PURGE_IC+'</button>'+
     '</div>'+
   '</div>';
@@ -474,26 +474,26 @@ async function rbRestore(num){
   if(r&&r.ok){ toast("بازیابی شد"); await rbRefresh(); refreshDocuments(); }
   else toast((r&&r.message)||"بازیابی ناموفق",true);
 }
-/* حذفِ همیشگیِ یک سند از سطلِ زباله (برگشت‌ناپذیر) */
+/* حذف همیشگی یک سند از سطل زباله (برگشت‌ناپذیر) */
 async function rbPurge(num){
-  if(!(await uiConfirm("سندِ «"+num+"» حذف دائمی می‌شود و دیگر قابلِ بازیابی نیست. مطمئنید؟",{danger:true,okLabel:"حذف دائمی"}))) return;
+  if(!(await uiConfirm("سند «"+num+"» حذف دائمی می‌شود و دیگر قابل بازیابی نیست. مطمئنید؟",{danger:true,okLabel:"حذف دائمی"}))) return;
   var r=await api("purgeDocument",{drawingNumber:num});
-  /* ⚠ refreshDocuments لازم است: حذفِ دائم یک رویدادِ 'purged' در گردشِ کار ثبت
-     می‌کند و بدونِ این، DB.workflow به‌روز نمی‌شد و آن رویداد تا رفرشِ کاملِ صفحه
-     در «فعالیت‌های اخیر» دیده نمی‌شد. حذفِ نرم و بازیابی این را از قبل داشتند. */
+  /* ⚠ refreshDocuments لازم است: حذف دائم یک رویداد 'purged' در گردش کار ثبت
+     می‌کند و بدون این، DB.workflow به‌روز نمی‌شد و آن رویداد تا رفرش کامل صفحه
+     در «فعالیت‌های اخیر» دیده نمی‌شد. حذف نرم و بازیابی این را از قبل داشتند. */
   if(r&&r.ok){ toast("حذف دائمی شد"); await rbRefresh(); refreshDocuments(); }
   else toast((r&&r.message)||"حذف ناموفق",true);
 }
-/* خالی‌کردنِ کاملِ سطلِ زباله — همهٔ رکوردها حذفِ دائمی می‌شوند */
+/* خالی‌کردن کامل سطل زباله — همهٔ رکوردها حذف دائمی می‌شوند */
 async function rbPurgeAll(){
   var nums=_rbDocs.map(function(d){ return d.drawingNumber; });
   if(!nums.length) return;
-  if(!(await uiConfirm("همهٔ "+faN(nums.length)+" سندِ داخلِ سطلِ زباله حذف دائمی می‌شوند و قابلِ بازیابی نیستند. مطمئنید؟",{danger:true,okLabel:"حذف دائمیِ همه"}))) return;
-  toast("در حال حذفِ همه…");
+  if(!(await uiConfirm("همهٔ "+faN(nums.length)+" سند داخل سطل زباله حذف دائمی می‌شوند و قابل بازیابی نیستند. مطمئنید؟",{danger:true,okLabel:"حذف دائمی همه"}))) return;
+  toast("در حال حذف همه…");
   for(var i=0;i<nums.length;i++){ await api("purgeDocument",{drawingNumber:nums[i]},{silent:true,quiet:true}); }
-  toast("سطلِ زباله خالی شد");
+  toast("سطل زباله خالی شد");
   await rbRefresh();
-  refreshDocuments();   // همان دلیلِ rbPurge: رویدادهای 'purged' باید به DB.workflow برسند
+  refreshDocuments();   // همان دلیل rbPurge: رویدادهای 'purged' باید به DB.workflow برسند
 }
 
 /* ================= پیش‌نمایش / دانلود فایل ================= */
@@ -505,11 +505,11 @@ async function previewFile(fileId){
   var inner = r.mimeType.indexOf("image/")===0 ? '<img src="'+url+'">' : '<iframe src="'+url+'"></iframe>';
   showModal(esc(r.name), inner);
 }
-/* دانلود دیگر کلِ صفحه را مسدود نمی‌کند: درخواست به «مرکز دانلود» (صفِ معلق) می‌رود و فایل در
-   پس‌زمینه آماده و سپس به مرورگر سپرده می‌شود. label = شمارهٔ سند برای نمایشِ اولیهٔ کارت. */
+/* دانلود دیگر کل صفحه را مسدود نمی‌کند: درخواست به «مرکز دانلود» (صف معلق) می‌رود و فایل در
+   پس‌زمینه آماده و سپس به مرورگر سپرده می‌شود. label = شمارهٔ سند برای نمایش اولیهٔ کارت. */
 async function downloadFile(fileId, label){
   if(typeof dlEnqueue==="function"){ dlEnqueue(fileId, label); return; }
-  // مسیرِ یدکی (اگر مرکزِ دانلود بارگذاری نشده بود)
+  // مسیر یدکی (اگر مرکز دانلود بارگذاری نشده بود)
   toast("در حال آماده‌سازی دانلود…");
   var r=await getFileRetry(fileId);
   if(!r||!r.ok){ toast((r&&r.message)||"خطا",true); return; }
@@ -521,30 +521,30 @@ function b64toBlob(b64,mime){
   for(var i=0;i<len;i++) arr[i]=bin.charCodeAt(i);
   return new Blob([arr],{type:mime||"application/octet-stream"});
 }
-/* آیا مودالِ *باز*ی روی صفحه هست؟
-   ⚠ صرفِ querySelector(".modal") کافی نیست: #newDocModal همیشه در DOM هست و فقط
-   با کلاسِ hidden پنهان می‌شود، پس همیشه پیدا می‌شد و کلاسِ modal-open هرگز
-   برداشته نمی‌شد — نتیجه‌اش قفل‌ماندنِ اسکرولِ کلِ سایت بود. */
-/* ================= بستنِ انیمیشن‌دارِ پنجره‌ها (مشترک در کلِ سایت) =================
-   el کلاسِ closing می‌گیرد (انیمیشنِ خروج در components.css) و پس از پایانش done اجرا می‌شود
-   (حذف از DOM یا افزودنِ hidden). کاهشِ حرکت → بی‌درنگ. */
+/* آیا مودال *باز*ی روی صفحه هست؟
+   ⚠ صرف querySelector(".modal") کافی نیست: #newDocModal همیشه در DOM هست و فقط
+   با کلاس hidden پنهان می‌شود، پس همیشه پیدا می‌شد و کلاس modal-open هرگز
+   برداشته نمی‌شد — نتیجه‌اش قفل‌ماندن اسکرول کل سایت بود. */
+/* ================= بستن انیمیشن‌دار پنجره‌ها (مشترک در کل سایت) =================
+   el کلاس closing می‌گیرد (انیمیشن خروج در components.css) و پس از پایانش done اجرا می‌شود
+   (حذف از DOM یا افزودن hidden). کاهش حرکت → بی‌درنگ. */
 var MODAL_OUT_MS=160;
 function modalClose(el, done){
   if(!el){ if(done) done(); return; }
-  if(el.classList.contains("closing")) return;            // همین حالا در حالِ بسته‌شدن است
+  if(el.classList.contains("closing")) return;            // همین حالا در حال بسته‌شدن است
   var reduce=(typeof prefersReducedMotion==="function") && prefersReducedMotion();
   if(reduce){ if(done) done(); return; }
   el.classList.add("closing");
   el._mdCloseT=setTimeout(function(){ el._mdCloseT=null; el.classList.remove("closing"); if(done) done(); }, MODAL_OUT_MS);
 }
-/* پنجرهٔ ثابتی (ویزارد) که وسطِ انیمیشنِ بسته‌شدن دوباره باز می‌شود: بستنِ نیمه‌کاره لغو شود،
-   وگرنه تایمرِ بستن پنجرهٔ تازه‌بازشده را پنهان می‌کرد. */
+/* پنجرهٔ ثابتی (ویزارد) که وسط انیمیشن بسته‌شدن دوباره باز می‌شود: بستن نیمه‌کاره لغو شود،
+   وگرنه تایمر بستن پنجرهٔ تازه‌بازشده را پنهان می‌کرد. */
 function modalCancelClose(el){
   if(!el || !el._mdCloseT) return;
   clearTimeout(el._mdCloseT); el._mdCloseT=null; el.classList.remove("closing");
 }
-/* بالاترین لایهٔ پشته‌ای که در حالِ بسته‌شدن نیست — لایهٔ در حالِ خروج تا پایانِ انیمیشن در DOM می‌ماند
-   و نباید «بالاترین پنجره» حساب شود (وگرنه بستنِ پشتِ‌سرِ‌هم یا جایگزینیِ پنجره، لایهٔ اشتباه را می‌گرفت). */
+/* بالاترین لایهٔ پشته‌ای که در حال بسته‌شدن نیست — لایهٔ در حال خروج تا پایان انیمیشن در DOM می‌ماند
+   و نباید «بالاترین پنجره» حساب شود (وگرنه بستن پشت‌سر‌هم یا جایگزینی پنجره، لایهٔ اشتباه را می‌گرفت). */
 function modalTop(host){
   host=host||document.getElementById("modalHost"); if(!host) return null;
   for(var el=host.lastElementChild; el; el=el.previousElementSibling){ if(!el.classList.contains("closing")) return el; }
@@ -560,24 +560,24 @@ function anyModalOpen(){
   }
   return false;
 }
-/* ===== قفلِ اسکرولِ پس‌زمینه =====
-   ⚠ هدر position:sticky است و به اسکرولِ صفحه چسبیده. اگر صفحه پایین آمده باشد
-   و همان‌جا قفل شود، هدر بالای کادرِ دید می‌ماند و دیده نمی‌شود — همان باگی که
-   در پنلِ جزئیاتِ سند رخ می‌داد.
-   راه‌حل: پیش از قفل، صفحه به بالا برده می‌شود تا هدر در کادر باشد؛ موقعیتِ قبلی
-   نگه داشته و هنگامِ بستن دقیقاً برگردانده می‌شود، پس کاربر جایش را گم نمی‌کند.
-   (position:fixed روی body امتحان شد و غلط بود: ارتفاعِ صفحه جمع می‌شد،
-   نوارِ اسکرول غیب می‌شد و هدر با topِ منفی بریده می‌شد.) */
+/* ===== قفل اسکرول پس‌زمینه =====
+   ⚠ هدر position:sticky است و به اسکرول صفحه چسبیده. اگر صفحه پایین آمده باشد
+   و همان‌جا قفل شود، هدر بالای کادر دید می‌ماند و دیده نمی‌شود — همان باگی که
+   در پنل جزئیات سند رخ می‌داد.
+   راه‌حل: پیش از قفل، صفحه به بالا برده می‌شود تا هدر در کادر باشد؛ موقعیت قبلی
+   نگه داشته و هنگام بستن دقیقاً برگردانده می‌شود، پس کاربر جایش را گم نمی‌کند.
+   (position:fixed روی body امتحان شد و غلط بود: ارتفاع صفحه جمع می‌شد،
+   نوار اسکرول غیب می‌شد و هدر با top منفی بریده می‌شد.) */
 var _mlY=0, _mlOn=false;
-/* ⚠ اسکرولِ اصلی روی #appView است نه پنجره (تا نوارش سمتِ چپ بیفتد)، پس
-   خواندن و نوشتنِ موقعیت هم باید روی همان باشد؛ window.pageYOffset همیشه
+/* ⚠ اسکرول اصلی روی #appView است نه پنجره (تا نوارش سمت چپ بیفتد)، پس
+   خواندن و نوشتن موقعیت هم باید روی همان باشد؛ window.pageYOffset همیشه
    صفر برمی‌گرداند. fallback به documentElement برای احتیاط است. */
 function appScroller(){ return document.getElementById("appView") || document.documentElement; }
 function modalLock(){
   if(_mlOn) return;
   var sc=appScroller();
   _mlY=sc.scrollTop||0;
-  if(_mlY>0) sc.scrollTop=0;   // هدر به بالای کادرِ دید بیاید
+  if(_mlY>0) sc.scrollTop=0;   // هدر به بالای کادر دید بیاید
   document.body.classList.add("modal-open");
   _mlOn=true;
   // دکمهٔ انتقال با این کلاس fixed می‌شود؛ مختصاتش باید همین‌جا ست شود
@@ -588,11 +588,11 @@ function modalUnlock(){
   document.body.classList.remove("modal-open");
   if(_mlY>0) appScroller().scrollTop=_mlY;   // بازگشت به همان جای قبلی
   _mlOn=false;
-  if(typeof xferPlaceBtn==="function") xferPlaceBtn();   // دکمه به جریانِ هدر برگردد
+  if(typeof xferPlaceBtn==="function") xferPlaceBtn();   // دکمه به جریان هدر برگردد
 }
 /* پنجره‌ها روی هم انباشته می‌شوند (پشته).
    پیش از این، showModal محتوای modalHost را بازنویسی می‌کرد و closeModal همه را یکجا پاک
-   می‌کرد؛ پس بازکردنِ پنجره‌ای از درونِ پنجرهٔ دیگر، پنجرهٔ زیرین را نابود می‌کرد و بستنِ
+   می‌کرد؛ پس بازکردن پنجره‌ای از درون پنجرهٔ دیگر، پنجرهٔ زیرین را نابود می‌کرد و بستن
    رویی کاربر را تا صفحهٔ زیرین عقب می‌برد. حالا هر پنجره یک لایهٔ مستقل است و
    closeModal فقط لایهٔ رویی را برمی‌دارد. */
 function showModal(title,innerHTML,boxClass){
@@ -606,10 +606,10 @@ function showModal(title,innerHTML,boxClass){
   host.appendChild(layer);
   modalLock();
 }
-/* به‌روزرسانیِ درجایِ همین پنجره — بدونِ ساختنِ لایهٔ تازه.
+/* به‌روزرسانی درجای همین پنجره — بدون ساختن لایهٔ تازه.
    ⚠ چرا لازم است: showModal عمداً appendChild می‌کند تا پنجرهٔ تودرتو
-   (مثلاً جزئیاتِ سند ← بارگذاریِ ریویژن) روی قبلی بنشیند و با بستن،
-   زیرین باقی بماند. ولی پنجره‌ای که خودش را دوباره رسم می‌کند (مثلِ
+   (مثلاً جزئیات سند ← بارگذاری ریویژن) روی قبلی بنشیند و با بستن،
+   زیرین باقی بماند. ولی پنجره‌ای که خودش را دوباره رسم می‌کند (مثل
    صفحه‌بندی) نباید لایهٔ تازه بسازد — وگرنه با هر کلیک یک پنجره روی
    پنجره جمع می‌شود، پس‌زمینه تیره‌تر می‌شود و بستن باید چندبار تکرار شود. */
 function updateModal(title,innerHTML,boxClass){
@@ -623,12 +623,12 @@ function updateModal(title,innerHTML,boxClass){
   var b=box.querySelector(".body"); if(b) b.innerHTML=innerHTML;
   return;
 }
-/* بستنِ فقط بالاترین پنجره؛ اگر زیرش پنجره‌ای بود، همان دوباره دیده می‌شود. */
+/* بستن فقط بالاترین پنجره؛ اگر زیرش پنجره‌ای بود، همان دوباره دیده می‌شود. */
 function closeModal(){
   var host=document.getElementById("modalHost");
   var top=modalTop(host);
-  /* پاکسازیِ پیش‌نمایش فقط وقتی که همین لایه صاحبِ پیش‌نمایش باشد؛ وگرنه بستنِ
-     یک پنجرهٔ کوچکِ رویی، پیش‌نمایشِ مودالِ زیرین را هم خاموش می‌کند. */
+  /* پاکسازی پیش‌نمایش فقط وقتی که همین لایه صاحب پیش‌نمایش باشد؛ وگرنه بستن
+     یک پنجرهٔ کوچک رویی، پیش‌نمایش مودال زیرین را هم خاموش می‌کند. */
   var ownsPreview = !!(top && top.querySelector && top.querySelector("#docPreviewHost, #filePreviewHost"));
   if(ownsPreview){
     if(typeof _dpStopPreview==="function") _dpStopPreview();
@@ -637,7 +637,7 @@ function closeModal(){
   if(!top){ if(host) host.innerHTML=""; if(!anyModalOpen()) modalUnlock(); return; }
   modalClose(top, function(){ if(top.parentNode) top.parentNode.removeChild(top); if(!anyModalOpen()) modalUnlock(); });
 }
-/* بستنِ کلِ پشته — برای جاهایی که پس از یک عمل، ماندنِ پنجرهٔ زیرین بی‌معناست */
+/* بستن کل پشته — برای جاهایی که پس از یک عمل، ماندن پنجرهٔ زیرین بی‌معناست */
 function closeAllModals(){
   var host=document.getElementById("modalHost");
   if(typeof _dpStopPreview==="function") _dpStopPreview();

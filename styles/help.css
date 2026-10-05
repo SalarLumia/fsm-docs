@@ -1,17 +1,17 @@
 /* ═══════════════ راهنمای سامانه ═══════════════
-   دو ستون: ریلِ موضوع‌ها در راست، محتوا در چپ. کادرِ جست‌وجو بالای هر دو
-   می‌نشیند و کلِ راهنما را می‌گردد — نه فقط عنوان‌ها.
-   حالتِ سلولِ ریل عیناً همان الگوی تاریخچهٔ سند و سایدبار است: هاور طوسی،
-   انتخاب‌شده نارنجیِ کم‌رنگ + نوارِ عمودیِ لبهٔ راست. */
+   دو ستون: ریل موضوع‌ها در راست، محتوا در چپ. کادر جست‌وجو بالای هر دو
+   می‌نشیند و کل راهنما را می‌گردد — نه فقط عنوان‌ها.
+   حالت سلول ریل عیناً همان الگوی تاریخچهٔ سند و سایدبار است: هاور طوسی،
+   انتخاب‌شده نارنجی کم‌رنگ + نوار عمودی لبهٔ راست. */
 
 .help-card{padding:0;overflow:hidden}
 
-/* ─── سرِ راهنما: عنوان + جست‌وجو ─── */
+/* ─── سر راهنما: عنوان + جست‌وجو ─── */
 .help-hd{padding:var(--sp-5) var(--sp-6);border-bottom:1px solid var(--line);background:var(--panel)}
 .help-hd-t{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--txt);margin-bottom:14px}
 .help-hd-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 
-/* جست‌وجو در مرکزِ صفحه است نه در گوشه: راهنمای دسته‌بندی‌محور از راهنمای
+/* جست‌وجو در مرکز صفحه است نه در گوشه: راهنمای دسته‌بندی‌محور از راهنمای
    جست‌وجومحور ضعیف‌تر عمل می‌کند، مخصوصاً وقتی کاربر واژهٔ خودش را می‌جوید. */
 .help-sbox{position:relative;max-width:520px}
 .help-sbox>svg{position:absolute;inset-inline-start:12px;top:50%;transform:translateY(-50%);
@@ -101,7 +101,7 @@
 .hp-content{max-width:70ch}
 .hp-p{margin:0 0 14px;font-size:12.5px;font-weight:500;color:var(--txt);line-height:2.05}
 
-/* گام‌ها: شماره در نشانِ گردِ خودش. سقفِ هفت گام برای هر رویه رعایت شده،
+/* گام‌ها: شماره در نشان گرد خودش. سقف هفت گام برای هر رویه رعایت شده،
    وگرنه رویه باید به دو مقاله شکسته شود. */
 .hp-steps{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:9px;
   counter-reset:none}
@@ -111,13 +111,13 @@
   font-size:11px;font-weight:700;line-height:1}
 .hp-stxt{flex:1;min-width:0;font-size:12.5px;font-weight:500;color:var(--txt);line-height:1.95}
 
-/* شمارهٔ سند و فرمول‌ها: بلوکِ چپ‌به‌راست، چون ساختارِ لاتین دارند و در
-   جریانِ راست‌به‌چپ بخش‌هایشان جابه‌جا دیده می‌شوند. */
+/* شمارهٔ سند و فرمول‌ها: بلوک چپ‌به‌راست، چون ساختار لاتین دارند و در
+   جریان راست‌به‌چپ بخش‌هایشان جابه‌جا دیده می‌شوند. */
 .hp-kbd{margin:0 0 14px;padding:11px 14px;background:var(--panel);border:1px solid var(--line);
   border-radius:var(--radius-sm);font-family:var(--mono);font-size:12.5px;font-weight:700;
   color:var(--txt);letter-spacing:.4px;text-align:center;overflow-x:auto;white-space:nowrap}
 
-/* یادداشت‌ها: سه لحن با سه رنگِ وضعیتِ سایت — آبی خبر، کهربایی هشدار، نارنجی پیشنهاد */
+/* یادداشت‌ها: سه لحن با سه رنگ وضعیت سایت — آبی خبر، کهربایی هشدار، نارنجی پیشنهاد */
 .hp-call{display:flex;align-items:flex-start;gap:9px;margin:0 0 14px;padding:11px 13px;
   border:1px solid;border-radius:var(--radius-sm);font-size:12px;font-weight:500;line-height:1.95}
 .hp-call svg{width:15px;height:15px;flex-shrink:0;margin-top:3px;stroke:currentColor;fill:none;stroke-width:2}
@@ -129,7 +129,7 @@
 .hp-tip{background:#fff3e6;border-color:#f7941f44;color:#7c3d00}
 .hp-tip svg,.hp-tip .hp-call-l{color:var(--brand)}
 
-/* جدولِ مرجع — هم‌سبکِ جدول‌های مدیریتیِ سایت */
+/* جدول مرجع — هم‌سبک جدول‌های مدیریتی سایت */
 .hp-tblwrap{margin:0 0 16px;border:1px solid var(--line);border-radius:var(--radius-sm);overflow-x:auto}
 .hp-tbl{width:100%;border-collapse:collapse;font-size:12px}
 .hp-tbl th{background:var(--panel);padding:9px 12px;text-align:right;font-weight:700;color:var(--txt);
@@ -140,7 +140,7 @@
 .hp-tbl tbody tr:hover td{background:var(--panel)}
 .hp-tbl td:first-child{font-weight:700;white-space:nowrap}
 
-/* هیچ مقاله‌ای بن‌بست نیست: پایانِ هر مقاله مسیرِ بعدی را می‌دهد */
+/* هیچ مقاله‌ای بن‌بست نیست: پایان هر مقاله مسیر بعدی را می‌دهد */
 .hp-next{margin-top:var(--sp-6);padding-top:var(--sp-4);border-top:1px solid var(--line)}
 .hp-next-t{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px}
 .hp-nextlink{display:flex;align-items:center;gap:7px;width:100%;text-align:right;
@@ -153,7 +153,7 @@
 .hp-nextlink:hover{border-color:var(--brand);background:#fff3e6;color:var(--brand)}
 .hp-nextlink:hover svg{stroke:var(--brand);transform:translateX(-3px)}
 
-/* ─── نتایجِ جست‌وجو ─── */
+/* ─── نتایج جست‌وجو ─── */
 .hp-res-h{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:12px}
 .hp-rescard{display:block;width:100%;text-align:right;padding:12px 14px;margin-bottom:8px;
   border:1px solid var(--line);background:var(--card);border-radius:var(--radius-sm);
@@ -177,20 +177,20 @@
 }
 
 /* ═══ دکمهٔ راهنمای بخش (راهنمای در بستر) ═══
-   نشانهٔ ورودِ راهنما در همان جایی که کاربر گیر می‌کند. عمداً از دکمه‌های
-   عملیاتیِ کنارش آرام‌تر است — کارِ اصلیِ آن بخش نیست، فقط راهِ فرار است.
-   آیکون عیناً همان آیکونِ «راهنما» در نوارِ کناری است تا ارتباط بی‌واسطه
+   نشانهٔ ورود راهنما در همان جایی که کاربر گیر می‌کند. عمداً از دکمه‌های
+   عملیاتی کنارش آرام‌تر است — کار اصلی آن بخش نیست، فقط راه فرار است.
+   آیکون عیناً همان آیکون «راهنما» در نوار کناری است تا ارتباط بی‌واسطه
    فهمیده شود. */
 .help-hint{position:relative;border-color:transparent;background:none;color:#a8a5a0}
 .help-hint .ic{width:15px;height:15px;stroke-width:1.8}
 .help-hint:hover{border-color:var(--brand);color:var(--brand);background:#fff8f0}
-/* برچسبِ هاور — عیناً جعبهٔ .sgt (تولتیپِ تکه‌های نوارِ پیشرفتِ داشبورد):
-   سفید، کادرِ نازک، گوشهٔ ۹ و همان سایه؛ تا سامانه یک زبانِ تولتیپ داشته باشد.
-   ⚠ به سمتِ *راست* باز می‌شود، یعنی به داخلِ سربرگ که خالی است. این دکمه در
-   گوشهٔ چپِ کارت می‌نشیند، پس هر چیزی که به چپ باز شود از صفحه بیرون می‌زند.
-   در راست‌به‌چپ inline-end یعنی سمتِ چپ، پس inset-inline-end همان left است و
-   برچسب را درست بعد از لبهٔ راستِ دکمه می‌گذارد.
-   پایینِ دکمه انتخاب نشد چون دکمهٔ «خروجی» دقیقاً همان‌جاست و پوشانده می‌شد. */
+/* برچسب هاور — عیناً جعبهٔ .sgt (تولتیپ تکه‌های نوار پیشرفت داشبورد):
+   سفید، کادر نازک، گوشهٔ ۹ و همان سایه؛ تا سامانه یک زبان تولتیپ داشته باشد.
+   ⚠ به سمت *راست* باز می‌شود، یعنی به داخل سربرگ که خالی است. این دکمه در
+   گوشهٔ چپ کارت می‌نشیند، پس هر چیزی که به چپ باز شود از صفحه بیرون می‌زند.
+   در راست‌به‌چپ inline-end یعنی سمت چپ، پس inset-inline-end همان left است و
+   برچسب را درست بعد از لبهٔ راست دکمه می‌گذارد.
+   پایین دکمه انتخاب نشد چون دکمهٔ «خروجی» دقیقاً همان‌جاست و پوشانده می‌شد. */
 .help-hint::after{content:"راهنمای این بخش";position:absolute;z-index:6;
   top:50%;inset-inline-end:calc(100% + 7px);
   padding:7px 9px;border-radius:9px;background:#fff;border:1px solid var(--line);

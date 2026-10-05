@@ -1,60 +1,60 @@
 /* ================= ورود / خروج ================= */
-/* عمرِ توکنِ بک‌اند (۱۲ ساعت). اگر در Code.gs عوض شد، این هم باید هم‌گام شود؛
-   بدترین حالتِ ناهماهنگی این است که یک بار درخواست به سرور می‌رود و رد می‌شود. */
+/* عمر توکن بک‌اند (۱۲ ساعت). اگر در Code.gs عوض شد، این هم باید هم‌گام شود؛
+   بدترین حالت ناهماهنگی این است که یک بار درخواست به سرور می‌رود و رد می‌شود. */
 var LG_TOKEN_TTL = 12*60*60*1000;
 var LG_TOKEN_TTL_REMEMBER = 30*24*60*60*1000;   // ۳۰ روز — هم‌گام با TOKEN_TTL_REMEMBER در Code.gs
-/* خطاهای ورود جای همان خطِ راهنما (تماس با مدیر) می‌نشینند، نه در یک بنرِ جداگانه:
-   آیکون به مثلثِ اخطار عوض می‌شود و رنگ به قرمز. با پاک‌شدنِ خطا، متنِ راهنما برمی‌گردد. */
+/* خطاهای ورود جای همان خط راهنما (تماس با مدیر) می‌نشینند، نه در یک بنر جداگانه:
+   آیکون به مثلث اخطار عوض می‌شود و رنگ به قرمز. با پاک‌شدن خطا، متن راهنما برمی‌گردد. */
 var LG_INFO_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>';
 var LG_WARN_IC='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
 var LG_HINT_TXT='برای دریافت نام کاربری و رمز عبور با مدیر سیستم تماس بگیرید.';
 function lgSetErr(msg){
   var el=document.querySelector(".lg-note"); if(!el) return;
-  if(!msg){   // بازگشت به حالتِ راهنما
+  if(!msg){   // بازگشت به حالت راهنما
     el.classList.remove("err");
     el.innerHTML=LG_INFO_IC+"<span>"+LG_HINT_TXT+"</span>";
     el.removeAttribute("role");
     return;
   }
   el.innerHTML=LG_WARN_IC+"<span>"+esc(msg)+"</span>";
-  /* اگر کلاسِ err از خطای قبلی مانده باشد، انیمیشنِ لرزش دوباره اجرا نمی‌شود؛
-     برداشتن و reflow و افزودنِ دوباره، آن را برای هر خطای جدید از سر می‌گیرد. */
+  /* اگر کلاس err از خطای قبلی مانده باشد، انیمیشن لرزش دوباره اجرا نمی‌شود؛
+     برداشتن و reflow و افزودن دوباره، آن را برای هر خطای جدید از سر می‌گیرد. */
   el.classList.remove("err");
   void el.offsetWidth;
   el.classList.add("err");
   el.setAttribute("role","alert");   // صفحه‌خوان خطا را اعلام کند
 }
-/* دکمهٔ ورود در حالتِ در حالِ پردازش: غیرفعال + اسپینر، تا کلیکِ دوباره ثبت نشود */
+/* دکمهٔ ورود در حالت در حال پردازش: غیرفعال + اسپینر، تا کلیک دوباره ثبت نشود */
 function lgBusy(on){
   var b=document.getElementById("lgBtn"); if(!b) return;
   b.disabled=!!on;
   b.classList.toggle("loading", !!on);
-  /* فیلدها هم همراهِ دکمه غیرفعال می‌شوند؛ وگرنه کاربر در حینِ ورود
-     می‌تواند مقدارها را عوض کند در حالی که درخواست با مقدارِ قبلی رفته است. */
+  /* فیلدها هم همراه دکمه غیرفعال می‌شوند؛ وگرنه کاربر در حین ورود
+     می‌تواند مقدارها را عوض کند در حالی که درخواست با مقدار قبلی رفته است. */
   ["lgUser","lgPass","lgRemember"].forEach(function(id){
     var el=document.getElementById(id); if(el) el.disabled=!!on; });
   var l=b.querySelector(".lg-lbl");
-  // نقطه‌ها با CSS متحرک می‌شوند (۱ تا ۴ و تکرار)، پس متن بدونِ نقطه نوشته می‌شود
+  // نقطه‌ها با CSS متحرک می‌شوند (۱ تا ۴ و تکرار)، پس متن بدون نقطه نوشته می‌شود
   if(l) l.textContent = on ? "در حال ورود" : "ورود";
 }
-/* مرحلهٔ دومِ دکمهٔ ورود: احرازِ هویت موفق بوده و حالا داده‌ها می‌آیند.
-   بدونِ این، کاربر در فاصلهٔ bootstrap نمی‌داند ورودش پذیرفته شده یا سایت گیر کرده. */
+/* مرحلهٔ دوم دکمهٔ ورود: احراز هویت موفق بوده و حالا داده‌ها می‌آیند.
+   بدون این، کاربر در فاصلهٔ bootstrap نمی‌داند ورودش پذیرفته شده یا سایت گیر کرده. */
 function lgStage2(){
   var b=document.getElementById("lgBtn"); if(!b) return;
   b.disabled=true; b.classList.add("loading");
   var l=b.querySelector(".lg-lbl");
   if(l) l.textContent="در حال بارگذاری اطلاعات";
 }
-/* مرحلهٔ ۲ صفحهٔ ورود: برند جمع می‌شود و کارتِ ورود با انیمیشن باز می‌شود */
+/* مرحلهٔ ۲ صفحهٔ ورود: برند جمع می‌شود و کارت ورود با انیمیشن باز می‌شود */
 /* ═══ محاسبهٔ هندسهٔ صفحهٔ ورود ═══
-   همهٔ عناصرِ بلوکِ برند absolute هستند تا حرکتشان روی هم اثر نگذارد؛ در نتیجه
-   موقعیتِ ثابتِ هرکدام و مقدارِ جابه‌جایی‌شان باید این‌جا حساب شود.
-   چیدمانِ مرحلهٔ ۱ از بالا به پایین: لوگو ← فاصله ← خط ← فاصله ← شرح ← دکمه
-   در مرحلهٔ ۲: لوگو کوچک و بالا می‌رود، خط پهن و بالا می‌رود تا لبهٔ بالاییِ پنل. */
+   همهٔ عناصر بلوک برند absolute هستند تا حرکتشان روی هم اثر نگذارد؛ در نتیجه
+   موقعیت ثابت هرکدام و مقدار جابه‌جایی‌شان باید این‌جا حساب شود.
+   چیدمان مرحلهٔ ۱ از بالا به پایین: لوگو ← فاصله ← خط ← فاصله ← شرح ← دکمه
+   در مرحلهٔ ۲: لوگو کوچک و بالا می‌رود، خط پهن و بالا می‌رود تا لبهٔ بالایی پنل. */
 var LG_GAP_DIV = 46;    // فاصلهٔ لوگو تا خط در مرحلهٔ ۱ (شرح و دکمه نسبت به خط جا می‌گیرند، پس با آن پایین می‌آیند)
-var LG_GAP_END = 46;    // فاصلهٔ لوگوی کوچک‌شده تا خط در مرحلهٔ ۲ — برابرِ حالتِ بسته، تا فاصله حفظ شود
-var LG_GAP_TXT = 26;    // فاصلهٔ خط تا شرحِ سامانه
-var LG_LIFT    = 150;   // ← مقدارِ بالا‌آمدنِ کلِ مجموعه (لوگو + خط + پنل) در مرحلهٔ ۲
+var LG_GAP_END = 46;    // فاصلهٔ لوگوی کوچک‌شده تا خط در مرحلهٔ ۲ — برابر حالت بسته، تا فاصله حفظ شود
+var LG_GAP_TXT = 26;    // فاصلهٔ خط تا شرح سامانه
+var LG_LIFT    = 150;   // ← مقدار بالا‌آمدن کل مجموعه (لوگو + خط + پنل) در مرحلهٔ ۲
 function lgSyncGeom(){
   var brand=document.querySelector(".login-brand"),
       mark=document.querySelector(".login-brand .mark"),
@@ -64,17 +64,17 @@ function lgSyncGeom(){
   if(!mw||!mh) return;
   var target=parseFloat(getComputedStyle(mark).getPropertyValue("--lg-mark-w"));
   if(!target) return;
-  var s=target/mw;                       // نسبتِ کوچک‌شدنِ لوگو در مرحلهٔ ۲
-  var divTop=Math.round(mh+LG_GAP_DIV);  // جای خط در مرحلهٔ ۱ (زیرِ لوگوی بزرگ)
-  var belowTop=divTop+LG_GAP_TXT;        // جای شرح و دکمه — ثابت، بدونِ هیچ انیمیشنی
+  var s=target/mw;                       // نسبت کوچک‌شدن لوگو در مرحلهٔ ۲
+  var divTop=Math.round(mh+LG_GAP_DIV);  // جای خط در مرحلهٔ ۱ (زیر لوگوی بزرگ)
+  var belowTop=divTop+LG_GAP_TXT;        // جای شرح و دکمه — ثابت، بدون هیچ انیمیشنی
   var belowH=below.offsetHeight||160;
 
-  /* موقعیتِ نهایی: لوگو سرِ جای خودش کوچک می‌شود، خط با فاصلهٔ ثابت زیرِ آن می‌ایستد.
-     لوگو با transform-origin بالا کوچک می‌شود، پس لبهٔ بالایش ثابت و ارتفاعِ دیده‌شده mh*s است.
-     markY صفر است: لوگو نباید بالاتر برود؛ کمتر بالا‌رفتنِ خط کارِ LG_GAP_END را می‌کند. */
+  /* موقعیت نهایی: لوگو سر جای خودش کوچک می‌شود، خط با فاصلهٔ ثابت زیر آن می‌ایستد.
+     لوگو با transform-origin بالا کوچک می‌شود، پس لبهٔ بالایش ثابت و ارتفاع دیده‌شده mh*s است.
+     markY صفر است: لوگو نباید بالاتر برود؛ کمتر بالا‌رفتن خط کار LG_GAP_END را می‌کند. */
   var markY=0;
-  var divEnd=Math.round(mh*s)+markY+LG_GAP_END; // جای نهاییِ خط = کفِ لوگوی کوچک + فاصله
-  var divY=divEnd-divTop;                       // مقدارِ حرکتِ خط (منفی = بالا)
+  var divEnd=Math.round(mh*s)+markY+LG_GAP_END; // جای نهایی خط = کف لوگوی کوچک + فاصله
+  var divY=divEnd-divTop;                       // مقدار حرکت خط (منفی = بالا)
 
   brand.style.setProperty("--lg-mark-s", s.toFixed(4));
   brand.style.setProperty("--lg-mark-y", markY+"px");
@@ -83,7 +83,7 @@ function lgSyncGeom(){
   brand.style.setProperty("--lg-below-top", belowTop+"px");
   // پنل دقیقاً از جایی که خط ایستاد باز می‌شود — یک متغیر برای هر دو، پس همیشه منطبق‌اند
   brand.style.setProperty("--lg-card-top", divEnd+"px");
-  /* کلِ بلوک (لوگو + خط + پنل) در مرحلهٔ ۲ بالا می‌رود تا پنل بالاتر بنشیند.
+  /* کل بلوک (لوگو + خط + پنل) در مرحلهٔ ۲ بالا می‌رود تا پنل بالاتر بنشیند.
      دو محدودیت: لوگوی کوچک‌شده از بالای صفحه بیرون نزند، و پنل هم از پایین جا بماند. */
   var brandTop=brand.getBoundingClientRect().top;
   var card=document.querySelector(".login-card");
@@ -92,12 +92,12 @@ function lgSyncGeom(){
   var minUp=(brandTop+divEnd+cardH+24)-window.innerHeight;        // تا پنل پایین نیفتد
   var lift=Math.max(Math.max(0,minUp), Math.min(LG_LIFT, Math.max(0,maxUp)));
   brand.style.setProperty("--lg-lift", "-"+Math.round(lift)+"px");
-  // ارتفاعِ ثابتِ بلوک: تا کفِ شرح و دکمه (چون همه absoluteاند، خودش ارتفاع نمی‌گیرد)
+  // ارتفاع ثابت بلوک: تا کف شرح و دکمه (چون همه absoluteاند، خودش ارتفاع نمی‌گیرد)
   brand.style.setProperty("--lg-brand-h", (belowTop+belowH)+"px");
   lgSyncBtn();         // جای دکمهٔ مرحلهٔ ۱ ذخیره شود تا در مرحلهٔ ۲ مبنای هم‌ترازی باشد
-  lgSyncFrame(card);   // ابعادِ قاب و --lg-card-h را خودش تنظیم می‌کند
-  /* اندازه‌ها واقعی شدند؛ از این لحظه گذارها آزادند. یک فریم صبر می‌کنیم تا مقادیرِ
-     تازه رندر شوند و برداشتنِ کلاس، خودِ همان جابه‌جایی را انیمیت نکند. */
+  lgSyncFrame(card);   // ابعاد قاب و --lg-card-h را خودش تنظیم می‌کند
+  /* اندازه‌ها واقعی شدند؛ از این لحظه گذارها آزادند. یک فریم صبر می‌کنیم تا مقادیر
+     تازه رندر شوند و برداشتن کلاس، خود همان جابه‌جایی را انیمیت نکند. */
   if(_lgPre){
     _lgPre=false;
     requestAnimationFrame(function(){
@@ -106,22 +106,22 @@ function lgSyncGeom(){
     });
   }
 }
-var _lgPre=true;   // تا نخستین اندازه‌گیریِ موفق، گذارهای جای‌گیری خاموش‌اند
-/* دکمهٔ «ورود» داخلِ پنل را روی همان نقطه‌ای می‌نشاند که دکمهٔ «ورود به سامانه» بود.
-   ⚠ به‌جای محاسبهٔ زنجیره‌ایِ مختصات (که با offsetParentهای متفاوت و lift به‌سادگی
-   غلط می‌شود)، اختلافِ واقعیِ دو دکمه روی صفحه اندازه گرفته و همان‌قدر جبران می‌شود.
-   هر دو دکمه داخلِ بلوکِ برندند و با هم بالا می‌روند، پس lift در اختلاف حذف می‌شود. */
-/* جای دکمهٔ مرحلهٔ ۱ روی صفحه، پیش از شروعِ گذار. در مرحلهٔ ۲ ذخیره می‌ماند
-   تا دکمهٔ داخلِ پنل با همان مقایسه شود. */
+var _lgPre=true;   // تا نخستین اندازه‌گیری موفق، گذارهای جای‌گیری خاموش‌اند
+/* دکمهٔ «ورود» داخل پنل را روی همان نقطه‌ای می‌نشاند که دکمهٔ «ورود به سامانه» بود.
+   ⚠ به‌جای محاسبهٔ زنجیره‌ای مختصات (که با offsetParentهای متفاوت و lift به‌سادگی
+   غلط می‌شود)، اختلاف واقعی دو دکمه روی صفحه اندازه گرفته و همان‌قدر جبران می‌شود.
+   هر دو دکمه داخل بلوک برندند و با هم بالا می‌روند، پس lift در اختلاف حذف می‌شود. */
+/* جای دکمهٔ مرحلهٔ ۱ روی صفحه، پیش از شروع گذار. در مرحلهٔ ۲ ذخیره می‌ماند
+   تا دکمهٔ داخل پنل با همان مقایسه شود. */
 var LG_START_Y = null;
 function lgSyncBtn(){
   var start=document.querySelector(".lg-start");
   if(start) LG_START_Y=start.getBoundingClientRect().top;
 }
-/* ⚠ تنظیمِ نهایی فقط در مرحلهٔ ۲ ممکن است:
-   در مرحلهٔ ۱ پنل بلور و اسکیل‌شده است و بلوکِ برند هنوز بالا نرفته، پس هر
+/* ⚠ تنظیم نهایی فقط در مرحلهٔ ۲ ممکن است:
+   در مرحلهٔ ۱ پنل بلور و اسکیل‌شده است و بلوک برند هنوز بالا نرفته، پس هر
    محاسبه‌ای آن‌جا تقریبی می‌ماند. این‌جا هر دو عنصر در جای نهایی‌شان‌اند و
-   اختلافِ واقعی‌شان مستقیم اندازه گرفته و جبران می‌شود. */
+   اختلاف واقعی‌شان مستقیم اندازه گرفته و جبران می‌شود. */
 function lgAlignBtn(){
   var card=document.querySelector(".login-card"), btn=document.querySelector(".btn-login");
   if(!card||!btn||LG_START_Y===null) return;
@@ -133,10 +133,10 @@ function lgAlignBtn(){
   lgSyncFrame(card);                            // ارتفاع عوض شد؛ قاب هم‌اندازه شود
 }
 /* ═══ نوار/قاب ═══
-   یک SVG که در هر دو مرحله همان دو مسیر را دارد؛ فقط طولِ خطِ نمایان
-   (stroke-dasharray) عوض می‌شود. مسیرها در مختصاتِ پیکسلیِ خودِ پنل نوشته می‌شوند
-   تا گوشه‌های گِرد کشیده و بیضی نشوند و ضخامت در کلِ طول ثابت بماند.
-   هر مسیر: از بالا-وسط → کنارهٔ خود → پایین → وسطِ پایین. دو مسیر آن‌جا به هم می‌رسند. */
+   یک SVG که در هر دو مرحله همان دو مسیر را دارد؛ فقط طول خط نمایان
+   (stroke-dasharray) عوض می‌شود. مسیرها در مختصات پیکسلی خود پنل نوشته می‌شوند
+   تا گوشه‌های گرد کشیده و بیضی نشوند و ضخامت در کل طول ثابت بماند.
+   هر مسیر: از بالا-وسط → کنارهٔ خود → پایین → وسط پایین. دو مسیر آن‌جا به هم می‌رسند. */
 function lgSyncFrame(card){
   if(!card) card=document.querySelector(".login-card");
   var svg=document.querySelector(".lg-frame");
@@ -144,7 +144,7 @@ function lgSyncFrame(card){
   var w=card.offsetWidth, h=card.scrollHeight;
   if(!w||!h) return;
   var r=parseFloat(getComputedStyle(card).borderRadius)||14;
-  var cx=w/2, mx=w-1, my=h-1;   // ۱px تورفتگی تا ضخامتِ ۲ کامل داخلِ کادر بماند
+  var cx=w/2, mx=w-1, my=h-1;   // ۱px تورفتگی تا ضخامت ۲ کامل داخل کادر بماند
   svg.setAttribute("viewBox","0 0 "+w+" "+h);
   svg.setAttribute("preserveAspectRatio","none");
   var right="M"+cx+" 1 H"+(mx-r)+" A"+r+" "+r+" 0 0 1 "+mx+" "+(1+r)+
@@ -154,24 +154,24 @@ function lgSyncFrame(card){
   var pr=svg.querySelector("path.r"), pl=svg.querySelector("path.l");
   if(pr) pr.setAttribute("d", right);
   if(pl) pl.setAttribute("d", left);
-  /* ⚠ مقادیرِ dash بر حسبِ پیکسلِ واقعی است، نه کسر.
-     قبلاً pathLength=1 بود و طول‌ها نرمال می‌شدند؛ همان باعث می‌شد مقدارِ نهایی
-     کلِ مسیر را نپوشاند و قاب در میانهٔ دو کناره ناتمام بماند.
-     حالا طولِ واقعیِ مسیر خوانده می‌شود، پس «کامل» یعنی دقیقاً کامل. */
+  /* ⚠ مقادیر dash بر حسب پیکسل واقعی است، نه کسر.
+     قبلاً pathLength=1 بود و طول‌ها نرمال می‌شدند؛ همان باعث می‌شد مقدار نهایی
+     کل مسیر را نپوشاند و قاب در میانهٔ دو کناره ناتمام بماند.
+     حالا طول واقعی مسیر خوانده می‌شود، پس «کامل» یعنی دقیقاً کامل. */
   var total=(pr&&pr.getTotalLength)?pr.getTotalLength():(cx+h+w);
-  var shown=Math.min(cx-r, 27);            // نیم‌عرضِ خطِ کوتاه (۵۴px کامل)
+  var shown=Math.min(cx-r, 27);            // نیم‌عرض خط کوتاه (۵۴px کامل)
   svg.style.setProperty("--lg-shown", shown.toFixed(1)+"px");
   svg.style.setProperty("--lg-full",  Math.ceil(total+2)+"px");   // +2 تا نقطهٔ اتصال حتماً بسته شود
   svg.style.setProperty("--lg-gap",   Math.ceil(total*2)+"px");   // فاصله‌ای بزرگ‌تر از مسیر، تا الگو تکرار نشود
-  // ارتفاعِ ظرفِ قاب همیشه با ارتفاعِ واقعیِ پنل یکی می‌ماند
+  // ارتفاع ظرف قاب همیشه با ارتفاع واقعی پنل یکی می‌ماند
   var brand=document.querySelector(".login-brand");
   if(brand) brand.style.setProperty("--lg-card-h", h+"px");
   return {w:w,h:h};
 }
-/* ⚠ چرا فقط load کافی نیست: load منتظرِ دانلودِ کاملِ تصویرها و فونت‌هاست. تا آن لحظه
-   صفحه با مقادیرِ پیش‌فرضِ CSS رسم شده و نوارِ نارنجی جایی می‌ایستد که جای واقعی‌اش نیست؛
-   بعد با رسیدنِ اندازه‌های واقعی سُر می‌خورد سرِ جای درست. راهِ حل: به‌محضِ آماده‌شدنِ
-   لوگو (نه کلِ صفحه) اندازه‌گیری شود، و تا آن زمان گذارها خاموش بمانند. */
+/* ⚠ چرا فقط load کافی نیست: load منتظر دانلود کامل تصویرها و فونت‌هاست. تا آن لحظه
+   صفحه با مقادیر پیش‌فرض CSS رسم شده و نوار نارنجی جایی می‌ایستد که جای واقعی‌اش نیست؛
+   بعد با رسیدن اندازه‌های واقعی سر می‌خورد سر جای درست. راه حل: به‌محض آماده‌شدن
+   لوگو (نه کل صفحه) اندازه‌گیری شود، و تا آن زمان گذارها خاموش بمانند. */
 (function lgEarlySync(){
   var img=document.querySelector(".login-brand .mark");
   if(img){
@@ -179,10 +179,10 @@ function lgSyncFrame(card){
     else img.addEventListener("load", lgSyncGeom, {once:true});
     img.addEventListener("error", lgSyncGeom, {once:true});   // حتی اگر لوگو نیامد، قفل باز شود
   }
-  // فونتِ IRANSans ارتفاعِ شرح و دکمه را عوض می‌کند → پس از آماده‌شدنِ فونت‌ها یک‌بار دیگر
+  // فونت IRANSans ارتفاع شرح و دکمه را عوض می‌کند → پس از آماده‌شدن فونت‌ها یک‌بار دیگر
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ lgSyncGeom(); });
-  /* تورِ ایمنی: اگر به هر دلیل اندازه‌گیری موفق نشد، قفلِ گذارها نباید برای همیشه بماند
-     وگرنه انیمیشنِ باز‌شدنِ پنل هم اجرا نمی‌شود. */
+  /* تور ایمنی: اگر به هر دلیل اندازه‌گیری موفق نشد، قفل گذارها نباید برای همیشه بماند
+     وگرنه انیمیشن باز‌شدن پنل هم اجرا نمی‌شود. */
   setTimeout(function(){
     var w=document.getElementById("loginView");
     if(w && w.classList.contains("lg-premeasure")){ _lgPre=false; w.classList.remove("lg-premeasure"); }
@@ -194,9 +194,9 @@ window.addEventListener("resize", function(){
   if(w && !w.classList.contains("open")) lgSyncGeom();   // فقط در مرحلهٔ ۱ اندازه‌ها معتبرند
 });
 /* ===== «مرا به خاطر بسپار» =====
-   ⚠ فقط نامِ کاربری و خودِ تیک ذخیره می‌شوند — هرگز رمز.
-   کلیدِ جدا از fsm_session است، چون باید پس از خروج هم باقی بماند؛
-   خروج، نشست را پاک می‌کند ولی انتخابِ کاربر نباید فراموش شود. */
+   ⚠ فقط نام کاربری و خود تیک ذخیره می‌شوند — هرگز رمز.
+   کلید جدا از fsm_session است، چون باید پس از خروج هم باقی بماند؛
+   خروج، نشست را پاک می‌کند ولی انتخاب کاربر نباید فراموش شود. */
 var LG_REMEMBER_KEY="fsm_remember";
 function lgLoadRemember(){
   var box=document.getElementById("lgRemember");
@@ -209,7 +209,7 @@ function lgLoadRemember(){
     if(!d || d.on!==true) return;
     box.checked=true;
     if(usr && typeof d.u==="string" && d.u && !usr.value) usr.value=d.u;
-  }catch(e){ /* خواندنِ خراب نباید ورود را زمین بزند */ }
+  }catch(e){ /* خواندن خراب نباید ورود را زمین بزند */ }
 }
 function lgSaveRemember(on, username){
   try{
@@ -220,37 +220,37 @@ function lgSaveRemember(on, username){
 function lgOpen(){
   var w=document.getElementById("loginView"); if(!w) return;
   if(w.classList.contains("open")) return;
-  lgSyncGeom();                     // هندسهٔ واقعی پیش از شروعِ گذار قفل شود
+  lgSyncGeom();                     // هندسهٔ واقعی پیش از شروع گذار قفل شود
   w.classList.add("open");
-  /* پس از پایانِ بالا‌رفتنِ بلوک (۵۵۰ms) دکمه روی جای دکمهٔ مرحلهٔ ۱ می‌نشیند.
-     ⚠ زودتر از این ممکن نیست: تا وقتی بلوک در حالِ حرکت است، مختصاتِ دکمه
+  /* پس از پایان بالا‌رفتن بلوک (۵۵۰ms) دکمه روی جای دکمهٔ مرحلهٔ ۱ می‌نشیند.
+     ⚠ زودتر از این ممکن نیست: تا وقتی بلوک در حال حرکت است، مختصات دکمه
      لحظه‌ای است و اندازه‌گیری اشتباه می‌شود. */
   setTimeout(function(){ lgAlignBtn(); }, 600);
-  // پس از پایانِ کاملِ کشو (۵۵۰ تأخیر + ۶۰۰ حرکت)، فوکوس روی نام کاربری
-  lgLoadRemember();                 // تیک و نامِ کاربریِ دفعهٔ قبل بازگردانده شوند
-  /* اگر نامِ کاربری از پیش پر است، فوکوس روی رمز مفیدتر است تا نامِ کاربری */
+  // پس از پایان کامل کشو (۵۵۰ تأخیر + ۶۰۰ حرکت)، فوکوس روی نام کاربری
+  lgLoadRemember();                 // تیک و نام کاربری دفعهٔ قبل بازگردانده شوند
+  /* اگر نام کاربری از پیش پر است، فوکوس روی رمز مفیدتر است تا نام کاربری */
   setTimeout(function(){
     var u=document.getElementById("lgUser"), pw=document.getElementById("lgPass");
     var t=(u && u.value && pw) ? pw : u;
     if(t) t.focus();
   }, 1150);
 }
-/* بازگشت به مرحلهٔ ۱ — همهٔ انیمیشن‌ها روی کلاسِ .open سوارند، پس با برداشتنِ آن خودبه‌خود معکوس اجرا می‌شوند.
-   مقادیرِ فیلدها عمداً پاک نمی‌شوند تا اگر کاربر دوباره باز کرد، نوشته‌اش سرِ جایش باشد. */
+/* بازگشت به مرحلهٔ ۱ — همهٔ انیمیشن‌ها روی کلاس .open سوارند، پس با برداشتن آن خودبه‌خود معکوس اجرا می‌شوند.
+   مقادیر فیلدها عمداً پاک نمی‌شوند تا اگر کاربر دوباره باز کرد، نوشته‌اش سر جایش باشد. */
 function lgClose(){
   var w=document.getElementById("loginView"); if(!w) return;
   if(!w.classList.contains("open")) return;
-  if(lgIsBusy()) return;            // وسطِ ارسالِ درخواست بسته نشود
+  if(lgIsBusy()) return;            // وسط ارسال درخواست بسته نشود
   w.classList.remove("open");
   lgSetErr("");
-  var a=document.activeElement;     // فوکوس از فیلدِ پنهان‌شده برداشته شود
+  var a=document.activeElement;     // فوکوس از فیلد پنهان‌شده برداشته شود
   if(a && w.contains(a) && typeof a.blur==="function") a.blur();
 }
 function lgIsBusy(){
   var b=document.getElementById("lgBtn");
   return !!(b && b.disabled);
 }
-/* Escape = بازگشت؛ کلیک روی فضای بیرونِ کارت هم می‌بندد (هم‌رفتار با مودال‌های سایت) */
+/* Escape = بازگشت؛ کلیک روی فضای بیرون کارت هم می‌بندد (هم‌رفتار با مودال‌های سایت) */
 document.addEventListener("keydown", function(e){
   if(e.key!=="Escape") return;
   var w=document.getElementById("loginView");
@@ -260,12 +260,12 @@ document.addEventListener("keydown", function(e){
 document.addEventListener("click", function(e){
   var w=document.getElementById("loginView");
   if(!w || w.classList.contains("hidden") || !w.classList.contains("open")) return;
-  if(e.target.closest(".login-card")) return;      // داخلِ کارت: کاری نکن
+  if(e.target.closest(".login-card")) return;      // داخل کارت: کاری نکن
   if(e.target.closest(".lg-start")) return;        // دکمهٔ آغاز خودش باز می‌کند
-  if(!w.contains(e.target)) return;                // کلیکِ بیرون از صفحهٔ ورود
+  if(!w.contains(e.target)) return;                // کلیک بیرون از صفحهٔ ورود
   lgClose();
 });
-/* نمایش/پنهان‌سازیِ رمز */
+/* نمایش/پنهان‌سازی رمز */
 function lgTogglePass(){
   var i=document.getElementById("lgPass"), b=document.getElementById("lgEye");
   if(!i||!b) return;
@@ -277,12 +277,12 @@ function lgTogglePass(){
   b.setAttribute("aria-label", t); b.setAttribute("title", t);
   i.focus();
 }
-/* ⚠ ورود فقط با کنشِ واقعیِ کاربر (کلیک یا Enter) مجاز است.
-   بدونِ این نگهبان، مدیرِ رمزِ مرورگر که فیلدها را خودکار پر می‌کند می‌توانست
-   بلافاصله ورود را هم شروع کند — کاربر بدونِ زدنِ هیچ دکمه‌ای وارد می‌شد. */
+/* ⚠ ورود فقط با کنش واقعی کاربر (کلیک یا Enter) مجاز است.
+   بدون این نگهبان، مدیر رمز مرورگر که فیلدها را خودکار پر می‌کند می‌توانست
+   بلافاصله ورود را هم شروع کند — کاربر بدون زدن هیچ دکمه‌ای وارد می‌شد. */
 async function doLogin(trusted){
-  if(trusted!==true) return;   // فقط فراخوانیِ صریح از دکمه/کلید
-  if(document.getElementById("lgBtn") && document.getElementById("lgBtn").disabled) return;   // جلوگیری از ارسالِ دوباره
+  if(trusted!==true) return;   // فقط فراخوانی صریح از دکمه/کلید
+  if(document.getElementById("lgBtn") && document.getElementById("lgBtn").disabled) return;   // جلوگیری از ارسال دوباره
   var u=document.getElementById("lgUser").value.trim();
   var p=document.getElementById("lgPass").value;
   lgSetErr("");
@@ -293,21 +293,21 @@ async function doLogin(trusted){
     var remember=!!(rem&&rem.checked);
     var r=await api("login",{username:u,password:p,remember:remember});
     if(!r.ok){
-      /* پیامِ یکسان برای «کاربر پیدا نشد» و «رمز اشتباه»: اگر این دو از هم
+      /* پیام یکسان برای «کاربر پیدا نشد» و «رمز اشتباه»: اگر این دو از هم
          تفکیک شوند، می‌شود با آزمون‌وخطا فهمید کدام نام‌کاربری‌ها وجود دارند.
          خطای شبکه استثناست، چون کاربر باید بداند مشکل از اتصال است نه رمز. */
       lgSetErr(r.netError ? (r.message||"خطا در ارتباط با سرویس.") : "نام کاربری یا رمز عبور نادرست است.");
       lgBusy(false); return;
     }
     ME={ token:r.token, role:r.role, name:r.name, username:r.username, gender:r.gender||"", position:r.position||"", avatar:r.avatar||"" };
-    /* زمانِ انقضا کنارِ توکن ذخیره می‌شود تا در بازگشاییِ بعدی، نشستِ تمام‌شده
-       بدونِ رفت‌وبرگشت به سرور تشخیص داده شود (توکنِ بک‌اند ۱۲ ساعته است).
-       اگر روزی خودِ بک‌اند expiresAt بفرستد، همان ملاک قرار می‌گیرد. */
-    /* ملاک همیشه expiresAt ِ سرور است (از v21 فرستاده می‌شود)؛ حدسِ محلی فقط
-       پشتیبانِ بک‌اندِ قدیمی است و با «مرا به خاطر بسپار» هم‌خوان نیست. */
+    /* زمان انقضا کنار توکن ذخیره می‌شود تا در بازگشایی بعدی، نشست تمام‌شده
+       بدون رفت‌وبرگشت به سرور تشخیص داده شود (توکن بک‌اند ۱۲ ساعته است).
+       اگر روزی خود بک‌اند expiresAt بفرستد، همان ملاک قرار می‌گیرد. */
+    /* ملاک همیشه expiresAt  سرور است (از v21 فرستاده می‌شود)؛ حدس محلی فقط
+       پشتیبان بک‌اند قدیمی است و با «مرا به خاطر بسپار» هم‌خوان نیست. */
     ME.expiresAt = r.expiresAt || (Date.now() + (remember ? LG_TOKEN_TTL_REMEMBER : LG_TOKEN_TTL));
     localStorage.setItem("fsm_session", JSON.stringify(ME));
-    lgSaveRemember(remember, u);   // انتخابِ کاربر برای دفعهٔ بعد نگه داشته شود (بدونِ رمز)
+    lgSaveRemember(remember, u);   // انتخاب کاربر برای دفعهٔ بعد نگه داشته شود (بدون رمز)
     // رمز نباید پس از ورود در DOM بماند
     var pw=document.getElementById("lgPass");
     if(pw){ pw.value=""; pw.type="password"; }
@@ -317,13 +317,13 @@ async function doLogin(trusted){
     lgBusy(false);
   }catch(e){ lgSetErr("خطا در اتصال به سرویس."); lgBusy(false); }
 }
-/* خروجِ دستی (دکمهٔ سایدبار): اول تأیید می‌گیرد.
-   ⚠ عمداً جدا از logout() است — خروجِ خودکار (نشستِ منقضی یا نشستِ نامعتبر)
-   نباید منتظرِ تأییدِ کاربر بماند و باید فوراً انجام شود. */
+/* خروج دستی (دکمهٔ سایدبار): اول تأیید می‌گیرد.
+   ⚠ عمداً جدا از logout() است — خروج خودکار (نشست منقضی یا نشست نامعتبر)
+   نباید منتظر تأیید کاربر بماند و باید فوراً انجام شود. */
 async function confirmLogout(){
-  /* انیمیشنِ فلش روی کلیک اجرا می‌شود، نه هوور: دکمهٔ خروج حالتِ «فعال»
+  /* انیمیشن فلش روی کلیک اجرا می‌شود، نه هوور: دکمهٔ خروج حالت «فعال»
      ندارد چون پنجرهٔ تأیید باز می‌کند؛ پس کلاس را دستی می‌گذاریم و پس از
-     پایانِ انیمیشن برمی‌داریم تا دفعهٔ بعد دوباره قابلِ اجرا باشد. */
+     پایان انیمیشن برمی‌داریم تا دفعهٔ بعد دوباره قابل اجرا باشد. */
   var lo=document.querySelector(".nav-item.nav-logout");
   if(lo){ lo.classList.remove("lo-go"); void lo.offsetWidth; lo.classList.add("lo-go");
     setTimeout(function(){ lo.classList.remove("lo-go"); },700); }
@@ -331,14 +331,14 @@ async function confirmLogout(){
     { title:"خروج از سامانه", okLabel:"خروج", cancelLabel:"انصراف", danger:true });
   if(ok) logout();
 }
-/* شمارندهٔ «نسلِ نشست»: هر ورود/خروج یک واحد جلو می‌برد. هر اجرای startApp نسلِ خودش را
-   نگه می‌دارد و پس از بازگشتِ bootstrap بررسی می‌کند که هنوز جدیدترین است یا نه.
-   بدونِ این، اگر کاربر سریع خارج و دوباره وارد شود، پاسخِ درخواستِ قبلی دیرتر می‌رسد و
-   دادهٔ نشستِ قدیمی را روی نشستِ جدید رسم می‌کند. */
+/* شمارندهٔ «نسل نشست»: هر ورود/خروج یک واحد جلو می‌برد. هر اجرای startApp نسل خودش را
+   نگه می‌دارد و پس از بازگشت bootstrap بررسی می‌کند که هنوز جدیدترین است یا نه.
+   بدون این، اگر کاربر سریع خارج و دوباره وارد شود، پاسخ درخواست قبلی دیرتر می‌رسد و
+   دادهٔ نشست قدیمی را روی نشست جدید رسم می‌کند. */
 var _appRun = 0;
 function logout(){
-  _appRun++;                              // هر اجرای در جریانِ startApp از این لحظه بی‌اعتبار است
-  /* قفلِ پنهان‌ماندنِ صفحهٔ ورود (که اسکریپتِ head برای نشستِ ذخیره‌شده گذاشته)
+  _appRun++;                              // هر اجرای در جریان startApp از این لحظه بی‌اعتبار است
+  /* قفل پنهان‌ماندن صفحهٔ ورود (که اسکریپت head برای نشست ذخیره‌شده گذاشته)
      باید برداشته شود، وگرنه پس از خروج صفحهٔ ورود نامرئی می‌ماند. */
   document.documentElement.classList.remove("has-session");
   ME={token:null}; localStorage.removeItem("fsm_session");
@@ -347,53 +347,53 @@ function logout(){
   stopClock();
   document.getElementById("appView").classList.add("hidden");
   document.getElementById("loginView").classList.remove("hidden");
-  document.body.classList.remove("in-app");   // اسکرول به خودِ صفحه برمی‌گردد (صفحهٔ ورود)
-  lgSetErr(""); lgBusy(false);            // صفحهٔ ورود تمیز برگردد (بدونِ خطا/اسپینرِ نشست قبلی)
-  document.getElementById("loginView").classList.remove("open");   // بازگشت به مرحلهٔ ۱ (برندِ بزرگ)
+  document.body.classList.remove("in-app");   // اسکرول به خود صفحه برمی‌گردد (صفحهٔ ورود)
+  lgSetErr(""); lgBusy(false);            // صفحهٔ ورود تمیز برگردد (بدون خطا/اسپینر نشست قبلی)
+  document.getElementById("loginView").classList.remove("open");   // بازگشت به مرحلهٔ ۱ (برند بزرگ)
   var pw=document.getElementById("lgPass");
   if(pw){ pw.value=""; pw.type="password"; }
   var eye=document.getElementById("lgEye");
   if(eye){ eye.classList.remove("on"); eye.setAttribute("aria-pressed","false"); }
 }
-/* پوستهٔ برنامه در هر دو مسیر (ورودِ دستی و نشستِ ذخیره‌شده) فقط پس از رسیدنِ
+/* پوستهٔ برنامه در هر دو مسیر (ورود دستی و نشست ذخیره‌شده) فقط پس از رسیدن
    دادهٔ کامل نمایش داده می‌شود؛ پس opts دیگر لازم نیست و نگه داشته شده تا
    فراخوان‌های قدیمی خطا ندهند. */
 async function startApp(){
-  var myRun=++_appRun;   // نسلِ این اجرا؛ اگر بعداً نسلِ تازه‌تری بیاید، این اجرا حق رسم ندارد
-  /* ⚡ بازشدنِ فوری: اگر از نشستِ قبلیِ همین کاربر دادهٔ ذخیره‌شده‌ای هست، پوسته همین حالا
+  var myRun=++_appRun;   // نسل این اجرا؛ اگر بعداً نسل تازه‌تری بیاید، این اجرا حق رسم ندارد
+  /* ⚡ بازشدن فوری: اگر از نشست قبلی همین کاربر دادهٔ ذخیره‌شده‌ای هست، پوسته همین حالا
      با آن رسم می‌شود و بوت‌استرپ در پس‌زمینه تازه‌اش می‌کند (فقط اگر چیزی فرق کرده بود،
-     دوباره رسم می‌شود). بدونِ دادهٔ ذخیره‌شده، رفتارِ قبلی برقرار است:
-     ⚠ پیش از رسیدنِ داده چیزی نمایش داده نمی‌شود؛ کاربر روی صفحهٔ ورود می‌ماند
-     (دکمه در حالتِ «در حال بارگذاری اطلاعات…») و پوسته فقط یک‌بار و با دادهٔ کامل
+     دوباره رسم می‌شود). بدون دادهٔ ذخیره‌شده، رفتار قبلی برقرار است:
+     ⚠ پیش از رسیدن داده چیزی نمایش داده نمی‌شود؛ کاربر روی صفحهٔ ورود می‌ماند
+     (دکمه در حالت «در حال بارگذاری اطلاعات…») و پوسته فقط یک‌بار و با دادهٔ کامل
      وارد می‌شود — وگرنه پنل‌ها یک‌بار خالی دیده و بعد دوباره در آبشار وارد می‌شدند. */
   var snap=(typeof snapLoad==="function")?snapLoad():null;
   if(snap){ applyBootData(snap); showAppShell(true); }
-  else lgStage2();   // متنِ دکمه: ورود موفق بود، حالا داده می‌آید
+  else lgStage2();   // متن دکمه: ورود موفق بود، حالا داده می‌آید
 
   var r=await api("bootstrap",{},{timeout:BOOT_TIMEOUT_MS});
-  /* نشستِ نامعتبر: api خودش logout() را صدا زده و صفحهٔ ورود را آورده،
+  /* نشست نامعتبر: api خودش logout() را صدا زده و صفحهٔ ورود را آورده،
      پس این‌جا فقط باید بی‌سروصدا برگردیم (وگرنه خطای bootstrap هم روی آن می‌نشیند). */
   if(!ME.token) return;
-  if(myRun!==_appRun) return;   // نشستِ تازه‌تری شروع شده؛ این پاسخ کهنه است و نباید چیزی رسم کند
+  if(myRun!==_appRun) return;   // نشست تازه‌تری شروع شده؛ این پاسخ کهنه است و نباید چیزی رسم کند
   if(!r || !r.ok){
     if(snap){ toast("ارتباط با سرویس برقرار نشد؛ آخرین دادهٔ ذخیره‌شده نمایش داده می‌شود.", true);
       if(typeof consumePendingRoute==="function") consumePendingRoute(); return; }
     // هنوز چیزی نمایش داده نشده؛ حالا پوسته را بیاور تا خطا جایی برای دیده‌شدن داشته باشد
     document.getElementById("loginView").classList.add("hidden");
     document.getElementById("appView").classList.remove("hidden");
-    document.body.classList.add("in-app");   // اسکرولِ اصلی به ظرفِ برنامه می‌رود
+    document.body.classList.add("in-app");   // اسکرول اصلی به ظرف برنامه می‌رود
     renderUserHeader(); applyRoleVisibility();
     showBootFail(r, myRun); return;
   }
-  /* تمدیدِ خودکار: اگر بک‌اند توکنِ تازه فرستاده، جایگزین می‌شود تا کاربرِ
-     فعال وسطِ کار بیرون نیفتد. ذخیرهٔ نهایی چند خط پایین‌تر انجام می‌شود. */
+  /* تمدید خودکار: اگر بک‌اند توکن تازه فرستاده، جایگزین می‌شود تا کاربر
+     فعال وسط کار بیرون نیفتد. ذخیرهٔ نهایی چند خط پایین‌تر انجام می‌شود. */
   if(r.token){ ME.token=r.token; if(r.expiresAt) ME.expiresAt=r.expiresAt; }
   var changed = !snap || bootSig(r)!==bootSig(DB);
   applyBootData(r);
-  if(!r.backendVersion){ toast("بک‌اندِ سرویس هنوز نسخهٔ قدیمی است. در Apps Script از Deploy ▸ Manage deployments، روی همان deployment «New version» را دیپلوی کنید.", true); }
-  /* نقشِ معتبر همان است که بک‌اند اعلام می‌کند، نه آنچه در localStorage نوشته شده.
-     بدونِ این خط، دست‌کاریِ fsm_session می‌توانست دکمه‌های مدیر را در رابط باز کند
-     (اقدامِ واقعی را بک‌اند رد می‌کند، ولی نباید اصلاً نمایش داده شود). */
+  if(!r.backendVersion){ toast("بک‌اند سرویس هنوز نسخهٔ قدیمی است. در Apps Script از Deploy ▸ Manage deployments، روی همان deployment «New version» را دیپلوی کنید.", true); }
+  /* نقش معتبر همان است که بک‌اند اعلام می‌کند، نه آنچه در localStorage نوشته شده.
+     بدون این خط، دست‌کاری fsm_session می‌توانست دکمه‌های مدیر را در رابط باز کند
+     (اقدام واقعی را بک‌اند رد می‌کند، ولی نباید اصلاً نمایش داده شود). */
   if(r.role) ME.role=r.role;
   // غنی‌سازی پروفایل کاربر جاری از رکورد خودش (برای مدیر که فهرست کاربران را دارد)
   var meRec=(DB.users||[]).find(function(x){return x.username===ME.username;});
@@ -401,14 +401,14 @@ async function startApp(){
     if(meRec.role) ME.role=meRec.role;
     ME.name=meRec.name||ME.name; ME.gender=meRec.gender||ME.gender; ME.position=meRec.position||ME.position; ME.avatar=meRec.avatar||ME.avatar;
   }
-  localStorage.setItem("fsm_session", JSON.stringify(ME));   // نشستِ ذخیره‌شده با مقادیرِ تأییدشده هم‌گام شود
+  localStorage.setItem("fsm_session", JSON.stringify(ME));   // نشست ذخیره‌شده با مقادیر تأییدشده هم‌گام شود
   if(typeof snapSave==="function") snapSave();
   if(typeof markSynced==="function") markSynced();
   if(!snap){ showAppShell(); return; }
-  // مسیرِ بازشدنِ فوری: پوسته از قبل روی صفحه است؛ فقط اگر داده/نقش فرق کرده بود به‌روز می‌شود
+  // مسیر بازشدن فوری: پوسته از قبل روی صفحه است؛ فقط اگر داده/نقش فرق کرده بود به‌روز می‌شود
   applyRoleVisibility(); renderUserHeader();
   if(changed){ rerenderAfterData(); if(typeof renderNavTree==="function") renderNavTree(); }
-  // سندِ QR ممکن است تازه باشد و در دادهٔ ذخیره‌شده نباشد؛ پس با دادهٔ تازه باز می‌شود
+  // سند QR ممکن است تازه باشد و در دادهٔ ذخیره‌شده نباشد؛ پس با دادهٔ تازه باز می‌شود
   if(typeof consumePendingRoute==="function") consumePendingRoute();
 }
 /* دادهٔ بوت‌استرپ (یا نسخهٔ ذخیره‌شده‌اش) → DB */
@@ -416,20 +416,20 @@ function applyBootData(r){
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
-  DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسنادِ حذف‌شده، برای معنا‌دار ماندنِ رویدادهای گذشته
+  DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسناد حذف‌شده، برای معنا‌دار ماندن رویدادهای گذشته
   DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[];
   DB.instanceCounts=r.instanceCounts||{};
-  DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردنِ همان بخش گرفته می‌شوند
+  DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردن همان بخش گرفته می‌شوند
 }
-/* امضای کاملِ دادهٔ بوت‌استرپ — dataSig به‌علاوهٔ بخش‌هایی که فقط هنگامِ شروع می‌آیند */
+/* امضای کامل دادهٔ بوت‌استرپ — dataSig به‌علاوهٔ بخش‌هایی که فقط هنگام شروع می‌آیند */
 function bootSig(x){
   return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[]]);
 }
-/* رسمِ پوستهٔ برنامه با DBِ فعلی — هم برای ورودِ عادی و هم بازشدنِ فوری با دادهٔ ذخیره‌شده */
-/* ================= «داده نرسیده»: بوت‌استرپِ ناموفق بدونِ دادهٔ ذخیره‌شده =================
-   قبلاً پیامِ خطا فقط در کارتِ پروژه‌های داشبورد می‌نشست؛ کافی بود کاربر روی هر بخشی کلیک کند
+/* رسم پوستهٔ برنامه با DB فعلی — هم برای ورود عادی و هم بازشدن فوری با دادهٔ ذخیره‌شده */
+/* ================= «داده نرسیده»: بوت‌استرپ ناموفق بدون دادهٔ ذخیره‌شده =================
+   قبلاً پیام خطا فقط در کارت پروژه‌های داشبورد می‌نشست؛ کافی بود کاربر روی هر بخشی کلیک کند
    تا همه‌چیز با فهرست‌های خالی رسم شود («پروژه‌ای ثبت نشده») و به نظر برسد پایگاه داده پاک شده.
-   حالا یک صفحهٔ وضعیت جای همهٔ تب‌ها را می‌گیرد (body.boot-failed)، علتِ واقعی را می‌گوید، صریحاً
+   حالا یک صفحهٔ وضعیت جای همهٔ تب‌ها را می‌گیرد (body.boot-failed)، علت واقعی را می‌گوید، صریحاً
    اعلام می‌کند که اطلاعات سالم است، و هر ۳۰ ثانیه خودکار دوباره تلاش می‌کند. */
 var BOOT_TIMEOUT_MS=45000, BOOT_RETRY_S=30, _bootTimer=null;
 function stopBootRetry(){ if(_bootTimer){ clearInterval(_bootTimer); _bootTimer=null; } }
@@ -441,17 +441,17 @@ async function showBootFail(r, myRun){
   host.innerHTML='<div class="boot-fail-in"><div class="spinner"></div></div>';
   var fi=(typeof fileFailInfo==="function")?await fileFailInfo(r):null;
   if(myRun!==_appRun || !ME.token) return;
-  // پیامِ مخصوصِ داده (نه فایل): برای پاسخِ معتبرِ ناموفقِ سرور، متنِ خودِ سرور
+  // پیام مخصوص داده (نه فایل): برای پاسخ معتبر ناموفق سرور، متن خود سرور
   if(!fi || (r && !r.netError && r.error!=="AUTH")) fi={ ic:(typeof FAIL_IC!=="undefined")?FAIL_IC.server:"", t:"سرور خطا داد", d:(r&&r.message)||"" };
   host.innerHTML='<div class="boot-fail-in empty-state">'+(fi.ic||"")+
     '<div class="es-title">'+esc(fi.t)+'</div>'+
-    '<div class="es-desc">اطلاعات سامانه سالم است و پس از برقراریِ ارتباط نمایش داده می‌شود.</div>'+
+    '<div class="es-desc">اطلاعات سامانه سالم است و پس از برقراری ارتباط نمایش داده می‌شود.</div>'+
     '<button class="btn primary" onclick="bootRetryNow()">تلاش دوباره</button>'+
     '<div class="boot-fail-auto" id="bootAuto"></div></div>';
   var left=BOOT_RETRY_S, auto=document.getElementById("bootAuto");
   var tick=function(){
     if(!auto) return;
-    auto.textContent='تلاشِ خودکار تا '+faN(left)+' ثانیهٔ دیگر';
+    auto.textContent='تلاش خودکار تا '+faN(left)+' ثانیهٔ دیگر';
   };
   tick();
   _bootTimer=setInterval(function(){
@@ -463,7 +463,7 @@ async function showBootFail(r, myRun){
 function bootRetryNow(){
   stopBootRetry();
   var host=document.getElementById("bootFail");
-  if(host) host.innerHTML='<div class="boot-fail-in empty-state"><div class="spinner"></div><div class="es-desc">در حالِ اتصال به سرور…</div></div>';
+  if(host) host.innerHTML='<div class="boot-fail-in empty-state"><div class="spinner"></div><div class="es-desc">در حال اتصال به سرور…</div></div>';
   startApp();
 }
 function hideBootFail(){
@@ -484,13 +484,13 @@ function showAppShell(deferRoute){
      دیده می‌شوند و بعد دوباره در آبشار وارد می‌شوند. */
   document.getElementById("loginView").classList.add("hidden");
   document.getElementById("appView").classList.remove("hidden");
-  document.body.classList.add("in-app");   // اسکرولِ اصلی به ظرفِ برنامه می‌رود
-  switchTab("dashboard");   // پنلِ داشبورد را نمایان می‌کند و آبشار را یک‌بار پخش می‌کند
-  lgBusy(false);            // دکمهٔ ورود برای دفعهٔ بعد به حالتِ عادی برگردد
-  // اگر کاربر با اسکنِ QR آمده، حالا که داده آماده است همان سند باز می‌شود
+  document.body.classList.add("in-app");   // اسکرول اصلی به ظرف برنامه می‌رود
+  switchTab("dashboard");   // پنل داشبورد را نمایان می‌کند و آبشار را یک‌بار پخش می‌کند
+  lgBusy(false);            // دکمهٔ ورود برای دفعهٔ بعد به حالت عادی برگردد
+  // اگر کاربر با اسکن QR آمده، حالا که داده آماده است همان سند باز می‌شود
   if(!deferRoute && typeof consumePendingRoute==="function") consumePendingRoute();
 }
-/* هدر کاربر: آواتار + (آقای/خانم + نام) + تگِ نقش | سمت */
+/* هدر کاربر: آواتار + (آقای/خانم + نام) + تگ نقش | سمت */
 function renderUserHeader(){
   var hon=honorific(ME.gender);
   var nm=ME.name||ME.username||"";
