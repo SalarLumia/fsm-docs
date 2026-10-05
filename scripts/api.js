@@ -23,12 +23,15 @@ async function api(action, payload, opts){
   // پس اورلیِ تمام‌صفحه اضافه و مزاحم است.
   var silent = (action === "ping" || action === "nextRevision" || action === "bootstrap" || action === "login") || !!(opts && opts.silent);
   if(!silent) setLoading(true, action);
+  /* opts.timeout: سقفِ انتظار (میلی‌ثانیه) — برای بوت‌استرپ، تا سرورِ گیرکرده کاربر را بی‌پایان معطل نکند */
+  var ctl=(opts && opts.timeout && typeof AbortController==="function")?new AbortController():null;
+  var tmr=ctl?setTimeout(function(){ ctl.abort(); }, opts.timeout):null;
   try {
     var res = await fetch(API_URL, {
       method:"POST",
       headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify({ action:action, token:ME.token, payload:payload||{} }),
-      redirect:"follow"
+      redirect:"follow", signal: ctl?ctl.signal:undefined
     });
     if(!res.ok) throw new Error("HTTP "+res.status);
     var data = await res.json();
@@ -44,6 +47,7 @@ async function api(action, payload, opts){
       toast("خطا در ارتباط با سرویس. اتصال اینترنت یا در دسترس‌بودن سرویس را بررسی کنید.", true);
     return { ok:false, message:"خطا در ارتباط با سرویس.", netError:true };
   } finally {
+    clearTimeout(tmr);
     if(!silent) setLoading(false);
   }
 }
@@ -86,9 +90,17 @@ async function apiFileSize(fileId){
    expectedTotal: طولِ تقریبیِ پاسخِ JSON (base64 + سرریز) که از حجمِ فایل حساب می‌شود تا درصد واقعی باشد. */
 async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal){
   if(!API_URL || API_URL.indexOf("PASTE_")===0) return { ok:false, message:"آدرس سرویس تنظیم نشده است." };
+  /* سقفِ انتظار تا *شروعِ* پاسخ (نه کلِ دانلود): سرورِ گیرکرده دیگر نوار را دقیقه‌ها نمی‌چرخاند.
+     ۳۵ ثانیه چون Apps Script پیش از فرستادنِ اولین بایت، کلِ فایل را از درایو می‌خواند و base64 می‌کند
+     (برای فایلِ بزرگ و شروعِ سرد ده‌ها ثانیه طول می‌کشد). پس از رسیدنِ سرآیندها، دانلود بی‌سقف ادامه دارد. */
+  var ctl=(typeof AbortController==="function")?new AbortController():null, timedOut=false;
+  var ttfb=ctl?setTimeout(function(){ timedOut=true; ctl.abort(); }, FILE_TTFB_MS):null;
   try{
     var res=await fetch(API_URL,{ method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify({ action:"getFile", token:ME.token, payload:{ fileId:fileId } }), redirect:"follow" });
+      body: JSON.stringify({ action:"getFile", token:ME.token, payload:{ fileId:fileId } }), redirect:"follow",
+      signal: ctl?ctl.signal:undefined });
+    clearTimeout(ttfb);
+    // ⚠ گوگل هنگامِ اختلال به‌جای JSON یک صفحهٔ HTML («فعلاً نمی‌توانیم فایل را باز کنیم») با کدِ ۴۰۴ می‌فرستد
     if(!res.ok) throw new Error("HTTP "+res.status);
     var total=parseInt(res.headers.get("Content-Length")||"0",10)||0;
     /* expectedTotal می‌تواند عدد باشد یا ظرفِ {v} که درخواستِ موازیِ حجم بعداً پرش می‌کند */
@@ -105,9 +117,47 @@ async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal){
     if(data && data.error==="AUTH"){ toast("نشست منقضی شد. دوباره وارد شوید.",true); logout(); }
     return data;
   }catch(e){
+    clearTimeout(ttfb);
     if(!quiet) toast("خطا در دریافت فایل. اتصال اینترنت را بررسی کنید.", true);
-    return { ok:false, message:"خطا در دریافت فایل.", netError:true };
+    // netError = سرور پاسخِ معتبری نداد (قطعی، صفحهٔ خطای گوگل، یا پاسخِ غیرِ JSON) — نه «فایل نیست»
+    return { ok:false, message:"خطا در دریافت فایل.", netError:true, timedOut:timedOut };
   }
+}
+var FILE_TTFB_MS=35000;
+
+/* ================= علتِ شکستِ دریافتِ فایل (برای پیامِ دقیق) =================
+   سه حالتِ متفاوت که قبلاً همه «پیش‌نمایش در دسترس نیست» بودند:
+   ۱) سرور پاسخِ معتبری نداد (netError) — با یک درخواستِ کوچک به خودِ سایت جدا می‌شود که
+      مقصر سرورِ گوگل است (سایت در دسترس) یا اینترنتِ کاربر (هیچ‌کدام در دسترس نیست)؛
+   ۲) سرور پاسخ داد ولی فایل را نیافت (ok:false بدونِ netError) — فایل در درایو حذف/جابه‌جا شده؛
+   ۳) فایل رسید ولی نمایش داده نشد — این یکی را خودِ نمایشگر با FAIL_RENDER اعلام می‌کند. */
+async function siteReachable(){
+  try{
+    var c=(typeof AbortController==="function")?new AbortController():null;
+    var t=c?setTimeout(function(){ c.abort(); }, 6000):null;
+    var r=await fetch("fsm-favicon.svg?probe="+Date.now(), {cache:"no-store", signal:c?c.signal:undefined});
+    clearTimeout(t);
+    return !!(r && r.ok);
+  }catch(e){ return false; }
+}
+/* آیکونِ هر علت — سرور: دو چرخ‌دندهٔ درگیر که گیر می‌کنند (انیمیشن در components.css)؛
+   اینترنت: وای‌فایِ خط‌خورده؛ فایلِ ناموجود: سند با «؟»؛ نمایش‌ناپذیر: سند با «×». */
+var FAIL_IC={
+  server:'<svg class="es-ic es-gears" viewBox="0 0 24 24"><g class="g1"><path d="M13.86,8.83 L15.54,9.12 L15.54,10.88 L13.86,11.17 L13.26,12.61 L14.25,14.00 L13.00,15.25 L11.61,14.26 L10.17,14.86 L9.88,16.54 L8.12,16.54 L7.83,14.86 L6.39,14.26 L5.00,15.25 L3.75,14.00 L4.74,12.61 L4.14,11.17 L2.46,10.88 L2.46,9.12 L4.14,8.83 L4.74,7.39 L3.75,6.00 L5.00,4.75 L6.39,5.74 L7.83,5.14 L8.12,3.46 L9.88,3.46 L10.17,5.14 L11.61,5.74 L13.00,4.75 L14.25,6.00 L13.26,7.39Z"/><circle cx="9" cy="10" r="2"/></g><g class="g2"><path d="M20.68,17.95 L21.65,18.76 L20.88,20.08 L19.71,19.64 L18.57,20.30 L18.36,21.53 L16.84,21.53 L16.63,20.30 L15.49,19.64 L14.32,20.08 L13.55,18.76 L14.52,17.95 L14.52,16.65 L13.55,15.84 L14.32,14.52 L15.49,14.96 L16.63,14.30 L16.84,13.07 L18.36,13.07 L18.57,14.30 L19.71,14.96 L20.88,14.52 L21.65,15.84 L20.68,16.65Z"/><circle cx="17.6" cy="17.3" r="1.3"/></g></svg>',
+  offline:'<svg class="es-ic" viewBox="0 0 24 24"><line x1="2" y1="2" x2="22" y2="22"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><path d="M16.85 11.25a10 10 0 0 1 2.22 1.68"/><path d="M5 13a10 10 0 0 1 5.24-2.76"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>',
+  missing:'<svg class="es-ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M10 12.5a2 2 0 1 1 2.8 1.8c-.5.2-.8.7-.8 1.2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>',
+  render:'<svg class="es-ic" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9.5" y1="12.5" x2="14.5" y2="17.5"/><line x1="14.5" y1="12.5" x2="9.5" y2="17.5"/></svg>',
+  auth:'<svg class="es-ic" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>'
+};
+var FAIL_RENDER={ ic:FAIL_IC.render, t:"فایل دریافت شد ولی قابل نمایش نیست", d:"ممکن است فایل خراب باشد یا قالبش پشتیبانی نشود." };
+async function fileFailInfo(r){
+  if(!r || r.netError){
+    if(await siteReachable())
+      return { ic:FAIL_IC.server, t:"سرور گوگل پاسخ نمی‌دهد", d:"چند دقیقهٔ دیگر دوباره تلاش کنید." };
+    return { ic:FAIL_IC.offline, t:"اتصال اینترنت برقرار نیست", d:"پس از برقراریِ اتصال، دوباره تلاش کنید." };
+  }
+  if(r.error==="AUTH") return { ic:FAIL_IC.auth, t:"نشست منقضی شد", d:"دوباره وارد شوید." };
+  return { ic:FAIL_IC.missing, t:"فایلِ این سند پیدا نشد", d:"ممکن است از گوگل‌درایو حذف یا جابه‌جا شده باشد." };
 }
 
 /* دریافتِ فایل با «تلاشِ دوبارهٔ خودکار» — بازهٔ cold-start/وارم‌آپِ Apps Script (چند دقیقهٔ اولِ بعد از
@@ -145,6 +195,9 @@ async function getFileRetry(fileId, o){
     if(o.onProgress && typeof apiGetFileStreamed==="function") r=await apiGetFileStreamed(fileId, o.onProgress, true, exp);
     else r=await api("getFile",{fileId:fileId},{silent:true, quiet:true});
     if(r && r.ok){ fileCachePut(fileId, r); return r; }   // موفق شد
+    /* تکرار فقط برای شکست‌های سریع و گذرا (صفحهٔ خطای گوگل، قطعیِ لحظه‌ای). سرورِ گیرکرده (timedOut)
+       یا «فایل نیست» (پاسخِ معتبرِ سرور) با تکرار درست نمی‌شود و فقط انتظار را چند برابر می‌کرد. */
+    if(r && (r.timedOut || !r.netError)) break;
     if(i<tries-1) await fileSleep(650*(i+1));   // ۰٫۶۵s سپس ۱٫۳s پیش از تلاشِ بعدی
   }
   return r;

@@ -170,8 +170,7 @@ function dmNewerRevBanner(d){
   return '<div class="dm-newer dp-newer"><div class="dm-newer-main">'+
     /* واژه و شکلِ شماره هم‌سانِ تاریخچهٔ سند: «ریویژن 01» (قبلاً «ویرایش ۱» — faN صفرِ ابتدایی را می‌انداخت) */
     '<div class="dm-newer-t"><span class="dm-newer-dot"></span>ریویژن جدیدتری تأیید شده است</div>'+
-    '<div class="dm-newer-note">این سند ریویژن '+esc(pad2(revFmt(d.rev)))+' است؛ ریویژن '+esc(pad2(revFmt(newer.rev)))+' تأیید شده. '+
-      'اگر نقشهٔ چاپیِ همین ریویژن را در دست دارید، از نسخهٔ تأییدشده استفاده کنید.</div></div>'+
+    '<div class="dm-newer-note">ریویژن به‌روزتری از این سند در سامانه ثبت شده است؛ برای چاپ سند، از آخرین ریویژن استفاده کنید.</div></div>'+
     /* درجا همان ریویژن در پیش‌نمایش انتخاب می‌شود (نه بازکردنِ دوبارهٔ پنجره) */
     '<button class="btn sm" onclick="dmSelectVersion(\''+esc(newer.drawingNumber)+'\')">مشاهدهٔ ریویژن '+esc(pad2(revFmt(newer.rev)))+'</button>'+
     /* بنر روی نقشه است و ممکن است جدولِ مشخصاتِ پایینِ آن را بپوشاند؛ بستن فقط برای همین ریویژن و همین بار */
@@ -589,7 +588,12 @@ async function dmSelectVersion(num){
     // اگر کاربر بین‌بین ریویژن دیگری انتخاب کرده یا پیش‌نمایش بسته شده، این نتیجه را دور بریز
     if(myToken!==_dpSeq) return;
     host=document.getElementById("docPreviewHost"); if(!host) return;
-    if(!r||!r.ok){ host.innerHTML='<div class="empty-state"><div class="es-title">پیش‌نمایش در دسترس نیست</div>'+dmRetryBtn(num)+'</div>'; return; }
+    if(!r||!r.ok){
+      var fi=await fileFailInfo(r);
+      if(myToken!==_dpSeq) return;
+      host=document.getElementById("docPreviewHost"); if(!host) return;
+      host.innerHTML=dmFailHTML(fi, num); return;
+    }
     var blob=b64toBlob(r.base64, r.mimeType); var url=previewBlobUrl("docPreview", blob);
     // فایلِ سه‌بعدی (GLB/GLTF) نباید در iframe برود (مرورگر دانلودش می‌کند)؛ با model-viewer نمایش داده می‌شود
     var really3D = is3D || /^model\//.test(r.mimeType||"") || /\.(glb|gltf)$/i.test(r.name||"");
@@ -639,8 +643,13 @@ async function dmSelectVersion(num){
     if(_dpEst===est) _dpEst=null;
     if(myToken!==_dpSeq) return;
     host=document.getElementById("docPreviewHost");
-    if(host) host.innerHTML='<div class="empty-state"><div class="es-title">خطا در بارگذاری پیش‌نمایش</div>'+dmRetryBtn(num)+'</div>';
+    if(host) host.innerHTML=dmFailHTML(FAIL_RENDER, num);
   }
+}
+/* حالتِ خطای پیش‌نمایش: علتِ واقعی (fileFailInfo / FAIL_RENDER) + توضیح + «تلاش مجدد» */
+function dmFailHTML(fi, num){
+  return '<div class="empty-state">'+(fi.ic||"")+'<div class="es-title">'+esc(fi.t)+'</div>'+
+    '<div class="es-desc">'+esc(fi.d)+'</div>'+dmRetryBtn(num)+'</div>';
 }
 /* دکمهٔ «تلاش مجدد» برای بارگذاریِ دوبارهٔ پیش‌نمایش/مدل از ابتدا */
 function dmRetryBtn(num){

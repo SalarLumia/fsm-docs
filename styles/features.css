@@ -195,8 +195,13 @@
 .dm-newer-main{flex:1;min-width:0}
 .dp-newer .dm-newer-note{margin:3px 0 0}
 .dp-newer .btn{flex-shrink:0}
-.dm-newer-x{flex-shrink:0;width:26px;height:26px;display:grid;place-items:center;border:none;background:none;
-  border-radius:7px;color:var(--muted);font-size:13px;cursor:pointer}
+/* روی پیش‌نمایش: زمینهٔ نارنجیِ کم‌رنگِ برند (هم‌رنگِ سلول‌های تکمیل‌شدهٔ ویزارد) به‌جای زردِ هشدار */
+.dp-newer{background:#fff8f0;border-color:var(--brand);padding-left:40px}
+.dp-newer .dm-newer-t{color:var(--brand)}
+.dp-newer .dm-newer-dot{background:var(--brand)}
+/* بستن: گوشهٔ بالا-چپِ بنر (padding-left بالا جایش را رزرو کرده تا روی دکمهٔ مشاهده نیفتد) */
+.dm-newer-x{position:absolute;top:6px;left:6px;width:24px;height:24px;display:grid;place-items:center;border:none;background:none;
+  border-radius:7px;color:var(--muted);font-size:12px;cursor:pointer}
 .dm-newer-x:hover{background:#00000010;color:var(--txt)}
 @media(max-width:560px){.dp-newer{flex-wrap:wrap}.dm-newer-main{flex-basis:100%}}
 /* بخشِ کدِ QR در ستونِ کناریِ مودالِ سند */
@@ -1464,3 +1469,15 @@ button.nd-chip:hover{border-color:var(--charcoal)}
   cursor:pointer;transition:color .12s}
 .pi-chip:hover{color:var(--brand);text-decoration:underline}
 .pi-chip.warn{color:var(--err)}
+
+/* ===== «داده نرسیده» (بوت‌استرپِ ناموفق) — جای همهٔ تب‌ها را می‌گیرد ===== */
+body.boot-failed .app-main .tabpane{display:none!important}
+.boot-fail{display:flex;align-items:center;justify-content:center;min-height:60vh}
+.boot-fail[hidden]{display:none}
+.boot-fail-in{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:40px 48px;
+  box-shadow:0 1px 4px #00000008;max-width:440px;width:100%;gap:10px}
+.boot-fail-in .btn{margin-top:10px}
+.boot-fail-auto{font-size:11px;color:var(--muted);margin-top:4px;min-height:18px}
+.boot-fail-in .spinner{width:34px;height:34px;border:3px solid #e2e0db;border-top-color:var(--brand);border-radius:50%;
+  animation:bootSpin .8s linear infinite;margin:0 auto}
+@keyframes bootSpin{to{transform:rotate(360deg)}}

@@ -502,18 +502,6 @@ function showDashboardSkeleton(){
   var rqc=document.getElementById("reviewQueueCount"); if(rqc) rqc.textContent="";
   var rqs=document.getElementById("reviewSeeAll"); if(rqs) rqs.hidden=true;
 }
-/* حالت خطای بارگذاری اولیه با دکمهٔ تلاش دوباره */
-function showBootstrapError(){
-  ["kpiDocs","kpiActiveProjects","kpiApproved","kpiPending"].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent="—"; });
-  var rc=document.getElementById("recentDocsList"); if(rc) rc.innerHTML="";
-  var pc=document.getElementById("projCardsList");
-  if(pc) pc.innerHTML='<div class="empty-state">'+
-    '<svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>'+
-    '<div class="es-title">بارگذاری داده‌ها ناموفق بود</div>'+
-    '<div class="es-desc">ارتباط با سرویس برقرار نشد. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.</div>'+
-    '<button class="btn primary" style="margin-top:14px" onclick="startApp()">تلاش دوباره</button></div>';
-}
-
 /* حالت خالی قابل‌استفاده */
 function emptyState(title,desc){
   return '<div class="empty-state">'+

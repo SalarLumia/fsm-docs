@@ -2046,7 +2046,9 @@ async function mvLoadPart(fileId, part){
     // getFileRetry فایل‌های قبلاً دانلودشده را از حافظهٔ موقت (api.js) بی‌درنگ برمی‌گرداند
     var r=await getFileRetry(fileId, {onProgress: function(loaded,total){ if(myToken===_mvLoadSeq && total>0) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(myToken!==_mvLoadSeq){ est.stop(); return; }   // منسوخ شد — نتیجه را دور بریز
-    if(!r||!r.ok){ est.stop(); loadBarHide(scope()); var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML='<div class="mv-empty-t">دریافتِ مدل ناموفق بود.</div>'+mvRetryBtn(fileId,part); return; }
+    if(!r||!r.ok){ est.stop(); loadBarHide(scope());
+      var fi=await fileFailInfo(r); if(myToken!==_mvLoadSeq) return;   // علتِ واقعی: سرور / اینترنت / فایلِ ناموجود
+      var ph1=document.getElementById("mvPh"); if(ph1) ph1.innerHTML=mvFailHTML(fi,fileId,part); return; }
     var blob=b64toBlob(r.base64, r.mimeType||"model/gltf-binary");
     var url=previewBlobUrl("mvModel", blob);
     var sh=document.getElementById("mvShell"); if(!sh){ est.stop(); return; }
@@ -2061,7 +2063,10 @@ async function mvLoadPart(fileId, part){
     var mv=document.getElementById("mvEl");
     if(mv){ mv.addEventListener("load", function(){ if(myToken===_mvLoadSeq){ est.done(); loadBarHide(scope()); } }); }
     else { est.done(); loadBarHide(scope()); }
-  }catch(e){ est.stop(); loadBarHide(scope()); var ph2=document.getElementById("mvPh"); if(ph2) ph2.innerHTML='<div class="mv-empty-t">خطا در بارگذاری مدل.</div>'+mvRetryBtn(fileId,part); }
+  }catch(e){ est.stop(); loadBarHide(scope()); var ph2=document.getElementById("mvPh"); if(ph2) ph2.innerHTML=mvFailHTML(FAIL_RENDER,fileId,part); }
+}
+function mvFailHTML(fi, fileId, part){
+  return '<div class="mv-fail-ic">'+(fi.ic||"")+'</div><div class="mv-empty-t">'+esc(fi.t)+'</div><div class="mv-empty-s">'+esc(fi.d)+'</div>'+mvRetryBtn(fileId,part);
 }
 /* دکمهٔ «تلاش مجدد» بارگذاریِ مدلِ سه‌بعدی از ابتدا (روی خطا/عدمِ دریافت) */
 function mvRetryBtn(fileId, part){

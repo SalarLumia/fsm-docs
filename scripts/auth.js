@@ -343,6 +343,7 @@ function logout(){
   document.documentElement.classList.remove("has-session");
   ME={token:null}; localStorage.removeItem("fsm_session");
   if(typeof snapClear==="function") snapClear();   // دادهٔ ذخیره‌شدهٔ نشست هم با خروج پاک می‌شود (رایانهٔ مشترک)
+  hideBootFail();
   stopClock();
   document.getElementById("appView").classList.add("hidden");
   document.getElementById("loginView").classList.remove("hidden");
@@ -369,7 +370,7 @@ async function startApp(){
   if(snap){ applyBootData(snap); showAppShell(true); }
   else lgStage2();   // متنِ دکمه: ورود موفق بود، حالا داده می‌آید
 
-  var r=await api("bootstrap",{});
+  var r=await api("bootstrap",{},{timeout:BOOT_TIMEOUT_MS});
   /* نشستِ نامعتبر: api خودش logout() را صدا زده و صفحهٔ ورود را آورده،
      پس این‌جا فقط باید بی‌سروصدا برگردیم (وگرنه خطای bootstrap هم روی آن می‌نشیند). */
   if(!ME.token) return;
@@ -382,9 +383,7 @@ async function startApp(){
     document.getElementById("appView").classList.remove("hidden");
     document.body.classList.add("in-app");   // اسکرولِ اصلی به ظرفِ برنامه می‌رود
     renderUserHeader(); applyRoleVisibility();
-    var dashErr=document.getElementById("tab-dashboard");
-    if(dashErr) dashErr.classList.remove("hidden");
-    if(typeof showBootstrapError==="function") showBootstrapError(); return;
+    showBootFail(r, myRun); return;
   }
   /* تمدیدِ خودکار: اگر بک‌اند توکنِ تازه فرستاده، جایگزین می‌شود تا کاربرِ
      فعال وسطِ کار بیرون نیفتد. ذخیرهٔ نهایی چند خط پایین‌تر انجام می‌شود. */
@@ -427,7 +426,53 @@ function bootSig(x){
   return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[]]);
 }
 /* رسمِ پوستهٔ برنامه با DBِ فعلی — هم برای ورودِ عادی و هم بازشدنِ فوری با دادهٔ ذخیره‌شده */
+/* ================= «داده نرسیده»: بوت‌استرپِ ناموفق بدونِ دادهٔ ذخیره‌شده =================
+   قبلاً پیامِ خطا فقط در کارتِ پروژه‌های داشبورد می‌نشست؛ کافی بود کاربر روی هر بخشی کلیک کند
+   تا همه‌چیز با فهرست‌های خالی رسم شود («پروژه‌ای ثبت نشده») و به نظر برسد پایگاه داده پاک شده.
+   حالا یک صفحهٔ وضعیت جای همهٔ تب‌ها را می‌گیرد (body.boot-failed)، علتِ واقعی را می‌گوید، صریحاً
+   اعلام می‌کند که اطلاعات سالم است، و هر ۳۰ ثانیه خودکار دوباره تلاش می‌کند. */
+var BOOT_TIMEOUT_MS=45000, BOOT_RETRY_S=30, _bootTimer=null;
+function stopBootRetry(){ if(_bootTimer){ clearInterval(_bootTimer); _bootTimer=null; } }
+async function showBootFail(r, myRun){
+  stopBootRetry();
+  document.body.classList.add("boot-failed");
+  var host=document.getElementById("bootFail"); if(!host) return;
+  host.hidden=false;
+  host.innerHTML='<div class="boot-fail-in"><div class="spinner"></div></div>';
+  var fi=(typeof fileFailInfo==="function")?await fileFailInfo(r):null;
+  if(myRun!==_appRun || !ME.token) return;
+  // پیامِ مخصوصِ داده (نه فایل): برای پاسخِ معتبرِ ناموفقِ سرور، متنِ خودِ سرور
+  if(!fi || (r && !r.netError && r.error!=="AUTH")) fi={ ic:(typeof FAIL_IC!=="undefined")?FAIL_IC.server:"", t:"سرور خطا داد", d:(r&&r.message)||"" };
+  host.innerHTML='<div class="boot-fail-in empty-state">'+(fi.ic||"")+
+    '<div class="es-title">'+esc(fi.t)+'</div>'+
+    '<div class="es-desc">اطلاعات سامانه سالم است و پس از برقراریِ ارتباط نمایش داده می‌شود.</div>'+
+    '<button class="btn primary" onclick="bootRetryNow()">تلاش دوباره</button>'+
+    '<div class="boot-fail-auto" id="bootAuto"></div></div>';
+  var left=BOOT_RETRY_S, auto=document.getElementById("bootAuto");
+  var tick=function(){
+    if(!auto) return;
+    auto.textContent='تلاشِ خودکار تا '+faN(left)+' ثانیهٔ دیگر';
+  };
+  tick();
+  _bootTimer=setInterval(function(){
+    if(document.hidden) return;   // زبانهٔ پنهان: شمارش متوقف، تا بی‌دلیل درخواست نرود
+    left--; if(left<=0){ bootRetryNow(); return; }
+    tick();
+  },1000);
+}
+function bootRetryNow(){
+  stopBootRetry();
+  var host=document.getElementById("bootFail");
+  if(host) host.innerHTML='<div class="boot-fail-in empty-state"><div class="spinner"></div><div class="es-desc">در حالِ اتصال به سرور…</div></div>';
+  startApp();
+}
+function hideBootFail(){
+  stopBootRetry();
+  document.body.classList.remove("boot-failed");
+  var host=document.getElementById("bootFail"); if(host){ host.hidden=true; host.innerHTML=""; }
+}
 function showAppShell(deferRoute){
+  hideBootFail();
   applyRoleVisibility();
   renderUserHeader();
   startClock();
