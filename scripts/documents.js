@@ -500,8 +500,12 @@ function currentNumber(){
 /* کپی شمارهٔ سند تولیدشده در کلیپ‌بورد */
 function copyDocNumber(){
   var n=currentNumber(); if(!n){ toast("ابتدا اطلاعات را کامل کن.",true); return; }
+  copyNumWithHint(n, "nCopyHint");
+}
+/* کپی یک شماره + تبدیل نوت راهنمای زیرش به «ذخیره شد» — مشترک بین ثبت سند و بارگذاری ریویژن */
+function copyNumWithHint(n, hintId){
   var done=function(){
-    var h=document.getElementById("nCopyHint");   // نوت راهنما به‌طور دائم به «ذخیره شد» تبدیل می‌شود (بدون toast)
+    var h=document.getElementById(hintId);   // نوت راهنما به‌طور دائم به «ذخیره شد» تبدیل می‌شود (بدون toast)
     if(h){ h.classList.add("ok"); h.innerHTML='<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>نام سند ذخیره شد.'; }
   };
   if(navigator.clipboard && navigator.clipboard.writeText){

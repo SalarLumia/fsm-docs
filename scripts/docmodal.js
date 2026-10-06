@@ -806,6 +806,9 @@ function openRevisionUploadModal(baseNum, mode){
     ? 'نسخهٔ اصلاح‌شدهٔ همین ریویژن (بدون تغییر شماره) را بارگذاری کنید؛ نسخهٔ قبلی جایگزین می‌شود.'
     : 'ریویژن بعدی این سند با عنوان «<b>ریویژن '+esc(pad2(rs.nextRev))+'</b>» ثبت می‌شود.';
   var noteLabel=isVer?"توضیحات این نسخه":"توضیحات این ریویژن";
+  // نامی که این بارگذاری می‌سازد: نسخهٔ جدید همان شماره را نگه می‌دارد؛ ریویژن جدید شمارهٔ ریویژن بعدی را می‌گیرد
+  var newNum=isVer ? baseNum
+    : ["FSM",String(d.clientCode).toUpperCase(),pad2(d.orderNo),pad2(d.projectNo),pad2(d.partNo),String(d.typeCode).toUpperCase(),pad2(rs.nextRev)].join("-");
   var upIco='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
   var stpTag = isVer?"فرمت اصلی برای آرشیو اسناد — اختیاری":"فرمت اصلی برای آرشیو اسناد — الزامی";
   var glbTag = isVer?"برای نمایش در سایت — اختیاری":"برای نمایش در سایت — الزامی";
@@ -836,8 +839,17 @@ function openRevisionUploadModal(baseNum, mode){
       dzHTML+
     '</div>'+
     hint3D+
-    '<div class="clm-actions"><button class="btn" onclick="closeModal()">انصراف</button>'+
-      '<button class="btn primary" onclick="submitRevisionUpload()">'+upIco+(isVer?'ثبت نسخه':'ثبت ریویژن')+'</button></div>'+
+    /* ردیف پایانی عیناً مثل ویزارد ثبت سند (.nd-actions): خط جداکننده، «نام سند» قابل‌کپی و دکمهٔ ثبت در انتهای چپ */
+    '<div class="nd-actions">'+
+      '<div class="nd-namewrap">'+
+        '<button type="button" class="nd-nameline" onclick="copyNumWithHint(\''+esc(newNum)+'\',\'rvCopyHint\')" title="برای کپی، روی نام کلیک کنید">'+
+          '<span class="nd-name-t">نام سند</span>'+
+          '<span class="nd-final-num">'+esc(newNum)+'</span>'+
+        '</button>'+
+        '<div class="nd-step-hint nd-copy-hint" id="rvCopyHint">'+ND_INFO_IC+'برای کپی کردن نام سند، روی آن کلیک نمایید.</div>'+
+      '</div>'+
+      '<button class="btn primary" onclick="submitRevisionUpload()">'+upIco+(isVer?'ثبت نسخه':'ثبت ریویژن')+'</button>'+
+    '</div>'+
   '</div>';
   showModal(isVer?"بارگذاری نسخهٔ جدید":"بارگذاری ریویژن جدید", body, "box-narrow");
   rvInitDrop("rvDrop","rvFile");
