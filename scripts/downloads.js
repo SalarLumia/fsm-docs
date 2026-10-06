@@ -51,6 +51,7 @@ async function dlPump(){
   if(!job) return;
   _dlActive = true;
   job.status="working"; job.pct=0; job.loaded=0; job.total=0; job.processing=false; job.msg="";
+  job.ctl=(typeof AbortController==="function")?new AbortController():null; job.xhr=null;
   dlRender();
   try{
     if(job.kind==="upload"){
@@ -59,17 +60,20 @@ async function dlPump(){
         job.loaded=loaded; job.total=total;
         if(total>0) job.pct=Math.min(99, Math.round(loaded/total*100));
         dlProgress(job);
-      });
-      if(!ru || !ru.ok){ job.status="error"; job.msg=(ru&&ru.message)||"ثبت ناموفق بود."; dlRender(); }
+      }, function(xhr){ job.xhr=xhr; });
+      if(job.status==="canceled"){ /* کاربر لغو کرد؛ dlCancel خودش کارت را به‌روز کرده */ }
+      else if(!ru || !ru.ok){ job.status="error"; job.msg=(ru&&ru.message)||"ثبت ناموفق بود."; dlRender(); }
       else { job.pct=100; job.status="done"; job.result=ru; dlRender();
              if(typeof job.onSuccess==="function"){ try{ job.onSuccess(ru); }catch(e){} } }
     } else {
-      var r = await getFileRetry(job.fileId, { onProgress:function(loaded,total){
+      var r = await getFileRetry(job.fileId, { signal:job.ctl?job.ctl.signal:undefined, onProgress:function(loaded,total){
+        if(job.status==="canceled") return;
         job.loaded=loaded; job.total=total;
         if(total>0) job.pct=Math.min(99, Math.round(loaded/total*100));
         dlProgress(job);   // به‌روزرسانی سبک فقط همان کارت (بدون بازسازی کل فهرست)
       }});
-      if(!r || !r.ok){
+      if(job.status==="canceled"){ /* لغوشده: فایل حتی اگر رسیده باشد به مرورگر سپرده نمی‌شود */ }
+      else if(!r || !r.ok){
         job.status="error"; job.msg=(r&&r.message)||"دریافت فایل ناموفق بود.";
         dlRender();
       } else {
@@ -83,9 +87,12 @@ async function dlPump(){
       }
     }
   }catch(e){
-    job.status="error"; job.msg=(job.kind==="upload")?"خطا در ثبت.":"خطا در دریافت فایل.";
-    dlRender();
+    if(job.status!=="canceled"){
+      job.status="error"; job.msg=(job.kind==="upload")?"خطا در ثبت.":"خطا در دریافت فایل.";
+      dlRender();
+    }
   } finally {
+    job.ctl=null; job.xhr=null;
     if(job.status==="done" || job.status==="error"){
       _dlLastKind=job.kind;
       if(!_dlOpen) _dlUnseen=true;   // اگر پنل باز نیست، نشان سبز/قرمز تا بازشدن پنل بماند
@@ -153,6 +160,7 @@ function dlStateText(j){
                      : ("در حال دریافت… "+(j.loaded/1048576).toFixed(1)+" MB");
   }
   if(j.status==="done") return up ? "بارگذاری شد" : "دریافت شد";
+  if(j.status==="canceled") return "لغو شد";
   return j.msg || "ناموفق";
 }
 function dlItemHTML(j){
@@ -169,7 +177,9 @@ function dlItemHTML(j){
      (چه دانلود، چه آپلود) و آیکون فلش دانلود با کارکردش جور نبود. */
   var acts="";
   if(j.status==="done" && !up) acts+='<button class="dl-iconbtn" onclick="dlRedownload('+j.id+')" title="دریافت دوباره" aria-label="دریافت دوباره">'+DL_IC.retry+'</button>';
-  else if(j.status==="error")  acts+='<button class="dl-iconbtn" onclick="dlRetry('+j.id+')" title="تلاش دوباره" aria-label="تلاش دوباره">'+DL_IC.retry+'</button>';
+  else if(j.status==="error"||j.status==="canceled") acts+='<button class="dl-iconbtn" onclick="dlRetry('+j.id+')" title="تلاش دوباره" aria-label="تلاش دوباره">'+DL_IC.retry+'</button>';
+  // کار در صف یا در حال انجام: ضربدر کوچک برای لغو (هم‌اندازهٔ دکمهٔ تلاش دوباره)
+  if(j.status==="queued"||j.status==="working") acts+='<button class="dl-iconbtn dl-cancel" onclick="dlCancel('+j.id+')" title="لغو" aria-label="لغو">'+DL_IC.x+'</button>';
 
   // آیکون سر هر رکورد = نوع فایل (سند/تصویر/مدل سه‌بعدی)، نه جهت انتقال
   return '<div class="dl-item '+j.status+(up?" up":" down")+'" data-id="'+j.id+'">'+
@@ -305,6 +315,20 @@ function xferOutside(e){
   xferClose();
 }
 function dlRedownload(id){ var j=_dlById(id); if(j && j.blobUrl) dlHandOff(j); }
+/* لغو یک کار. در صف: فقط از صف بیرون می‌رود. در حال انجام: درخواست قطع می‌شود.
+   ⚠ آپلودی که بدنه‌اش کامل به سرور رسیده باشد را نمی‌شود پس گرفت (Apps Script کارش را تمام
+   می‌کند)؛ چون درصد واقعی آپلود را نداریم، پس از لغو یک آپلود فعال، داده‌ها در پس‌زمینه
+   دوباره خوانده می‌شوند تا اگر سند با این حال ثبت شده بود، در سایت دیده شود. */
+function dlCancel(id){
+  var j=_dlById(id); if(!j || (j.status!=="queued" && j.status!=="working")) return;
+  var wasWorking=(j.status==="working");
+  j.status="canceled"; j.msg="";
+  try{ if(j.ctl) j.ctl.abort(); }catch(e){}
+  try{ if(j.xhr) j.xhr.abort(); }catch(e){}
+  dlRender();
+  if(wasWorking && j.kind==="upload" && typeof refreshDocuments==="function")
+    setTimeout(function(){ refreshDocuments({background:true}); }, 15000);
+}
 function dlRetry(id){ var j=_dlById(id); if(!j) return; j.status="queued"; j.pct=0; j.msg=""; dlRender(); dlPump(); }
 function dlRemove(id){
   var j=_dlById(id);

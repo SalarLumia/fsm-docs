@@ -50,7 +50,7 @@ async function openDocDetail(num){
   var dlBtnHTML = is3DType
     ? '<div class="dm-dl-wrap" id="dmDlWrap">'+
         '<div class="dm-dl-pop" id="dmDlPop"></div>'+
-        '<button class="btn primary dm-dl" id="dpDownload" onclick="dmDownloadSelected()" disabled>'+dlIcon+'<span id="dpDlLbl">دانلود سند</span></button>'+
+        '<button class="btn primary dm-dl" id="dpDownload" onclick="dmDlMain(event)" aria-expanded="false" disabled>'+dlIcon+'<span class="dm-dl-txt">دانلود<span class="dm-dl-var" id="dpDlVar"><span class="v-a">فایل</span><span class="v-b">همه</span></span></span></button>'+
       '</div>'
     : '<button class="btn primary dm-dl" id="dpDownload" onclick="dmDownloadSelected()" disabled>'+dlIcon+'دانلود سند</button>';
   var body=''+
@@ -682,7 +682,7 @@ function mvPartBadgeHTML(name){
 }
 
 /* ================= دانلود اسناد سه‌بعدی: فهرست فرمت‌ها با هاور =================
-   بدون حالت انتخاب: کلیک روی هر ردیف (یا دکمهٔ کنارش) همان فرمت را دانلود می‌کند و
+   بدون حالت انتخاب: فقط دکمهٔ دانلود کنار هر ردیف همان فرمت را دانلود می‌کند (خود ردیف کلیک‌پذیر نیست) و
    دکمهٔ پایین همیشه همهٔ فرمت‌ها را یکجا دانلود می‌کند. */
 /* لیست فرمت‌های موجود روی همین ریویژن (فقط آن‌هایی که واقعاً فایل دارند نشان داده می‌شوند) */
 function dm3DFormats(d){
@@ -700,22 +700,46 @@ function dmInit3DDownload(d){
   var wrap=document.getElementById("dmDlWrap"), pop=document.getElementById("dmDlPop"), btn=document.getElementById("dpDownload");
   if(!wrap||!pop||!btn) return;
   var formats=dm3DFormats(d);
-  var lbl=document.getElementById("dpDlLbl");
-  if(lbl) lbl.textContent = formats.length>1 ? "دانلود تمامی فرمت‌ها" : "دانلود سند";
+  dmDlSetOpen(false);   // با عوض‌شدن ریویژن، کشو بسته و متن دکمه به حالت اول برمی‌گردد
   if(!formats.length){ pop.innerHTML=""; btn.disabled=true; return; }
-  pop.innerHTML='<div class="dm-dl-head">فرمت مورد نظر خود را انتخاب کنید.</div>'+
-    formats.map(function(fm){
-    return '<div class="dm-dl-opt" role="button" tabindex="0" title="دانلود '+esc(fm.label)+'"'+
-        ' onclick="event.stopPropagation();dm3DDownloadOne(\''+fm.key+'\')"'+
-        ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();dm3DDownloadOne(\''+fm.key+'\')}">'+
+  pop.innerHTML='<div class="dm-dl-list"><div class="dm-dl-in">'+formats.map(function(fm){
+    return '<div class="dm-dl-opt">'+
       '<span class="dm-dl-tile">'+DM_DL_CUBE+'</span>'+
       '<span class="dm-dl-opt-t"><span class="dm-dl-opt-l">'+esc(fm.label)+'</span><span class="dm-dl-opt-s">'+esc(fm.sub)+'</span></span>'+
-      '<span class="dm-dl-one" aria-hidden="true">'+DM_DL_ARROW+'</span>'+
+      '<button type="button" class="dm-dl-one" title="دانلود '+esc(fm.label)+'" aria-label="دانلود '+esc(fm.label)+'"'+
+        ' onclick="event.stopPropagation();dm3DDownloadOne(\''+fm.key+'\')">'+DM_DL_ARROW+'</button>'+
     '</div>';
-  }).join("");
+  }).join("")+'</div></div>';
   btn.disabled=false;
 }
-/* دانلود تکی یک فرمت (کلیک روی ردیف) */
+/* کشوی فرمت‌ها با کلیک (نه هاور) باز می‌شود: کلیک اول روی دکمهٔ اصلی کشو را رو به بالا باز
+   می‌کند و متن دکمه «دانلود همه» می‌شود؛ کلیک دوم همهٔ فرمت‌ها را دانلود می‌کند.
+   اگر فقط یک فرمت هست، کشو لازم نیست و همان کلیک اول دانلود می‌کند. */
+function dmDlSetOpen(open){
+  var wrap=document.getElementById("dmDlWrap"), btn=document.getElementById("dpDownload");
+  if(!wrap) return;
+  // ارتفاع واقعی دکمه تا پنل دقیقاً دورش بنشیند (درصد در padding نسبت به عرض حساب می‌شود، نه ارتفاع)
+  if(open && btn) wrap.style.setProperty("--dlh", btn.offsetHeight+"px");
+  wrap.classList.toggle("open", !!open);
+  if(btn) btn.setAttribute("aria-expanded", open?"true":"false");
+}
+function dmDlMain(e){
+  if(e) e.stopPropagation();
+  var wrap=document.getElementById("dmDlWrap"), d=docByNumber(_dm.selNum);
+  if(wrap && d && !wrap.classList.contains("open") && dm3DFormats(d).length>1){ dmDlSetOpen(true); return; }
+  dmDownloadSelected();
+  dmDlSetOpen(false);
+}
+/* کلیک بیرون از کشو یا کلید Escape کشو را می‌بندد */
+document.addEventListener("click", function(e){
+  var wrap=document.getElementById("dmDlWrap");
+  if(wrap && wrap.classList.contains("open") && !wrap.contains(e.target)) dmDlSetOpen(false);
+});
+document.addEventListener("keydown", function(e){
+  var wrap=document.getElementById("dmDlWrap");
+  if(e.key==="Escape" && wrap && wrap.classList.contains("open")){ e.stopPropagation(); dmDlSetOpen(false); }
+}, true);
+/* دانلود تکی یک فرمت (دکمهٔ کنار هر ردیف) */
 function dm3DDownloadOne(key){
   var d=docByNumber(_dm.selNum); if(!d) return;
   var fm=dm3DFormats(d).filter(function(x){ return x.key===key; })[0];

@@ -620,12 +620,11 @@ function playDonutsIn(root, instant){
     }
   }); });
 }
-function cellDonut(label,appr,reg,total,unit,tips){
+/* aprT/regT: عنوان دو راهنما؛ پیش‌فرض برای دونات قطعات «تکمیل‌شده/شروع‌شده» */
+function cellDonut(label,appr,reg,total,unit,tips,aprT,regT){
   var sp=total?Math.round(appr/total*100):0, rp=total?Math.round(reg/total*100):0;
-  var leg = unit
-    ? '<div class="mleg"><i></i>تکمیل‌شده <b>'+faN(appr)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>'+
-      '<div class="mleg faint"><i></i>شروع‌شده <b>'+faN(reg)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>'
-    : '<div class="mleg"><i></i>تأییدشده</div><div class="mleg faint"><i></i>ثبت‌شده</div>';
+  var leg='<div class="mleg"><i></i>'+esc(aprT||"تکمیل‌شده")+' <b>'+faN(appr)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>'+
+      '<div class="mleg faint"><i></i>'+esc(regT||"شروع‌شده")+' <b>'+faN(reg)+'</b> از <b>'+faN(total)+'</b> '+esc(unit)+'</div>';
   return '<div class="mcell"><div class="mdonut">'+donutHTML(sp,rp,tips)+
       '<div class="mtext"><div class="mlabel">'+esc(label)+'</div>'+leg+'</div>'+
     '</div></div>';
@@ -700,8 +699,8 @@ function mbandHTML(p,s){
     cellDonut("پیشرفت قطعات", partsApp, partsReg, parts.length, "قطعه",
       dTips(partsApp, partsReg, parts.length, "قطعه", "تکمیل‌شده", "شروع‌شده", "شروع‌نشده",
         {apr:nameRow(pDone), reg:nameRow(pStart), none:nameRow(pIdle)}))+
-    cellDonut("نقشه‌های پروژه", dApp, dReg, dTot, undefined, dTips(dApp, dReg, dTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"))+
-    cellDonut("مدارک عمومی پروژه", pApp, pReg, pTot, undefined, dTips(pApp, pReg, pTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"));
+    cellDonut("نقشه‌های پروژه", dApp, dReg, dTot, "سند", dTips(dApp, dReg, dTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"), "تأییدشده", "ثبت‌شده")+
+    cellDonut("مدارک عمومی پروژه", pApp, pReg, pTot, "سند", dTips(pApp, pReg, pTot, "سند", "تأییدشده", "ثبت‌شده، تأییدنشده", "بارگذاری‌نشده"), "تأییدشده", "ثبت‌شده");
 }
 /* آیکن‌های سربرگ کارت‌ها (خطی، هم‌زبان نظام طراحی) */
 var SEC_IC_DOC='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>';

@@ -127,42 +127,57 @@
 .dm-act-disabled{color:var(--muted);background:var(--panel);border-color:var(--line);cursor:pointer}
 .dm-act-disabled:hover{color:var(--muted);background:var(--panel);border-color:var(--line)}
 
-/* دانلود اسناد سه‌بعدی: هاور روی دکمه یک پاپ‌آور انتخاب فرمت (GLB/STP/USDZ) بالای دکمه باز می‌کند.
-   حالت اولیه (هیچ فرمتی انتخاب نشده) = ظاهر ناقص/خاکستری؛ با اولین تاگل، دکمه نارنجی (فعال) می‌شود. */
-/* z-index:20 → پاپ‌آور روی لایه‌های پیش‌نمایش (نوار بارگذاری و بنر ریویژن جدیدتر، z=6) می‌نشیند */
+/* دانلود اسناد سه‌بعدی: کلیک روی دکمه کشوی فرمت‌ها (GLB/STP/USDZ) را رو به بالا باز می‌کند.
+   z-index:20 → کشو روی لایه‌های پیش‌نمایش (نوار بارگذاری و بنر ریویژن جدیدتر، z=6) می‌نشیند */
 .dm-dl-wrap{position:relative;z-index:20;flex:1 1 0;min-width:0;display:flex}
-.dm-dl-wrap .dm-dl{width:100%}
-.dm-dl-pop{position:absolute;bottom:calc(100% + 10px);left:0;right:0;min-width:260px;background:#fff;border:1px solid var(--line);
-  border-radius:14px;box-shadow:0 18px 40px #0000001c,0 2px 6px #0000000d;padding:6px;opacity:0;visibility:hidden;
-  transform:translateY(6px) scale(.98);transform-origin:bottom center;
-  transition:opacity .18s,transform .18s cubic-bezier(.2,0,0,1),visibility .18s;z-index:5}
-/* پل نامرئی روی فاصلهٔ ۱۰pxی بین پاپ‌آور و دکمه تا هاور هنگام عبور موس قطع نشود */
-.dm-dl-pop::after{content:"";position:absolute;left:0;right:0;top:100%;height:12px}
-.dm-dl-wrap:hover .dm-dl-pop,.dm-dl-wrap:focus-within .dm-dl-pop{opacity:1;visibility:visible;transform:none}
-.dm-dl-head{padding:6px 8px 9px;margin-bottom:4px;border-bottom:1px solid #f2f1ee;
-  font-size:12px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* هر ردیف هم‌سبک ردیف مرکز دانلود (.dl-item): کاشی فایل + نام/توضیح + اکشن در انتها */
-.dm-dl-opt{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border:1px solid transparent;border-radius:10px;
-  cursor:pointer;font-family:inherit;text-align:right;transition:background .14s,border-color .14s}
+.dm-dl-wrap .dm-dl{width:100%;position:relative;z-index:1}
+/* متن دکمه: «دانلود» + بخش متغیر («فایل» ↔ «همه») در یک span تا gap دکمه بینشان نیفتد.
+   افکت «غلتک»: کلمهٔ قبلی رو به بالا بیرون می‌رود و تازه از پایین جایش می‌نشیند (بدون محوشدن)،
+   هم‌جهت باز شدن کشو، با منحنی ease-in-out. بخش ثابت تکان نمی‌خورد: هر دو کلمه در یک خانهٔ grid
+   روی هم‌اند، پس عرض بخش متغیر همیشه برابر کلمهٔ بلندتر است و عوض نمی‌شود. justify-self:start
+   (در راست‌به‌چپ = راست) هر دو کلمه را به «دانلود» می‌چسباند تا فاصلهٔ بین دو کلمه یکی بماند. */
+.dm-dl-txt{display:inline-flex;align-items:center;line-height:1.5em;white-space:nowrap}
+/* کادر برش از بالا و پایین .45em بزرگ‌تر از خود سطر است (حاشیهٔ منفی جبرانش می‌کند تا ارتفاع دکمه
+   عوض نشود)؛ وگرنه حروف بلند مثل «ا» و «ل» در «فایل» پیش از محوشدن زیر لبهٔ کادر بریده می‌شدند. */
+.dm-dl-var{display:inline-grid;padding:.45em 0;margin:-.45em 0 -.45em 0;margin-inline-start:.3em;overflow:hidden}
+/* هم‌زمان با غلتک، محوشدن: کلمهٔ رونده زود (۰٫۲ ثانیهٔ اول) محو می‌شود و کلمهٔ آینده با کمی تأخیر
+   پدیدار می‌شود. قاعدهٔ پایه = حالت «آینده»؛ قاعدهٔ رونده تأخیر را صفر و زمان را کوتاه می‌کند. */
+.dm-dl-var>span{grid-area:1/1;justify-self:start;line-height:1.5em;white-space:nowrap;
+  transition:transform .4s cubic-bezier(.65,0,.35,1),opacity .24s ease-out .14s}
+.dm-dl-var .v-b{transform:translateY(100%);opacity:0;transition-duration:.4s,.2s;transition-delay:0s,0s;transition-timing-function:cubic-bezier(.65,0,.35,1),ease-in}
+.dm-dl-wrap.open .dm-dl-var .v-a{transform:translateY(-100%);opacity:0;transition-duration:.4s,.2s;transition-delay:0s,0s;transition-timing-function:cubic-bezier(.65,0,.35,1),ease-in}
+.dm-dl-wrap.open .dm-dl-var .v-b{transform:none;opacity:1;transition-duration:.4s,.24s;transition-delay:0s,.14s;transition-timing-function:cubic-bezier(.65,0,.35,1),ease-out}
+/* کشوی فرمت‌ها: با کلیک (کلاس open، نه هاور) باز می‌شود. پنل سفید از لبهٔ پایین دکمه شروع
+   می‌شود و دکمه را در پایین خودش در بر می‌گیرد، پس انگار خود دکمه بزرگ شده و رو به بالا باز
+   می‌شود. ارتفاع با ترفند grid-template-rows (0fr→1fr) باز می‌شود؛ clip-path به کار نرفت چون
+   سایهٔ پنل را هم می‌برید. */
+.dm-dl-pop{position:absolute;bottom:-6px;left:-6px;right:-6px;display:grid;grid-template-rows:0fr;
+  background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 18px 40px #0000001c,0 2px 6px #0000000d;
+  padding:6px 6px calc(var(--dlh,38px) + 12px);opacity:0;visibility:hidden;
+  transition:grid-template-rows .24s cubic-bezier(.2,0,0,1),opacity .14s,visibility .24s}
+.dm-dl-wrap.open .dm-dl-pop{grid-template-rows:1fr;opacity:1;visibility:visible}
+.dm-dl-list{min-height:0;overflow:hidden}
+.dm-dl-in{padding-bottom:6px;opacity:0;transition:opacity .16s}
+.dm-dl-wrap.open .dm-dl-in{opacity:1;transition-delay:.08s}
+/* هر ردیف هم‌سبک ردیف مرکز دانلود (.dl-item): کاشی فایل + نام/توضیح + دکمهٔ دانلود در انتها.
+   خود ردیف کلیک‌پذیر نیست و هاور ندارد؛ فقط دکمهٔ دانلود واکنش نشان می‌دهد. */
+.dm-dl-opt{display:flex;align-items:center;gap:10px;width:100%;padding:8px;border-radius:10px;text-align:right}
 .dm-dl-opt+.dm-dl-opt{margin-top:2px}
-.dm-dl-opt:hover{background:var(--panel)}
-.dm-dl-opt:focus-visible{outline:none;box-shadow:inset 0 0 0 2px #f7941f66}
 .dm-dl-tile{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;
-  border-radius:9px;background:var(--panel);border:1px solid var(--line);transition:background .14s,border-color .14s}
-.dm-dl-tile svg{width:18px;height:18px;fill:none;stroke:var(--charcoal);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;transition:stroke .14s}
+  border-radius:9px;background:var(--panel);border:1px solid var(--line)}
+.dm-dl-tile svg{width:18px;height:18px;fill:none;stroke:var(--charcoal);stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
 .dm-dl-opt-t{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
 .dm-dl-opt-l{font-size:12.5px;font-weight:700;color:var(--txt)}
 .dm-dl-opt-s{font-size:10.5px;color:var(--muted)}
-/* دانلود تکی همان فرمت */
+/* دانلود تکی همان فرمت — نارنجی فقط وقتی موس روی خود دکمه است */
 .dm-dl-one{flex-shrink:0;width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;padding:0;
-  border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);cursor:pointer;
+  border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--muted);cursor:pointer;font-family:inherit;
   transition:background .14s,border-color .14s,color .14s,transform .14s}
 .dm-dl-one svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.dm-dl-opt:hover .dm-dl-one{background:var(--brand);border-color:var(--brand);color:#fff}
-.dm-dl-opt:hover .dm-dl-tile{background:#fff3e6;border-color:#fbcf88}
-.dm-dl-opt:hover .dm-dl-tile svg{stroke:var(--brand)}
-.dm-dl-opt:active .dm-dl-one{transform:scale(.92)}
-@media(prefers-reduced-motion:reduce){.dm-dl-pop{transition:opacity .01s,visibility .01s;transform:none}}
+.dm-dl-one:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+.dm-dl-one:focus-visible{outline:none;box-shadow:0 0 0 2px #f7941f66}
+.dm-dl-one:active{transform:scale(.92)}
+@media(prefers-reduced-motion:reduce){.dm-dl-pop,.dm-dl-in,.dm-dl-var>span{transition:none}}
 /* ⚠ ظرف عمداً ltr است تا نوار اسکرول سمت راست سکشن بنشیند (لبهٔ بیرونی
    پنجره) نه سمت چپ که مرز پیش‌نمایش است؛ در RTL مرورگر نوار را سمت چپ
    می‌گذارد. جهت متن با .doc-side-in به rtl برمی‌گردد.

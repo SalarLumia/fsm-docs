@@ -57,8 +57,9 @@ async function api(action, payload, opts){
    به‌صورت OPTIONS می‌فرستد؛ وب‌اپ Apps Script فقط doGet/doPost دارد و به OPTIONS جواب نمی‌دهد،
    پس آپلود با خطای شبکه می‌افتد. برای همین هیچ شنونده‌ای روی xhr.upload نمی‌گذاریم تا درخواست
    «ساده» بماند و بدون preflight کار کند. در نتیجه درصد واقعی آپلود در دسترس نیست و نوار
-   «نامعیّن» نمایش داده می‌شود. onProgress اینجا فراخوانی نمی‌شود (برای سازگاری امضا نگه داشته شده). */
-function apiUpload(action, payload, onProgress){
+   «نامعیّن» نمایش داده می‌شود. onProgress اینجا فراخوانی نمی‌شود (برای سازگاری امضا نگه داشته شده).
+   onXhr(xhr): خود درخواست را به صدازننده می‌دهد تا بتواند لغوش کند (مرکز انتقال). */
+function apiUpload(action, payload, onProgress, onXhr){
   return new Promise(function(resolve){
     if(!API_URL || API_URL.indexOf("PASTE_")===0){ resolve({ ok:false, message:"آدرس سرویس (API_URL) تنظیم نشده است." }); return; }
     try{
@@ -73,6 +74,8 @@ function apiUpload(action, payload, onProgress){
       };
       xhr.onerror  =function(){ resolve({ ok:false, message:"خطا در ارتباط با سرویس.", netError:true }); };
       xhr.ontimeout=function(){ resolve({ ok:false, message:"زمان ارتباط با سرویس به پایان رسید.", netError:true }); };
+      xhr.onabort  =function(){ resolve({ ok:false, message:"لغو شد", canceled:true }); };
+      if(onXhr) try{ onXhr(xhr); }catch(_){}
       xhr.send(JSON.stringify({ action:action, token:ME.token, payload:payload||{} }));
     }catch(e){ resolve({ ok:false, message:"خطا در ارسال.", netError:true }); }
   });
@@ -87,14 +90,17 @@ async function apiFileSize(fileId){
 /* دریافت فایل به‌صورت استریمی — برای نمایش پیشرفت بارگذاری بدون اورلی سراسری.
    onProgress(loaded,total): اگر total>0 (Content-Length یا expectedTotal داده‌شده) درصد دقیق ممکن است؛
    وگرنه (روی Apps Script معمولاً Content-Length نیست) حجم دریافتی نشان داده می‌شود.
-   expectedTotal: طول تقریبی پاسخ JSON (base64 + سرریز) که از حجم فایل حساب می‌شود تا درصد واقعی باشد. */
-async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal){
+   expectedTotal: طول تقریبی پاسخ JSON (base64 + سرریز) که از حجم فایل حساب می‌شود تا درصد واقعی باشد.
+   signal: لغو از بیرون (دکمهٔ ضربدر مرکز انتقال)؛ نتیجه {canceled:true} است، نه خطا. */
+async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal, signal){
   if(!API_URL || API_URL.indexOf("PASTE_")===0) return { ok:false, message:"آدرس سرویس تنظیم نشده است." };
   /* سقف انتظار تا *شروع* پاسخ (نه کل دانلود): سرور گیرکرده دیگر نوار را دقیقه‌ها نمی‌چرخاند.
      ۳۵ ثانیه چون Apps Script پیش از فرستادن اولین بایت، کل فایل را از درایو می‌خواند و base64 می‌کند
      (برای فایل بزرگ و شروع سرد ده‌ها ثانیه طول می‌کشد). پس از رسیدن سرآیندها، دانلود بی‌سقف ادامه دارد. */
   var ctl=(typeof AbortController==="function")?new AbortController():null, timedOut=false;
   var ttfb=ctl?setTimeout(function(){ timedOut=true; ctl.abort(); }, FILE_TTFB_MS):null;
+  var onExt=function(){ if(ctl) ctl.abort(); };
+  if(signal){ if(signal.aborted) return { ok:false, message:"لغو شد", canceled:true }; signal.addEventListener("abort", onExt); }
   try{
     var res=await fetch(API_URL,{ method:"POST", headers:{ "Content-Type":"text/plain;charset=utf-8" },
       body: JSON.stringify({ action:"getFile", token:ME.token, payload:{ fileId:fileId } }), redirect:"follow",
@@ -118,9 +124,12 @@ async function apiGetFileStreamed(fileId, onProgress, quiet, expectedTotal){
     return data;
   }catch(e){
     clearTimeout(ttfb);
+    if(signal && signal.aborted) return { ok:false, message:"لغو شد", canceled:true };
     if(!quiet) toast("خطا در دریافت فایل. اتصال اینترنت را بررسی کنید.", true);
     // netError = سرور پاسخ معتبری نداد (قطعی، صفحهٔ خطای گوگل، یا پاسخ غیر JSON) — نه «فایل نیست»
     return { ok:false, message:"خطا در دریافت فایل.", netError:true, timedOut:timedOut };
+  }finally{
+    if(signal) signal.removeEventListener("abort", onExt);
   }
 }
 var FILE_TTFB_MS=35000;
@@ -200,12 +209,13 @@ async function getFileRetry(fileId, o){
     apiFileSize(fileId).then(function(sz){ if(sz>0) holder.v=Math.ceil(sz/3)*4 + 120; });   // طول base64 + سرریز JSON
   }
   for(var i=0;i<tries;i++){
-    if(o.onProgress && typeof apiGetFileStreamed==="function") r=await apiGetFileStreamed(fileId, o.onProgress, true, exp);
+    if(o.signal && o.signal.aborted) return { ok:false, message:"لغو شد", canceled:true };
+    if(o.onProgress && typeof apiGetFileStreamed==="function") r=await apiGetFileStreamed(fileId, o.onProgress, true, exp, o.signal);
     else r=await api("getFile",{fileId:fileId},{silent:true, quiet:true});
     if(r && r.ok){ fileCachePut(fileId, r); return r; }   // موفق شد
     /* تکرار فقط برای شکست‌های سریع و گذرا (صفحهٔ خطای گوگل، قطعی لحظه‌ای). سرور گیرکرده (timedOut)
        یا «فایل نیست» (پاسخ معتبر سرور) با تکرار درست نمی‌شود و فقط انتظار را چند برابر می‌کرد. */
-    if(r && (r.timedOut || !r.netError)) break;
+    if(r && (r.canceled || r.timedOut || !r.netError)) break;
     if(i<tries-1) await fileSleep(650*(i+1));   // ۰٫۶۵s سپس ۱٫۳s پیش از تلاش بعدی
   }
   return r;
