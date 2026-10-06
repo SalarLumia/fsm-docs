@@ -445,7 +445,9 @@ async function rbRefresh(){
   if(!docs.length){ host.innerHTML='<div class="rb-empty">'+emptyState("سطل زباله خالی است","اسنادی که حذف کنید تا ۳۰ روز اینجا می‌مانند و قابل بازیابی‌اند؛ پس از آن سامانه حذف دائمی‌شان می‌کند.")+'</div>'; return; }
   host.innerHTML='<div class="rb-list">'+docs.map(rbRowHTML).join("")+'</div>';
 }
-function rbRowHTML(d){
+/* ⚠ دکمه‌ها با اندیس ردیف کار می‌کنند نه شماره: یک شماره ممکن است هم زنده باشد و هم
+   (یک یا چند بار) در سطل زباله؛ سرور نسخهٔ درست را با زمان حذف (deletedAt) پیدا می‌کند. */
+function rbRowHTML(d,i){
   var num=esc(d.drawingNumber);
   // ترتیب: نام فارسی سند ← قطعه ← پروژه ← مشتری؛ جداکننده = خط عمودی نازک و کم‌رنگ (rb-sep)
   var parts=[typeName(d.typeCode), partNameFa(d.partNo), projectLabel(d), clientName(d.clientCode)]
@@ -464,20 +466,23 @@ function rbRowHTML(d){
     '</div>'+
     '<span class="rb-days'+(dl<=5?" low":"")+'">'+faN(dl)+' روز مانده</span>'+
     '<div class="rb-acts">'+
-      '<button class="icon-btn sm" onclick="rbRestore(\''+num+'\')" title="بازیابی سند" aria-label="بازیابی سند">'+RB_RESTORE_IC+'</button>'+
-      '<button class="icon-btn sm danger" onclick="rbPurge(\''+num+'\')" title="حذف دائمی" aria-label="حذف دائمی">'+RB_PURGE_IC+'</button>'+
+      '<button class="icon-btn sm" onclick="rbRestore('+i+')" title="بازیابی سند" aria-label="بازیابی سند">'+RB_RESTORE_IC+'</button>'+
+      '<button class="icon-btn sm danger" onclick="rbPurge('+i+')" title="حذف دائمی" aria-label="حذف دائمی">'+RB_PURGE_IC+'</button>'+
     '</div>'+
   '</div>';
 }
-async function rbRestore(num){
-  var r=await api("restoreDocument",{drawingNumber:num});
+function rbKey(d){ return {drawingNumber:d.drawingNumber, deletedAt:d.deletedAt}; }
+async function rbRestore(i){
+  var d=_rbDocs[i]; if(!d) return;
+  var r=await api("restoreDocument",rbKey(d));
   if(r&&r.ok){ toast("بازیابی شد"); await rbRefresh(); refreshDocuments(); }
   else toast((r&&r.message)||"بازیابی ناموفق",true);
 }
 /* حذف همیشگی یک سند از سطل زباله (برگشت‌ناپذیر) */
-async function rbPurge(num){
-  if(!(await uiConfirm("سند «"+num+"» حذف دائمی می‌شود و دیگر قابل بازیابی نیست. مطمئنید؟",{danger:true,okLabel:"حذف دائمی"}))) return;
-  var r=await api("purgeDocument",{drawingNumber:num});
+async function rbPurge(i){
+  var d=_rbDocs[i]; if(!d) return;
+  if(!(await uiConfirm("سند «"+d.drawingNumber+"» حذف دائمی می‌شود و دیگر قابل بازیابی نیست. مطمئنید؟",{danger:true,okLabel:"حذف دائمی"}))) return;
+  var r=await api("purgeDocument",rbKey(d));
   /* ⚠ refreshDocuments لازم است: حذف دائم یک رویداد 'purged' در گردش کار ثبت
      می‌کند و بدون این، DB.workflow به‌روز نمی‌شد و آن رویداد تا رفرش کامل صفحه
      در «فعالیت‌های اخیر» دیده نمی‌شد. حذف نرم و بازیابی این را از قبل داشتند. */
@@ -486,11 +491,11 @@ async function rbPurge(num){
 }
 /* خالی‌کردن کامل سطل زباله — همهٔ رکوردها حذف دائمی می‌شوند */
 async function rbPurgeAll(){
-  var nums=_rbDocs.map(function(d){ return d.drawingNumber; });
+  var nums=_rbDocs.map(rbKey);
   if(!nums.length) return;
   if(!(await uiConfirm("همهٔ "+faN(nums.length)+" سند داخل سطل زباله حذف دائمی می‌شوند و قابل بازیابی نیستند. مطمئنید؟",{danger:true,okLabel:"حذف دائمی همه"}))) return;
   toast("در حال حذف همه…");
-  for(var i=0;i<nums.length;i++){ await api("purgeDocument",{drawingNumber:nums[i]},{silent:true,quiet:true}); }
+  for(var i=0;i<nums.length;i++){ await api("purgeDocument",nums[i],{silent:true,quiet:true}); }
   toast("سطل زباله خالی شد");
   await rbRefresh();
   refreshDocuments();   // همان دلیل rbPurge: رویدادهای 'purged' باید به DB.workflow برسند
