@@ -694,9 +694,9 @@ function dataSig(src){
 async function refreshDocuments(opts){
   var bg=!!(opts&&opts.background), my=++_syncSeq;
   var r=await api("bootstrap",{});
-  if(!r.ok){ return; }
-  if(my!==_syncSeq) return;
-  if(bg && _opsInFlight>0) return;
+  if(!r.ok){ return false; }   // false = سرور جواب نداد (تلاش دوبارهٔ پس از بازشدن فوری از این استفاده می‌کند)
+  if(my!==_syncSeq) return true;
+  if(bg && _opsInFlight>0) return true;
   var same = bg && dataSig(r)===dataSig(DB);
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[];
@@ -705,9 +705,10 @@ async function refreshDocuments(opts){
   if(r.users&&r.users.length) DB.users=r.users;
   if(r.instanceCounts) DB.instanceCounts=r.instanceCounts;
   snapSave(); markSynced();
-  if(same) return;   // صفحه همین حالا درست است؛ رسم دوباره فقط پرش می‌سازد
+  if(same) return true;   // صفحه همین حالا درست است؛ رسم دوباره فقط پرش می‌سازد
   rerenderAfterData();
   if(bg && opts.full && typeof renderNavTree==="function") renderNavTree();   // همگام‌سازی خودکار: مشتری/پروژهٔ تازهٔ کاربران دیگر
+  return true;
 }
 
 /* ================= دادهٔ ذخیره‌شده برای بازشدن فوری =================

@@ -180,6 +180,14 @@ function fileCachePut(id, r){
     var old=_fileCacheOrder.shift(); _fileCacheChars-=String((_fileCache[old]||{}).base64||"").length; delete _fileCache[old];
   }
 }
+/* فایلی که رسید ولی نمایش داده نشد نباید در حافظه بماند؛ وگرنه «تلاش مجدد» همان نسخهٔ معیوب را برمی‌داشت. */
+function fileCacheDrop(id){
+  if(!id || !_fileCache[id]) return;
+  _fileCacheChars-=String(_fileCache[id].base64||"").length; delete _fileCache[id];
+  _fileCacheOrder=_fileCacheOrder.filter(function(x){ return x!==id; });
+}
+/* اطلاعات خطای «ابزار نمایش (کتابخانهٔ محلی سایت) بارگذاری نشد» — با اینترنت ناپایدار پیش می‌آید، نه با خرابی فایل */
+var FAIL_ASSET={ ic:FAIL_IC.offline, t:"ابزار نمایش بارگذاری نشد", d:"اتصال اینترنت ناپایدار است. فایل سالم است؛ دوباره تلاش کنید." };
 async function getFileRetry(fileId, o){
   o=o||{}; var tries=3, r=null;
   if(fileId && _fileCache[fileId]){ if(o.onProgress) try{ o.onProgress(1,1); }catch(e){} return _fileCache[fileId]; }

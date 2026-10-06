@@ -1966,7 +1966,7 @@ function ensureModelViewer(){
   if(_mvLibPromise) return _mvLibPromise;
   _mvLibPromise=new Promise(function(resolve){
     var s=document.createElement("script"); s.type="module"; s.src="vendor/model-viewer.min.js";
-    s.onload=function(){ resolve(); }; s.onerror=function(){ resolve(); };
+    s.onload=function(){ resolve(); }; s.onerror=function(){ _mvLibPromise=null; s.remove(); resolve(); };   // شکست شبکه‌ای کش نشود
     document.head.appendChild(s);
     setTimeout(resolve,4000); // مهلت رجیسترشدن custom element
   });
@@ -2063,7 +2063,10 @@ async function mvLoadPart(fileId, part){
     var mv=document.getElementById("mvEl");
     if(mv){ mv.addEventListener("load", function(){ if(myToken===_mvLoadSeq){ est.done(); loadBarHide(scope()); } }); }
     else { est.done(); loadBarHide(scope()); }
-  }catch(e){ est.stop(); loadBarHide(scope()); var ph2=document.getElementById("mvPh"); if(ph2) ph2.innerHTML=mvFailHTML(FAIL_RENDER,fileId,part); }
+  }catch(e){ est.stop(); loadBarHide(scope());
+    if(typeof fileCacheDrop==="function") fileCacheDrop(fileId);   // نسخهٔ معیوب نماند تا «تلاش مجدد» از نو بگیرد
+    try{ console.warn("[FSM] نمایش مدل ناموفق:", e); }catch(_){}
+    var ph2=document.getElementById("mvPh"); if(ph2) ph2.innerHTML=mvFailHTML(FAIL_RENDER,fileId,part); }
 }
 function mvFailHTML(fi, fileId, part){
   return '<div class="mv-fail-ic">'+(fi.ic||"")+'</div><div class="mv-empty-t">'+esc(fi.t)+'</div><div class="mv-empty-s">'+esc(fi.d)+'</div>'+mvRetryBtn(fileId,part);

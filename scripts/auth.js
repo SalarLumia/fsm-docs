@@ -367,6 +367,10 @@ async function startApp(){
      (دکمه در حالت «در حال بارگذاری اطلاعات…») و پوسته فقط یک‌بار و با دادهٔ کامل
      وارد می‌شود — وگرنه پنل‌ها یک‌بار خالی دیده و بعد دوباره در آبشار وارد می‌شدند. */
   var snap=(typeof snapLoad==="function")?snapLoad():null;
+  /* دادهٔ ذخیره‌شدهٔ خالی (بی مشتری، بی پروژه، بی سند) بازشدن فوری ندارد: اگر سرور هم جواب ندهد،
+     داشبورد با «پروژه‌ای ثبت نشده» رسم می‌شد و به نظر می‌رسید پایگاه داده پاک شده.
+     پس مثل نبودِ داده رفتار می‌شود تا در قطعی، صفحهٔ «داده نرسیده» بیاید. */
+  if(snap && !((snap.clients||[]).length || (snap.projects||[]).length || (snap.documents||[]).length)) snap=null;
   if(snap){ applyBootData(snap); showAppShell(true); }
   else lgStage2();   // متن دکمه: ورود موفق بود، حالا داده می‌آید
 
@@ -377,6 +381,7 @@ async function startApp(){
   if(myRun!==_appRun) return;   // نشست تازه‌تری شروع شده؛ این پاسخ کهنه است و نباید چیزی رسم کند
   if(!r || !r.ok){
     if(snap){ toast("ارتباط با سرویس برقرار نشد؛ آخرین دادهٔ ذخیره‌شده نمایش داده می‌شود.", true);
+      snapRetryLater(myRun);
       if(typeof consumePendingRoute==="function") consumePendingRoute(); return; }
     // هنوز چیزی نمایش داده نشده؛ حالا پوسته را بیاور تا خطا جایی برای دیده‌شدن داشته باشد
     document.getElementById("loginView").classList.add("hidden");
@@ -459,6 +464,16 @@ async function showBootFail(r, myRun){
     left--; if(left<=0){ bootRetryNow(); return; }
     tick();
   },1000);
+}
+/* بازشدن فوری با دادهٔ ذخیره‌شده ولی سرور در دسترس نبود: هر ۳۰ ثانیه بی‌صدا دوباره تلاش می‌شود
+   تا دادهٔ تازه برسد (قبلاً تا همگام‌سازی ۴ دقیقه‌ای بعدی منتظر می‌ماند). */
+function snapRetryLater(myRun){
+  setTimeout(async function(){
+    if(myRun!==_appRun || !ME.token) return;
+    if(document.hidden){ snapRetryLater(myRun); return; }
+    var ok=(typeof refreshDocuments==="function")?await refreshDocuments({background:true, full:true}):true;
+    if(!ok) snapRetryLater(myRun);
+  }, BOOT_RETRY_S*1000);
 }
 function bootRetryNow(){
   stopBootRetry();

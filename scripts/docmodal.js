@@ -271,7 +271,7 @@ function ensurePdfLib(){
       if(window.pdfjsLib) window.pdfjsLib.GlobalWorkerOptions.workerSrc="vendor/pdf.worker.min.js";
       resolve(!!window.pdfjsLib);
     };
-    sc.onerror=function(){ resolve(false); };
+    sc.onerror=function(){ _pdfLibPromise=null; sc.remove(); resolve(false); };   // شکست شبکه‌ای کش نشود تا تلاش بعدی دوباره بارگذاری کند
     document.head.appendChild(sc);
   });
   return _pdfLibPromise;
@@ -551,7 +551,7 @@ function dmToggleRev(num){
 }
 
 /* انتخاب یک ریویژن → پیش‌نمایش داخل صفحه + فعال‌کردن دانلود همان ریویژن */
-async function dmSelectVersion(num){
+async function dmSelectVersion(num, _retried){
   var d=docByNumber(num); if(!d) return;
   _dm.selNum=num;
   dmApplySelection(d);
@@ -623,7 +623,8 @@ async function dmSelectVersion(num){
           (typeof mvToolbarHTML==="function"?mvToolbarHTML():'')+
         '</div>';
       } else {
-        host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><div class="es-title">نمایش سه‌بعدی در دسترس نیست</div><div class="es-desc">فایل کتابخانهٔ model-viewer در پوشهٔ vendor موجود نیست.</div></div>';
+        // کتابخانه نیامد: تقریباً همیشه اینترنت ناپایدار است (فایلش در vendor هست)
+        host.innerHTML=dmFailHTML(FAIL_ASSET, num);
       }
     } else {
       var isPdf = /pdf/i.test(r.mimeType||"") || /\.pdf$/i.test(r.name||"");
@@ -651,8 +652,16 @@ async function dmSelectVersion(num){
     if(est) est.stop();
     if(_dpEst===est) _dpEst=null;
     if(myToken!==_dpSeq) return;
+    /* فایل رسید ولی نمایش شکست خورد. با اینترنت ناپایدار این معمولاً خرابی فایل نیست (بارگذاری
+       ابزار نمایش یا خود دریافت نیمه‌کاره ماند)؛ پس نسخهٔ در حافظه دور ریخته و یک‌بار بی‌صدا از نو
+       گرفته می‌شود. فقط اگر بار دوم هم شکست خورد پیام داده می‌شود — و اگر اینترنت قطع است، همان را می‌گوید. */
+    if(typeof fileCacheDrop==="function") fileCacheDrop(d.fileId);
+    try{ console.warn("[FSM] نمایش پیش‌نمایش ناموفق:", e); }catch(_){}
+    if(!_retried){ dmSelectVersion(num, true); return; }
+    var online=(typeof siteReachable==="function")?await siteReachable():true;
+    if(myToken!==_dpSeq) return;
     host=document.getElementById("docPreviewHost");
-    if(host) host.innerHTML=dmFailHTML(FAIL_RENDER, num);
+    if(host) host.innerHTML=dmFailHTML(online?FAIL_RENDER:FAIL_ASSET, num);
   }
 }
 /* حالت خطای پیش‌نمایش: علت واقعی (fileFailInfo / FAIL_RENDER) + توضیح + «تلاش مجدد» */
