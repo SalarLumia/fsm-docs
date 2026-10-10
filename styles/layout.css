@@ -3,8 +3,8 @@
    پس نوار سمت چپ می‌نشیند. سایدبار position:fixed است و بیرون این اسکرول
    می‌ماند؛ هدر چسبان هم نسبت به همین ظرف می‌چسبد، نه پنجره. */
 #appView{height:100%;overflow:auto}
-/* قفل اسکرول هنگام باز بودن پنجره‌ها روی همین ظرف اعمال می‌شود، نه body */
-body.modal-open #appView{overflow:hidden}
+/* قفل اسکرول هنگام باز بودن پنجره‌ها: overflow عمداً بسته نمی‌شود تا نوار اسکرول بماند و صفحه کش نیاید؛
+   قفل با رویدادها در modalLock (archive.js) انجام می‌شود */
 .sidebar{width:220px;transition:width .28s cubic-bezier(.4,0,.2,1);background:var(--charcoal);box-shadow:-2px 0 16px #00000028;display:flex;flex-direction:column;
   position:fixed;right:0;top:0;bottom:0;z-index:40;flex-shrink:0}
 .sb-brand{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,0.1);
@@ -196,6 +196,23 @@ body.sb-wide .app-body{margin-right:308px}
 .top-clock{white-space:nowrap;font-weight:500;display:inline-flex;align-items:center}
 /* خط جداکنندهٔ بین تاریخ و دکمهٔ انتقال — هم‌سبک جداکنندهٔ نقش/سمت کاربر (۱px + ۱۶px فاصله) */
 .tb-sep{align-self:center;width:1px;height:18px;background:var(--line);margin-inline:9px;flex-shrink:0}
+/* برچسب «نسخهٔ محلی» (scripts/local.js) — فقط وقتی سایت از سرور محلی باز شده */
+.lc-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn);border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;max-width:46vw;overflow:hidden}
+.lc-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);flex-shrink:0}
+.lc-chip.busy .lc-dot{animation:lcPulse 1s ease-in-out infinite}
+.lc-meta{color:var(--muted);overflow:hidden;text-overflow:ellipsis}
+.lc-chip.err .lc-meta{color:var(--err)}
+.lc-btn{border:0;background:none;color:var(--brand);font:inherit;font-weight:700;cursor:pointer;padding:0}
+.lc-btn:hover{color:var(--brand2)}
+.lc-btn:disabled{opacity:.45;cursor:default}
+.lc-btn+.lc-btn{margin-inline-start:4px}
+.lc-danger{color:var(--err)}
+.lc-danger:hover{color:var(--err2)}
+.lc-chip.ok{border-color:var(--ok-line);background:var(--ok-bg);color:var(--ok)}
+.lc-chip.ok .lc-dot{background:var(--ok)}
+.lc-chip.err{border-color:var(--err-line);background:var(--err-bg);color:var(--err)}
+.lc-chip.err .lc-dot{background:var(--err)}
+@keyframes lcPulse{50%{opacity:.25}}
 
 /* ===== محتوای اصلی ===== */
 /* ⚠ پدینگ پایین از ۶۰ به ۲۸ آمد. آن ۶۰ فضای ثابتی بود که «خالی» دیده می‌شد

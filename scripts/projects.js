@@ -108,7 +108,7 @@ function renderNavTree(){
         ? projs.map(function(p){
             var o=pad2(p.orderNo), pr=pad2(p.projectNo);
             var pCur=(projActive&&_projView.mode==="detail"&&_projView.c===c.code&&_projView.o===o&&_projView.pr===pr);
-            return '<button class="nav-leaf nav-pleaf'+(pCur?' cur':'')+'" data-prj="'+esc(c.code)+'/'+esc(o)+'/'+esc(pr)+'" onclick="navGoProject(\''+esc(c.code)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')"><span class="nav-dot"></span><span class="nav-lb">'+esc(p.description||("پروژهٔ "+pr))+'</span></button>';
+            return '<button class="nav-leaf nav-pleaf'+(pCur?' cur':'')+'" data-prj="'+esc(c.code)+'/'+esc(o)+'/'+esc(pr)+'" onclick="navGoProject(\''+esc(c.code)+'\',\''+esc(o)+'\',\''+esc(pr)+'\')"><span class="nav-dot"></span><span class="nav-lb">'+esc(projNameFa(p)||("پروژهٔ "+pr))+'</span></button>';
           }).join("")
         : '<div class="nav-empty">پروژه‌ای نیست.</div>';
       // ظرف آکاردئونی پروژه‌ها (همیشه در DOM؛ open آن مستقل از ریشه است)
@@ -360,7 +360,9 @@ function cpOpenProjectModal(op){
   var label=editing?("ویرایش پروژهٔ "+esc(pad2(parts[1]))+" — سفارش "+esc(orderNo)):("نام پروژهٔ جدید — سفارش "+esc(orderNo));
   var body='<div class="clm">'+
     '<div class="clm-row"><label class="fld">'+label+'</label>'+
-      '<input id="cpPrDesc" placeholder="مثلاً مجموعه شفت و غلطک کوره سیمان" value="'+esc(rec?rec.description||"":"")+'"></div>'+
+      '<input id="cpPrDesc" placeholder="مثلاً مجموعه شفت و غلطک کوره سیمان" value="'+esc(projNameFa(rec))+'"></div>'+
+    '<div class="clm-row"><label class="fld">نام انگلیسی</label>'+
+      '<input id="cpPrEn" dir="ltr" placeholder="e.g. Shaft & roller set W=700" value="'+esc(projNameEn(rec))+'"></div>'+
     '<div class="clm-actions"><button class="btn" onclick="closeModal()">انصراف</button>'+
       '<button class="btn primary" onclick="cpSaveProject()">'+(editing?"به‌روزرسانی":"افزودن پروژه")+'</button></div>'+
   '</div>';
@@ -395,8 +397,8 @@ async function cpSaveProject(){
   var parts=editing?_cp.editingProject.split("/"):[_cp.order,""];
   var orderNo=pad2(parts[0]);
   if(!orderNo){ toast("سفارش نامشخص است.",true); return; }
-  var desc=val("cpPrDesc").trim();
-  var payload={clientCode:_cp.client, orderNo:orderNo, description:desc};
+  var desc=val("cpPrDesc").trim(), descEn=val("cpPrEn").trim();
+  var payload={clientCode:_cp.client, orderNo:orderNo, nameFa:desc, nameEn:descEn};
   if(editing) payload.projectNo=parts[1];
   var r=await api("saveProject",payload);
   if(!r.ok){ toast(r.message||"ذخیره ناموفق",true); return; }
@@ -405,10 +407,10 @@ async function cpSaveProject(){
   /* ⚠ localUpsert جایگزین کامل است (arr[i]=newItem)، نه ادغام. پس اگر شیء تازه را از صفر
      بسازیم هر فیلدی که در آن نیاوریم از نسخهٔ داخل مرورگر پاک می‌شود — از جمله specs که
      همهٔ ماژول‌ها، قطعات و پارامترهای پروژه در آن است. بک‌اند دست‌نخورده می‌ماند (فقط
-     description فرستاده می‌شود)، ولی پنل تا رفرش بعدی خالی دیده می‌شد.
+     نام پروژه فرستاده می‌شود)، ولی پنل تا رفرش بعدی خالی دیده می‌شد.
      راه‌حل: از نسخهٔ قبلی شروع کن و فقط چیزی را که واقعاً عوض شده بنویس. */
   var next={}; if(prev){ for(var k in prev){ if(prev.hasOwnProperty(k)) next[k]=prev[k]; } }
-  next.clientCode=_cp.client; next.orderNo=orderNo; next.projectNo=pn; next.description=desc;
+  next.clientCode=_cp.client; next.orderNo=orderNo; next.projectNo=pn; next.nameFa=desc; next.nameEn=descEn; next.description=desc;
   if(!prev) next.createdBy=ME.username;   // فقط پروژهٔ تازه ثبت‌کننده می‌گیرد؛ ویرایش نباید ثبت‌کنندهٔ اصلی را عوض کند
   localUpsert(DB.projects,function(x){return x.clientCode===_cp.client&&pad2(x.orderNo)===pad2(orderNo)&&pad2(x.projectNo)===pad2(pn);},next);
   _cp.editingProject=""; _cp.order=orderNo;
@@ -837,6 +839,62 @@ function projectPartsDocsHTML(p){
    قابل خاموش‌کردن یا جابه‌جایی نیست و همیشه ردیف اول است. */
 var PART_CODE_LABEL="کد قطعه";
 function partCode(c,o,pr,pn){ return String(c||"").toUpperCase()+"-"+pad2(o)+"-"+pad2(pr)+"-"+pad2(pn); }
+/* ═══ وزن خودکار: حجم مدل سه‌بعدی نقشه × وزن مخصوص جنس از کتابخانهٔ مواد ═══
+   وزن نهایی از مدل نقشهٔ ماشینکاری (MC) می‌آید؛ وزن ریخته‌گری از مدل نقشهٔ ریخته‌گری (AC)، فقط وقتی AC
+   برای همین قطعه فعال است. دستی وارد نمی‌شود. حجم هنگام بارگذاری STEP ذخیره می‌شود؛ اگر مدلی حجم
+   ذخیره‌شده نداشت (مثلاً از فایل سه‌بعدی قدیمی آمده)، همین‌جا یک‌بار از روی STEP حساب و نگه داشته می‌شود. */
+var WEIGHT_LABEL="وزن";
+var _volCache=(function(){ try{ return JSON.parse(localStorage.getItem("fsmVolCache")||"{}")||{}; }catch(e){ return {}; } })();
+function partModelDoc(p,pn,type){
+  return projectDocs(p).filter(function(d){ return pad2(d.partNo)===pad2(pn) && String(d.typeCode).toUpperCase()===type; })
+    .sort(function(a,b){ return (parseInt(b.rev,10)||0)-(parseInt(a.rev,10)||0); })[0]||null;
+}
+function docVolume(d){
+  var v=parseFloat(d.modelVolume); if(v>0) return v;
+  var k=String(d.stpFileId||""); if(!k) return null;
+  if(_volCache[k]>0) return _volCache[k];
+  if(_volCache[k]===undefined) partVolumeBackfill(k);
+  return _volCache[k]===-2 ? -2 : null;
+}
+async function partVolumeBackfill(k){
+  _volCache[k]=-1;   // در حال محاسبه
+  try{
+    var r=await getFileRetry(k);
+    if(!r || !r.ok) throw new Error("file");
+    var c=await stepConvert(new File([b64toBlob(r.base64, r.mimeType||"application/step")], "m.stp"));
+    _volCache[k]=c.volume;
+    try{ localStorage.setItem("fsmVolCache", JSON.stringify(_volCache)); }catch(e){}
+  }catch(e){ _volCache[k]=-2; }
+  var tab=document.getElementById("tab-project");
+  if(tab && !tab.classList.contains("hidden") && typeof rerenderProjectTab==="function") rerenderProjectTab();
+}
+function partWeightOne(p,pn,type,mat){
+  var d=partModelDoc(p,pn,type);
+  /* تا نقشهٔ ماشینکاری بیاید، فایل سه‌بعدی قدیمی همان قطعه (3D) مبنای وزن نهایی است */
+  if(type==="MC" && !docHasModel(d)) d=partModelDoc(p,pn,"3D")||d;
+  if(!d || !docHasModel(d)) return { t:"No 3D model", empty:true };
+  if(!mat) return { t:"Material not set", empty:true };
+  var v=docVolume(d);
+  if(v===-2) return { t:"Not available", empty:true };
+  if(v==null) return { t:"Calculating…", empty:true };
+  return { t:weightRound(v*Number(mat.density)), kg:true };
+}
+/* گردکردن وزن مثل عددی که روی نقشه نوشته می‌شود: دقت عدد با بزرگی‌اش کم می‌شود
+   (۲٫۷ · ۴۳ · ۴۹۰ · ۱۴۰۰ · ۷۹۴۰) — رقم اضافه دقتی را القا می‌کند که حجم مدل و وزن مخصوص ندارند */
+function weightRound(kg){
+  var step = kg<10 ? 0.1 : kg<100 ? 1 : kg<1000 ? 5 : 10;
+  var r=Math.round(kg/step)*step;
+  return step<1 ? r.toFixed(1).replace(/\.0$/,"") : Math.round(r).toLocaleString("en-US");
+}
+function partWeightHTML(p,pn,vals){
+  var mat=materialByValue(String(vals[MATERIAL_LABEL]||""));
+  var fmt=function(w){ return w.kg ? esc(w.t)+' <span class="spec-unit">kg</span>' : '<span class="wt-empty">'+esc(w.t)+'</span>'; };
+  var fin=partWeightOne(p,pn,"MC",mat);
+  if(partDocTypesForPart(p,pn).indexOf("AC")<0) return fmt(fin);
+  var ac=partWeightOne(p,pn,"AC",mat);
+  return '<span class="wt-line"><span class="wt-k">Machined</span>'+fmt(fin)+'</span>'+
+         '<span class="wt-line"><span class="wt-k">As-cast</span>'+fmt(ac)+'</span>';
+}
 /* ردیف‌های اطلاعات قطعه (کد قطعه + وزن/جنس/…)؛ مقدار پارامترها برای مدیر با کلیک قابل ویرایش است. */
 function partSpecRowsHTML(p,pn,admin){
   var mods=partModsForPart(p,pn).filter(function(m){ return m.on && m.label; });   // فقط پارامترهای فعال همین قطعه
@@ -848,10 +906,20 @@ function partSpecRowsHTML(p,pn,admin){
     var cls=v?pdValClass(v):'spec-val ltr empty';
     var unit=(typeof partModUnitOf==="function")?partModUnitOf(m.label):"";   // واحد خودکار این پارامتر
     var body=v?(esc(v)+(unit?' <span class="spec-unit">'+esc(unit)+'</span>':'')):'Not specified';
+    /* جنس = گرید یک مادهٔ کتابخانه؛ متن نمایشی از خود کتابخانه ساخته می‌شود */
+    if(m.label===MATERIAL_LABEL && v){
+      var mat=materialByValue(v);
+      body=mat?esc(materialLabel(mat)):(esc(v)+' <span class="mat-off">خارج از کتابخانه</span>');
+    }
     /* پارامتر «تعداد» = سقف تولید، پس وضعیت قطعات تولیدی در دنبالهٔ همین مقدار می‌آید:
        «2 pcs (1 of 2 approved)». خود عدد مثل بقیهٔ پارامترها با کلیک ویرایش می‌شود و
        فقط دنبالهٔ داخل پرانتز به بخش ردیابی می‌رود. */
     if(m.label===PART_QTY_LABEL){ qtySeen=true; body+=partInstSuffix(c,o,pr,pn,v); }
+    /* وزن محاسبه می‌شود، ویرایش نمی‌شود */
+    if(m.label===WEIGHT_LABEL){
+      return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(m.label)+'</span></span>'+
+        '<span class="spec-val ltr wt-val" title="حجم مدل سه‌بعدی نقشه × وزن مخصوص جنس">'+partWeightHTML(p,pn,vals)+'</span></div>';
+    }
     var edit=admin?' data-val="'+esc(v)+'" title="کلیک برای ویرایش" onclick="partSpecEdit(this,\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\',\''+esc(m.label)+'\')"':'';
     return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(m.label)+'</span></span>'+
       '<span class="'+cls+(admin?' editable':'')+'"'+edit+'>'+body+'</span></div>';
@@ -909,12 +977,152 @@ function partDocRowsHTML(p,pn,partTypes,latest,admin){
 /* ویرایش درجای مقدار یک ماژول قطعه (بدون دکمهٔ جدا؛ کلیک روی مقدار) */
 function partSpecEdit(el,c,o,pr,pn,label){
   if(!el || el.getAttribute("data-editing")==="1") return;
+  if(label===MATERIAL_LABEL){ partMaterialEdit(el,c,o,pr,pn); return; }
+  var ok=optListOfLabel(label); if(ok && optSorted(ok).length){ partOptEdit(el,c,o,pr,pn,ok); return; }
   el.setAttribute("data-editing","1");
   var raw=el.getAttribute("data-val")||"";
   el.innerHTML='<input class="spec-inline" value="'+esc(raw)+'" data-orig="'+esc(raw)+'" '+
     'onblur="partSpecSave(this,\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\',\''+esc(label)+'\')" '+
     'onkeydown="if(event.key===\'Enter\'){this.blur();}else if(event.key===\'Escape\'){this.value=this.getAttribute(\'data-orig\');this.blur();}">';
   var inp=el.querySelector&&el.querySelector("input"); if(inp){ try{ inp.focus(); inp.select(); }catch(e){} }
+}
+/* جنس فقط از کتابخانهٔ مواد انتخاب می‌شود، نه متن آزاد. مقدار قبلی که در کتابخانه نیست
+   به‌عنوان یک گزینهٔ جدا می‌ماند تا با بازکردن فهرست از دست نرود. */
+function partMaterialEdit(el,c,o,pr,pn){
+  var mats=materialsSorted();
+  if(!mats.length){ toast("ابتدا ماده را در تنظیمات ◂ کتابخانهٔ مواد تعریف کنید.",true); return; }
+  el.setAttribute("data-editing","1");
+  var raw=el.getAttribute("data-val")||"", cur=materialByValue(raw);
+  var sel=cur?String(cur.grade):raw;
+  /* منوی سفارشی هم‌شکل منوی انتخاب قطعه (.ed-part-*)، نه <select> مرورگر که شکلش با سایت نمی‌خواند */
+  /* گزینهٔ «Not specified» در فهرست نیست: کلیک دوباره روی جنس انتخاب‌شده آن را خاموش می‌کند و همه خاموش = مشخص‌نشده */
+  var items=[];
+  if(raw && !cur) items.push({v:raw,t:raw+" (not in library)"});
+  mats.forEach(function(m){ items.push({v:String(m.grade),t:materialLabel(m)}); });
+  var curItem=items.filter(function(x){ return x.v===sel; })[0]||{v:"",t:"Not specified"};
+  var args='\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\'';
+  el.innerHTML='<div class="ed-part-dd mat-dd" onclick="event.stopPropagation()" data-orig="'+esc(raw)+'" data-has="'+(curItem.v?1:0)+'">'+
+    '<button type="button" class="ed-part-trig mat-trig" onclick="matDDCancel('+args+')" onkeydown="matDDKey(event,'+args+')">'+
+      '<span class="heat-cur'+(curItem.v?'':' none')+'" title="'+esc(curItem.v?curItem.t:'')+'">'+esc(curItem.t)+'</span>'+ED_CHEV_IC+'</button>'+
+    /* همان شکل منوی عملیات حرارتی/فرآیند (دایرهٔ استاندارد سایت)، ولی تک‌انتخابی: کلیک = انتخاب و بستن */
+    '<div class="ed-part-menu mat-menu heat-menu dd-anim" role="listbox" onclick="event.stopPropagation()">'+items.map(function(x){
+      var on=(x.v===sel);
+      return '<button type="button" role="option" aria-selected="'+on+'" class="ed-part-opt heat-opt'+(on?' on':'')+(x.v?'':' none')+'" data-v="'+esc(x.v)+'" title="'+esc(x.t)+'" '+
+        'onclick="matDDPick(this,'+args+')" onkeydown="matDDKey(event,'+args+')"><span class="ed-check'+(on?' on':'')+'"></span><span class="heat-t">'+esc(x.t)+'</span></button>'; }).join("")+'</div></div>';
+  var dd=el.querySelector(".mat-dd"), on=dd&&dd.querySelector(".ed-part-opt.on");
+  var menu=matDDPlace(el, dd);
+  if(on){ try{ on.focus({preventScroll:true}); menu.scrollTop=Math.max(0, on.offsetTop-menu.clientHeight/2); }catch(e){} }
+  /* کلیک بیرون = انصراف (مقدار قبلی می‌ماند) */
+  _matDD={el:el,c:c,o:o,pr:pr,pn:pn,orig:raw,menu:menu};
+  matDDListen();
+}
+/* جای منوی سفارشی: به body منتقل و fixed می‌شود تا لبهٔ کارت قطعه آن را نبُرد (و transform کارت جایش را به‌هم نزند)؛
+   اگر پایین جا نبود، بالای دکمه باز می‌شود. مشترک میان منوی جنس و عملیات حرارتی. */
+function matDDPlace(el, dd){
+  var trig=dd.querySelector(".mat-trig"), menu=dd.querySelector(".ed-part-menu");
+  document.body.appendChild(menu);
+  /* عرض دکمه و منو یکی است و هرگز پهن‌تر از جای خالی ردیف نمی‌شود:
+     · پارامتر هنوز مقدار ندارد → به اندازهٔ بلندترین گزینه (حالت بیشینه)؛
+     · مقدار دارد → به اندازهٔ همان مقدار: متن روی دکمه، یا اگر گزینهٔ انتخاب‌شده در منو (با دایره‌اش) پهن‌تر است،
+       به اندازهٔ همان گزینه تا خودش کامل دیده شود؛ گزینه‌های بلندتر دیگر «…» می‌گیرند (هرگز دو خطی نمی‌شوند).
+     ⚠ وقتی گزینه‌ها زیادند، نوار اسکرول منو از عرض متن کم می‌کند؛ عرض نوار جدا اضافه می‌شود */
+  var room=Math.max(160, el.getBoundingClientRect().width), need;
+  menu.style.width="max-content";
+  /* ⚠ نوار اسکرول هنگام اندازه‌گیری هنوز ظاهر نشده؛ از ارتفاع حساب می‌شود: منوی بلندتر از ۲۶۰px نوار ۸px دارد */
+  var sb=(menu.scrollHeight>260)?8:0;
+  if(dd.getAttribute("data-has")==="1"){
+    /* ⚠ انیمیشن باز شدن منو را ۹۵٪ کوچک می‌کند؛ برای اندازه‌گیری دقیق یک لحظه خاموش می‌شود (و بعد از نو پخش می‌شود) */
+    var selW=0; menu.style.animation="none";
+    [].slice.call(menu.querySelectorAll(".ed-part-opt.on")).forEach(function(o){
+      o.classList.add("dd-measure"); selW=Math.max(selW, o.getBoundingClientRect().width); o.classList.remove("dd-measure"); });
+    menu.style.animation="";
+    need=Math.ceil(Math.max(trig.getBoundingClientRect().width, selW+8+2+sb))+2;   // ۸ پدینگ و ۲ حاشیهٔ منو؛ +۲ برای گردکردن زیرپیکسلی
+  } else need=Math.ceil(Math.max(menu.offsetWidth+sb, trig.getBoundingClientRect().width))+4;
+  trig.style.width=Math.min(need, room)+"px";
+  var tr=trig.getBoundingClientRect(), w=tr.width; menu.style.width=w+"px";   // عرض واقعی دکمه (پس از محدودیت ردیف) مبنای منو
+  var h=Math.min(260, menu.scrollHeight+2), below=window.innerHeight-tr.bottom-8;
+  menu.style.position="fixed"; menu.style.left=Math.max(8, Math.min(tr.left, window.innerWidth-w-8))+"px";
+  var down=(below>=h || below>=tr.top);
+  menu.style.top=(down ? tr.bottom+4 : Math.max(8, tr.top-4-h))+"px";
+  menu.classList.toggle("up", !down);   // جهت انیمیشن باز/بسته‌شدن
+  requestAnimationFrame(function(){ dd.classList.add("open"); });   // چورون با انیمیشن بچرخد
+  return menu;
+}
+function matDDListen(){
+  setTimeout(function(){ document.addEventListener("click", matDDOutside, true); },0);
+  var sc=appScroller(); if(sc) sc.addEventListener("scroll", matDDOnScroll, {passive:true});   // فهرست fixed با صفحه جابه‌جا نمی‌شود
+}
+var _matDD=null;
+function matDDOnScroll(){ if(_matDD){ var m=_matDD; matDDOff(); if(m.commit) m.commit(); else showProjectDetail(m.c,m.o,m.pr); } }
+/* بستن با انیمیشن استاندارد سایت (popClose): منو (که در body است) محو می‌شود و چورون برمی‌گردد، حتی وقتی کارت هم‌زمان از نو رسم می‌شود */
+function matDDOff(){ document.removeEventListener("click", matDDOutside, true); var sc=appScroller(); if(sc) sc.removeEventListener("scroll", matDDOnScroll);
+  var m=_matDD; _matDD=null; if(!m) return;
+  var dd=m.el && m.el.querySelector && m.el.querySelector(".mat-dd"); if(dd) dd.classList.remove("open");
+  var menu=m.menu; if(!menu || !menu.parentNode) return;
+  popClose(menu); }
+function matDDOutside(e){ if(!_matDD) return matDDOff(); if(e.target && e.target.closest && e.target.closest(".mat-dd, .mat-menu")) return;
+  var m=_matDD; matDDOff(); if(m.commit) m.commit(); else showProjectDetail(m.c,m.o,m.pr); }
+function matDDCancel(c,o,pr,pn){ var m=_matDD; matDDOff(); if(m && m.commit) m.commit(); else showProjectDetail(c,o,pr); }
+function matDDPick(btn,c,o,pr,pn){
+  if(!_matDD || _matDD.picking) return;
+  /* کلیک روی جنس انتخاب‌شده = خاموش‌کردنش؛ وقتی هیچ‌کدام روشن نیست، جنس «مشخص‌نشده» ذخیره می‌شود */
+  var off=btn.classList.contains("on"), orig=_matDD.orig, v=off?"":btn.getAttribute("data-v"); _matDD.picking=true;
+  /* اول انتخاب روی همان منو دیده شود (پرشدن/خالی‌شدن دایره)، بعد منو بسته و ذخیره شود */
+  [].slice.call(_matDD.menu.querySelectorAll(".heat-opt")).forEach(function(b){ var on=(b===btn && !off);
+    b.classList.toggle("on",on); b.setAttribute("aria-selected",on); var ck=b.querySelector(".ed-check"); if(ck) ck.classList.toggle("on",on); });
+  var reduce=(typeof prefersReducedMotion==="function") && prefersReducedMotion();
+  setTimeout(function(){ matDDOff(); partSpecSave({value:v, getAttribute:function(){ return orig; }}, c,o,pr,pn, MATERIAL_LABEL); }, reduce?0:150);
+}
+/* صفحه‌کلید: بالا/پایین بین گزینه‌ها، Enter انتخاب، Escape انصراف */
+function matDDKey(e,c,o,pr,pn){
+  var menu=_matDD&&_matDD.menu; if(!menu) return;
+  var opts=[].slice.call(menu.querySelectorAll(".ed-part-opt")), i=opts.indexOf(document.activeElement);
+  if(e.key==="Escape"){ e.preventDefault(); matDDOff(); showProjectDetail(c,o,pr); }   // Escape همیشه انصراف، حتی در چندانتخابی
+  else if(e.key==="ArrowDown"||e.key==="ArrowUp"){ e.preventDefault();
+    var n=opts[Math.max(0,Math.min(opts.length-1,(i<0?0:i)+(e.key==="ArrowDown"?1:-1)))]; if(n){ n.focus(); n.scrollIntoView({block:"nearest"}); } }
+}
+/* عملیات حرارتی و فرآیند تولید: چندانتخابی از فهرست تنظیمات (OPT_LISTS). هر کلیک یک مورد را روشن/خاموش می‌کند و منو باز می‌ماند؛
+   بستن (کلیک بیرون، دوباره روی دکمه، Enter) ذخیره می‌کند و Escape انصراف است. متن ذخیره به ترتیب فهرست با « & ». */
+function partOptEdit(el,c,o,pr,pn,k){
+  el.setAttribute("data-editing","1");
+  var raw=el.getAttribute("data-val")||"", hp=optParse(k,raw), sel={};
+  hp.names.forEach(function(n){ sel[optKey(n)]=1; });
+  var items=optSorted(k).map(function(m){ return {v:String(m.name), t:String(m.name)}; })
+    .concat(hp.unknown.map(function(u){ return {v:u, t:u+" (not in library)", unk:1}; }));
+  hp.unknown.forEach(function(u){ sel[optKey(u)]=1; });
+  var args='\''+esc(c)+'\',\''+esc(o)+'\',\''+esc(pr)+'\',\''+esc(pn)+'\'';
+  el.innerHTML='<div class="ed-part-dd mat-dd" onclick="event.stopPropagation()" data-has="'+(hp.names.length||hp.unknown.length?1:0)+'">'+
+    '<button type="button" class="ed-part-trig mat-trig" onclick="matDDCancel('+args+')" onkeydown="matDDKey(event,'+args+')">'+
+      '<span class="heat-cur"></span>'+ED_CHEV_IC+'</button>'+
+    '<div class="ed-part-menu mat-menu heat-menu dd-anim" role="listbox" aria-multiselectable="true" onclick="event.stopPropagation()">'+items.map(function(x){
+      var on=!!sel[optKey(x.v)];
+      return '<button type="button" role="option" aria-selected="'+on+'" class="ed-part-opt heat-opt'+(on?' on':'')+'" data-v="'+esc(x.v)+'" title="'+esc(x.t)+'"'+(x.unk?' data-unk="1"':'')+' '+
+        'onclick="heatDDToggle(this)" onkeydown="matDDKey(event,'+args+')"><span class="ed-check'+(on?' on':'')+'"></span><span class="heat-t">'+esc(x.t)+'</span></button>'; }).join("")+'</div></div>';
+  var dd=el.querySelector(".mat-dd");
+  heatDDLabel(dd.querySelector(".heat-menu"), dd, k);
+  var menu=matDDPlace(el, dd);
+  heatDDLabel(menu, dd, k);
+  var first=menu.querySelector(".heat-opt"); if(first) try{ first.focus({preventScroll:true}); }catch(e){}
+  _matDD={el:el,c:c,o:o,pr:pr,pn:pn,orig:raw,menu:menu,k:k,commit:function(){
+    var names=[], unk=[];
+    [].slice.call(menu.querySelectorAll(".heat-opt.on")).forEach(function(b){ (b.getAttribute("data-unk")?unk:names).push(b.getAttribute("data-v")); });
+    partSpecSave({value:optJoin(k,names,unk), getAttribute:function(){ return raw; }}, c,o,pr,pn, OPT_LISTS[k].label);
+  }};
+  matDDListen();
+}
+function heatDDToggle(btn){
+  var on=!btn.classList.contains("on");
+  btn.classList.toggle("on",on); btn.setAttribute("aria-selected",on);
+  var ck=btn.querySelector(".ed-check"); if(ck) ck.classList.toggle("on",on);
+  if(_matDD) heatDDLabel(_matDD.menu, _matDD.el.querySelector(".mat-dd"), _matDD.k);
+}
+/* متن دکمه = همان چیزی که ذخیره می‌شود */
+function heatDDLabel(menu, dd, k){
+  if(!menu||!dd) return;
+  var names=[], unk=[];
+  [].slice.call(menu.querySelectorAll(".heat-opt.on")).forEach(function(b){ (b.getAttribute("data-unk")?unk:names).push(b.getAttribute("data-v")); });
+  var t=optJoin(k,names,unk), cur=dd.querySelector(".heat-cur");
+  if(cur){ cur.textContent=t||"Not specified"; cur.title=t; cur.classList.toggle("none",!t); }   // نام کامل با نگه‌داشتن موس
 }
 async function partSpecSave(inp,c,o,pr,pn,label){
   if(!inp) return;
@@ -1098,13 +1306,18 @@ function specsRoot(p){
       if(j.ordPartMods&&typeof j.ordPartMods==="object") root.ordPartMods=j.ordPartMods;
     }
   }catch(e){} }
+  /* انواع بازنشسته (3D/3DA) از فهرست اسناد الزامی پروژه بیرون می‌روند؛ با اولین ذخیرهٔ پروژه از داده هم پاک می‌شوند */
+  var live=function(a){ return Array.isArray(a) ? a.filter(function(x){ return !isRetiredType(x); }) : a; };
+  ["partDocTypes","projDocTypes","projDocOrder","ordProjDocs"].forEach(function(k){ root[k]=live(root[k]); });
+  ["partDocsByPart","ordPartDocs"].forEach(function(k){ var o=root[k]; if(!o) return;
+    var n={}; Object.keys(o).forEach(function(pn){ n[pn]=live(o[pn]); }); root[k]=n; });
   return root;
 }
-/* ماژول‌های سطح پروژه (دسته‌بندی محصول و…) */
+/* ماژول‌های سطح پروژه (دسته‌بندی پروژه و…) */
 function projectSpecs(p){
   return specsRoot(p).project.map(function(m){ return {label:String(m.label||m.key||""),value:String(m.value==null?"":m.value),on:m.on!==false}; });
 }
-function projectSpecsSeed(){ return [{label:"دسته‌بندی محصول",value:"",on:true}]; }
+function projectSpecsSeed(){ return [{label:"دسته‌بندی پروژه",value:"",on:true}]; }
 /* ماژول‌های پیش‌فرض اطلاعات قطعه (fallback فقط وقتی فهرست اصلی خالی و پروژه هم چیزی ندارد) */
 function partModsSeed(){ return [{label:"وزن",on:true},{label:"جنس",on:true},{label:"نوع عملیات حرارتی",on:true}]; }
 /* ماژول‌های اطلاعات قطعهٔ این پروژه = فهرست اصلی سراسری (DB.partMods) با روشن/خاموش per-project.
@@ -1254,22 +1467,26 @@ function projDocTypesOf(p){
   if(r.projDocTypes) return r.projDocTypes.map(function(x){ return String(x).toUpperCase(); });
   return docTypesSorted().filter(function(t){ return t.scope==="project"; }).map(function(t){ return String(t.code).toUpperCase(); });
 }
-/* دسته‌بندی محصول پروژه (تنها فیلد متنی قالب ثابت)؛ از ساختار tpl یا ماژول قدیمی */
+/* دسته‌بندی پروژه پروژه (تنها فیلد متنی قالب ثابت)؛ از ساختار tpl یا ماژول قدیمی */
 function projectCategory(p){
   var root=specsRoot(p);
   if(root.tpl && root.tpl.category!=null) return String(root.tpl.category);
   var m=(root.project||[]).filter(function(x){ return String(x.label||"").indexOf("دسته")>=0; })[0];
   return m?String(m.value||""):"";
 }
-/* قالب ثابت مشخصات پروژه (۶ فیلد) برای نمایش در کارت «مشخصات پروژه» */
+/* قالب ثابت مشخصات پروژه (۷ فیلد) برای نمایش در کارت «مشخصات پروژه» */
 function projectSpecTemplateRows(c,o,pr,s,p){
-  var dt=projectDates(p), cat=projectCategory(p), nParts=projectPartsList(p).length;
+  var dt=projectDates(p), cat=projectCategory(p), nParts=projectPartsList(p).length, en=projNameEn(p);
   return pdMetaRow("نام مشتری", '<span title="'+esc(clientName(c)||c)+'">'+esc(clientNameEn(c))+'</span>')+
+    /* نام انگلیسی پروژه، هم‌شکل ردیف مشتری: نام فارسی در راهنمای موس */
+    (en?pdMetaRow("نام پروژه", '<span title="'+esc(projNameFa(p))+'">'+esc(en)+'</span>')
+       :'<div class="spec-row"><span class="spec-label"><span class="lbl-t">نام پروژه</span></span>'+
+          '<span class="spec-val ltr empty">Not specified</span></div>')+
     pdMetaRow("کد پروژه", esc(c+"-"+o+"-"+pr))+
     metaRowOrDash("تاریخ ایجاد", dt.created)+
     metaRowOrDash("تاریخ آخرین تغییرات", dt.updated)+
-    (cat?pdMetaRow("دسته‌بندی محصول", esc(cat))
-        :'<div class="spec-row"><span class="spec-label"><span class="lbl-t">دسته‌بندی محصول</span></span>'+
+    (cat?pdMetaRow("دسته‌بندی پروژه", esc(cat))
+        :'<div class="spec-row"><span class="spec-label"><span class="lbl-t">دسته‌بندی پروژه</span></span>'+
            '<span class="spec-val ltr empty">Not specified</span></div>')+
     '<div class="spec-row"><span class="spec-label"><span class="lbl-t">تعداد کل قطعات</span></span>'+
       '<span class="spec-val ltr">'+esc(String(nParts))+' <span class="unit">'+(nParts===1?"part":"parts")+'</span></span></div>';
@@ -1335,7 +1552,7 @@ function metaRowOrDash(label,val){
   return '<div class="spec-row"><span class="spec-label"><span class="lbl-t">'+esc(label)+'</span></span>'+
     '<span class="spec-val empty">ثبت نشده</span></div>';
 }
-/* ردیف‌های ماژول مشخصات — جواب لاتین چپ‌چین؛ اگر پروژه مشخصاتی ندارد، پیش‌فرض «دسته‌بندی محصول» */
+/* ردیف‌های ماژول مشخصات — جواب لاتین چپ‌چین؛ اگر پروژه مشخصاتی ندارد، پیش‌فرض «دسته‌بندی پروژه» */
 function projectSpecsRows(p){
   var specs=projectSpecs(p).filter(function(m){ return m.on && m.label; });
   if(!specs.length) specs=projectSpecsSeed().filter(function(m){ return m.on && m.label; });
@@ -1352,7 +1569,7 @@ function openProjectSpecs(c,o,pr){
   if(ME.role!=="admin"){ toast("فقط مدیر می‌تواند ویرایش کند.",true); return; }
   var p=findProject(c,o,pr); if(!p) return;
   var on={}; projDocTypesOf(p).forEach(function(T){ on[T]=1; });
-  PSED={ c:c,o:o,pr:pr, name:(p.description||""), category:projectCategory(p),
+  PSED={ c:c,o:o,pr:pr, name:projNameFa(p), nameEn:projNameEn(p), category:projectCategory(p),
     projDocs: orderedProjectTypesFor(p).map(function(t){ var T=String(t.code).toUpperCase(); return {code:T,label:t.nameFa||T,on:!!on[T]}; }),
     customOrd: false
   };
@@ -1370,12 +1587,14 @@ function drawProjectSpecsBody(c,o,pr){
   var host=document.getElementById("psedBody"); if(!host||!PSED) return;
   var _sc=pedScrollSave(host);   // جای اسکرول پیش از بازسازی innerHTML
   var p=findProject(c,o,pr); if(!p) return;
-  /* کارت ۱: فیلدهای قابل ویرایش کاربر — نام پروژه و دسته‌بندی محصول.
+  /* کارت ۱: فیلدهای قابل ویرایش کاربر — نام پروژه و دسته‌بندی پروژه.
      (مشتری/کد/تاریخ‌ها/تعداد قطعات را سامانه خودکار می‌سازد؛ در ویرایش نمایش داده نمی‌شوند.) */
   var tplCard='<div class="ed-card"><h4 class="ed-sec-t">'+SEC_IC_DOC+'مشخصات پروژه</h4>'+
     '<div class="ed-fld-row"><span class="ed-fld-lab">نام پروژه</span>'+
-      '<input type="text" id="psedName" placeholder="مثلاً Roller W=700" value="'+esc(PSED.name)+'" oninput="PSED.name=this.value"></div>'+
-    '<div class="ed-fld-row"><span class="ed-fld-lab">دسته‌بندی محصول</span>'+
+      '<input type="text" id="psedName" placeholder="مثلاً مجموعه شفت و غلطک W=700" value="'+esc(PSED.name)+'" oninput="PSED.name=this.value"></div>'+
+    '<div class="ed-fld-row"><span class="ed-fld-lab">نام انگلیسی</span>'+
+      '<input type="text" dir="ltr" id="psedNameEn" placeholder="e.g. Shaft & roller set W=700" value="'+esc(PSED.nameEn)+'" oninput="PSED.nameEn=this.value"></div>'+
+    '<div class="ed-fld-row"><span class="ed-fld-lab">دسته‌بندی پروژه</span>'+
       '<input type="text" dir="ltr" id="psedCategory" placeholder="e.g. Power Transmission Parts" value="'+esc(PSED.category)+'" oninput="PSED.category=this.value"></div>'+
   '</div>';
   /* کارت ۲: اسناد پروژه — فقط روشن/خاموش؛ افزودن نوع جدید فقط در تنظیمات */
@@ -1412,10 +1631,10 @@ async function saveProjectSpecs(){
   root.ordProjDocs=(PSED.customOrd && !sameOrder(_codes,_def))?_codes:null;
   root.projDocOrder=null;   // کلید قدیمی (پیش از ترتیب پیش‌فرض) پاک می‌شود
   root.project=[];   // قالب ثابت جایگزین ماژول‌های پویا شد
-  var desc=String(PSED.name||"").trim();
-  p.description=desc;                       // به‌روزرسانی محلی تا UI فوراً نام تازه را نشان دهد
+  var desc=String(PSED.name||"").trim(), descEn=String(PSED.nameEn||"").trim();
+  p.nameFa=desc; p.nameEn=descEn; p.description=desc;   // به‌روزرسانی محلی تا UI فوراً نام تازه را نشان دهد
   closeModal();
-  await saveSpecs(c,o,pr,root,{description:desc});
+  await saveSpecs(c,o,pr,root,{nameFa:desc, nameEn:descEn});
 }
 
 /* ============ پنل ویرایش قطعات پروژه: عضویت قطعات + انواع سند + ماژول‌های اطلاعات قطعه ============ */
@@ -1871,8 +2090,6 @@ var MV_LOAD_IC=(function(){
     '<g class="lis-rig">'+seg("lis-track")+seg("lis-tail")+seg("lis-mid")+seg("lis-head")+'</g></svg>';
 })();
 var MODEL_PLAY_IC='<svg viewBox="0 0 24 24" class="ic"><path d="M21 12a9 9 0 1 1-6.22-8.56"/><polyline points="21 3 21 9 15 9"/></svg>';
-/* آیا نوع سند 3D در سیستم تعریف شده؟ (کاربر از «تنظیمات ◂ انواع اسناد» با scope=پروژه اضافه می‌کند) */
-function has3DType(){ return docTypesSorted().some(function(t){ return String(t.code).toUpperCase()==="3D"; }); }
 /* مدل حالا در سطح قطعه است: هر قطعه می‌تواند سند نوع «3D» خودش را داشته باشد
    (FSM-...-PART-3D-REV). فهرست قطعات دارای مدل برای منوی انتخاب چپ ویوئر ساخته می‌شود. */
 var _mvParts=[];            // [{part,name,fileId,num}] — قطعات دارای مدل سه‌بعدی
@@ -1906,20 +2123,26 @@ function mvReattach(old){
   return true;
 }
 function projectModelParts(p){
-  /* هر نوع سندی که با 3D شروع می‌شود مدل سه‌بعدی است (3D برای قطعه، 3DA برای مونتاژ). */
-  var all=projectDocs(p).filter(function(d){ return String(d.typeCode).toUpperCase().indexOf("3D")===0 &&
-    String(d.isLatest).toLowerCase()==="true"; });
-  var byPart={}; all.forEach(function(d){ byPart[pad2(d.partNo)]=d; });
+  /* مدل هر قطعه: آخرین ریویژن سندی که فایل نمایش سه‌بعدی دارد. اسناد 3D/3DA قدیمی تا پایان انتقال
+     مقدم‌اند؛ بعد نقشهٔ ماشینکاری/مونتاژ، و بعد هر نقشهٔ دیگری که مدل دارد. */
+  var rank=function(d){ var t=String(d.typeCode).toUpperCase();
+    return t.indexOf("3D")===0 ? 0 : (t==="MC"||t==="AS") ? 1 : 2; };
+  var byPart={};
+  projectDocs(p).forEach(function(d){
+    if(String(d.isLatest).toLowerCase()!=="true" || !docGlbId(d)) return;
+    var pn=pad2(d.partNo), cur=byPart[pn];
+    if(!cur || rank(d)<rank(cur)) byPart[pn]=d;
+  });
   var out=[];
   /* مدل مونتاژ سطح پروژه (قطعهٔ ۰۰) همیشه سلول اول است — کلّ مجموعه پیش از اجزای آن. */
   /* برچسب عمداً ثابت Assembly است، نه نام کامل نوع سند: ردیف‌های دیگر این منو
      نام قطعه‌اند (Shaft، Drive Pinion)، پس این‌جا هم باید کوتاه و هم‌وزن باشد. */
-  if(byPart["00"]) out.push({part:"00", name:"Assembly", fileId:byPart["00"].fileId||"", num:byPart["00"].drawingNumber});
+  if(byPart["00"]) out.push({part:"00", name:"Assembly", fileId:docGlbId(byPart["00"]), num:byPart["00"].drawingNumber});
   // سپس قطعات، دقیقاً به ترتیب فهرست قطعات پروژه
   var pns=projectPartsList(p).filter(function(pn){ return pn!=="00" && byPart[pn]; });
   Object.keys(byPart).forEach(function(pn){ if(pn!=="00" && pns.indexOf(pn)<0) pns.push(pn); });   // احتیاط: مدلی که در فهرست نیست
   pns.forEach(function(pn){ var d=byPart[pn];
-    out.push({part:pn, name:partName(pn), fileId:d.fileId||"", num:d.drawingNumber}); });
+    out.push({part:pn, name:partName(pn), fileId:docGlbId(d), num:d.drawingNumber}); });
   // شماره‌گذاری متوالی از ۱ پس از چیدن کامل ترتیب
   out.forEach(function(x,i){ x.idx=i+1; });
   return out;
@@ -1941,12 +2164,9 @@ function mvPickerHTML(parts, selPart){
 function projectModelHTML(p,admin,c,o,pr){
   _mvParts=projectModelParts(p);
   if(!_mvParts.length){
-    var can3D=has3DType();
     return '<div class="mv-empty"><div class="mv-empty-ic">'+MODEL_IC+'</div>'+
       '<div class="mv-empty-t">مدل سه‌بعدی قطعه‌ای بارگذاری نشده است</div>'+
-      (can3D
-        ? '<div class="mv-empty-s">'+(admin?'برای هر قطعه، در کارت «قطعات پروژه» نوع «مدل سه‌بعدی» را فعال و فایل GLB را آپلود کنید.':'هنوز برای هیچ قطعه‌ای مدلی ثبت نشده.')+'</div>'
-        : '<div class="mv-empty-s">'+(admin?'برای فعال‌سازی، نوع سند «3D» را در «تنظیمات ◂ انواع اسناد» با سطح «قطعه» بسازید.':'مدل سه‌بعدی هنوز فعال نشده.')+'</div>')+
+      '<div class="mv-empty-s">'+(admin?'مدل سه‌بعدی هر قطعه همراه نقشهٔ ماشینکاری آن (فایل STEP) بارگذاری می‌شود.':'هنوز برای هیچ قطعه‌ای مدلی ثبت نشده.')+'</div>'+
     '</div>';
   }
   return '<div class="mv-shell" id="mvShell">'+
@@ -2108,7 +2328,7 @@ function mvReset(btn){ var m=mvViewerOf(btn); if(!m) return;
    دکمهٔ AR آگاه از دستگاه است: iPhone → AR Quick Look با فایل USDZ · Android → Scene Viewer با فایل GLB ·
    دسکتاپ → کد QR واقعی که به صفحهٔ سبک ar.html اشاره می‌کند تا کاربر با موبایل اسکن و در AR باز کند.
    فایل‌ها هنگام ثبت «عمومی (هرکس با لینک)» شده‌اند تا اپ‌های AR بتوانند واکشی‌شان کنند. */
-function driveDirectUrl(id){ return id ? "https://drive.google.com/uc?export=download&id="+id : ""; }
+function driveDirectUrl(id){ return fileDirectUrl(id); }
 function arPlatform(){
   var ua=navigator.userAgent||"";
   if(/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1)) return "ios";
@@ -2128,21 +2348,21 @@ function mvArDoc(btn){
   /* پنل پروژه: شناسهٔ مدل درحال‌نمایش. فقط وقتی معتبر است که همین ویوئر روی صفحه باشد،
      وگرنه مقدار به‌جامانده از مدل قبلی باعث می‌شد AR سند اشتباهی را باز کند. */
   if(_mvCurFileId && document.getElementById("mvShell")){
-    var m=(DB.documents||[]).filter(function(x){ return String(x.fileId)===String(_mvCurFileId); })[0];
+    var m=(DB.documents||[]).filter(function(x){ return docGlbId(x)===String(_mvCurFileId); })[0];
     if(m) return m;
   }
   return null;
 }
 function mvAR(btn){
   var mv=mvViewerOf(btn), d=mvArDoc(btn);
-  if(!d || (!d.fileId && !d.usdzFileId)){
+  if(!d || (!docGlbId(d) && !d.usdzFileId)){
     if(mv && mv.canActivateAR){ try{ mv.activateAR(); return; }catch(e){} }   // آخرین چاره: AR درون‌مرورگر
     showARQr(null); return;
   }
-  var src={ glbId:d.fileId||"", usdzId:d.usdzFileId||"", drawingNumber:d.drawingNumber||"",
-            glbUrl:driveDirectUrl(d.fileId), usdzUrl:driveDirectUrl(d.usdzFileId) };
+  var src={ glbId:docGlbId(d), usdzId:d.usdzFileId||"", drawingNumber:d.drawingNumber||"",
+            glbUrl:driveDirectUrl(docGlbId(d)), usdzUrl:driveDirectUrl(d.usdzFileId) };
   // اطمینان از عمومی‌بودن فایل‌ها (اسناد جدید از قبل عمومی‌اند؛ این تضمین اسناد قدیمی است) — بدون انتظار تا ژست کلیک برای iOS حفظ شود
-  try{ var pr=api("arSources", d.drawingNumber?{drawingNumber:d.drawingNumber}:{fileId:d.fileId}); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){}
+  try{ var pr=api("arSources", d.drawingNumber?{drawingNumber:d.drawingNumber}:{fileId:docGlbId(d)}); if(pr&&pr.catch) pr.catch(function(){}); }catch(e){}
   arLaunch(src, mv);
 }
 function arLaunch(src, mv){

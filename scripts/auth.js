@@ -422,13 +422,13 @@ function applyBootData(r){
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
   DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسناد حذف‌شده، برای معنا‌دار ماندن رویدادهای گذشته
-  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[];
+  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[];
   DB.instanceCounts=r.instanceCounts||{};
   DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردن همان بخش گرفته می‌شوند
 }
 /* امضای کامل دادهٔ بوت‌استرپ — dataSig به‌علاوهٔ بخش‌هایی که فقط هنگام شروع می‌آیند */
 function bootSig(x){
-  return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[]]);
+  return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[],x.heatTreats||[],x.processes||[]]);
 }
 /* رسم پوستهٔ برنامه با DB فعلی — هم برای ورود عادی و هم بازشدن فوری با دادهٔ ذخیره‌شده */
 /* ================= «داده نرسیده»: بوت‌استرپ ناموفق بدون دادهٔ ذخیره‌شده =================

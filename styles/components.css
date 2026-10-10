@@ -378,7 +378,7 @@ html:has(.modal:not(.hidden)){overflow:hidden}
 
 /* ===== انتخابگر تاریخ دوتقویمی (scripts/datepicker.js) =====
    فیلد عیناً هم‌شکل input سایت است (کادر، شعاع، فوکوس)؛ پاپ‌آور همان قاب منوی فیلتر است
-   (قاب، سایه، انیمیشن filtPop)؛ سوئیچ تقویم همان .seg؛ هاور روزها همان هاور آیتم‌های فیلتر. */
+   (قاب، سایه، انیمیشن استاندارد dd-anim)؛ سوئیچ تقویم همان .seg؛ هاور روزها همان هاور آیتم‌های فیلتر. */
 .dp-field{display:flex;align-items:center;gap:8px;width:100%;box-sizing:border-box;
   background:#ffffff;border:1px solid #d4d3ce;color:var(--txt);padding:10px 12px;border-radius:var(--radius-sm);
   font-family:inherit;font-size:14px;cursor:pointer;text-align:start;transition:.15s}
@@ -392,8 +392,36 @@ html:has(.modal:not(.hidden)){overflow:hidden}
 .dp-field+.fld-hint{display:block;margin-top:6px}
 .dp-cal-tag{flex-shrink:0;font-size:11px;font-weight:500;color:var(--muted);background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:2px 9px}
 
+/* ===== راهنمای موس سایت (scripts/tooltip.js) =====
+   هم‌شکل راهنمای نمودارهای پیشرفت (.sgt در dashboard.css): جعبهٔ سفید، حاشیهٔ خط، گوشهٔ ۹px، سایهٔ نرم،
+   ظاهرشدن با محو + ۴px حرکت در ۰٫۱۶s. جای راهنمای خام مرورگر در کل سایت. */
+.ftip{position:fixed;z-index:2000;max-width:280px;box-sizing:border-box;background:#fff;border:1px solid var(--line);border-radius:9px;
+  padding:6px 9px;box-shadow:0 10px 30px #00000024;font-family:inherit;font-size:11px;font-weight:600;line-height:1.6;color:var(--txt);
+  white-space:pre-line;overflow-wrap:break-word;pointer-events:none;unicode-bidi:plaintext;
+  opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .16s,transform .16s,visibility .16s}
+.ftip.down{transform:translateY(-4px)}
+.ftip.on{opacity:1;visibility:visible;transform:translateY(0)}
+.ftip[dir=ltr]{text-align:left;font-variant-numeric:tabular-nums}
+.ftip[dir=rtl]{text-align:right}
+@media(prefers-reduced-motion:reduce){.ftip{transition:opacity .12s,visibility .12s;transform:none}}
+/* ===== استاندارد انیمیشن منوهای کشویی و پنجره‌های کوچک سایت =====
+   مبنا منوی «تعداد سطر» بایگانی (.pg-drop-menu): محو + ۶px جابه‌جایی + کوچک‌شدن تا ۹۵٪، شفافیت ۰٫۱۸s و
+   حرکت ۰٫۲s با cubic-bezier(.2,0,0,1)؛ بستن همان، برعکس. هر منوی شناوری که با JS ساخته می‌شود کلاس dd-anim
+   می‌گیرد (و اگر بالای دکمه باز شد up) و با popClose (archive.js) بسته می‌شود تا انیمیشن بستن هم پخش شود. */
+.dd-anim{animation:ddIn .2s cubic-bezier(.2,0,0,1);transform-origin:top center}
+.dd-anim.up{animation-name:ddInUp;transform-origin:bottom center}
+.dd-anim.dd-out{animation:ddOut .2s cubic-bezier(.2,0,0,1) forwards;pointer-events:none}
+.dd-anim.up.dd-out{animation-name:ddOutUp}
+@keyframes ddIn{from{opacity:0;transform:translateY(-6px) scale(.95)}}
+@keyframes ddInUp{from{opacity:0;transform:translateY(6px) scale(.95)}}
+@keyframes ddOut{to{opacity:0;transform:translateY(-6px) scale(.95)}}
+@keyframes ddOutUp{to{opacity:0;transform:translateY(6px) scale(.95)}}
+@keyframes ddFade{from{opacity:0}}
+@keyframes ddFadeOut{to{opacity:0}}
+/* کاهش حرکت: مثل منوی صفحه‌بندی فقط محوشدن کوتاه، بدون حرکت */
+@media(prefers-reduced-motion:reduce){.dd-anim,.dd-anim.up{animation:ddFade .12s}.dd-anim.dd-out,.dd-anim.up.dd-out{animation:ddFadeOut .12s forwards}}
 .dp-pop{position:fixed;z-index:110;width:292px;box-sizing:border-box;padding:10px;background:#fff;
-  border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px #00000022;animation:filtPop .16s ease}
+  border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px #00000022}
 .dp-seg{display:flex;width:100%}
 .dp-nav{display:flex;align-items:center;justify-content:space-between;margin:12px 2px 8px}
 .dp-title{font:inherit;font-size:14px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;border:none;background:none;padding:4px 10px;border-radius:8px}

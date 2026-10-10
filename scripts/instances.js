@@ -223,7 +223,7 @@ function instRowHTML(r,admin){
 /* توضیح پروژه برای ستون «قطعه» (اگر پروژه پیدا نشد، کدش) */
 function projDesc(r){
   var p=findProject(r.clientCode,pad2(r.orderNo),pad2(r.projectNo));
-  return (p&&p.description)?p.description:(String(r.clientCode||"")+"-"+pad2(r.orderNo)+"-"+pad2(r.projectNo));
+  return projNameFa(p)?projNameFa(p):(String(r.clientCode||"")+"-"+pad2(r.orderNo)+"-"+pad2(r.projectNo));
 }
 /* تاریخ ذخیره‌شده ISO است؛ نمایش شمسی عددی (مثل بقیهٔ تاریخ‌های سایت) */
 function instDateFa(iso){
@@ -290,7 +290,7 @@ var INST_WIZ={
         return {val:n, label:(o.title||("سفارش "+n)), icon:ndNumBadge(n)}; }); }
     if(f==="iwP"){ var c2=wzVal("iwC"), o2=wzVal("iwO"); if(!c2||!o2) return [];
       return projectsOf(c2,o2).map(function(p){ var n=pad2(p.projectNo);
-        return {val:n, label:(p.description||("پروژه "+n)), icon:ndNumBadge(n)}; }); }
+        return {val:n, label:(projNameFa(p)||("پروژه "+n)), icon:ndNumBadge(n)}; }); }
     if(f==="iwPart"){
       /* فقط قطعات همین پروژه — قطعهٔ ۰۰ (سطح پروژه) اینجا معنا ندارد، چون
          قطعهٔ تولیدی همیشه یک قطعهٔ فیزیکی واقعی است. */

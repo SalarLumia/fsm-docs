@@ -2,13 +2,13 @@
 function renderDataTables(){
   // parts (مرتب بر اساس شماره، صعودی)
   document.getElementById("partsBody").innerHTML=partsSorted().map(function(p){
-    return "<tr><td class='col-el'><span class='el-badge'>"+partIconInner(p)+"</span></td><td class='nm-fa'>"+esc(p.nameFa||"—")+"</td><td class='spec-en c-mid'><span class='en-shift'>"+esc(p.name)+"</span></td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModal('"+esc(pad2(p.partNo))+"')")+delIconBtn("del('deletePart',{partNo:'"+esc(pad2(p.partNo))+"'})")+"</div></td></tr>";
-  }).join("")||emptyRow(4);
+    return "<tr><td><div class='pm-cell'><span class='el-badge'>"+partIconInner(p)+"</span><span class='nm-fa'>"+esc(p.nameFa||"—")+"</span></div></td><td class='spec-en c-mid'><span class='en-shift'>"+esc(p.name)+"</span></td><td class='col-act'><div class='row-actions'>"+editIconBtn("openPartModal('"+esc(pad2(p.partNo))+"')")+delIconBtn("del('deletePart',{partNo:'"+esc(pad2(p.partNo))+"'})")+"</div></td></tr>";
+  }).join("")||emptyRow(3);
   /* doctypes — ترتیب این جدول همان «ترتیب پیش‌فرض» در همهٔ پروژه‌هاست: اول اسناد سطح پروژه،
      سپس سطح قطعه؛ جابه‌جایی فقط درون هر گروه (data-scope). */
   document.getElementById("doctypesBody").innerHTML=docTypesDefault("project").concat(docTypesDefault("part")).map(function(t){
-    return "<tr "+mgRowAttrs(t.code, t.scope==="project"?"project":"part")+"><td class='col-el'><span class='el-badge'>"+docTypeIconInner(t)+"</span></td><td class='nm-fa'>"+esc(t.nameFa)+"</td><td class='spec-en c-mid'><span class='en-shift'>"+esc(t.nameEn)+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(t.code)+"</span></td><td class='c-mid'>"+(t.scope==="project"?'<span class="tag proj"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>پروژه</span>':'<span class="tag"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>قطعه</span>')+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openDocTypeModal('"+esc(t.code)+"')")+delIconBtn("del('deleteDocType',{code:'"+esc(t.code)+"'})")+mgGripHTML()+"</div></td></tr>";
-  }).join("")||emptyRow(6);
+    return "<tr "+mgRowAttrs(t.code, t.scope==="project"?"project":"part")+"><td><div class='pm-cell'><span class='el-badge'>"+docTypeIconInner(t)+"</span><span class='nm-fa'>"+esc(t.nameFa)+"</span></div></td><td class='spec-en c-mid'><span class='en-shift'>"+esc(t.nameEn)+"</span></td><td class='spec-en c-mid'><span class='unit-shift'>"+esc(t.code)+"</span></td><td class='c-mid'>"+(t.scope==="project"?'<span class="tag proj"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>پروژه</span>':'<span class="tag"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>قطعه</span>')+"</td><td class='col-act'><div class='row-actions'>"+editIconBtn("openDocTypeModal('"+esc(t.code)+"')")+delIconBtn("del('deleteDocType',{code:'"+esc(t.code)+"'})")+mgGripHTML()+"</div></td></tr>";
+  }).join("")||emptyRow(5);
   // part info modules (پارامتر‌های اطلاعات قطعه) — فهرست اصلی سراسری
   var pmBody=document.getElementById("partmodsBody");
   if(pmBody) pmBody.innerHTML=partModsSorted().map(function(m){   // ترتیب این جدول = ترتیب پیش‌فرض پارامترها
@@ -17,6 +17,8 @@ function renderDataTables(){
   // فهرست‌های اصلی ردیابی: تأمین‌کنندگان و انواع مادهٔ خام (ترتیب هر جدول با کشیدن)
   renderNamedMaster("suppliersBody", suppliersSorted(), "openSupplierModal", "deleteSupplier", SUPPLIER_EL_SVG);
   renderNamedMaster("rawtypesBody", rawTypesSorted(), "openRawTypeModal", "deleteRawType", RAWTYPE_EL_SVG);
+  renderMaterials();
+  renderOptList('heat'); renderOptList('proc');
   // users: کارت کاربر (آواتار + نام + نام کاربری) · سمت · تگ نقش · ویرایش
   var meU=(typeof ME!=="undefined"&&ME)?String(ME.username||""):"";
   // ترتیب پیش‌فرض بر اساس نقش: مدیر سیستم ← بازبین ← بیننده (و در هر گروه، الفبایی)
@@ -97,6 +99,9 @@ var DEL_MAP = {
   deletePartMod:  {arr:'partMods',  test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
   deleteSupplier: {arr:'suppliers', test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
   deleteRawType:  {arr:'rawTypes',  test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
+  deleteMaterial: {arr:'materials', test:function(x,p){return String(x.grade)===String(p.grade);}},
+  deleteHeatTreat: {arr:'heatTreats', test:function(x,p){return String(x.name)===String(p.name);}},
+  deleteProcess:   {arr:'processes',  test:function(x,p){return String(x.name)===String(p.name);}},
   deleteUser:     {arr:'users',     test:function(x,p){return x.username===p.username;}}
 };
 
@@ -150,6 +155,9 @@ function mgRowDragEnd(e){
   else if(tb.id==="partmodsBody") mgCommitOrder("partMods", DB.partMods, "nameFa", keys);
   else if(tb.id==="suppliersBody") mgCommitOrder("suppliers", DB.suppliers, "nameFa", keys);
   else if(tb.id==="rawtypesBody") mgCommitOrder("rawTypes", DB.rawTypes, "nameFa", keys);
+  else if(tb.id==="materialsBody") mgCommitOrder("materials", DB.materials, "grade", keys);
+  else if(tb.id==="heattreatsBody") mgCommitOrder("heatTreats", DB.heatTreats, "name", keys);
+  else if(tb.id==="processesBody") mgCommitOrder("processes", DB.processes, "name", keys);
 }
 async function mgCommitOrder(table, arr, keyField, keys){
   var changed=false;
@@ -186,7 +194,16 @@ async function del(action,payload){
       return;
     }
   }
-  if(!(await uiConfirm("حذف این مورد؟",{danger:true,okLabel:"حذف"}))) return;
+  var ask="حذف این مورد؟";
+  if(action==="deleteMaterial"){
+    var nUse=materialUseCount(payload.grade);
+    if(nUse) ask="این ماده جنس "+faN(nUse)+" قطعه است. پس از حذف، جنس آن قطعه‌ها «خارج از کتابخانه» نشان داده می‌شود. حذف شود؟";
+  }
+  if(action==="deleteHeatTreat"||action==="deleteProcess"){
+    var nHt=optUseCount(action==="deleteProcess"?"proc":"heat", payload.name);
+    if(nHt) ask="این مورد برای "+faN(nHt)+" قطعه انتخاب شده است. مقدار آن قطعه‌ها دست نمی‌خورد ولی دیگر از فهرست قابل انتخاب نیست. حذف شود؟";
+  }
+  if(!(await uiConfirm(ask,{danger:true,okLabel:"حذف"}))) return;
   var r=await api(action,payload);
   if(r.ok){
     var m=DEL_MAP[action];
@@ -435,6 +452,162 @@ async function saveNamedMaster(kind){
   /* تغییر نام فقط فهرست اصلی را عوض می‌کند؛ قطعات تولیدی ثبت‌شده مقدار متنی خودشان را
      نگه می‌دارند تا سابقهٔ آن‌ها دست‌نخورده بماند (ردیابی به گذشته وابسته است). */
   closeModal(); localRefresh(); toast((isSup?"تأمین‌کننده ":"نوع مادهٔ خام ")+(oldName?"به‌روزرسانی شد":"افزوده شد"));
+}
+
+/* ═══ کتابخانهٔ مواد ═══
+   جنس هر قطعه از این فهرست انتخاب می‌شود (نه متن آزاد) و وزن قطعه بعداً از حجم مدل سه‌بعدی ×
+   همین وزن مخصوص حساب می‌شود. کلید هر ماده گرید آن است. */
+var MATERIAL_EL_SVG='<svg viewBox="0 0 24 24"><path d="M3 18h18l-3-7H6z"/><path d="M8.5 11l1.5-5h4l1.5 5"/></svg>';
+function renderMaterials(){
+  var host=document.getElementById("materialsBody"); if(!host) return;
+  host.innerHTML=materialsSorted().map(function(m){
+    var g=String(m.grade), d=Number(m.density)||0;
+    return "<tr "+mgRowAttrs(g,"")+" title='"+esc(materialTip(m))+"'><td><div class='pm-cell'><span class='el-badge'>"+MATERIAL_EL_SVG+"</span><span class='mat-grade'>"+esc(g)+"</span></div></td>"+
+      "<td class='spec-en c-mid'><span class='en-shift'>"+esc(matNoOf(m)||"—")+"</span></td>"+
+      "<td class='spec-en c-mid'>"+esc(m.standard||"—")+"</td>"+
+      "<td class='spec-en c-mid'>"+(d?esc(d.toLocaleString("en-US"))+" kg/m³":"—")+"</td>"+
+      "<td class='col-act'><div class='row-actions'>"+editIconBtn("openMaterialModal('"+esc(g)+"')")+
+        delIconBtn("del('deleteMaterial',{grade:'"+esc(g)+"'})")+mgGripHTML()+"</div></td></tr>";
+  }).join("")||emptyRow(5);
+}
+function materialTip(m){
+  return [m.nameFa, m.category, m.equivalents?("معادل: "+m.equivalents):""].filter(function(x){ return String(x||"").trim(); }).join(" · ");
+}
+/* تعداد قطعه‌هایی که جنسشان این ماده است (برای هشدار حذف) */
+function materialUseCount(grade){
+  var n=0, k=materialKey(grade);
+  (DB.projects||[]).forEach(function(p){ var pv=specsRoot(p).partVals||{};
+    Object.keys(pv).forEach(function(pn){ if(pv[pn] && materialKey(pv[pn][MATERIAL_LABEL])===k) n++; }); });
+  return n;
+}
+var _matEdit="";   // گرید مادهٔ در حال ویرایش؛ "" = افزودن
+function openMaterialModal(grade){
+  var m = grade ? (DB.materials||[]).find(function(x){ return String(x.grade)===String(grade); }) : null;
+  _matEdit = m ? String(m.grade) : "";
+  var v=function(k){ return esc(m?String(k==="matNo"?matNoOf(m):(m[k]==null?"":m[k])):""); };
+  var ltr=' style="direction:ltr;text-align:left"';
+  var cats=[]; (DB.materials||[]).forEach(function(x){ var c=String(x.category||"").trim(); if(c && cats.indexOf(c)<0) cats.push(c); });
+  var body='<div class="um-form">'+
+    '<div class="um-row">'+
+      '<div class="um-field"><label class="fld">گرید</label><input id="mtGrade"'+ltr+' placeholder="42CrMo4" value="'+v("grade")+'"></div>'+
+      '<div class="um-field"><label class="fld">شمارهٔ ماده <span class="fld-hint">(اختیاری)</span></label><input id="mtNo"'+ltr+' placeholder="1.7225" value="'+v("matNo")+'"></div>'+
+    '</div>'+
+    '<div class="um-row">'+
+      '<div class="um-field"><label class="fld">استاندارد</label><input id="mtStd"'+ltr+' placeholder="DIN EN 10250-3" value="'+v("standard")+'"></div>'+
+      '<div class="um-field"><label class="fld">دسته</label><input id="mtCat" list="mtCatList" placeholder="مثلاً فولاد ریختگی" value="'+v("category")+'">'+
+        '<datalist id="mtCatList">'+cats.map(function(c){ return '<option value="'+esc(c)+'">'; }).join("")+'</datalist></div>'+
+    '</div>'+
+    '<div class="um-row">'+
+      '<div class="um-field"><label class="fld">نام فارسی <span class="fld-hint">(اختیاری)</span></label><input id="mtFa" placeholder="مثلاً فولاد کروم مولیبدن" value="'+v("nameFa")+'"></div>'+
+      '<div class="um-field"><label class="fld">وزن مخصوص <span class="fld-hint">(kg/m³)</span></label><input id="mtDen"'+ltr+' inputmode="decimal" placeholder="7850" value="'+v("density")+'"></div>'+
+    '</div>'+
+    '<div class="um-field"><label class="fld">نام‌های معادل <span class="fld-hint">(با کاما جدا کنید؛ برای شناختن خودکار جنس از روی نقشه)</span></label>'+
+      '<input id="mtEq"'+ltr+' placeholder="AISI 4140, 42CrMo4+QT" value="'+v("equivalents")+'"></div>'+
+    '<div class="um-actions">'+
+      '<button class="btn" onclick="closeModal()">انصراف</button>'+
+      '<button class="btn primary" onclick="saveMaterial()">'+(m?"ذخیرهٔ تغییرات":"افزودن ماده")+'</button>'+
+    '</div></div>';
+  showModal(m?"ویرایش ماده":"افزودن ماده", body, "form-modal");
+}
+function matDigits(s){ return String(s||"").replace(/[۰-۹]/g,function(d){ return "۰۱۲۳۴۵۶۷۸۹".indexOf(d); }).replace(/[٠-٩]/g,function(d){ return "٠١٢٣٤٥٦٧٨٩".indexOf(d); }).replace(/٫/g,"."); }
+async function saveMaterial(){
+  var val=function(id){ return String((document.getElementById(id)||{}).value||"").trim(); };
+  var grade=val("mtGrade"), den=Number(matDigits(val("mtDen")).replace(/,/g,""));
+  if(!grade){ toast("گرید ماده لازم است.",true); return; }
+  if(!(den>=500 && den<=25000)){ toast("وزن مخصوص را به کیلوگرم بر متر مکعب وارد کنید (مثلاً ۷۸۵۰).",true); return; }
+  var old=_matEdit;
+  if((DB.materials||[]).some(function(x){ return String(x.grade).trim().toLowerCase()===grade.toLowerCase() && String(x.grade)!==old; })){
+    toast("این گرید قبلاً در کتابخانه ثبت شده است.",true); return; }
+  var payload={grade:grade, matNo:matDigits(val("mtNo")), standard:val("mtStd"), category:val("mtCat"),
+               nameFa:val("mtFa"), density:den, equivalents:val("mtEq")};
+  if(old) payload.oldGrade=old;
+  var r=await api("saveMaterial",payload);
+  if(!r||!r.ok){ toast((r&&r.message)||"ذخیره ناموفق بود",true); return; }
+  var arr=DB.materials=DB.materials||[], ord=0, idx=-1;
+  arr.forEach(function(x,i){ if(String(x.grade)===(old||grade)){ ord=Number(x.order)||0; idx=i; } });
+  if(idx>=0) arr.splice(idx,1);
+  else { var mx=0; arr.forEach(function(x){ var n=Number(x.order)||0; if(n>mx)mx=n; }); ord=mx+1; }
+  arr.push({grade:grade, matNo:payload.matNo, standard:payload.standard, category:payload.category,
+            nameFa:payload.nameFa, density:den, equivalents:payload.equivalents, active:true, order:ord});
+  if(old && old!==grade) await migrateMaterialRename(old, grade);
+  closeModal(); localRefresh(); toast("ماده "+(old?"به‌روزرسانی شد":"افزوده شد"));
+}
+/* تغییر گرید → جنس همهٔ قطعه‌هایی که این ماده را داشتند به گرید تازه منتقل می‌شود */
+async function migrateMaterialRename(oldGrade, newGrade){
+  var k=materialKey(oldGrade);
+  for(var i=0;i<(DB.projects||[]).length;i++){
+    var p=DB.projects[i], root=specsRoot(p), pv=root.partVals||{}, changed=false;
+    Object.keys(pv).forEach(function(pn){ if(pv[pn] && materialKey(pv[pn][MATERIAL_LABEL])===k){ pv[pn][MATERIAL_LABEL]=newGrade; changed=true; } });
+    if(changed){
+      var json=JSON.stringify(root); p.specs=json;
+      await api("saveProject",{clientCode:p.clientCode,orderNo:pad2(p.orderNo),projectNo:pad2(p.projectNo),specs:json});
+    }
+  }
+}
+
+/* ═══ فهرست‌های گزینه (v42): عملیات حرارتی و فرآیند تولید — تعریفشان در OPT_LISTS (state.js) ═══
+   فقط نام انگلیسی. ترتیب هر جدول (با کشیدن) = ترتیب نمایش گزینه‌ها روی کارت قطعه. */
+var OPT_EL_SVG={
+  heat:'<svg viewBox="0 0 24 24"><path d="M12 2c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.8 1.5-3.8.3 1.3 1 2.1 2 2.3C11 7 11.2 4.5 12 2z"/><path d="M5 21h14"/><path d="M7 17.5h10"/></svg>',
+  proc:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M4.9 19.1L7 17M17 7l2.1-2.1"/></svg>'
+};
+function renderOptList(k){
+  var L=OPT_LISTS[k], host=document.getElementById(L.body); if(!host) return;
+  host.innerHTML=optSorted(k).map(function(m){
+    var n=String(m.name), u=optUseCount(k,n);
+    return "<tr "+mgRowAttrs(n,"")+"><td><div class='pm-cell'><span class='el-badge'>"+OPT_EL_SVG[k]+"</span><span class='mat-grade'>"+esc(n)+"</span></div></td>"+
+      "<td class='c-mid'>"+(u?faN(u)+" قطعه":"—")+"</td>"+
+      "<td class='col-act'><div class='row-actions'>"+editIconBtn("openOptModal('"+k+"','"+esc(n)+"')")+
+        delIconBtn("del('"+L.del+"',{name:'"+esc(n)+"'})")+mgGripHTML()+"</div></td></tr>";
+  }).join("")||emptyRow(3);
+}
+var _optEdit={k:"", old:""};
+function openOptModal(k, name){
+  var L=OPT_LISTS[k], m = name ? (DB[L.arr]||[]).find(function(x){ return String(x.name)===String(name); }) : null;
+  _optEdit={k:k, old:m?String(m.name):""};
+  var body='<div class="um-form">'+
+    '<div class="um-row"><div class="um-field"><label class="fld">'+esc(L.field)+'</label>'+
+      '<input id="optName" style="direction:ltr;text-align:left" placeholder="'+esc(L.ph)+'" value="'+esc(m?m.name:"")+'" '+
+      'onkeydown="if(event.key===\'Enter\')saveOptItem()"></div></div>'+
+    '<div class="um-actions">'+
+      '<button class="btn" onclick="closeModal()">انصراف</button>'+
+      '<button class="btn primary" onclick="saveOptItem()">'+(m?"ذخیرهٔ تغییرات":"افزودن")+'</button>'+
+    '</div></div>';
+  showModal((m?"ویرایش ":"افزودن ")+L.title, body, "form-modal");
+  var t=document.getElementById("optName"); if(t) try{ t.focus(); }catch(e){}
+}
+async function saveOptItem(){
+  var k=_optEdit.k, L=OPT_LISTS[k]; if(!L) return;
+  var name=String(document.getElementById("optName").value||"").replace(/\s+/g," ").trim();
+  if(!name){ toast("نام لازم است.",true); return; }
+  var old=_optEdit.old, arr=DB[L.arr]=DB[L.arr]||[];
+  if(arr.some(function(x){ return optKey(x.name)===optKey(name) && String(x.name)!==old; })){ toast("این مورد قبلاً ثبت شده است.",true); return; }
+  var payload={name:name}; if(old) payload.oldName=old;
+  var r=await api(L.save,payload);
+  if(!r||!r.ok){ toast((r&&r.message)||"ذخیره ناموفق بود",true); return; }
+  /* تغییر نام: پیش از عوض‌کردن فهرست، قطعه‌هایی که نام قدیمی را دارند پیدا می‌شوند (با فهرست قدیمی) */
+  var renames=[];
+  if(old && old!==name){
+    (DB.projects||[]).forEach(function(p){ var pv=specsRoot(p).partVals||{};
+      Object.keys(pv).forEach(function(pn){ if(!pv[pn]) return; var hp=optParse(k,pv[pn][L.label]);
+        if(hp.names.indexOf(old)>=0) renames.push({p:p,pn:pn,hp:hp}); }); });
+  }
+  var ord=0, idx=-1;
+  arr.forEach(function(x,i){ if(String(x.name)===(old||name)){ ord=Number(x.order)||0; idx=i; } });
+  if(old && idx>=0) arr.splice(idx,1);
+  else if(!old){ var mx=0; arr.forEach(function(x){ var n=Number(x.order)||0; if(n>mx)mx=n; }); ord=mx+1; }
+  localUpsert(arr,function(x){ return String(x.name)===name; },{name:name,active:true,order:ord});
+  if(renames.length) await migrateOptRename(k, renames, old, name);
+  closeModal(); localRefresh(); toast(L.title+" "+(old?"به‌روزرسانی شد":"افزوده شد"));
+}
+/* نام تازه در مقدار قطعه‌هایی که نام قدیمی را داشتند، هر پروژه یک ذخیره */
+async function migrateOptRename(k, list, oldName, newName){
+  var label=OPT_LISTS[k].label, byProj=[];
+  list.forEach(function(x){ var names=x.hp.names.map(function(n){ return n===oldName?newName:n; });
+    var root=specsRoot(x.p); root.partVals[x.pn][label]=optJoin(k, names, x.hp.unknown);
+    x.p.specs=JSON.stringify(root); if(byProj.indexOf(x.p)<0) byProj.push(x.p); });
+  for(var i=0;i<byProj.length;i++){ var p=byProj[i];
+    await api("saveProject",{clientCode:p.clientCode,orderNo:pad2(p.orderNo),projectNo:pad2(p.projectNo),specs:p.specs}); }
 }
 
 /* ---- کاربران (نقش + جنسیت + سمت + آواتار) ---- */

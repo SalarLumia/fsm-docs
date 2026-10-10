@@ -2,7 +2,8 @@
 var DB = { clients:[], orders:[], projects:[], parts:[], docTypes:[], documents:[], users:[], templates:[], workflow:[], partMods:[], trashedDocs:[],
   /* ردیابی قطعات تولیدی: instances فقط با بازکردن بخش ردیابی گرفته می‌شود (سنگین است)،
      ولی instanceCounts در بوت‌استرپ می‌آید تا کارت هر قطعه بی‌درنگ «۱ از ۲ تأییدشده» را نشان دهد. */
-  suppliers:[], rawTypes:[], instances:[], instanceCounts:{}, instancesLoaded:false };
+  suppliers:[], rawTypes:[], instances:[], instanceCounts:{}, instancesLoaded:false,
+  materials:[], heatTreats:[], processes:[] };   // کتابخانهٔ مواد: جنس استاندارد قطعات + وزن مخصوص
 var ME = { token:null, role:null, name:null, username:null, gender:null, position:null, avatar:null };
 
 /* مجموعهٔ آواتارهای قابل‌انتخاب (خودبسنده، بدون منبع بیرونی) */
@@ -45,6 +46,10 @@ function partName(no){ if(pad2(no)==="00")return"سند پروژه"; var p=DB.pa
 function partRec(no){ return DB.parts.find(function(x){return pad2(x.partNo)===pad2(no);})||null; }
 /* نام فارسی قطعه (اگر بود)، وگرنه نام انگلیسی */
 function partNameFa(no){ if(pad2(no)==="00")return"سند پروژه"; var p=partRec(no); return p?(p.nameFa||p.name||pad2(no)):pad2(no); }
+/* نام پروژه به دو زبان (ستون‌های nameFa/nameEn از v40). description نام قدیمی همان nameFa است
+   و تا وقتی داده از سرور قدیمی برسد، پشتیبان می‌ماند. هر جا نام پروژه لازم است از این دو بخوان. */
+function projNameFa(p){ return p?String(p.nameFa||p.description||"").trim():""; }
+function projNameEn(p){ return p?String(p.nameEn||"").trim():""; }
 /* نام خالص پروژه (توضیح واردشده) از روی مختصات یک سند — بدون هیچ پیشوند.
    ⚠ عمداً «خالص» است: اگر خودش پیشوند بگذارد، فراخوان نمی‌تواند بداند پیشوند دارد یا نه
    و نتیجه‌اش «پروژه پروژهٔ ۰۱» می‌شود. پیشوند فقط کار projectTitle است. */
@@ -57,7 +62,7 @@ function projectName(d){
     return String(x.clientCode||"").trim().toUpperCase()===cc &&
            pad2(x.orderNo)===pad2(d.orderNo) && pad2(x.projectNo)===pad2(d.projectNo);
   });
-  return (p&&p.description)?String(p.description).trim():"";
+  return projNameFa(p);
 }
 /* عنوان کامل پروژه، هم‌واژهٔ تیتر صفحهٔ پروژه و کارت داشبورد: «پروژه تولید <نام>».
    اگر پروژه هنوز نامی ندارد، به شماره برمی‌گردد و آن‌وقت پیشوند درست «پروژهٔ» است. */
@@ -112,7 +117,10 @@ function byCode(a,b){ return String(a.code).localeCompare(String(b.code),"en"); 
 function clientOrderVal(c){ return (c.order===undefined||c.order===null||c.order==="")?9999:Number(c.order); }
 function clientsSorted(){ return DB.clients.slice().sort(function(a,b){
   var d=clientOrderVal(a)-clientOrderVal(b); return d!==0?d:byCode(a,b); }); }
-function docTypesSorted(){ return DB.docTypes.slice().sort(byCode); }
+/* انواع بازنشسته: مدل سه‌بعدی حالا جزو خود نقشه است (MC/AS)، پس 3D و 3DA دیگر نوع سند جدا نیستند.
+   ردیف‌شان در برگه می‌ماند تا فایل‌های سه‌بعدی قدیمیِ هنوز منتقل‌نشده نامشان را داشته باشند. */
+function isRetiredType(code){ return String(code||"").toUpperCase().indexOf("3D")===0; }
+function docTypesSorted(){ return DB.docTypes.filter(function(t){ return !isRetiredType(t.code); }).sort(byCode); }
 /* فهرست اصلی ماژول‌های اطلاعات قطعه (سراسری)، مرتب بر اساس order سپس نام */
 function partModsSorted(){ return (DB.partMods||[]).filter(function(m){ return String(m.active).toLowerCase()!=="false" && String(m.nameFa||"").trim()!==""; })
   .slice().sort(function(a,b){ var d=(Number(a.order)||0)-(Number(b.order)||0); return d!==0?d:String(a.nameFa).localeCompare(String(b.nameFa),"fa"); }); }
@@ -125,6 +133,79 @@ function namedMasterSorted(arr){
 }
 function suppliersSorted(){ return namedMasterSorted(DB.suppliers); }
 function rawTypesSorted(){ return namedMasterSorted(DB.rawTypes); }
+
+/* ═══ کتابخانهٔ مواد ═══
+   مقدار پارامتر «جنس» روی کارت قطعه = گرید یک مادهٔ کتابخانه (کلید). متن نمایشی از خود کتابخانه
+   ساخته می‌شود تا با ویرایش ماده، همهٔ قطعه‌ها یک‌جا درست نمایش داده شوند. */
+var MATERIAL_LABEL="جنس";
+/* ═══ فهرست‌های گزینهٔ چندانتخابی (v42): عملیات حرارتی و فرآیند تولید ═══
+   مقدار پارامتر روی کارت قطعه = نام‌های انتخاب‌شده، به ترتیب همان فهرست تنظیمات، با « & ».
+   خود نام‌ها هم ممکن است «&» داشته باشند (Quenching & Tempering)؛ پس خواندن مقدار، تکه‌ها را حریصانه
+   با نام‌های فهرست جفت می‌کند. افزودن فهرست تازه = یک ردیف در OPT_LISTS + برگه و اکشن‌های سرور. */
+var HEAT_LABEL="نوع عملیات حرارتی", PROC_LABEL="فرآیند تولید";
+var OPT_LISTS={
+  heat:{label:HEAT_LABEL, arr:"heatTreats", table:"heatTreats", save:"saveHeatTreat", del:"deleteHeatTreat", body:"heattreatsBody",
+        title:"عملیات حرارتی", field:"نام عملیات", ph:"e.g. Normalizing"},
+  proc:{label:PROC_LABEL, arr:"processes", table:"processes", save:"saveProcess", del:"deleteProcess", body:"processesBody",
+        title:"فرآیند تولید", field:"نام فرآیند", ph:"e.g. Machined"}
+};
+function optListOfLabel(label){ for(var k in OPT_LISTS){ if(OPT_LISTS[k].label===label) return k; } return ""; }
+function optSorted(k){
+  return (DB[OPT_LISTS[k].arr]||[]).filter(function(m){ return String(m.active).toLowerCase()!=="false" && String(m.name||"").trim()!==""; })
+    .slice().sort(function(a,b){ var d=(Number(a.order)||0)-(Number(b.order)||0); return d!==0?d:String(a.name).localeCompare(String(b.name)); });
+}
+function optKey(v){ return String(v==null?"":v).replace(/\s+/g," ").trim().toLowerCase(); }
+/* «Normalizing & Stress Relieving» → {names:["Normalizing","Stress Relieving"], unknown:[]} */
+function optParse(k,v){
+  var by={}; optSorted(k).forEach(function(m){ by[optKey(m.name)]=String(m.name); });
+  var tk=String(v==null?"":v).split(/\s*&\s*/).map(function(x){ return x.trim(); }).filter(Boolean);
+  var names=[], unknown=[], i=0;
+  while(i<tk.length){
+    var hit=-1;
+    for(var j=tk.length-1;j>=i;j--){ if(by[optKey(tk.slice(i,j+1).join(" & "))]){ hit=j; break; } }
+    if(hit>=0){ var n=by[optKey(tk.slice(i,hit+1).join(" & "))]; if(names.indexOf(n)<0) names.push(n); i=hit+1; }
+    else { unknown.push(tk[i]); i++; }
+  }
+  return {names:names, unknown:unknown};
+}
+/* نام‌های انتخاب‌شده → متن ذخیره، به ترتیب فهرست؛ مقدارهای بیرون از فهرست ته متن می‌مانند */
+function optJoin(k, names, unknown){
+  var on={}; (names||[]).forEach(function(n){ on[optKey(n)]=1; });
+  return optSorted(k).filter(function(m){ return on[optKey(m.name)]; }).map(function(m){ return String(m.name); })
+    .concat(unknown||[]).join(" & ");
+}
+function optUseCount(k, name){
+  var n=0, key=optKey(name), label=OPT_LISTS[k].label;
+  (DB.projects||[]).forEach(function(p){ var pv=specsRoot(p).partVals||{};
+    Object.keys(pv).forEach(function(pn){ if(pv[pn] && optParse(k,pv[pn][label]).names.some(function(x){ return optKey(x)===key; })) n++; }); });
+  return n;
+}
+function materialsSorted(){
+  return (DB.materials||[]).filter(function(m){ return String(m.active).toLowerCase()!=="false" && String(m.grade||"").trim()!==""; })
+    .slice().sort(function(a,b){ var d=(Number(a.order)||0)-(Number(b.order)||0);
+      return d!==0?d:String(a.grade).localeCompare(String(b.grade)); });
+}
+/* شمارهٔ ماده همیشه چهار رقم اعشار دارد؛ اگر جایی عدد شده باشد (1.057) صفر آخرش برمی‌گردد. */
+function matNoOf(m){
+  var v=String((m&&m.matNo)==null?"":m.matNo).trim();
+  return /^\d\.\d{1,3}$/.test(v) ? Number(v).toFixed(4) : v;
+}
+/* «CK45 (1.1191) per DIN EN 10250-2» یا بدون شمارهٔ ماده «G38Mn5 (per FSM spec)» */
+function materialLabel(m){
+  if(!m) return "";
+  var g=String(m.grade||"").trim(), no=matNoOf(m), st=String(m.standard||"").trim();
+  if(no) return g+" ("+no+")"+(st?" per "+st:"");
+  return g+(st?" (per "+st+")":"");
+}
+function materialKey(v){ return String(v==null?"":v).replace(/\s+/g,"").toLowerCase(); }
+/* مادهٔ کتابخانه برای یک مقدار ذخیره‌شده: گرید، متن کامل نمایشی یا یکی از معادل‌ها */
+function materialByValue(v){
+  var k=materialKey(v); if(!k) return null;
+  var all=materialsSorted();
+  return all.find(function(m){ return materialKey(m.grade)===k; }) ||
+         all.find(function(m){ return materialKey(materialLabel(m))===k; }) ||
+         all.find(function(m){ return String(m.equivalents||"").split(",").some(function(e){ return e.trim() && materialKey(e)===k; }); }) || null;
+}
 /* کلید قطعهٔ پروژه در شمارش قطعات تولیدی — دقیقاً هم‌شکل instKey در بک‌اند */
 function instPartKey(c,o,pr,pn){ return String(c||"").toUpperCase()+"|"+pad2(o)+"|"+pad2(pr)+"|"+pad2(pn); }
 function instCountsOf(c,o,pr,pn){
@@ -335,7 +416,7 @@ function projectProjTypes(p){
   })();
   if(fromSpecs){ fromSpecs.forEach(function(t){ var u=String(t).toUpperCase(); if(u) set[u]=1; }); }
   else { csv(p.enabledTypes||"").forEach(function(t){ var u=String(t).toUpperCase(); if(codes.indexOf(u)>=0) set[u]=1; }); }
-  projectDocs(p).forEach(function(d){ if(pad2(d.partNo)==="00"){ set[String(d.typeCode).toUpperCase()]=1; } });
+  projectDocs(p).forEach(function(d){ if(pad2(d.partNo)==="00" && !isRetiredType(d.typeCode)){ set[String(d.typeCode).toUpperCase()]=1; } });
   return Object.keys(set);
 }
 /* قطعات پروژه = ذخیره‌شده ∪ قطعات دارای سند (به‌جز 00). خروجی: آرایهٔ کد قطعه، مرتب. */
@@ -379,7 +460,7 @@ function projectPartSlots(p){
     csv(p.enabledSlots||"").forEach(function(sl){ var m=parseSlot(sl); if(m) map[m.part+"-"+m.type]=m; });
   }
   // هر سند موجود هم یک ماژول واقعی است، حتی اگر در پیکربندی نباشد
-  projectDocs(p).forEach(function(d){ var pn=pad2(d.partNo); if(pn && pn!=="00"){ var t=String(d.typeCode).toUpperCase(); map[pn+"-"+t]={part:pn,type:t}; } });
+  projectDocs(p).forEach(function(d){ var pn=pad2(d.partNo); if(pn && pn!=="00" && !isRetiredType(d.typeCode)){ var t=String(d.typeCode).toUpperCase(); map[pn+"-"+t]={part:pn,type:t}; } });
   return Object.keys(map).map(function(k){ return map[k]; });
 }
 /* آخرین سند یک نوع مدرک داخل یک پروژه (بدون توجه به قطعه) */
@@ -505,7 +586,7 @@ function projectStats(p){
           inRev:inRev,                        // زیرمجموعه: سند دارند ولی تأیید نشده
           missingLabels:missingLabels,pendingLabels:pendingLabels,partBreak:partBreak,segs:segs,
           modules:modules,last:last,status:st,docCount:pdocs.length,
-          name:p.description||"پروژهٔ بدون نام",client:clientName(p.clientCode),
+          name:projNameFa(p)||"پروژهٔ بدون نام",client:clientName(p.clientCode),
           c:p.clientCode,o:pad2(p.orderNo),pr:pad2(p.projectNo),proj:p};
 }
 

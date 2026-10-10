@@ -43,7 +43,11 @@
 (function(){
   function qp(k){ var m=new RegExp("[?&]"+k+"=([^&]*)").exec(location.search); return m?decodeURIComponent(m[1]):""; }
   var glbId=qp("g"), usdzId=qp("u"), name=qp("n");
-  function driveUrl(id){ return id ? "https://drive.google.com/uc?export=download&id="+id : ""; }
+  /* نسخهٔ محلی (server/run.py روی درگاه 8790) فایل را خودش می‌دهد، نه درایو */
+  function driveUrl(id){
+    if(!id) return "";
+    return location.port==="8790" ? location.origin+"/f/"+encodeURIComponent(id) : "https://drive.google.com/uc?export=download&id="+id;
+  }
   var glbUrl=driveUrl(glbId), usdzUrl=driveUrl(usdzId);
   var ua=navigator.userAgent||"";
   var isIOS=/iPad|iPhone|iPod/.test(ua) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);

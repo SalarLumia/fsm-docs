@@ -105,7 +105,8 @@ function filtReposition(){ var a=_filtMenu&&document.getElementById(_filtMenu._a
 function filtPosition(anchor){
   if(!_filtMenu) return;
   var r=anchor.getBoundingClientRect(), mw=_filtMenu.offsetWidth, mh=_filtMenu.offsetHeight;
-  var top=r.bottom+12; if(top+mh>window.innerHeight-8) top=Math.max(8, r.top-mh-12);
+  var top=r.bottom+12, up=(top+mh>window.innerHeight-8); if(up) top=Math.max(8, r.top-mh-12);
+  _filtMenu.classList.toggle("up", up);
   var left=r.right-mw; if(left<8) left=8; if(left+mw>window.innerWidth-8) left=window.innerWidth-8-mw;
   _filtMenu.style.top=Math.max(8,top)+"px"; _filtMenu.style.left=left+"px";
 }
@@ -118,7 +119,7 @@ function filtOnScroll(e){
 }
 function filtCloseMenu(){
   if(!_filtMenu) return;
-  _filtMenu.remove(); _filtMenu=null;
+  popClose(_filtMenu); _filtMenu=null;
   document.removeEventListener("click", filtOutside, false);
   document.removeEventListener("scroll", filtOnScroll, true);
   window.removeEventListener("resize", filtCloseMenu);
@@ -129,7 +130,7 @@ function filtToggleMenu(ev, anchorId, key){
   filtCloseMenu();
   if(wasFor) return;   // toggle
   var anchor=document.getElementById(anchorId); if(!anchor) return;
-  var m=document.createElement("div"); m.className="filt-pop"; m._anchor=anchorId; m._key=key||"arch";
+  var m=document.createElement("div"); m.className="filt-pop dd-anim"; m._anchor=anchorId; m._key=key||"arch";
   m.innerHTML=filtMenuHTML(m._key, null);
   document.body.appendChild(m); _filtMenu=m; filtPosition(anchor);
   setTimeout(function(){

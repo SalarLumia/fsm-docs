@@ -131,7 +131,7 @@ function dpOpen(id){
   DP.id=id; DP.field=btn; DP.view="d";
   var base=dpIsoToJdn(inp.value); if(base==null) base=dpTodayJdn();
   var x=dpFromJdn(DP.cal,base); DP.vy=x.y; DP.vm=x.m;
-  var p=document.createElement("div"); p.className="dp-pop"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","انتخاب تاریخ");
+  var p=document.createElement("div"); p.className="dp-pop dd-anim"; p.setAttribute("role","dialog"); p.setAttribute("aria-label","انتخاب تاریخ");
   /* پوسته یک‌بار ساخته می‌شود: سوئیچ تقویم (بخشی از رابط فارسی، همیشه راست‌به‌چپ) ثابت
      می‌ماند تا کراس‌فید .seg-btn پخش شود؛ فقط .dp-body از نو ساخته می‌شود. */
   p.innerHTML=
@@ -151,7 +151,7 @@ function dpOpen(id){
 }
 function dpClose(){
   if(!DP.pop) return;
-  DP.pop.remove(); DP.pop=null;
+  popClose(DP.pop); DP.pop=null;
   if(DP.field) DP.field.classList.remove("open");
   document.removeEventListener("pointerdown",dpOutside,true);
   window.removeEventListener("scroll",dpOnScroll,true);
@@ -173,7 +173,8 @@ function dpPlace(){
   var p=DP.pop, b=DP.field; if(!p||!b) return;
   var r=b.getBoundingClientRect(), w=p.offsetWidth, h=p.offsetHeight, gap=6;
   var left=Math.max(8, Math.min(r.right-w, window.innerWidth-w-8));
-  var top=(r.bottom+gap+h<=window.innerHeight-8)?r.bottom+gap:Math.max(8,r.top-gap-h);
+  var down=(r.bottom+gap+h<=window.innerHeight-8), top=down?r.bottom+gap:Math.max(8,r.top-gap-h);
+  p.classList.toggle("up", !down);
   p.style.left=left+"px"; p.style.top=top+"px";
 }
 

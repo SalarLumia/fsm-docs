@@ -42,7 +42,7 @@ function ndOptions(field){
       return {val:n, label:(o.title||("سفارش "+n)), icon:ndNumBadge(n)}; }); }   // تیتر = نام سفارش، نه «سفارش ۰۱»
   if(field==="nProject"){ var c2=ndVal("nClient"), o2=ndVal("nOrder"); if(!c2||!o2) return [];
     return projectsOf(c2,o2).map(function(p){ var n=pad2(p.projectNo);
-      return {val:n, label:(p.description||("پروژه "+n)), icon:ndNumBadge(n)}; }); }
+      return {val:n, label:(projNameFa(p)||("پروژه "+n)), icon:ndNumBadge(n)}; }); }
   if(field==="nPart"){
     var arr=partsSorted().map(function(p){ var n=pad2(p.partNo);
       return {val:n, label:partNameFa(n), icon:ndElBadge(partIconInner(p))}; });   // بدون نام انگلیسی
@@ -88,7 +88,8 @@ function ndPick(field,val){
      ۱) محو رینگ ۲) سلول قبلی به سایز اصلی ۳) سوئیچ و بزرگ‌شدن سلول جدید ۴) شروع دوبارهٔ چرخش رینگ. */
 function ndGoto(field){
   if(field==="FSM"||field==="nRev") return;        // این دو ایستگاه کاربر‌ویرایش‌پذیر نیستند (REV خودکار)
-  if(!ndCanEnter(field)) return;                    // سلول قفل: نادیده
+  if(ND.locked) return;                             // مسیر قفل (آمده از ماژول سند پروژه): شکستن مسیر مجاز نیست
+  if(!ndCanEnter(field)) return;                   // سلول قفل: نادیده
   ndClearTimers();
   var wasActive=(ndCurrentField()===field);         // آیا روی همان سلول فعال کلیک شد؟
   var idx=ND_ORDER.indexOf(field);                  // ریست: خود این سلول و همهٔ جلویی‌ها پاک شوند
@@ -114,7 +115,8 @@ function ndCloseMenu(){}
 
 /* ---- رندر کامل: ریل + ایستگاه فعال + بخش نهایی ---- */
 function ndReset(){
-  ND={ active:"nClient" };
+  ND={ active:"nClient", locked:false };
+  var m=document.getElementById("newDocModal"); if(m) m.classList.remove("nd-locked");
   ["nClient","nOrder","nProject","nPart","nType","nRev"].forEach(function(f){ ndSet(f,""); });
   var t=document.getElementById("nTitle"); if(t) t.value="";
   _newDocBlocked=false;
@@ -245,7 +247,7 @@ function ndSyncStates(){
     var chip=rail.querySelector('.nd-chip[data-f="'+f+'"]'); if(!chip) return;
     chip.className="nd-chip "+ndCellState(f,curF);
     var val=chip.querySelector(".nd-chip-val"), v=ndSegVal(f); if(val) val.textContent=v||"—";
-    chip.disabled=!((f!=="FSM"&&f!=="nRev")&&!!(ndVal(f)||ndCanEnter(f)));
+    chip.disabled=ND.locked || !((f!=="FSM"&&f!=="nRev")&&!!(ndVal(f)||ndCanEnter(f)));
   });
   rail.querySelectorAll(".nd-cx").forEach(function(cx){
     cx.classList.toggle("on", ndFilled(ND_SEQ[parseInt(cx.getAttribute("data-i"),10)]));
@@ -411,7 +413,7 @@ function ndFinalHTML(){
              updateRevMode بر اساس نوع سند پر می‌کند. */
           '<div class="ndoc-note"><textarea id="nTitle" class="ndoc-note-ta" placeholder="'+NOTE_PH_NEW+'"></textarea>'+
             '<div class="rv-3d-hint" id="nNoteHint" hidden></div></div>'+
-          (is3D?nd3DUploadHTML():ndFileHTML())+
+          (is3D?nd3DUploadHTML():(isModelType(ndVal("nType"))?ndModelUploadHTML():ndFileHTML()))+
         '</div>'+
         '<div class="nd-actions">'+
           '<div class="nd-namewrap">'+
@@ -428,15 +430,20 @@ function ndFinalHTML(){
 }
 function ndFileHTML(){
   return '<div class="nd-up-grid nd-up-1">'+
-    ndDropzoneHTML("nDrop","nFile",".pdf,image/*","فایل","PDF یا تصویر — الزامی","")+
+    ndDropzoneHTML("nDrop","nFile",".pdf,image/*","فایل",DZ_DRAW_SUB,"")+
   '</div>';
 }
-/* مدل سه‌بعدی: سه فایل (ترتیب راست‌به‌چپ: STP، GLB، USDZ). عنوان بولد = «فایل + فرمت»، خط دوم = کارکرد. */
+/* مدل سه‌بعدی: فقط STEP؛ فایل نمایش سایت و واقعیت افزوده در مرورگر ساخته می‌شوند (stepconv.js) */
 function nd3DUploadHTML(){
-  return '<div class="nd-up-grid nd-up-3">'+
-    ndDropzoneHTML("nDrop3","nFile3",".stp,.step","فایل STP","فرمت اصلی برای آرشیو اسناد","")+
-    ndDropzoneHTML("nDrop","nFile",".glb,.gltf","فایل GLB/GLTF","برای نمایش در سایت","")+
-    ndDropzoneHTML("nDrop2","nFile2",".usdz","فایل USDZ","برای نمایش در واقعیت افزوده","")+
+  return '<div class="nd-up-grid nd-up-1">'+
+    ndDropzoneHTML("nDrop3","nFile3",".stp,.step",DZ_MODEL_MAIN,DZ_MODEL_SUB,"")+
+  '</div>';
+}
+/* نقشه: PDF الزامی + مدل سه‌بعدی همان نقشه (STEP) به‌صورت اختیاری */
+function ndModelUploadHTML(){
+  return '<div class="nd-up-grid nd-up-2">'+
+    ndDropzoneHTML("nDrop","nFile",".pdf,image/*",DZ_DRAW_MAIN,DZ_DRAW_SUB,"")+
+    ndDropzoneHTML("nDrop3","nFile3",".stp,.step",DZ_MODEL_MAIN,DZ_MODEL_SUB,"")+
   '</div>';
 }
 function ndDropzoneHTML(zoneId,inputId,accept,main,sub,tag){
@@ -531,12 +538,14 @@ async function submitDocument(){
   if(_newDocBlocked){ toast("ریویژن فعلی هنوز تأیید نشده؛ نمی‌توان ریویژن جدید ثبت کرد.",true); return; }
   var n=currentNumber();
   if(!n){ toast("ابتدا همهٔ ایستگاه‌های شماره را کامل کن.",true); return; }
-  var is3D=String(ndVal("nType")).toUpperCase().indexOf("3D")===0;
+  var is3D=is3DType(ndVal("nType"));
   var fi=document.getElementById("nFile"); var f=fi&&fi.files&&fi.files[0];
-  if(!f){ toast(is3D?"بارگذاری فایل GLB/GLTF الزامی است.":"بارگذاری فایل سند الزامی است.",true); return; }
-  if(f.size>25*1024*1024){ toast("حجم فایل بیش از ۲۵ مگابایت است.",true); return; }
-  if(is3D){ var stpEl=document.getElementById("nFile3"), stpF=stpEl&&stpEl.files&&stpEl.files[0];
-    if(!stpF){ toast("بارگذاری فایل STP الزامی است.",true); return; } }   // STP اجباری برای اسناد سه‌بعدی
+  var stpEl=document.getElementById("nFile3"), stpF=stpEl&&stpEl.files&&stpEl.files[0];
+  if(is3D){ if(!stpF){ toast("بارگذاری فایل STEP الزامی است.",true); return; } }
+  else {
+    if(!f){ toast("بارگذاری فایل سند الزامی است.",true); return; }
+    if(f.size>25*1024*1024){ toast("حجم فایل بیش از ۲۵ مگابایت است.",true); return; }
+  }
   var noteEl=document.getElementById("nTitle");
   /* توضیحات فقط برای «نقشهٔ رفرنس» اجباری است — جای ثبت شمارهٔ نقشهٔ خود مشتری.
      ⚠ فقط «خالی نبودن» بررسی می‌شود، نه درستی قالب: شماره‌گذاری مشتری‌ها الگوی
@@ -549,14 +558,13 @@ async function submitDocument(){
   }
   var payload={ clientCode:ndVal("nClient"), orderNo:ndVal("nOrder"), projectNo:ndVal("nProject"),
     partNo:ndVal("nPart"), typeCode:ndVal("nType"), rev:ndVal("nRev"), title:(noteEl?noteEl.value:"") };
-  payload.fileBase64=await fileToBase64(f); payload.fileName=f.name; payload.mimeType=f.type;   // فایل اصلی (برای سه‌بعدی: GLB/GLTF)
-  if(is3D){   // STP (اجباری) و USDZ (اختیاری) هم همراه همین درخواست ذخیره می‌شوند
-    var stpEl3=document.getElementById("nFile3"), stpF3=stpEl3&&stpEl3.files&&stpEl3.files[0];
-    if(stpF3){ if(stpF3.size>25*1024*1024){ toast("حجم فایل STP بیش از ۲۵ مگابایت است.",true); return; }
-      payload.stpBase64=await fileToBase64(stpF3); payload.stpName=stpF3.name; payload.stpMime=stpF3.type; }
-    var usdzEl=document.getElementById("nFile2"), usdzF=usdzEl&&usdzEl.files&&usdzEl.files[0];
-    if(usdzF){ if(usdzF.size>25*1024*1024){ toast("حجم فایل USDZ بیش از ۲۵ مگابایت است.",true); return; }
-      payload.usdzBase64=await fileToBase64(usdzF); payload.usdzName=usdzF.name; payload.usdzMime=usdzF.type; }
+  if(f){ payload.fileBase64=await fileToBase64(f); payload.fileName=f.name; payload.mimeType=f.type; }
+  /* STEP: فایل نمایش (GLB)، واقعیت افزوده (USDZ) و حجم همین‌جا ساخته و همراه همین درخواست فرستاده می‌شوند.
+     برای سند 3D قدیمی، GLB همان فایل اصلی سند است. */
+  if(stpF && (is3D || isModelType(ndVal("nType")))){
+    var btn=document.getElementById("nSubmitBtn"); if(btn) btn.disabled=true;
+    try{ Object.assign(payload, await stepPayload(stpF, is3D)); }
+    catch(e){ if(btn) btn.disabled=false; toast(stepErrMsg(e),true); return; }
   }
   // آپلود به «مرکز انتقال» می‌رود (غیرمسدودکننده)؛ مودال بلافاصله بسته می‌شود و سایت آزاد می‌ماند.
   // ارسال برای بازبینی به‌صورت پیش‌فرض و خودکار پس از ثبت انجام می‌شود (بدون پرسش).
@@ -613,6 +621,7 @@ function ndFilePicked(zoneId,inputId){
   var f=inp.files&&inp.files[0];
   if(f){ if(lbl){ lbl.textContent="✓ "+f.name; lbl.hidden=false; } zone.classList.add("has-file"); }
   else { if(lbl){ lbl.textContent=""; lbl.hidden=true; } zone.classList.remove("has-file"); }
+  if(f && inputId==="nFile3") stepPicked(inputId, function(){ ndFilePicked(zoneId,inputId); });
 }
 function ndAcceptOk(f,acc){
   if(!acc) return true;
@@ -642,7 +651,7 @@ function ndBindDrop(zoneId,inputId){
     ndFilePicked(zoneId,inputId);
   });
 }
-function ndBindDropzones(){ ndBindDrop("nDrop","nFile"); ndBindDrop("nDrop2","nFile2"); ndBindDrop("nDrop3","nFile3"); }
+function ndBindDropzones(){ ndBindDrop("nDrop","nFile"); ndBindDrop("nDrop3","nFile3"); }
 
 /* ================= پیش‌تنظیم ویزارد پس از افزودن مشتری/سفارش/پروژه یا از پنل پروژه ================= */
 function syncNewDocAfterClient(code){ ndPick("nClient",code); }
@@ -659,7 +668,14 @@ function goNewDocForProject(c,o,pr,typeCode,part){
   if(typeCode && pt){ var sc=typeScope(typeCode); if((sc==="project")===(pt==="00")) ndSet("nType",String(typeCode).toUpperCase()); }
   ndRecomputeRev();
   ND.active=ndFirstIncomplete();
+  // مسیر کامل از ماژول سند آمده: کاربر فقط فایل همین سند را بارگذاری می‌کند، پس مسیر قفل می‌شود
+  if(ndComplete()){ ND.locked=true; var m=document.getElementById("newDocModal"); if(m) m.classList.add("nd-locked"); }
   ndRender();
+  if(ND.locked){                                      // اسکرول خودکار تا باکس بارگذاری، هم‌گام با باز‌شدنش
+    ndScrollToActive();
+    _ndTimers.push(setTimeout(function(){ var s=document.getElementById("ndScroll");
+      if(s) s.scrollTop=Math.max(0, s.scrollHeight - s.clientHeight); }, 700));
+  }
 }
 
 /* ================= به‌روزرسانی خوش‌بینانه =================
@@ -691,7 +707,7 @@ function dataSig(src){
   var wf=(src.workflow||[]).map(function(w){
     return [w.drawingNumber,w.action,w.user,w.comment].map(S).join(""); }).sort();
   var tr=(src.trashedDocs||[]).map(function(x){ return S(x.drawingNumber); }).sort();
-  return JSON.stringify([docs,wf,tr,src.clients,src.orders,src.projects,src.parts,src.docTypes,src.partMods]);
+  return JSON.stringify([docs,wf,tr,src.clients,src.orders,src.projects,src.parts,src.docTypes,src.partMods,src.materials||[],src.heatTreats||[],src.processes||[]]);
 }
 /* opts.background: همگام‌سازی پس‌زمینه پس از تغییر خوش‌بینانه — اگر چیزی فرق نکرده بود رسم نمی‌کند،
    و اگر وسطش فرمان دیگری شروع شده بود نتیجه را دور می‌ریزد (همگام‌سازی بعدی همان فرمان می‌آید). */
@@ -705,7 +721,7 @@ async function refreshDocuments(opts){
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
-  DB.trashedDocs=r.trashedDocs||[];
+  DB.trashedDocs=r.trashedDocs||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[];
   if(r.users&&r.users.length) DB.users=r.users;
   if(r.instanceCounts) DB.instanceCounts=r.instanceCounts;
   snapSave(); markSynced();
@@ -726,7 +742,7 @@ function snapSave(){
     localStorage.setItem(SNAP_KEY, JSON.stringify({ v:SNAP_VER, u:ME.username, t:Date.now(), db:{
       clients:DB.clients, orders:DB.orders, projects:DB.projects, parts:DB.parts, docTypes:DB.docTypes,
       documents:DB.documents, users:DB.users, templates:DB.templates, workflow:DB.workflow, partMods:DB.partMods,
-      trashedDocs:DB.trashedDocs, suppliers:DB.suppliers, rawTypes:DB.rawTypes, instanceCounts:DB.instanceCounts } }));
+      trashedDocs:DB.trashedDocs, suppliers:DB.suppliers, rawTypes:DB.rawTypes, materials:DB.materials, heatTreats:DB.heatTreats, processes:DB.processes, instanceCounts:DB.instanceCounts } }));
   }catch(e){ snapClear(); }
 }
 function snapLoad(){
@@ -815,6 +831,11 @@ function localAddDoc(r, payload){
     fileId:"", fileUrl:r.fileUrl||"", uploadedBy:ME.username, timestamp:new Date().toISOString(),
     status:"draft", reviewedBy:"", reviewedAt:"", reviewNote:"" };
   d.isLatest=true;
+  /* فایل سه‌بعدی قدیمی همین قطعه (3D/3DA) که نقشه گرفت یا کنار گذاشت: ردیفش بی‌سابقه حذف شده است */
+  (r.retired||[]).forEach(function(n){
+    DB.documents=DB.documents.filter(function(x){ return x.drawingNumber!==n; });
+    DB.workflow=DB.workflow.filter(function(w){ return w.drawingNumber!==n; });
+  });
   var isRev=false;
   DB.documents.forEach(function(x){ if(localSameBase(x,d)){ isRev=true; x.isLatest=false; } });
   DB.documents=DB.documents.filter(function(x){ return x.drawingNumber!==d.drawingNumber; });

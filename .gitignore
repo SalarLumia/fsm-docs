@@ -36,3 +36,7 @@ Thumbs.db
 *.log
 *.tmp
 *.bak
+
+# ── سرور محلی / سرور اختصاصی آینده (جانشین Code.gs) — مثل Code.gs روی مخزن عمومی نمی‌رود ──
+# داده‌ها (server/data) و رمز سرور (server/local.env) هم داخل همین پوشه‌اند.
+server/

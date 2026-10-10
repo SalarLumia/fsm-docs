@@ -2,6 +2,20 @@
 /* آدرس exec بک‌اند Apps Script (پس از هر انتشار نسخهٔ جدید، در صورت تغییر به‌روزرسانی شود) */
 var API_URL = "https://script.google.com/macros/s/AKfycbzbA19MkrR8LGySKeb0fRTRbHgicDUFbRu3iKWcXGnep_tUEUEO62IwFGO9ZX70tCEM/exec";
 
+/* ═══ نسخهٔ محلی (server/run.py) ═══
+   همین فایل‌های سایت، وقتی از سرور محلی باز شوند، به‌جای گوگل به همان سرور وصل می‌شوند.
+   تشخیص با درگاه است: سرور محلی همیشه روی LOCAL_PORT اجرا می‌شود و گیت‌هاب و Live Server هرگز.
+   ⚠ LOCAL_PORT باید با PORT در server/run.py یکی باشد. */
+var LOCAL_PORT = "8790";
+var LOCAL_MODE = (location.port === LOCAL_PORT);
+if(LOCAL_MODE) API_URL = location.origin + "/api";
+
+/* لینک مستقیم فایل عمومی (برای اپ‌های AR): درایو در نسخهٔ گوگل، خود سرور در نسخهٔ محلی */
+function fileDirectUrl(id){
+  if(!id) return "";
+  return LOCAL_MODE ? location.origin+"/f/"+encodeURIComponent(id) : "https://drive.google.com/uc?export=download&id="+id;
+}
+
 /* ═══ آدرس پایهٔ کدهای QR روی اسناد چاپی ═══
    ⚠ این مقدار روی کاغذ چاپ می‌شود و دیگر قابل تغییر نیست. پس عمداً روی دامنهٔ خود
    شرکت است، نه آدرس میزبانی؛ روزی که سایت به سرور اختصاصی منتقل شود فقط DNS

@@ -116,13 +116,6 @@
    دکمه دقیقاً هم‌عرض‌اند، مستقل از طول نوشته. */
 .dp-actions .btn,.dp-actions .dm-dl-wrap{flex:1 1 0;min-width:0;justify-content:center}
 .dp-actions .btn{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-/* انتخاب فرمت در مودال افزودن فرمت (فقط وقتی هر دو فرمت جا افتاده باشند) */
-.af-tabs{display:flex;gap:8px;margin:10px 0 4px}
-.af-tab{flex:1 1 0;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;
-  font-family:inherit;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:.14s}
-.af-tab:hover{border-color:var(--brand);color:var(--brand)}
-.af-tab.on{border-color:var(--brand);background:#fff3e6;color:var(--brand);font-weight:700}
-.af-tab.on,.af-tab.xf-out{transition:all .14s,border-color var(--xf-t),background-color var(--xf-t),color var(--xf-t)}
 /* دکمهٔ «بارگذاری نسخهٔ جدید» وقتی سند در حال بازبینی است: خاکستری، ولی کلیک‌پذیر (برای نمایش پیام راهنما) */
 .dm-act-disabled{color:var(--muted);background:var(--panel);border-color:var(--line);cursor:pointer}
 .dm-act-disabled:hover{color:var(--muted);background:var(--panel);border-color:var(--line)}
@@ -596,6 +589,11 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .nd-menu-empty{padding:14px 12px;font-size:12px;color:var(--muted);text-align:center}
 .nd-step-hint{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.6}
 .nd-step-hint svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+/* مسیر قفل (ثبت سند از ماژول سند پروژه): ریل و سکشن‌ها فقط نمایشی‌اند، نه کلیک‌پذیر */
+.nd-locked .nd-chip,.nd-locked .nd-sec-hd,.nd-locked .nd-opt{cursor:default}
+.nd-locked button.nd-chip:hover{border-color:var(--brand)}
+.nd-locked .nd-opt:hover{background:#fff8f0;border-color:var(--brand)}
+.nd-locked .nd-sec-chev{display:none}
 /* --- بخش نهایی: انیمیشن باز‌شدن هم‌سبک سکشن‌ها (grid 0fr→1fr) --- */
 .nd-final{margin-top:12px;display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s cubic-bezier(.2,0,0,1)}
 .nd-final.show{grid-template-rows:1fr}
@@ -626,7 +624,15 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .nd-up-grid{display:grid;gap:12px}
 .nd-up-1{grid-template-columns:1fr}
 .nd-up-3{grid-template-columns:repeat(3,1fr)}
-@media(max-width:620px){.nd-up-3{grid-template-columns:1fr}}
+.nd-up-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:620px){.nd-up-3,.nd-up-2{grid-template-columns:1fr}}
+/* «در حال آماده‌سازی مدل…» زیر نام فایل STEP */
+.dz-file.dz-busy{color:var(--muted)}
+/* خانهٔ فایل 3D در ریویژن نقشهٔ دارای مدل: تیک گوشه = «مدل هم تغییر کرده»؛ خاموش = خاکستری */
+.dropzone .dz-check{position:absolute;top:10px;inset-inline-start:10px;z-index:2;padding:0;cursor:pointer}
+.dropzone.dz-off{border-color:#e2e0db;background:#f3f2f0;cursor:pointer}
+.dropzone.dz-off:hover{border-color:var(--brand);background:#f3f2f0}
+.dropzone.dz-off .dz-ico,.dropzone.dz-off .dz-main,.dropzone.dz-off .dz-sub{opacity:.45}
 .nd-up-grid .dropzone{min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 /* نوار پایین باکس: «نام سند» + نام کلیک‌پذیر (سمت راست) و دکمهٔ ثبت (سمت چپ) */
 .nd-actions{display:flex;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
@@ -848,14 +854,12 @@ button.nd-chip:hover{border-color:var(--charcoal)}
   background:#fff3e6;border:1px solid #f7941f33;border-radius:20px;padding:1px 7px;vertical-align:1px}
 .users-table td{vertical-align:middle}
 /* نقش: تیتر و تگ هر دو وسط‌چین. عملیات: دکمه‌ها در گوشهٔ چپ سلول می‌مانند و تیتر روی آن‌ها می‌آید */
-.users-table th:nth-child(4){text-align:center}
-.users-table td:nth-child(4){text-align:center}
 .users-table th:nth-child(5){text-align:left;padding-left:14px}   /* = پدینگ سلول دکمه‌ها تا تیتر عملیات دقیقاً روی گروه دکمه‌ها بنشیند */
 /* نام و نام خانوادگی کاربر: پدینگ ۱۶px تا مرکز فلش .th-exp (۱۶+۱۳=۲۹) دقیقاً روی مرکز آواتار (۱۴+۱۵=۲۹) بنشیند */
 .users-table th:nth-child(1){padding-right:16px}
 /* گپ فلش↔متن در کاربران و پارامترها ۱۳px می‌شود تا متن تیتر روی ۵۵px بیفتد (۱۶ + ۲۶ فلش + ۱۳ = ۵۵) و با تیتر
    نام‌فارسی جدول‌های دیگر (که آن‌ها هم روی ۵۵px‌اند) دقیقاً زیر هم شود — بی‌آنکه مرکز فلش از آواتار/بج جدا شود. */
-.users-table .th-exp,.partmods-tbl .th-exp{gap:13px}
+.users-table .th-exp,.mgmt-table .th-exp{gap:13px}
 /* عرض ستون‌های کاربران در بلوک «هم‌ترازی سه جدول» (پایین‌تر) به‌صورت درصدی تعریف شده‌اند. */
 /* کاربر غیرفعال: کل سطر فریز/خاکستری — مثل ماژول‌های خاموش */
 .users-table td,.users-table .u-av,.users-table .u-name{transition:opacity .2s}
@@ -881,23 +885,22 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 
 /* ===== جدول‌های مدیریت اطلاعات پایه (قطعات/انواع سند/پارامترها) — هم‌استاندارد کاربران ===== */
 .mgmt-table td{vertical-align:middle}
-.mgmt-table th.c-mid,.mgmt-table td.c-mid,.users-table th.c-mid,.users-table td.c-mid{text-align:center}   /* عرض در بلوک هم‌ترازی سه جدول */
+.mgmt-table th.c-mid,.mgmt-table td.c-mid,.users-table th.c-mid,.users-table td.c-mid{text-align:center}   /* ستون‌های میانی وسط‌چین؛ عرض در بلوک «شبکهٔ مشترک» */
 /* ستون عملیات: عرض ثابت، تیتر وسط دکمه‌ها */
-.mgmt-table th.col-act,.mgmt-table td.col-act{width:96px;white-space:nowrap;text-align:left}
+.mgmt-table th.col-act,.mgmt-table td.col-act{white-space:nowrap;text-align:left}
 /* دکمه‌های عملیات همهٔ جدول‌ها چسبیده به لبهٔ چپ (flex-end در RTL) — تا در همهٔ جدول‌ها زیر هم و هم‌تراز شوند */
 .mgmt-table td.col-act .row-actions{justify-content:flex-end}
 /* تیتر «عملیات»: باکس هم‌عرض گروه دکمه‌ها (۲×۲۶px + ۶px = ۵۸px)، وسط‌چین، چسبیده به لبهٔ چپ (پدینگ ۱۴px هدر
    = پدینگ سلول دکمه‌ها) تا دقیقاً وسط فاصلهٔ آیکون ویرایش و حذف بنشیند و در همهٔ جدول‌ها زیر هم بیاید. */
 .act-h{display:inline-block;width:58px;text-align:center}
-/* ستون المان (اول سمت راست): کادر هم‌شکل آیکون سند پنل پروژه — آیکون/تصویر/کد قطعه داخلش
-   (مثل آواتار کاربران، اول المان بعد مشخصات). */
-/* المان راست‌چین (نه وسط‌چین) تا badge از لبهٔ راست شروع شود و دقیقاً زیر آواتار کاربران بنشیند */
-.mgmt-table th.col-el,.mgmt-table td.col-el{text-align:right}   /* عرض در بلوک هم‌ترازی سه جدول */
+/* المان (کادر هم‌شکل آیکون سند پنل پروژه) — در همهٔ جدول‌ها داخل سلول نام (.pm-cell) */
 .el-badge{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;
   background:#fff;border:1px solid var(--line);border-radius:8px;color:var(--txt);overflow:hidden;vertical-align:middle}
 .el-badge svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.25}
 /* نماد سند/۳بعدی جدول اسناد (۲۱px) خط نازک‌تری می‌گیرد تا رندرش هم‌ضخامت خط المان پارامتر (۱۷px) شود */
 .doctypes-tbl .el-badge svg{stroke-width:1}
+/* نماد قطعه و سند اندازهٔ کامل ۲۱px خودش را نگه می‌دارد (نه ۱۷px آیکون پارامترها) */
+.parts-tbl .pm-cell .el-badge svg,.doctypes-tbl .pm-cell .el-badge svg{width:21px;height:21px}
 /* کد داخل نماد: پر، بدون خط دور، هم‌فونت متن لاتین سایت (IRANSans)، وزن سبک‌تر */
 .el-badge svg text{stroke:none;fill:currentColor;font-family:inherit;font-weight:400}
 /* کد سند/قطعه در مرکز المان — هم در کادر جدول (.el-badge) و هم در پنل پروژه (.doc-ic) */
@@ -912,45 +915,45 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* ستون دوم از راست (دادهٔ لاتین: نام انگلیسی قطعه/سند/پارامتر + نام کاربری) در هر چهار جدول:
    محتوا وسط‌چین و با translateX به راست جابه‌جا می‌شود (روی محتوا، نه سلول؛ عرض ستون و خط ردیف دست‌نخورده).
    مقدار ۱۰۰px مشترک است تا هر چهار ستون به یک اندازه جابه‌جا و در کل صفحه هم‌تراز بمانند. */
-.mgmt-table .en-shift,.users-table .en-shift{display:inline-block;transform:translateX(100px)}
+.mgmt-table .en-shift,.users-table .en-shift{display:inline-block}
 /* ستون ۳۶٪ (نام انگلیسی قطعه) را با padding به قاب ۲۰٪ سمت راست جمع می‌کنیم تا مرکزش
    دقیقاً مثل ستون‌های ۲۰٪ (نام کاربری/نام انگلیسی سند/پارامتر) روی ۵۸٪ بیفتد و هم‌تراز شود (border-box). */
-.parts-tbl th:nth-child(3),.parts-tbl td:nth-child(3){padding-left:calc(16% + 14px)}
 /* ستون «واحد» (جدول پارامترها) و «کد سند» (جدول اسناد) — هر دو در همان جای افقی (زیر هم) با یک شیفت
    مشترک. عدد را دستی تنظیم کن — مثبت = راست، منفی = چپ؛ صفر = دقیقاً وسط ستون. */
-.partmods-tbl .unit-shift,.doctypes-tbl .unit-shift{display:inline-block;transform:translateX(70px)}
+.partmods-tbl .unit-shift,.doctypes-tbl .unit-shift{display:inline-block}
 
-/* ===== هم‌ترازی ستونی سه جدول (کاربران ↔ اسناد ↔ قطعات) =====
-   عرض‌ها «درصدی» و مشترک‌اند تا در هر عرض صفحه دقیقاً زیر هم بمانند (هم در هدر هم در بدنه ست می‌شوند،
-   چون در الگوی هدر ثابت، thead و هر سطر tbody جداگانه display:table;table-layout:fixed هستند).
-   قاعده (طبق انتخاب کاربر — گزینهٔ A): «نقش ≡ سطح» کاملاً هم‌عرض و زیر هم؛ «نام‌کاربری ≡ نام‌انگلیسی سند ≡
-   نام‌انگلیسی قطعه» از لبهٔ راست (محل متن لاتین) زیر هم — پس ستون نام انگلیسی کمی پهن‌تر است و اختلاف
-   ستون «سمت» را در خود جذب می‌کند. رفرنس نام‌ها = جدول کاربران؛ «سمت» فقط تا حدی باریک شد که نقش/سطح
-   به راست بیایند ولی سمت تنگ نشود. مجموع هر ردیف = ۱۰۰٪. */
-.users-table th:nth-child(1),.users-table td:nth-child(1){width:32%}   /* نام و آواتار */
-.users-table th:nth-child(2),.users-table td:nth-child(2){width:20%}   /* نام‌کاربری */
-.users-table th:nth-child(3),.users-table td:nth-child(3){width:16%}   /* سمت (باریک‌تر) */
-.users-table th:nth-child(4),.users-table td:nth-child(4){width:13%}   /* نقش  ← هم‌تراز سطح */
-.users-table th:nth-child(5),.users-table td:nth-child(5){width:19%}   /* عملیات */
-.doctypes-tbl th:nth-child(1),.doctypes-tbl td:nth-child(1){width:55px}   /* المان = عرض ناحیهٔ آواتار کاربران (۱۴ پدینگ + ۳۰ بج + ۱۱ گپ) */
-.doctypes-tbl th:nth-child(2),.doctypes-tbl td:nth-child(2){width:calc(32% - 55px);padding-right:0}   /* نام فارسی سند — شروع از ۵۵px، دقیقاً زیر نام کاربر */
-.doctypes-tbl th:nth-child(3),.doctypes-tbl td:nth-child(3){width:20%}   /* نام انگلیسی سند — حالا ۲۰٪ (مثل نام‌انگلیسی پارامتر) تا «کد سند» در چپش جا شود */
-.doctypes-tbl th:nth-child(4),.doctypes-tbl td:nth-child(4){width:16%}   /* کد سند — دقیقاً زیر ستون «واحد» جدول پارامترها (۳۲٪ تا ۴۸٪) */
-.doctypes-tbl th:nth-child(5),.doctypes-tbl td:nth-child(5){width:13%}   /* سطح  ← هم‌تراز نقش */
-.doctypes-tbl th:nth-child(6),.doctypes-tbl td:nth-child(6){width:19%}   /* عملیات */
-.parts-tbl th:nth-child(1),.parts-tbl td:nth-child(1){width:55px}   /* المان = عرض ناحیهٔ آواتار کاربران (۱۴ پدینگ + ۳۰ بج + ۱۱ گپ) */
-.parts-tbl th:nth-child(2),.parts-tbl td:nth-child(2){width:calc(32% - 55px);padding-right:0}   /* نام فارسی قطعه — شروع از ۵۵px، دقیقاً زیر نام کاربر */
-.parts-tbl th:nth-child(3),.parts-tbl td:nth-child(3){width:36%}   /* نام انگلیسی قطعه (هم‌تراز نام انگلیسی سند) */
-.parts-tbl th:nth-child(4),.parts-tbl td:nth-child(4){width:32%}   /* عملیات (چون ستون سطح ندارد، پهن‌تر) */
-/* پارامترها (۳ ستون): نام‌فارسی ۳۲٪ (زیر نام کاربر) · نام‌انگلیسی ۳۶٪ (زیر نام‌انگلیسی قطعه/سند و نام‌کاربری) · عملیات ۳۲٪.
-   ستون المان ندارد؛ پس نام فارسی با تورفتگی ۵۵px (داده) و ۲۱px (هدر چورون‌دار: ۲۱+۲۶+۸=۵۵) دقیقاً روی ۵۵px می‌نشیند. */
-.partmods-tbl th:nth-child(1),.partmods-tbl td:nth-child(1){width:32%}   /* نام فارسی — زیر نام و نام خانوادگی کاربر */
-.partmods-tbl th:nth-child(2),.partmods-tbl td:nth-child(2){width:20%}   /* نام انگلیسی — زیر نام کاربری (لبهٔ راست روی ۳۲٪، تا ۵۲٪) */
-.partmods-tbl th:nth-child(3),.partmods-tbl td:nth-child(3){width:16%}   /* واحد — دقیقاً زیر ستون سمت (۵۲٪ تا ۶۸٪) */
-.partmods-tbl th:nth-child(4),.partmods-tbl td:nth-child(4){width:32%}   /* عملیات */
-/* دادهٔ ستون اول حالا المان مرجع دارد (.pm-cell)، پس پدینگ استاندارد ۱۴px تا بج روی [۱۴،۴۴] بنشیند (مثل آواتار/المان اسناد).
-   هدر: پدینگ ۱۶px تا مرکز چورون روی مرکز بج (۲۹px) بیفتد؛ گپ ۱۳px (پایین‌تر) متن تیتر را روی ۵۵px نگه می‌دارد. */
-.partmods-tbl th:nth-child(1){padding-right:16px}
+/* ===== شبکهٔ مشترک ستون‌ها در همهٔ جدول‌های تنظیمات =====
+   فقط جدول‌های تنظیمات (#tab-data)؛ جدول ردیابی هم mgmt-table است و ردیف جدولی می‌ماند.
+   هر ردیف (تیتر و داده) یک CSS grid است، نه ردیف جدول: عرض سلول جدول calc() را نمی‌پذیرد و با درصد
+   فاصله‌ها فقط در یک عرض صفحه برابر می‌شوند. معیار: «فاصلهٔ خالیِ دیده‌شده» بین محتوای هر دو ستون
+   مجاور برابر باشد (نه فاصلهٔ مرکز تا مرکز).
+   پهنای محتوای هر جایگاه = پهن‌ترین محتوای آن جایگاه در همهٔ جدول‌ها (اندازه‌گیری‌شده با رندر):
+     نام با المان و پدینگ راست ۲۰۰px · ستون ۲: ۱۴۱px · ستون ۳: ۹۷px · ستون ۴: ۷۰px · دکمه‌ها با پدینگ چپ ۹۸px
+   جمع = ۶۰۶px؛ باقی‌مانده چهار فاصلهٔ برابر --tg می‌شود. مرز هر دو ستون وسط فاصله است و محتوای
+   ستون‌های میانی وسط‌چین است، پس هر محتوا دقیقاً بین دو فاصلهٔ برابر می‌نشیند.
+   جدولی که ستون کمتری دارد همان جایگاه‌ها را نگه می‌دارد و عملیات (1fr) باقی‌مانده را می‌گیرد.
+   اگر محتوای پهن‌تری اضافه شد، فقط عدد همان جایگاه و جمع را عوض کن. */
+#tab-data .mgmt-table,#tab-data .users-table{
+  --tg:max(24px,calc((100% - 606px) / 4));
+  --tc1:calc(200px + var(--tg) / 2);
+  --tc2:calc(141px + var(--tg));
+  --tc3:calc(97px + var(--tg));
+  --tc4:calc(70px + var(--tg))}
+#tab-data .mgmt-table tr,#tab-data .users-table tr{display:grid;width:100%;
+  grid-template-columns:var(--tc1) var(--tc2) var(--tc3) var(--tc4) 1fr}
+#tab-data .parts-tbl tr,#tab-data .suppliers-tbl tr,#tab-data .rawtypes-tbl tr,#tab-data .opt-tbl tr{grid-template-columns:var(--tc1) var(--tc2) 1fr}
+#tab-data .partmods-tbl tr{grid-template-columns:var(--tc1) var(--tc2) var(--tc3) 1fr}
+/* سلول‌ها آیتم گرید با ارتفاع کامل ردیف (خط زیر و کارت هاور یکدست)؛ محتوا با flex وسط عمودی می‌شود */
+#tab-data .mgmt-table th,#tab-data .mgmt-table td,#tab-data .users-table th,#tab-data .users-table td{display:flex;align-items:center;min-width:0;justify-content:flex-start}
+#tab-data .mgmt-table th:not(:first-child):not(:last-child),#tab-data .mgmt-table td:not(:first-child):not(:last-child),
+#tab-data .users-table th:not(:first-child):not(:last-child),#tab-data .users-table td:not(:first-child):not(:last-child){justify-content:center;text-align:center}
+#tab-data .mgmt-table th:last-child,#tab-data .mgmt-table td:last-child,#tab-data .users-table th:last-child,#tab-data .users-table td:last-child{justify-content:flex-end}
+#tab-data .mgmt-table td[colspan],#tab-data .users-table td[colspan]{grid-column:1 / -1;justify-content:center}
+/* تیتر ستون اول با چورون: پدینگ ۱۶px تا مرکز چورون روی مرکز بج بیفتد؛ گپ ۱۳px متن را روی ۵۵px نگه می‌دارد */
+#tab-data .mgmt-table th:first-child,#tab-data .users-table th:first-child{padding-right:16px}
+/* کتابخانهٔ مواد: گرید (لاتین) در جای نام */
+#tab-data .mats-tbl .mat-grade,#tab-data .opt-tbl .mat-grade{font-size:13px;font-weight:500;color:var(--txt);direction:ltr;unicode-bidi:isolate}
+#tab-data .mats-tbl td.spec-en{font-variant-numeric:tabular-nums}
 
 /* ===== هدر ثابت + اسکرول فقط روی سطرهای داده (نه سطر تیترها) — همهٔ جدول‌های تنظیمات =====
    thead و هر سطر tbody به‌صورت table با چیدمان ثابت رندر می‌شوند تا ستون‌ها هم‌تراز بمانند.
@@ -958,7 +961,10 @@ button.nd-chip:hover{border-color:var(--charcoal)}
    thead به‌اندازهٔ عرض نوار اسکرول (۹px، در RTL سمت چپ) باریک‌تر می‌شود تا با tbody هم‌تراز بماند. */
 /* هدر تمام عرض باکس را می‌گیرد و پس‌زمینهٔ خاکستری‌اش تا انتها می‌رود؛ ۹px جای نوار اسکرول
    (در RTL سمت چپ) با padding رزرو می‌شود تا ستون‌های هدر با بدنه هم‌تراز بمانند (box-sizing:border-box). */
-.mgmt-table thead,.users-table thead{display:table;table-layout:fixed;width:100%;padding-inline-end:9px;background:#f4f4f2}
+/* ⚠ خود thead بلوک است و ردیفش جدول: اگر thead جدول باشد، درصد ستون‌های تیتر روی عرض «با» پدینگ ۹px
+   حساب می‌شود و ستون‌های تیتر نسبت به ردیف‌ها ۳ تا ۹px جابه‌جا می‌افتند. */
+.mgmt-table thead,.users-table thead{display:block;padding-inline-end:9px;background:#f4f4f2}
+.mgmt-table thead tr,.users-table thead tr{display:table;table-layout:fixed;width:100%}
 .mgmt-table tbody,.users-table tbody{display:block;overflow-y:scroll;overflow-x:hidden}
 .mgmt-table tbody tr,.users-table tbody tr{display:table;table-layout:fixed;width:100%}
 .mgmt-table tbody{max-height:212px}
@@ -1323,8 +1329,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 
 /* پاپ‌اوور جامع فیلتر — دو پنجرهٔ مستقل جدا (هرکدام کادر/سایهٔ خودش، ارتفاع مستقل) */
 .filt-pop{position:fixed;z-index:100;display:flex;flex-direction:row;align-items:flex-start;gap:4px;
-  background:none;border:none;box-shadow:none;padding:0;animation:filtPop .16s ease}
-@keyframes filtPop{from{opacity:0;transform:translateY(-6px) scale(.97)}to{opacity:1;transform:none}}
+  background:none;border:none;box-shadow:none;padding:0}   /* انیمیشن: .dd-anim (components.css) */
 .filt-fields,.filt-panel{display:flex;flex-direction:column;gap:2px;padding:6px;background:#fff;
   border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 34px #00000022}
 .filt-fields{min-width:150px}
@@ -1410,8 +1415,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* جمع = ۴ سطر (max-height پیش‌فرض 212px)، باز = همهٔ سطرها؛ انیمیشن max-height در toggleMgmtTable با ارتفاع واقعی انجام می‌شود */
 .mgmt-table tbody,.users-table tbody{transition:max-height .26s cubic-bezier(0,0,.2,1)}
 /* باز = همهٔ سطرها بی‌نوار اسکرول؛ جای ۹pxی نوار در هدر هم برداشته می‌شود تا ستون‌ها هم‌تراز بمانند */
-.mgmt-table.expanded tbody,.users-table.expanded tbody{max-height:none;overflow-y:hidden}
-.mgmt-table.expanded thead,.users-table.expanded thead{padding-inline-end:0}
+/* جای ۹px نوار اسکرول در حالت بازشده هم خالی می‌ماند تا ستون‌های جدول باز و بسته زیر هم بمانند */
+.mgmt-table.expanded tbody,.users-table.expanded tbody{max-height:none;overflow-y:hidden;padding-inline-end:9px}
 /* سقف ۵۶۰pxی عمومی tablewrap هم برای جدول‌های تنظیمات برداشته می‌شود؛ وگرنه بخش باز پرسطر باز نوار اسکرول می‌گیرد */
 #tab-data .tablewrap{max-height:none;overflow:hidden}
 @media(prefers-reduced-motion:reduce){
@@ -1463,12 +1468,11 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* کاهش حرکت: کراس‌فیدهای انتخاب خاموش (کلاس .xf-out هم در این حالت اثری ندارد) */
 @media(prefers-reduced-motion:reduce){
   .ver-row.sel::before,.ver-row.xf-out::before,.cp-client-item.sel::before,.cp-client-item.xf-out::before,
-  .cp-order-card.sel,.cp-order-card.xf-out,.af-tab.on,.af-tab.xf-out,.seg-btn.on,.seg-btn.xf-out,
+  .cp-order-card.sel,.cp-order-card.xf-out,.seg-btn.on,.seg-btn.xf-out,
   .av-opt.sel,.av-opt.xf-out,.av-toggle.on,.av-toggle.xf-out,.pass-eye svg{transition:none}}
 
 /* ═══ ترتیب پیش‌فرض در جدول‌های «انواع اسناد» و «پارامترها» ═══
    دستهٔ کشیدن کنار دکمه‌های عملیات؛ ستون عملیات این دو جدول برای جای آن پهن‌تر است. */
-.doctypes-tbl th.col-act,.doctypes-tbl td.col-act,.partmods-tbl th.col-act,.partmods-tbl td.col-act{width:122px}
 .mgmt-table .mg-grip{align-self:center;height:28px;border-radius:6px}
 .mgmt-table tbody tr.mg-dragging{opacity:.4}
 .mgmt-table tbody tr.mg-dragging>td{background:#fff8f0}
@@ -1486,6 +1490,10 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* کد نمونه هرگز نمی‌شکند: یک شناسه است و شکستنش خواندنش را سخت می‌کند */
 .inst-num{font-size:12.5px;font-weight:700;color:var(--txt);direction:ltr;text-align:right;white-space:nowrap}
 .inst-tbl th:first-child,.inst-tbl td:first-child{width:200px}
+/* جدول ردیابی هنوز روی چیدمان جدولی قدیم است (شبکهٔ مشترک فقط برای تنظیمات است): عرض ثابت عملیات و
+   جابه‌جایی متن لاتین که پیش‌تر قاعدهٔ عمومی بودند، اینجا نگه داشته می‌شوند. */
+.inst-tbl th.col-act,.inst-tbl td.col-act{width:96px}
+.inst-tbl .en-shift{transform:translateX(100px)}
 .inst-id{font-size:11px;color:var(--muted);direction:ltr;text-align:right}
 .inst-part{display:flex;flex-direction:column;gap:2px}
 .inst-proj{font-size:11px;color:var(--muted)}
@@ -1520,3 +1528,10 @@ body.boot-failed .app-main .tabpane{display:none!important}
 .boot-fail-in .spinner{width:34px;height:34px;border:3px solid #e2e0db;border-top-color:var(--brand);border-radius:50%;
   animation:bootSpin .8s linear infinite;margin:0 auto}
 @keyframes bootSpin{to{transform:rotate(360deg)}}
+
+/* سوییچ «نقشه / مدل سه‌بعدی» بالای پیش‌نمایش سند — فقط برای نقشه‌ای که مدل دارد */
+.dm-vsw{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:8px;pointer-events:none}
+.dm-vsw>*{pointer-events:auto}
+.dm-vsw .seg{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.dm-vsw .seg-btn{padding:6px 14px}
+.dm-vsw-from{font-size:11px;font-weight:500;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}

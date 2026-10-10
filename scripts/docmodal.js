@@ -1,6 +1,6 @@
 /* ================= مودال جزئیات سند ================= */
 /* وضعیت ریویژن انتخاب‌شده در مودال (برای پیش‌نمایش و دانلود) */
-var _dm = { num:"", selNum:"" };
+var _dm = { num:"", selNum:"", view:"doc" };   // view: «doc» نقشه یا «model» مدل سه‌بعدی همان نقشه
 
 /* شمارندهٔ بارگذاری پیش‌نمایش + برآوردگر نوار پیشرفت فعال.
    بدون این، اگر پیش‌نمایشی پیش از تکمیل بسته و پیش‌نمایش تازه‌ای باز شود، تایمر برآوردگر قبلی
@@ -25,6 +25,7 @@ async function openDocDetail(num){
   var _topLayer=modalTop(_mh);
   var _swap=!!(_topLayer && _topLayer.querySelector && _topLayer.querySelector(".doc-modal"));
   if(_swap) _mh.removeChild(_topLayer);
+  if(!_swap) _dm.view="doc";   // پنجرهٔ تازه همیشه با نقشه باز می‌شود
   _dm.num=num; _dm.selNum=num;
 
   var metaHTML=dmMetaHTML(d);
@@ -40,14 +41,16 @@ async function openDocDetail(num){
   if(ME.role==="admin"){
     if(cst==="draft") actionBtn='<button class="btn dm-act" onclick="submitReview(\''+esc(cur.drawingNumber)+'\')">'+ICON.send+'ارسال برای بازبینی</button>';
     else if(cst==="rejected") actionBtn='<button class="btn dm-act" onclick="startRevisionUpload(\''+esc(cur.drawingNumber)+'\')">'+ICON.upload+'بارگذاری نسخهٔ جدید</button>';
+    else if(cst==="approved" && isRetiredType(cur.typeCode)) actionBtn="";   // فایل سه‌بعدی قدیمی: مدل تازه همراه نقشه بارگذاری می‌شود
     else if(cst==="approved") actionBtn='<button class="btn dm-act" onclick="startRevisionUpload(\''+esc(cur.drawingNumber)+'\')">'+ICON.upload+'بارگذاری ریویژن جدید</button>';
     // در حال بازبینی: دکمه غیرفعال (خاکستری) — کلیک روی آن، پیام راهنما + میان‌بر به کارتابل بازبینی همین سند را باز می‌کند
     else if(cst==="pending") actionBtn='<button class="btn dm-act dm-act-disabled" onclick="pendingUploadNotice(\''+esc(cur.drawingNumber)+'\')">'+ICON.upload+'بارگذاری نسخهٔ جدید</button>';
   }
 
   var dlIcon='<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;margin-inline-end:5px;vertical-align:-3px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>';
-  var is3DType=String(d.typeCode).toUpperCase().indexOf("3D")===0;
-  var dlBtnHTML = is3DType
+  /* کشوی فرمت‌ها برای اسناد سه‌بعدی و نقشه‌هایی که مدل دارند (PDF + STEP + GLB + USDZ) */
+  var is3DDoc=is3DType(d.typeCode) || isModelType(d.typeCode);
+  var dlBtnHTML = is3DDoc
     ? '<div class="dm-dl-wrap" id="dmDlWrap">'+
         '<div class="dm-dl-pop" id="dmDlPop"></div>'+
         '<button class="btn primary dm-dl" id="dpDownload" onclick="dmDlMain(event)" aria-expanded="false" disabled>'+dlIcon+'<span class="dm-dl-txt">دانلود<span class="dm-dl-var" id="dpDlVar"><span class="v-a">فایل</span><span class="v-b">همه</span></span></span></button>'+
@@ -57,8 +60,8 @@ async function openDocDetail(num){
     '<div class="doc-modal">'+
       '<div class="doc-preview">'+
         /* بنر «ریویژن جدیدتر» روی پیش‌نمایش، چسبیده به پایین کادر — کنار همان نقشه‌ای که منسوخ است */
-        '<div class="dp-stage"><div class="dp-frame" id="docPreviewHost"></div><div id="dmNewerSlot"></div></div>'+
-        '<div class="dp-actions">'+actionBtn+dmAddFormatBtnHTML(cur,is3DType)+dlBtnHTML+'</div>'+
+        '<div class="dp-stage"><div class="dp-frame" id="docPreviewHost"></div><div id="dmViewSw"></div><div id="dmNewerSlot"></div></div>'+
+        '<div class="dp-actions">'+actionBtn+dmAddFormatBtnHTML(cur)+dlBtnHTML+'</div>'+
       '</div>'+
       /* ظرف داخلی: خود .doc-side جهت ltr دارد تا نوار اسکرول سمت راست
          بیفتد؛ جهت محتوا اینجا به rtl برمی‌گردد. */
@@ -80,72 +83,73 @@ async function openDocDetail(num){
   dmSelectVersion(num);
 }
 
-/* ═══ افزودن فرمت مکمل به سند سه‌بعدی موجود ═══
-   دکمه فقط وقتی می‌آید که واقعاً کاری برای انجام باشد: سند سه‌بعدی، مدیر، و دست‌کم یکی از
-   دو فرمت STP/USDZ جا افتاده باشد. اگر هر دو موجودند دکمه اصلاً ساخته نمی‌شود. */
-function dmMissingFormats(d){
-  var out=[];
-  if(!String(d.stpFileId||"").trim())  out.push({kind:"stp",  label:"STP",  accept:".stp,.step", tag:"فرمت اصلی برای آرشیو اسناد"});
-  if(!String(d.usdzFileId||"").trim()) out.push({kind:"usdz", label:"USDZ", accept:".usdz",      tag:"برای نمایش واقعیت افزوده در iOS"});
-  return out;
+/* ═══ افزودن مدل سه‌بعدی به نقشهٔ موجود، بدون ریویژن ═══
+   برای نقشه‌ای که هنوز مدل ندارد (مثلاً مدلش بعداً آماده شده). فقط STEP گرفته می‌شود؛ GLB و USDZ و حجم
+   در مرورگر ساخته و پشت سر هم در «مرکز انتقال» ثبت می‌شوند. شماره و وضعیت سند تغییر نمی‌کند. */
+function dmAddFormatBtnHTML(d){
+  if(ME.role!=="admin" || !d || !isModelType(d.typeCode) || docHasModel(d)) return "";
+  return '<button class="btn dm-act" onclick="openAddModelModal(\''+esc(d.drawingNumber)+'\')">'+ICON.plus+'افزودن مدل سه‌بعدی</button>';
 }
-function dmAddFormatBtnHTML(d, is3DType){
-  if(!is3DType || ME.role!=="admin" || !d) return "";
-  if(!dmMissingFormats(d).length) return "";
-  return '<button class="btn dm-act" onclick="openAddFormatModal(\''+esc(d.drawingNumber)+'\')">'+ICON.plus+'افزودن فرمت</button>';
-}
-var _af={ num:"", kind:"", file:null };
-function openAddFormatModal(num){
+var _af={ num:"" };
+function openAddModelModal(num){
   var d=docByNumber(num); if(!d){ toast("سند یافت نشد.",true); return; }
-  var miss=dmMissingFormats(d);
-  if(!miss.length){ toast("همهٔ فرمت‌ها از قبل ثبت شده‌اند.",true); return; }
-  _af={ num:num, kind:miss[0].kind, file:null };
-  var tabs = miss.length>1
-    ? '<div class="af-tabs">'+miss.map(function(m,i){
-        return '<button type="button" class="af-tab'+(i===0?' on':'')+'" data-kind="'+m.kind+'" onclick="afPickKind(\''+m.kind+'\')">'+esc(m.label)+'</button>';
-      }).join("")+'</div>'
-    : '';
-  var zones = miss.map(function(m,i){
-    return '<div class="af-zone" data-kind="'+m.kind+'"'+(i===0?'':' hidden')+'>'+
-      rvDropzoneHTML("afDrop_"+m.kind,"afFile_"+m.kind,m.accept,"فایل "+m.label,m.tag)+'</div>';
-  }).join("");
-  showModal("افزودن فرمت به سند",
+  if(docHasModel(d)){ toast("این سند از قبل مدل سه‌بعدی دارد؛ برای مدل تازه، ریویژن جدید بسازید.",true); return; }
+  _af={ num:num };
+  _rv={ file:null, file3:null };   // rvFilePicked و rvInitDrop از همین وضعیت استفاده می‌کنند
+  /* سربرگ هم‌الگوی پنجرهٔ ریویژن: یک سلول با رینگ نارنجی چرخان دور شمارهٔ سند */
+  var stem=String(num).replace(/-[^-]*$/,""), rev=String(num).split("-").pop();
+  showModal("افزودن مدل سه‌بعدی",
+    '<div class="rv-band"><div class="rv-flow"><div class="rv-cell next">'+
+      '<svg class="rv-ring" aria-hidden="true"><rect width="100%" height="100%" rx="12" ry="12" pathLength="100"/></svg>'+
+      '<span class="rv-cn">'+esc(stem)+'-<b>'+esc(rev)+'</b></span><span class="rv-cap">3D FILE</span></div></div></div>'+
     '<div class="rv-up">'+
-      '<div class="rv-num mono" style="direction:ltr">'+esc(num)+'</div>'+
-      '<p class="rv-lead">فایل تکمیلی به همین سند افزوده می‌شود؛ '+
-        'شمارهٔ سند و ویرایش تغییر نمی‌کند و سند دوباره به بازبینی نمی‌رود.</p>'+
-      tabs+zones+
-      '<div class="lg-note" style="margin-top:14px"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'+
-        '<span>اگر خود طراحی تغییر کرده، به‌جای این کار ریویژن جدید بسازید.</span></div>'+
-      '<div class="clm-actions"><button class="btn" onclick="closeModal()">انصراف</button>'+
-        '<button class="btn primary" id="afSave" onclick="submitAddFormat()">'+ICON.plus+'افزودن</button></div>'+
+      '<div class="nd-up-grid nd-up-1">'+
+        rvDropzoneHTML("rvDrop3","rvFile3",".stp,.step",DZ_MODEL_MAIN,DZ_MODEL_SUB)+
+      '</div>'+
+      '<div class="clm-actions"><button class="btn primary" id="afSave" onclick="submitAddModel()">ثبت</button></div>'+
     '</div>', "box-narrow");
-  miss.forEach(function(m){ rvInitDrop("afDrop_"+m.kind,"afFile_"+m.kind); });
+  rvInitDrop("rvDrop3","rvFile3");
 }
-function afPickKind(kind){
-  _af.kind=kind; _af.file=null;
-  [].forEach.call(document.querySelectorAll(".af-tab"), function(b){ xfSet(b, "on", b.getAttribute("data-kind")===kind); });
-  [].forEach.call(document.querySelectorAll(".af-zone"), function(z){ z.hidden = z.getAttribute("data-kind")!==kind; });
-}
-async function submitAddFormat(){
-  var inp=document.getElementById("afFile_"+_af.kind);
-  var f=inp&&inp.files&&inp.files[0];
-  if(!f){ toast("فایلی انتخاب نشده است.",true); return; }
-  if(f.size>25*1024*1024){ toast("حجم فایل بیش از ۲۵ مگابایت است.",true); return; }
-  var b64=await fileToBase64(f);
-  var num=_af.num, kind=_af.kind;
-  /* مثل بقیهٔ آپلودها از «مرکز انتقال» عبور می‌کند تا رابط قفل نشود و پیشرفت دیده شود.
-     ⚙ برخلاف ریویژن، عمداً submitForReview صدا زده نمی‌شود: سند تأییدشده می‌ماند. */
+async function submitAddModel(){
+  var f=_rv.file3;
+  if(!f){ toast("فایل STEP انتخاب نشده است.",true); return; }
+  var num=_af.num, btn=document.getElementById("afSave");
+  if(btn) btn.disabled=true;
+  var m;
+  try{ m=await stepPayload(f, false); }
+  catch(e){ if(btn) btn.disabled=false; toast(stepErrMsg(e),true); return; }
   closeModal();
-  dlEnqueueUpload({
-    label: num+" ‹ "+kind.toUpperCase(),
-    action: "addFormat",
-    payload: { drawingNumber:num, kind:kind, fileBase64:b64, fileName:f.name, mimeType:f.type },
-    onSuccess: async function(r){
-      if(!r || !r.ok){ toast((r&&r.message)||"افزودن فرمت ناموفق بود.",true); return; }
-      toast("فرمت "+kind.toUpperCase()+" افزوده شد.");
-      await refreshDocuments();
-    }
+  if(m.serverConvert){
+    /* سرور از روی STEP فایل نمایش و واقعیت افزوده را می‌سازد و هر سه را ثبت می‌کند */
+    dlEnqueueUpload({
+      label: num+" ‹ STEP",
+      action: "addFormat",
+      payload: { drawingNumber:num, kind:"stp", fileBase64:m.stpBase64, fileName:m.stpName, mimeType:m.stpMime, serverConvert:true },
+      onSuccess: async function(r){
+        if(!r || !r.ok){ toast((r&&r.message)||"افزودن مدل ناموفق بود.",true); return; }
+        toast("مدل سه‌بعدی افزوده شد."); await refreshDocuments();
+      }
+    });
+    return;
+  }
+  /* سه کار پشت سر هم (صف انتقال ترتیبی است): اول STEP همراه حجم، بعد فایل نمایش و واقعیت افزوده */
+  var jobs=[
+    { kind:"stp",  b64:m.stpBase64,  name:m.stpName,  mime:m.stpMime, vol:true },
+    { kind:"glb",  b64:m.glbBase64,  name:m.glbName,  mime:"model/gltf-binary" },
+    { kind:"usdz", b64:m.usdzBase64, name:m.usdzName, mime:"model/vnd.usdz+zip" }
+  ];
+  jobs.forEach(function(j, i){
+    var payload={ drawingNumber:num, kind:j.kind, fileBase64:j.b64, fileName:j.name, mimeType:j.mime };
+    if(j.vol) payload.modelVolume=m.modelVolume;
+    dlEnqueueUpload({
+      label: num+" ‹ "+j.kind.toUpperCase(),
+      action: "addFormat",
+      payload: payload,
+      onSuccess: async function(r){
+        if(!r || !r.ok){ toast((r&&r.message)||"افزودن مدل ناموفق بود.",true); return; }
+        if(i===jobs.length-1){ toast("مدل سه‌بعدی افزوده شد."); await refreshDocuments(); }
+      }
+    });
   });
 }
 /* بازرسم مودال جزئیات سند پس از تازه‌شدن داده.
@@ -561,17 +565,22 @@ async function dmSelectVersion(num, _retried){
   var row=document.getElementById("ver-"+num);
   var list=document.querySelectorAll(".ver-row"); for(var i=0;i<list.length;i++) xfSet(list[i],"sel",list[i]===row);
   // وضعیت دکمهٔ دانلود بر اساس ریویژن انتخاب‌شده
-  var is3DSel=String(d.typeCode).toUpperCase().indexOf("3D")===0;
-  if(is3DSel){ dmInit3DDownload(d); }
+  if(is3DType(d.typeCode) || isModelType(d.typeCode)){ dmInit3DDownload(d); }
   else { var dl=document.getElementById("dpDownload"); if(dl) dl.disabled=!d.fileId; }
+  /* نقشهٔ دارای مدل: سوییچ «نقشه / مدل سه‌بعدی» روی پیش‌نمایش */
+  var glbId=docGlbId(d), canModel=!is3DType(d.typeCode) && !!glbId;
+  if(!canModel) _dm.view="doc";
+  var asModel=canModel && _dm.view==="model";
+  dmRenderViewSwitch(d, canModel);
+  var fid=asModel ? glbId : d.fileId;
   // پیش‌نمایش
   var host=document.getElementById("docPreviewHost"); if(!host) return;
   host.classList.remove("is-3d"); host.classList.remove("is-frame");   // پیش‌فرض: قاب عادی flex (عکس/PDF)؛ فقط شاخهٔ سه‌بعدی دوباره فعالش می‌کند
-  if(!d.fileId){
+  if(!fid){
     host.innerHTML='<div class="empty-state"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div class="es-title">این ریویژن فایلی ندارد</div></div>';
     return;
   }
-  var is3D = String(d.typeCode).toUpperCase()==="3D";
+  var is3D = asModel || String(d.typeCode).toUpperCase()==="3D";
   // نوار پیشرفت درون‌بخشی به‌جای اورلی تمام‌صفحه؛ فایل به‌صورت استریمی در همین بخش لود می‌شود و بقیهٔ سایت آزاد می‌ماند
   /* هم‌سبک لودینگ ویوئر سه‌بعدی: اسپینر لیساژو + عنوان + نام لاتین نوع سند،
      و نوار پیشرفت زیر همه. نام لاتین خط جداگانه و LTR است، وگرنه در یک خط
@@ -580,7 +589,7 @@ async function dmSelectVersion(num, _retried){
   host.innerHTML=(typeof loadBarHTML==="function")
     ? '<div class="dp-load">'+
         '<div class="mv-empty-ic mv-load-ic">'+((typeof MV_LOAD_IC!=="undefined")?MV_LOAD_IC:"")+'</div>'+
-        '<div class="mv-empty-t">در حال بارگذاری سند</div>'+
+        '<div class="mv-empty-t">'+(asModel?'در حال بارگذاری مدل':'در حال بارگذاری سند')+'</div>'+
         (_dEn?'<div class="mv-load-name">'+esc(_dEn)+'</div>':'')+
       '</div>'+
       /* نوار بیرون .dp-load و در حالت چسبیده‌به‌کف (نه inline) — عیناً مثل ویوئر
@@ -591,7 +600,7 @@ async function dmSelectVersion(num, _retried){
   var est=(typeof loadBarEstimate==="function")?loadBarEstimate(getHost, 94):null;   // پیشرفت نرم تا نوار روی صفر نماند
   _dpEst=est;
   try{
-    var r=await getFileRetry(d.fileId, {onProgress: function(loaded,total){ if(est && total>0 && myToken===_dpSeq) est.real(Math.min(99,Math.round(loaded/total*100))); }});
+    var r=await getFileRetry(fid, {onProgress: function(loaded,total){ if(est && total>0 && myToken===_dpSeq) est.real(Math.min(99,Math.round(loaded/total*100))); }});
     if(est) est.stop();
     if(_dpEst===est) _dpEst=null;
     // اگر کاربر بین‌بین ریویژن دیگری انتخاب کرده یا پیش‌نمایش بسته شده، این نتیجه را دور بریز
@@ -655,7 +664,7 @@ async function dmSelectVersion(num, _retried){
     /* فایل رسید ولی نمایش شکست خورد. با اینترنت ناپایدار این معمولاً خرابی فایل نیست (بارگذاری
        ابزار نمایش یا خود دریافت نیمه‌کاره ماند)؛ پس نسخهٔ در حافظه دور ریخته و یک‌بار بی‌صدا از نو
        گرفته می‌شود. فقط اگر بار دوم هم شکست خورد پیام داده می‌شود — و اگر اینترنت قطع است، همان را می‌گوید. */
-    if(typeof fileCacheDrop==="function") fileCacheDrop(d.fileId);
+    if(typeof fileCacheDrop==="function") fileCacheDrop(fid);
     try{ console.warn("[FSM] نمایش پیش‌نمایش ناموفق:", e); }catch(_){}
     if(!_retried){ dmSelectVersion(num, true); return; }
     var online=(typeof siteReachable==="function")?await siteReachable():true;
@@ -663,6 +672,24 @@ async function dmSelectVersion(num, _retried){
     host=document.getElementById("docPreviewHost");
     if(host) host.innerHTML=dmFailHTML(online?FAIL_RENDER:FAIL_ASSET, num);
   }
+}
+/* سوییچ «نقشه / مدل سه‌بعدی» گوشهٔ پیش‌نمایش. اگر مدل از ریویژن قبلی به اشتراک آمده، در حالت مدل گفته می‌شود. */
+function dmRenderViewSwitch(d, canModel){
+  var slot=document.getElementById("dmViewSw"); if(!slot) return;
+  if(!canModel){ slot.innerHTML=""; return; }
+  var from=docModelFromRev(d), m=_dm.view==="model";
+  slot.innerHTML='<div class="dm-vsw">'+
+    '<div class="seg">'+
+      '<button type="button" class="seg-btn'+(m?'':' on')+'" onclick="dmSetView(\'doc\')">نقشه</button>'+
+      '<button type="button" class="seg-btn'+(m?' on':'')+'" onclick="dmSetView(\'model\')">مدل سه‌بعدی</button>'+
+    '</div>'+
+    (m && from ? '<span class="dm-vsw-from">مدل ریویژن '+Number(from).toLocaleString("fa-IR",{minimumIntegerDigits:2})+'</span>' : '')+
+  '</div>';
+}
+function dmSetView(v){
+  if(_dm.view===v) return;
+  _dm.view=v;
+  if(_dm.selNum) dmSelectVersion(_dm.selNum);
 }
 /* حالت خطای پیش‌نمایش: علت واقعی (fileFailInfo / FAIL_RENDER) + توضیح + «تلاش مجدد» */
 function dmFailHTML(fi, num){
@@ -687,6 +714,14 @@ function mvPartBadgeHTML(name){
 /* لیست فرمت‌های موجود روی همین ریویژن (فقط آن‌هایی که واقعاً فایل دارند نشان داده می‌شوند) */
 function dm3DFormats(d){
   var f=[];
+  if(!is3DType(d.typeCode)){
+    var ext=(String(d.fileName||"").match(/\.([a-z0-9]+)$/i)||[])[1]||"PDF";
+    if(d.fileId)     f.push({key:"DOC",  label:ext.toUpperCase(), sub:"فایل نقشه",         fileId:d.fileId,     name:d.drawingNumber});
+    if(d.stpFileId)  f.push({key:"STP",  label:"STEP",            sub:"مدل سه‌بعدی اصلی",  fileId:d.stpFileId,  name:d.drawingNumber+".stp"});
+    if(d.glbFileId)  f.push({key:"GLB",  label:"GLB",             sub:"نمایش سه‌بعدی",     fileId:d.glbFileId,  name:d.drawingNumber+".glb"});
+    if(d.usdzFileId) f.push({key:"USDZ", label:"USDZ",            sub:"واقعیت افزوده آیفون", fileId:d.usdzFileId, name:d.drawingNumber+".usdz"});
+    return f;
+  }
   if(d.fileId)     f.push({key:"GLB",  label:"GLB / GLTF", sub:"نمایش سایت",        fileId:d.fileId,     name:d.drawingNumber+".glb"});
   if(d.stpFileId)  f.push({key:"STP",  label:"STP",         sub:"فرمت اصلی آرشیو",  fileId:d.stpFileId,  name:d.stpFileName||(d.drawingNumber+".stp")});
   if(d.usdzFileId) f.push({key:"USDZ", label:"USDZ",        sub:"واقعیت افزوده",     fileId:d.usdzFileId, name:d.usdzFileName||(d.drawingNumber+".usdz")});
@@ -749,7 +784,7 @@ function dm3DDownloadOne(key){
 function dmDownloadSelected(){
   var d=docByNumber(_dm.selNum);
   if(!d){ toast("سند یافت نشد.",true); return; }
-  var is3D=String(d.typeCode).toUpperCase().indexOf("3D")===0;
+  var is3D=is3DType(d.typeCode) || isModelType(d.typeCode);
   if(!is3D){
     if(!d.fileId){ toast("این ریویژن فایلی برای دانلود ندارد.",true); return; }
     downloadFile(d.fileId, d.drawingNumber); return;
@@ -822,10 +857,12 @@ function openRevisionUploadModal(baseNum, mode){
   var d=docByNumber(baseNum); if(!d){ toast("سند یافت نشد.",true); return; }
   // نوع سند از روی همان مبنا مشخص می‌شود: برای سه‌بعدی، فرمت آپلود باید همانی بماند که قبلاً ثبت شده (STP/GLB/USDZ)،
   // نه فرمت عمومی PDF/تصویر — وگرنه امکان بارگذاری فایل سه‌بعدی از این مسیر اصلاً وجود نداشت.
-  var is3D=String(d.typeCode).toUpperCase().indexOf("3D")===0;
-  _rv={ baseNum:baseNum, mode:mode, file:null, file3:null, file2:null, is3D:is3D };
+  var is3D=is3DType(d.typeCode), isModel=isModelType(d.typeCode);
   var isVer=(mode==="version");
   var rs=revState(d.clientCode,d.orderNo,d.projectNo,d.partNo,d.typeCode);
+  /* ریویژن جدید نقشه‌ای که مدل دارد: پیش‌فرض «مدل تغییر نکرده» ← همان مدل ریویژن قبلی به اشتراک گرفته می‌شود */
+  var canKeep=isModel && !isVer && docHasModel(rs.latest||d);
+  _rv={ baseNum:baseNum, mode:mode, file:null, file3:null, is3D:is3D, isModel:isModel, canKeep:canKeep, modelOn:!canKeep };
   var lead=isVer
     ? 'نسخهٔ اصلاح‌شدهٔ همین ریویژن (بدون تغییر شماره) را بارگذاری کنید؛ نسخهٔ قبلی جایگزین می‌شود.'
     : 'ریویژن بعدی این سند با عنوان «<b>ریویژن '+esc(pad2(rs.nextRev))+'</b>» ثبت می‌شود.';
@@ -834,22 +871,21 @@ function openRevisionUploadModal(baseNum, mode){
   var newNum=isVer ? baseNum
     : ["FSM",String(d.clientCode).toUpperCase(),pad2(d.orderNo),pad2(d.projectNo),pad2(d.partNo),String(d.typeCode).toUpperCase(),pad2(rs.nextRev)].join("-");
   var upIco='<svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
-  var stpTag = isVer?"فرمت اصلی برای آرشیو اسناد — اختیاری":"فرمت اصلی برای آرشیو اسناد — الزامی";
-  var glbTag = isVer?"برای نمایش در سایت — اختیاری":"برای نمایش در سایت — الزامی";
+  var stpZone=function(){ return rvDropzoneHTML("rvDrop3","rvFile3",".stp,.step",DZ_MODEL_MAIN,DZ_MODEL_SUB); };
   var dzHTML = is3D
-    ? '<div class="nd-up-grid nd-up-3">'+
-        rvDropzoneHTML("rvDrop3","rvFile3",".stp,.step","فایل STP",stpTag)+
-        rvDropzoneHTML("rvDrop","rvFile",".glb,.gltf","فایل GLB/GLTF",glbTag)+
-        rvDropzoneHTML("rvDrop2","rvFile2",".usdz","فایل USDZ","برای نمایش در واقعیت افزوده — اختیاری")+
+    ? '<div class="nd-up-grid nd-up-1">'+stpZone()+'</div>'
+    : isModel
+    ? '<div class="nd-up-grid nd-up-2">'+
+        rvDropzoneHTML("rvDrop","rvFile",".pdf,image/*",DZ_DRAW_MAIN,DZ_DRAW_SUB)+
+        stpZone()+
       '</div>'
     : '<div class="nd-up-grid nd-up-1">'+
-        rvDropzoneHTML("rvDrop","rvFile",".pdf,image/*","فایل","PDF یا تصویر — الزامی")+
+        rvDropzoneHTML("rvDrop","rvFile",".pdf,image/*","فایل",DZ_DRAW_SUB)+
       '</div>';
-  // فقط برای «نسخهٔ جدید» (سند ردشده) صادق است: می‌شود فقط فرمت تغییریافته را بارگذاری کرد
-  var hint3D = (is3D && isVer)
-    ? '<div class="rv-3d-hint"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".6" fill="currentColor" stroke="none"/></svg>'+
-        '<span>فقط فرمتی را بارگذاری کنید که تغییر کرده؛ هر فرمتی که خالی بماند، از نسخهٔ قبلی همین سند استفاده می‌شود.</span></div>'
-    : '';
+  var infoTxt = (isVer && (is3D || isModel)) ? (is3D
+      ? 'فایل STEP اصلاح‌شده را بارگذاری کنید؛ فایل‌های نمایش از روی آن دوباره ساخته می‌شوند.'
+      : 'فقط فایلی را بارگذاری کنید که تغییر کرده؛ هر کدام خالی بماند، فایل قبلی همین نسخه می‌ماند.') : '';
+  var hint3D = infoTxt ? '<div class="rv-3d-hint">'+RV_INFO+'<span>'+infoTxt+'</span></div>' : '';
   /* چیدمان هم‌الگوی ویزارد ثبت سند: نوار شماره بالا (زمینهٔ خاکستری + سایهٔ زیرش، مثل .nd-rail)،
      و در بدنه اول توضیحات و بعد بارگذاری فایل (مثل .nd-fstack). */
   var body='<div class="rv-band">'+
@@ -877,7 +913,36 @@ function openRevisionUploadModal(baseNum, mode){
   '</div>';
   showModal(isVer?"بارگذاری نسخهٔ جدید":"بارگذاری ریویژن جدید", body, "box-narrow");
   rvInitDrop("rvDrop","rvFile");
-  if(is3D){ rvInitDrop("rvDrop3","rvFile3"); rvInitDrop("rvDrop2","rvFile2"); }
+  rvInitDrop("rvDrop3","rvFile3");
+  /* ریویژن نقشه‌ای که مدل دارد: تیک گوشهٔ خانهٔ فایل 3D یعنی «مدل هم تغییر کرده».
+     خاموش (پیش‌فرض) = خانه خاکستری و همان مدل ریویژن قبلی می‌ماند؛ روشن = خانه مثل خانهٔ نقشه فعال می‌شود. */
+  if(canKeep){
+    var z3=document.getElementById("rvDrop3");
+    if(z3){
+      z3.insertAdjacentHTML("afterbegin",'<button type="button" class="ed-check dz-check" role="checkbox" aria-checked="false" '+
+        'title="مدل سه‌بعدی هم در این ریویژن تغییر کرده است" onclick="event.preventDefault();event.stopPropagation();rvToggleModel()"></button>');
+      z3.addEventListener("click", function(e){ if(!_rv.modelOn){ e.preventDefault(); rvToggleModel(); } });
+    }
+    rvApplyModelOn();
+  }
+}
+var RV_INFO='<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12.5"/><circle cx="12" cy="16" r=".6" fill="currentColor" stroke="none"/></svg>';
+/* متن یکسان خانه‌های بارگذاری در همهٔ فرم‌ها: خط اول چیست، خط دوم چه فرمتی */
+var DZ_DRAW_MAIN="نقشه مهندسی", DZ_DRAW_SUB="PDF یا تصویر", DZ_MODEL_MAIN="فایل 3D", DZ_MODEL_SUB="STEP یا STP";
+function rvToggleModel(){
+  _rv.modelOn=!_rv.modelOn;
+  if(!_rv.modelOn){   // خاموش‌کردن، فایل انتخاب‌شده را هم کنار می‌گذارد
+    var inp=document.getElementById("rvFile3"); if(inp) try{ inp.value=""; }catch(e){}
+    rvFilePicked("rvDrop3","rvFile3");
+  }
+  rvApplyModelOn();
+}
+function rvApplyModelOn(){
+  var z=document.getElementById("rvDrop3"); if(!z) return;
+  z.classList.toggle("dz-off", !_rv.modelOn);
+  var inp=document.getElementById("rvFile3"); if(inp) inp.disabled=!_rv.modelOn;
+  var c=z.querySelector(".dz-check");
+  if(c){ c.classList.toggle("on", _rv.modelOn); c.setAttribute("aria-checked", _rv.modelOn?"true":"false"); }
 }
 
 function rvDropzoneHTML(zoneId,inputId,accept,main,sub){
@@ -894,15 +959,15 @@ function rvFilePicked(zoneId,inputId){
   var inp=document.getElementById(inputId), lbl=document.getElementById(inputId+"Name"), zone=document.getElementById(zoneId);
   var f=inp&&inp.files&&inp.files[0];
   if(inputId==="rvFile3") _rv.file3=f||null;
-  else if(inputId==="rvFile2") _rv.file2=f||null;
   else _rv.file=f||null;
   if(f){ if(lbl){ lbl.textContent="✓ "+f.name; lbl.hidden=false; } if(zone) zone.classList.add("has-file"); }
   else { if(lbl){ lbl.textContent=""; lbl.hidden=true; } if(zone) zone.classList.remove("has-file"); }
+  if(f && inputId==="rvFile3") stepPicked(inputId, function(){ rvFilePicked(zoneId,inputId); });
 }
 function rvInitDrop(zoneId,inputId){
   var zone=document.getElementById(zoneId), inp=document.getElementById(inputId);
   if(!zone||!inp) return;
-  var depth=0, is3D=(inputId!=="rvFile")||_rv.is3D;
+  var depth=0;
   zone.addEventListener("dragenter",function(e){ e.preventDefault(); depth++; zone.classList.add("drag"); });
   zone.addEventListener("dragover",function(e){ e.preventDefault(); if(e.dataTransfer) e.dataTransfer.dropEffect="copy"; });
   zone.addEventListener("dragleave",function(e){ e.preventDefault(); depth=Math.max(0,depth-1); if(depth===0) zone.classList.remove("drag"); });
@@ -911,10 +976,9 @@ function rvInitDrop(zoneId,inputId){
     var files=e.dataTransfer&&e.dataTransfer.files; if(!files||!files.length) return;
     var f=files[0];
     var ok = inputId==="rvFile3" ? /\.(stp|step)$/i.test(f.name)
-           : inputId==="rvFile2" ? /\.usdz$/i.test(f.name)
-           : _rv.is3D            ? /\.(glb|gltf)$/i.test(f.name)
            :                       (/^image\//.test(f.type)||/pdf$/i.test(f.type)||/\.pdf$/i.test(f.name));
     if(!ok){ toast("فرمت فایل مجاز نیست.",true); return; }
+    if(inputId==="rvFile3" && _rv.canKeep && !_rv.modelOn) rvToggleModel();   // رهاکردن فایل 3D یعنی مدل تغییر کرده
     try{ var dt=new DataTransfer(); dt.items.add(f); inp.files=dt.files; }
     catch(err){ toast("مرورگر شما از رهاکردن فایل پشتیبانی نمی‌کند؛ از دکمهٔ انتخاب استفاده کنید.",true); return; }
     rvFilePicked(zoneId,inputId);
@@ -922,15 +986,16 @@ function rvInitDrop(zoneId,inputId){
 }
 async function submitRevisionUpload(){
   var isVer=(_rv.mode==="version");
-  var f=_rv.file;
-  // «نسخهٔ جدید» (سند ردشده) روی سه‌بعدی: هر سه فایل اختیاری‌اند — هرکدام خالی بماند، نسخهٔ قبلی
-  // همان فایل در بک‌اند دست‌نخورده می‌ماند؛ فقط باید دست‌کم یکی از سه فایل انتخاب شده باشد.
-  // «ریویژن جدید» (سند تأییدشده) یک رکورد کاملاً جدید می‌سازد، پس فایل اصلی (و برای سه‌بعدی، STP) همچنان الزامی است.
-  if(_rv.is3D && isVer){
-    if(!f && !_rv.file3 && !_rv.file2){ toast("دست‌کم یکی از فایل‌های STP، GLB یا USDZ را بارگذاری کنید.",true); return; }
+  var f=_rv.file, stp=(_rv.is3D || (_rv.isModel && _rv.modelOn)) ? _rv.file3 : null;
+  /* «نسخهٔ جدید» (سند ردشده): هر فایلی که خالی بماند، فایل قبلی همین نسخه می‌ماند؛ دست‌کم یکی لازم است.
+     «ریویژن جدید» رکورد تازه می‌سازد: فایل نقشه الزامی است و اگر کلید «مدل تغییر کرده» روشن باشد، STEP هم. */
+  if(_rv.is3D){
+    if(!stp){ toast("بارگذاری فایل STEP الزامی است.",true); return; }
+  } else if(isVer){
+    if(!f && !stp){ toast(_rv.isModel?"دست‌کم یکی از فایل نقشه یا مدل سه‌بعدی را بارگذاری کنید.":"بارگذاری فایل الزامی است.",true); return; }
   } else {
-    if(!f){ toast(_rv.is3D?"بارگذاری فایل GLB/GLTF الزامی است.":"بارگذاری فایل الزامی است.",true); return; }
-    if(_rv.is3D && !_rv.file3){ toast("بارگذاری فایل STP الزامی است.",true); return; }
+    if(!f){ toast("بارگذاری فایل الزامی است.",true); return; }
+    if(_rv.canKeep && _rv.modelOn && !stp){ toast("مدل تازه را بارگذاری کنید، یا کلید «مدل تغییر کرده» را خاموش کنید.",true); return; }
   }
   if(f && f.size>25*1024*1024){ toast("حجم فایل بیش از ۲۵ مگابایت است.",true); return; }
   var ta=document.getElementById("rvNote"); var note=ta?String(ta.value).trim():"";
@@ -941,26 +1006,20 @@ async function submitRevisionUpload(){
   if(isVer){
     action="uploadNewVersion";
     payload={drawingNumber:_rv.baseNum, note:note};
-    if(f){ payload.fileBase64=b64; payload.fileName=f.name; payload.mimeType=f.type; }
     label=_rv.baseNum;
   } else {
     var rs=revState(base.clientCode,base.orderNo,base.projectNo,base.partNo,base.typeCode);
     action="createDocument";
     payload={clientCode:base.clientCode, orderNo:base.orderNo, projectNo:base.projectNo,
-        partNo:base.partNo, typeCode:base.typeCode, rev:rs.nextRev, title:note,
-        fileBase64:b64, fileName:f.name, mimeType:f.type};
+        partNo:base.partNo, typeCode:base.typeCode, rev:rs.nextRev, title:note};
+    if(_rv.canKeep && !_rv.modelOn) payload.keepModel=true;   // فقط نقشه عوض شده: مدل ریویژن قبلی مشترک می‌ماند
     label=base.drawingNumber;
   }
-  // اسناد سه‌بعدی: STP و USDZ هم همراه همین درخواست ارسال می‌شوند (هرکدام که انتخاب شده باشد)
-  if(_rv.is3D){
-    if(_rv.file3){
-      if(_rv.file3.size>25*1024*1024){ toast("حجم فایل STP بیش از ۲۵ مگابایت است.",true); return; }
-      payload.stpBase64=await fileToBase64(_rv.file3); payload.stpName=_rv.file3.name; payload.stpMime=_rv.file3.type;
-    }
-    if(_rv.file2){
-      if(_rv.file2.size>25*1024*1024){ toast("حجم فایل USDZ بیش از ۲۵ مگابایت است.",true); return; }
-      payload.usdzBase64=await fileToBase64(_rv.file2); payload.usdzName=_rv.file2.name; payload.usdzMime=_rv.file2.type;
-    }
+  if(f){ payload.fileBase64=b64; payload.fileName=f.name; payload.mimeType=f.type; }
+  /* STEP ← GLB و USDZ و حجم، ساخته‌شده در مرورگر (برای 3D قدیمی، GLB همان فایل اصلی است) */
+  if(stp){
+    try{ Object.assign(payload, await stepPayload(stp, _rv.is3D)); }
+    catch(e){ toast(stepErrMsg(e),true); return; }
   }
   // آپلود به «مرکز انتقال» می‌رود؛ مودال بلافاصله بسته می‌شود و ارسال برای بازبینی خودکار انجام می‌شود.
   closeModal();

@@ -121,7 +121,7 @@ function filtFieldValues(id){
     .map(function(o){ return {value:o.clientCode+"|"+pad2(o.orderNo), fa:(o.title||("سفارش "+pad2(o.orderNo)))}; });   // بدون انگلیسی
   if(id==="aProject") return DB.projects.filter(function(p){ return !fc.length||fc.indexOf(p.clientCode)>=0; }).slice().sort(function(a,b){
       return String(a.clientCode).localeCompare(String(b.clientCode),"en")||(numOf(a.orderNo)-numOf(b.orderNo))||(numOf(a.projectNo)-numOf(b.projectNo)); })
-    .map(function(p){ return {value:p.clientCode+"|"+pad2(p.orderNo)+"|"+pad2(p.projectNo), fa:(p.description||("پروژه "+pad2(p.projectNo)))}; });   // بدون انگلیسی
+    .map(function(p){ return {value:p.clientCode+"|"+pad2(p.orderNo)+"|"+pad2(p.projectNo), fa:(projNameFa(p)||("پروژه "+pad2(p.projectNo)))}; });   // بدون انگلیسی
   return [];
 }
 filtRegister("arch", {
@@ -140,7 +140,7 @@ function populateArchiveProjects(){
   });
   el.innerHTML='<option value="">همه پروژه‌ها</option>'+list.map(function(p){
     var val=p.clientCode+"|"+pad2(p.orderNo)+"|"+pad2(p.projectNo);
-    var label=p.clientCode+"-"+pad2(p.orderNo)+"-"+pad2(p.projectNo)+(p.description?(" — "+p.description):"");
+    var label=p.clientCode+"-"+pad2(p.orderNo)+"-"+pad2(p.projectNo)+(projNameFa(p)?(" — "+projNameFa(p)):"");
     return '<option value="'+esc(val)+'">'+esc(label)+'</option>';
   }).join("");
 }
@@ -378,7 +378,7 @@ function archCellNav(ev, num, kind){
 var _archMenu=null;
 function archCloseKebab(){
   if(!_archMenu) return;
-  _archMenu.remove(); _archMenu=null;
+  popClose(_archMenu); _archMenu=null;
   document.removeEventListener("click",_archDocClick,false);
   document.removeEventListener("scroll",archCloseKebab,true);
   window.removeEventListener("resize",archCloseKebab);
@@ -390,13 +390,13 @@ function archKebab(ev, num){
   archCloseKebab();
   if(wasFor) return;                                   // toggle: کلیک دوباره ⟵ بستن
   var r=ev.currentTarget.getBoundingClientRect();
-  var m=document.createElement("div"); m.className="kebab-pop"; m._num=num;
+  var m=document.createElement("div"); m.className="kebab-pop dd-anim"; m._num=num;
   m.innerHTML=
     '<button class="kebab-item" onclick="archCloseKebab();openDocDetail(\''+esc(num)+'\')">'+ICON.edit+'ویرایش</button>'+
     '<button class="kebab-item danger" onclick="archCloseKebab();delDocument(\''+esc(num)+'\')">'+ICON.trash+'حذف</button>';
   document.body.appendChild(m);
   var mw=m.offsetWidth, mh=m.offsetHeight;
-  var top=r.bottom+5; if(top+mh>window.innerHeight-8) top=r.top-mh-5;   // اگر پایین جا نبود، بالا باز شود
+  var top=r.bottom+5; if(top+mh>window.innerHeight-8){ top=r.top-mh-5; m.classList.add("up"); }   // اگر پایین جا نبود، بالا باز شود
   var left=r.right-mw; if(left<8) left=8;                              // در RTL راست‌تراز دکمه
   m.style.top=Math.max(8,top)+"px"; m.style.left=left+"px";
   _archMenu=m;
@@ -534,6 +534,16 @@ function b64toBlob(b64,mime){
    el کلاس closing می‌گیرد (انیمیشن خروج در components.css) و پس از پایانش done اجرا می‌شود
    (حذف از DOM یا افزودن hidden). کاهش حرکت → بی‌درنگ. */
 var MODAL_OUT_MS=160;
+/* بستن انیمیشن‌دار منوهای شناور (کلاس dd-anim): کلاس dd-out می‌گیرد و پس از پایان انیمیشن از صفحه برداشته
+   می‌شود. منو بی‌درنگ از چشم منطق برنامه بیرون است (فراخوان مرجعش را همان لحظه null می‌کند)، پس باز کردن
+   منوی تازه منتظر این محو شدن نمی‌ماند. */
+var DD_OUT_MS=200;
+function popClose(el){
+  if(!el || !el.parentNode) return;
+  if(el.classList.contains("dd-out")) return;
+  el.classList.add("dd-out");
+  setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, DD_OUT_MS);
+}
 function modalClose(el, done){
   if(!el){ if(done) done(); return; }
   if(el.classList.contains("closing")) return;            // همین حالا در حال بسته‌شدن است
@@ -566,11 +576,13 @@ function anyModalOpen(){
   return false;
 }
 /* ===== قفل اسکرول پس‌زمینه =====
-   ⚠ هدر position:sticky است و به اسکرول صفحه چسبیده. اگر صفحه پایین آمده باشد
-   و همان‌جا قفل شود، هدر بالای کادر دید می‌ماند و دیده نمی‌شود — همان باگی که
-   در پنل جزئیات سند رخ می‌داد.
-   راه‌حل: پیش از قفل، صفحه به بالا برده می‌شود تا هدر در کادر باشد؛ موقعیت قبلی
-   نگه داشته و هنگام بستن دقیقاً برگردانده می‌شود، پس کاربر جایش را گم نمی‌کند.
+   ظرف اسکرول (#appView) overflow خودش را نگه می‌دارد تا نوار اسکرول سر جایش بماند؛ بستن
+   overflow نوار را برمی‌داشت و عرضش به صفحه اضافه می‌شد (صفحهٔ پشت کش می‌آمد). به‌جایش
+   چرخ موس/لمس بیرون از پنجره بی‌اثر می‌شود و هر اسکرولی که باز هم رخ دهد (کیبورد، کشیدن نوار،
+   زنجیرهٔ اسکرول از داخل پنجره) فوراً به همان موقعیت قبلی برگردانده می‌شود.
+   ⚠ پیش‌تر صفحه پیش از قفل به بالا برده می‌شد تا هدر sticky دیده شود؛ از وقتی اسکرول
+   روی #appView است هدر در هر موقعیتی سر جایش می‌ماند و آن پرش فقط پس‌زمینه را جابه‌جا
+   می‌کرد (باگ ۱۸ مهر ۱۴۰۵)، پس حذف شد. موقعیت هنوز نگه داشته و هنگام بستن برگردانده می‌شود.
    (position:fixed روی body امتحان شد و غلط بود: ارتفاع صفحه جمع می‌شد،
    نوار اسکرول غیب می‌شد و هدر با top منفی بریده می‌شد.) */
 var _mlY=0, _mlOn=false;
@@ -578,11 +590,16 @@ var _mlY=0, _mlOn=false;
    خواندن و نوشتن موقعیت هم باید روی همان باشد؛ window.pageYOffset همیشه
    صفر برمی‌گرداند. fallback به documentElement برای احتیاط است. */
 function appScroller(){ return document.getElementById("appView") || document.documentElement; }
+function _mlHold(){ var sc=appScroller(); if(_mlOn && sc.scrollTop!==_mlY) sc.scrollTop=_mlY; }
+/* چرخ موس روی پس‌زمینه بی‌اثر؛ داخل جعبهٔ پنجره (و پنل‌های شناور مثل مرکز انتقال) آزاد است */
+function _mlWheel(e){ var t=e.target; if(t && t.closest && t.closest(".modal .box, .xfer-wrap, .mat-menu")) return; e.preventDefault(); }
 function modalLock(){
   if(_mlOn) return;
   var sc=appScroller();
   _mlY=sc.scrollTop||0;
-  if(_mlY>0) sc.scrollTop=0;   // هدر به بالای کادر دید بیاید
+  sc.addEventListener("scroll", _mlHold);
+  sc.addEventListener("wheel", _mlWheel, {passive:false});
+  sc.addEventListener("touchmove", _mlWheel, {passive:false});
   document.body.classList.add("modal-open");
   _mlOn=true;
   // دکمهٔ انتقال با این کلاس fixed می‌شود؛ مختصاتش باید همین‌جا ست شود
@@ -590,8 +607,12 @@ function modalLock(){
 }
 function modalUnlock(){
   if(!_mlOn) return;
+  var sc=appScroller();
+  sc.removeEventListener("scroll", _mlHold);
+  sc.removeEventListener("wheel", _mlWheel);
+  sc.removeEventListener("touchmove", _mlWheel);
   document.body.classList.remove("modal-open");
-  if(_mlY>0) appScroller().scrollTop=_mlY;   // بازگشت به همان جای قبلی
+  if(sc.scrollTop!==_mlY) sc.scrollTop=_mlY;   // بازگشت به همان جای قبلی
   _mlOn=false;
   if(typeof xferPlaceBtn==="function") xferPlaceBtn();   // دکمه به جریان هدر برگردد
 }
