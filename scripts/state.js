@@ -3,7 +3,7 @@ var DB = { clients:[], orders:[], projects:[], parts:[], docTypes:[], documents:
   /* ردیابی قطعات تولیدی: instances فقط با بازکردن بخش ردیابی گرفته می‌شود (سنگین است)،
      ولی instanceCounts در بوت‌استرپ می‌آید تا کارت هر قطعه بی‌درنگ «۱ از ۲ تأییدشده» را نشان دهد. */
   suppliers:[], rawTypes:[], instances:[], instanceCounts:{}, instancesLoaded:false,
-  materials:[], heatTreats:[], processes:[] };   // کتابخانهٔ مواد: جنس استاندارد قطعات + وزن مخصوص
+  materials:[], heatTreats:[], processes:[], positions:[] };   // کتابخانهٔ مواد: جنس استاندارد قطعات + وزن مخصوص
 var ME = { token:null, role:null, name:null, username:null, gender:null, position:null, avatar:null };
 
 /* مجموعهٔ آواتارهای قابل‌انتخاب (خودبسنده، بدون منبع بیرونی) */
@@ -133,6 +133,8 @@ function namedMasterSorted(arr){
 }
 function suppliersSorted(){ return namedMasterSorted(DB.suppliers); }
 function rawTypesSorted(){ return namedMasterSorted(DB.rawTypes); }
+/* سمت‌ها (v43): Users.position = nameFa؛ CAD Studio نام انگلیسی همان ردیف را نشان می‌دهد */
+function positionsSorted(){ return namedMasterSorted(DB.positions); }
 
 /* ═══ کتابخانهٔ مواد ═══
    مقدار پارامتر «جنس» روی کارت قطعه = گرید یک مادهٔ کتابخانه (کلید). متن نمایشی از خود کتابخانه

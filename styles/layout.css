@@ -252,6 +252,12 @@ main{max-width:none;margin:0;padding:0}
 .nav-item.active .ni-dash .q3{transform:translateX(-13px);opacity:0}
 .nav-item.active .ni-dash .q4{transform:translateX(13px);opacity:0}
 
+/* CAD Studio: مکعب داخل چهار گوشهٔ قاب؛ با رسیدن موس گوشه‌ها کمی به بیرون باز می‌شوند (مثل قاب‌گرفتن دوربین) */
+.nav-item:hover .ni-cad .cs-c1{transform:translate(-1px,-1px)}
+.nav-item:hover .ni-cad .cs-c2{transform:translate(1px,-1px)}
+.nav-item:hover .ni-cad .cs-c3{transform:translate(1px,1px)}
+.nav-item:hover .ni-cad .cs-c4{transform:translate(-1px,1px)}
+
 /* پوشه: پنل جلویی در حالت عادی نامرئی است؛ در حالت فعال
    محو می‌شود و کمی زاویه می‌گیرد → پوشهٔ باز. لولا روی لبهٔ بالایی خود پنل است. */
 .ni-folder .fd-lid{transform-origin:50% 0;transform:scaleY(.55);opacity:0}

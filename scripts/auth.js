@@ -299,7 +299,7 @@ async function doLogin(trusted){
       lgSetErr(r.netError ? (r.message||"خطا در ارتباط با سرویس.") : "نام کاربری یا رمز عبور نادرست است.");
       lgBusy(false); return;
     }
-    ME={ token:r.token, role:r.role, name:r.name, username:r.username, gender:r.gender||"", position:r.position||"", avatar:r.avatar||"" };
+    ME={ token:r.token, role:r.role, name:r.name, username:r.username, gender:r.gender||"", position:r.position||"", avatar:r.avatar||"", nameEn:r.nameEn||"" };
     /* زمان انقضا کنار توکن ذخیره می‌شود تا در بازگشایی بعدی، نشست تمام‌شده
        بدون رفت‌وبرگشت به سرور تشخیص داده شود (توکن بک‌اند ۱۲ ساعته است).
        اگر روزی خود بک‌اند expiresAt بفرستد، همان ملاک قرار می‌گیرد. */
@@ -404,7 +404,7 @@ async function startApp(){
   var meRec=(DB.users||[]).find(function(x){return x.username===ME.username;});
   if(meRec){
     if(meRec.role) ME.role=meRec.role;
-    ME.name=meRec.name||ME.name; ME.gender=meRec.gender||ME.gender; ME.position=meRec.position||ME.position; ME.avatar=meRec.avatar||ME.avatar;
+    ME.name=meRec.name||ME.name; ME.gender=meRec.gender||ME.gender; ME.position=meRec.position||ME.position; ME.avatar=meRec.avatar||ME.avatar; ME.nameEn=meRec.nameEn||ME.nameEn||"";
   }
   localStorage.setItem("fsm_session", JSON.stringify(ME));   // نشست ذخیره‌شده با مقادیر تأییدشده هم‌گام شود
   if(typeof snapSave==="function") snapSave();
@@ -422,13 +422,13 @@ function applyBootData(r){
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
   DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسناد حذف‌شده، برای معنا‌دار ماندن رویدادهای گذشته
-  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[];
+  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[]; DB.positions=r.positions||[];
   DB.instanceCounts=r.instanceCounts||{};
   DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردن همان بخش گرفته می‌شوند
 }
 /* امضای کامل دادهٔ بوت‌استرپ — dataSig به‌علاوهٔ بخش‌هایی که فقط هنگام شروع می‌آیند */
 function bootSig(x){
-  return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[],x.heatTreats||[],x.processes||[]]);
+  return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[],x.heatTreats||[],x.processes||[],x.positions||[]]);
 }
 /* رسم پوستهٔ برنامه با DB فعلی — هم برای ورود عادی و هم بازشدن فوری با دادهٔ ذخیره‌شده */
 /* ================= «داده نرسیده»: بوت‌استرپ ناموفق بدون دادهٔ ذخیره‌شده =================

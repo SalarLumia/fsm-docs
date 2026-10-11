@@ -76,3 +76,9 @@ function switchTab(name){
   if(name!=="project" && typeof navRefreshSelection==="function") navRefreshSelection();
   if(typeof playTabReveal==="function") playTabReveal(pane);   // ورود آبشاری بلوک‌های همان تب
 }
+
+/* CAD Studio هنوز به سایت وصل نشده: روی سرور محلی نمونهٔ اولیه را در زبانهٔ تازه باز می‌کند، روی سایت فقط خبر می‌دهد */
+function openCadStudio(){
+  if(/^(localhost|127\.)/.test(location.hostname)) window.open("_dev/studio/index.html","_blank");
+  else toast("CAD Studio به‌زودی فعال می‌شود");
+}

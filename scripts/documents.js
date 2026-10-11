@@ -707,7 +707,7 @@ function dataSig(src){
   var wf=(src.workflow||[]).map(function(w){
     return [w.drawingNumber,w.action,w.user,w.comment].map(S).join(""); }).sort();
   var tr=(src.trashedDocs||[]).map(function(x){ return S(x.drawingNumber); }).sort();
-  return JSON.stringify([docs,wf,tr,src.clients,src.orders,src.projects,src.parts,src.docTypes,src.partMods,src.materials||[],src.heatTreats||[],src.processes||[]]);
+  return JSON.stringify([docs,wf,tr,src.clients,src.orders,src.projects,src.parts,src.docTypes,src.partMods,src.materials||[],src.heatTreats||[],src.processes||[],src.positions||[]]);
 }
 /* opts.background: همگام‌سازی پس‌زمینه پس از تغییر خوش‌بینانه — اگر چیزی فرق نکرده بود رسم نمی‌کند،
    و اگر وسطش فرمان دیگری شروع شده بود نتیجه را دور می‌ریزد (همگام‌سازی بعدی همان فرمان می‌آید). */
@@ -721,7 +721,7 @@ async function refreshDocuments(opts){
   DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
   DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[];
   DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
-  DB.trashedDocs=r.trashedDocs||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[];
+  DB.trashedDocs=r.trashedDocs||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[]; DB.positions=r.positions||DB.positions||[];
   if(r.users&&r.users.length) DB.users=r.users;
   if(r.instanceCounts) DB.instanceCounts=r.instanceCounts;
   snapSave(); markSynced();
@@ -742,7 +742,7 @@ function snapSave(){
     localStorage.setItem(SNAP_KEY, JSON.stringify({ v:SNAP_VER, u:ME.username, t:Date.now(), db:{
       clients:DB.clients, orders:DB.orders, projects:DB.projects, parts:DB.parts, docTypes:DB.docTypes,
       documents:DB.documents, users:DB.users, templates:DB.templates, workflow:DB.workflow, partMods:DB.partMods,
-      trashedDocs:DB.trashedDocs, suppliers:DB.suppliers, rawTypes:DB.rawTypes, materials:DB.materials, heatTreats:DB.heatTreats, processes:DB.processes, instanceCounts:DB.instanceCounts } }));
+      trashedDocs:DB.trashedDocs, suppliers:DB.suppliers, rawTypes:DB.rawTypes, materials:DB.materials, heatTreats:DB.heatTreats, processes:DB.processes, positions:DB.positions, instanceCounts:DB.instanceCounts } }));
   }catch(e){ snapClear(); }
 }
 function snapLoad(){

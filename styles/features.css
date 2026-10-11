@@ -941,7 +941,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
   --tc4:calc(70px + var(--tg))}
 #tab-data .mgmt-table tr,#tab-data .users-table tr{display:grid;width:100%;
   grid-template-columns:var(--tc1) var(--tc2) var(--tc3) var(--tc4) 1fr}
-#tab-data .parts-tbl tr,#tab-data .suppliers-tbl tr,#tab-data .rawtypes-tbl tr,#tab-data .opt-tbl tr{grid-template-columns:var(--tc1) var(--tc2) 1fr}
+#tab-data .parts-tbl tr,#tab-data .suppliers-tbl tr,#tab-data .rawtypes-tbl tr,#tab-data .positions-tbl tr,#tab-data .opt-tbl tr{grid-template-columns:var(--tc1) var(--tc2) 1fr}
 #tab-data .partmods-tbl tr{grid-template-columns:var(--tc1) var(--tc2) var(--tc3) 1fr}
 /* سلول‌ها آیتم گرید با ارتفاع کامل ردیف (خط زیر و کارت هاور یکدست)؛ محتوا با flex وسط عمودی می‌شود */
 #tab-data .mgmt-table th,#tab-data .mgmt-table td,#tab-data .users-table th,#tab-data .users-table td{display:flex;align-items:center;min-width:0;justify-content:flex-start}

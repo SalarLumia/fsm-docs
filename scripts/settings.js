@@ -17,6 +17,7 @@ function renderDataTables(){
   // فهرست‌های اصلی ردیابی: تأمین‌کنندگان و انواع مادهٔ خام (ترتیب هر جدول با کشیدن)
   renderNamedMaster("suppliersBody", suppliersSorted(), "openSupplierModal", "deleteSupplier", SUPPLIER_EL_SVG);
   renderNamedMaster("rawtypesBody", rawTypesSorted(), "openRawTypeModal", "deleteRawType", RAWTYPE_EL_SVG);
+  renderNamedMaster("positionsBody", positionsSorted(), "openPositionModal", "deletePosition", POSITION_EL_SVG);
   renderMaterials();
   renderOptList('heat'); renderOptList('proc');
   // users: کارت کاربر (آواتار + نام + نام کاربری) · سمت · تگ نقش · ویرایش
@@ -99,6 +100,7 @@ var DEL_MAP = {
   deletePartMod:  {arr:'partMods',  test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
   deleteSupplier: {arr:'suppliers', test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
   deleteRawType:  {arr:'rawTypes',  test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
+  deletePosition: {arr:'positions', test:function(x,p){return String(x.nameFa)===String(p.nameFa);}},
   deleteMaterial: {arr:'materials', test:function(x,p){return String(x.grade)===String(p.grade);}},
   deleteHeatTreat: {arr:'heatTreats', test:function(x,p){return String(x.name)===String(p.name);}},
   deleteProcess:   {arr:'processes',  test:function(x,p){return String(x.name)===String(p.name);}},
@@ -155,6 +157,7 @@ function mgRowDragEnd(e){
   else if(tb.id==="partmodsBody") mgCommitOrder("partMods", DB.partMods, "nameFa", keys);
   else if(tb.id==="suppliersBody") mgCommitOrder("suppliers", DB.suppliers, "nameFa", keys);
   else if(tb.id==="rawtypesBody") mgCommitOrder("rawTypes", DB.rawTypes, "nameFa", keys);
+  else if(tb.id==="positionsBody") mgCommitOrder("positions", DB.positions, "nameFa", keys);
   else if(tb.id==="materialsBody") mgCommitOrder("materials", DB.materials, "grade", keys);
   else if(tb.id==="heattreatsBody") mgCommitOrder("heatTreats", DB.heatTreats, "name", keys);
   else if(tb.id==="processesBody") mgCommitOrder("processes", DB.processes, "name", keys);
@@ -198,6 +201,10 @@ async function del(action,payload){
   if(action==="deleteMaterial"){
     var nUse=materialUseCount(payload.grade);
     if(nUse) ask="این ماده جنس "+faN(nUse)+" قطعه است. پس از حذف، جنس آن قطعه‌ها «خارج از کتابخانه» نشان داده می‌شود. حذف شود؟";
+  }
+  if(action==="deletePosition"){
+    var nPos=(DB.users||[]).filter(function(u){ return String(u.position||"").trim()===String(payload.nameFa); }).length;
+    if(nPos) ask="این سمت برای "+faN(nPos)+" کاربر ثبت شده است. سمت آن کاربران دست نمی‌خورد ولی دیگر از فهرست قابل انتخاب نیست. حذف شود؟";
   }
   if(action==="deleteHeatTreat"||action==="deleteProcess"){
     var nHt=optUseCount(action==="deleteProcess"?"proc":"heat", payload.name);
@@ -404,6 +411,7 @@ async function migratePartModRename(oldName,newName){
 /* ═══ فهرست‌های اصلی نام‌محور ردیابی: تأمین‌کننده و نوع مادهٔ خام ═══
    ساختارشان یکی است (نام فارسی + نام انگلیسی + ترتیب)، پس رندر و مودالشان مشترک است. */
 var SUPPLIER_EL_SVG='<svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h3.5L22 11v5h-6z"/><circle cx="5.5" cy="19" r="1.6"/><circle cx="18" cy="19" r="1.6"/></svg>';
+var POSITION_EL_SVG='<svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M2 13h20"/></svg>';
 var RAWTYPE_EL_SVG='<svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/></svg>';
 function renderNamedMaster(bodyId, rows, editFn, delAction, icon){
   var host=document.getElementById(bodyId); if(!host) return;
@@ -414,8 +422,9 @@ function renderNamedMaster(bodyId, rows, editFn, delAction, icon){
         delIconBtn("del('"+delAction+"',{nameFa:'"+esc(m.nameFa)+"'})")+mgGripHTML()+"</div></td></tr>";
   }).join("")||emptyRow(3);
 }
-var _namedEdit={sup:"", raw:""};
+var _namedEdit={sup:"", raw:"", pos:""};
 function openSupplierModal(name){ openNamedMasterModal("sup", name, DB.suppliers, "تأمین‌کننده", "مثلاً فولاد مبارکه", "e.g. Mobarakeh Steel"); }
+function openPositionModal(name){ openNamedMasterModal("pos", name, DB.positions, "سمت", "مثلاً واحد کنترل کیفیت", "e.g. Quality Control"); }
 function openRawTypeModal(name){ openNamedMasterModal("raw", name, DB.rawTypes, "نوع مادهٔ خام", "مثلاً گرد فولادی", "e.g. Steel Round Bar"); }
 function openNamedMasterModal(kind, name, arr, title, phFa, phEn){
   var m = name ? (arr||[]).find(function(x){ return String(x.nameFa)===String(name); }) : null;
@@ -434,7 +443,7 @@ function openNamedMasterModal(kind, name, arr, title, phFa, phEn){
   showModal((m?"ویرایش ":"افزودن ")+title, body, "form-modal");
 }
 async function saveNamedMaster(kind){
-  var isSup=(kind==="sup"), arr=isSup?DB.suppliers:DB.rawTypes;
+  var isSup=(kind==="sup"), isPos=(kind==="pos"), arr=isPos?(DB.positions=DB.positions||[]):(isSup?DB.suppliers:DB.rawTypes);
   var name=String(document.getElementById("nmFa").value||"").trim();
   var nameEn=String(document.getElementById("nmEn").value||"").trim();
   if(!name){ toast("نام لازم است.",true); return; }
@@ -442,7 +451,7 @@ async function saveNamedMaster(kind){
   if((arr||[]).some(function(x){ return String(x.nameFa).trim()===name && String(x.nameFa)!==oldName; })){ toast("این نام قبلاً ثبت شده است.",true); return; }
   var payload={nameFa:name,nameEn:nameEn};
   if(oldName) payload.oldName=oldName;
-  var r=await api(isSup?"saveSupplier":"saveRawType", payload);
+  var r=await api(isPos?"savePosition":(isSup?"saveSupplier":"saveRawType"), payload);
   if(!r||!r.ok){ toast((r&&r.message)||"ذخیره ناموفق بود",true); return; }
   var ord=0, idx=-1;
   (arr||[]).forEach(function(x,i){ if(String(x.nameFa)===(oldName||name)){ ord=Number(x.order)||0; idx=i; } });
@@ -451,7 +460,12 @@ async function saveNamedMaster(kind){
   localUpsert(arr,function(x){ return String(x.nameFa)===name; },{nameFa:name,nameEn:nameEn,active:true,order:ord});
   /* تغییر نام فقط فهرست اصلی را عوض می‌کند؛ قطعات تولیدی ثبت‌شده مقدار متنی خودشان را
      نگه می‌دارند تا سابقهٔ آن‌ها دست‌نخورده بماند (ردیابی به گذشته وابسته است). */
-  closeModal(); localRefresh(); toast((isSup?"تأمین‌کننده ":"نوع مادهٔ خام ")+(oldName?"به‌روزرسانی شد":"افزوده شد"));
+  /* سمت برخلاف آن دو، کلید پروفایل کاربران است: سرور کاربران را به نام تازه برده، اینجا هم همین */
+  if(isPos && oldName && oldName!==name){
+    (DB.users||[]).forEach(function(u){ if(String(u.position||"").trim()===oldName) u.position=name; });
+    if(ME && String(ME.position||"").trim()===oldName){ ME.position=name; if(typeof renderUserHeader==="function") renderUserHeader(); }
+  }
+  closeModal(); localRefresh(); toast((isPos?"سمت ":(isSup?"تأمین‌کننده ":"نوع مادهٔ خام "))+(oldName?"به‌روزرسانی شد":"افزوده شد"));
 }
 
 /* ═══ کتابخانهٔ مواد ═══
@@ -693,13 +707,15 @@ function openUserModal(username){
   var body='<div class="um-form">'+
     '<div class="um-field"><label class="fld">نام و نام خانوادگی</label>'+
       '<input id="usName" placeholder="علی شفیعی" value="'+esc(u?(u.name||""):"")+'"></div>'+
+    '<div class="um-field"><label class="fld">نام انگلیسی <span class="fld-hint">(در CAD Studio نمایش داده می‌شود)</span></label>'+
+      '<input id="usNameEn" placeholder="Ali Shafiei" style="direction:ltr;text-align:left" value="'+esc(u?(u.nameEn||""):"")+'"></div>'+
     '<div class="um-row">'+
       '<div class="um-field"><label class="fld">نام کاربری (لاتین)</label>'+
         '<input id="usUser" placeholder="ali" style="direction:ltr;text-align:left" oninput="filterUsername(this)" value="'+esc(u?(u.username||""):"")+'"'+(isEdit?" disabled":"")+'></div>'+
       '<div class="um-field"><label class="fld">جنسیت</label>'+segControl("usGender",GENDERS_SEG,(u&&u.gender)||"male")+'</div>'+
     '</div>'+
     '<div class="um-field"><label class="fld">سمت</label>'+
-      '<input id="usPosition" placeholder="واحد تحقیق و توسعه" value="'+esc(u?(u.position||""):"")+'"></div>'+
+      '<select id="usPosition">'+positionOptions(u?String(u.position||"").trim():"")+'</select></div>'+
     '<div class="um-field"><label class="fld">رمز عبور'+(isEdit?' <span class="fld-hint">(برای بی‌تغییر ماندن خالی بگذارید)</span>':'')+'</label>'+
       '<div class="pass-wrap"><input id="usPass" type="password" placeholder="••••••">'+
         '<button type="button" class="pass-eye" onclick="togglePass(\'usPass\',this)" title="نمایش/مخفی">'+eye+'</button></div></div>'+
@@ -732,10 +748,17 @@ async function deleteUserGuarded(ev, username){
     closeModal(); localRefresh(); toast("کاربر حذف شد");
   } else toast(r.message||"حذف ناموفق",true);
 }
+/* گزینه‌های سمت از فهرست تنظیمات؛ سمت قدیمی بیرون از فهرست بی‌صدا گم نمی‌شود (هم‌الگوی تأمین‌کننده) */
+function positionOptions(cur){
+  var list=positionsSorted();
+  return '<option value="">انتخاب کنید</option>'+list.map(function(m){
+      return '<option value="'+esc(m.nameFa)+'"'+(cur===m.nameFa?" selected":"")+'>'+esc(m.nameFa)+'</option>'; }).join("")+
+    ((cur && !list.some(function(m){ return m.nameFa===cur; }))?'<option value="'+esc(cur)+'" selected>'+esc(cur)+' (خارج از فهرست)</option>':'');
+}
 async function saveUser(){
   var wasEdit=!!_userEdit;
   var uname=usUser.value.trim(), name=usName.value.trim(), role=usRole.value;
-  var gender=usGender.value, position=usPosition.value.trim();
+  var gender=usGender.value, position=usPosition.value.trim(), nameEn=usNameEn.value.replace(/\s+/g," ").trim();
   var avatar=usAvatar.value;
   var _ex=(DB.users||[]).find(function(x){return String(x.username)===uname;});
   var active=_ex?(_ex.active!==false):true;   // وضعیت از toggle ردیف کنترل می‌شود؛ اینجا فقط حفظش می‌کنیم
@@ -757,9 +780,9 @@ async function saveUser(){
       toast("آخرین مدیر سیستم را نمی‌توان از نقش مدیریت خارج کرد.",true); return;
     }
   }
-  var r=await api("saveUser",{username:uname,name:name,password:usPass.value,role:role,gender:gender,position:position,avatar:avatar});
+  var r=await api("saveUser",{username:uname,name:name,nameEn:nameEn,password:usPass.value,role:role,gender:gender,position:position,avatar:avatar});
   if(r.ok){
-    localUpsert(DB.users,function(x){return x.username===uname;},{username:uname,name:name,role:role,active:active,gender:gender,position:position,avatar:avatar});
+    localUpsert(DB.users,function(x){return x.username===uname;},{username:uname,name:name,nameEn:nameEn,role:role,active:active,gender:gender,position:position,avatar:avatar});
     closeModal(); localRefresh(); toast("کاربر "+(wasEdit?"به‌روزرسانی شد":"افزوده شد"));
   } else toast(r.message,true);
 }
