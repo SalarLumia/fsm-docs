@@ -339,6 +339,8 @@ function cpOpenOrderModal(o){
   var body='<div class="clm">'+
     '<div class="clm-row"><label class="fld">'+(editing?"ویرایش عنوان سفارش "+esc(pad2(o)):"عنوان سفارش جدید")+'</label>'+
       '<input id="cpOTitle" placeholder="مثلاً دو مجموعه شافت و غلطک" value="'+esc(rec?rec.title||"":"")+'"></div>'+
+    '<div class="clm-row"><label class="fld">توضیح انگلیسی</label>'+
+      '<input id="cpOTitleEn" dir="ltr" placeholder="e.g. Two shaft & roller sets" value="'+esc(rec?rec.titleEn||"":"")+'"></div>'+
     '<div class="clm-actions"><button class="btn" onclick="closeModal()">انصراف</button>'+
       '<button class="btn primary" onclick="cpSaveOrder()">'+(editing?"به‌روزرسانی":"افزودن سفارش")+'</button></div>'+
   '</div>';
@@ -372,19 +374,20 @@ function cpOpenProjectModal(op){
 
 async function cpSaveOrder(){
   if(!_cp.client){ toast("ابتدا مشتری را انتخاب کنید.",true); return; }
-  var title=val("cpOTitle").trim();
+  var title=val("cpOTitle").trim(), titleEn=val("cpOTitleEn").trim();
+  if(!title||!titleEn){ toast("توضیح فارسی و توضیح انگلیسی سفارش هر دو لازم است.",true); return; }   // CAD Studio توضیح انگلیسی را نشان می‌دهد
   /* در حالت ویرایش، سفارش موجود را برمی‌داریم تا «تاریخ ایجاد» و «ثبت‌کنندهٔ» اولیه حفظ شود
      (ارسال date به بک‌اند باعث می‌شود حتی نسخهٔ منتشرنشدهٔ قبلی هم تاریخ را بازننویسد). */
   var prev=_cp.editingOrder ? DB.orders.find(function(x){
     return x.clientCode===_cp.client && pad2(x.orderNo)===pad2(_cp.editingOrder); }) : null;
-  var payload={clientCode:_cp.client, title:title};
+  var payload={clientCode:_cp.client, title:title, titleEn:titleEn};
   if(_cp.editingOrder) payload.orderNo=_cp.editingOrder;
   if(prev && prev.date) payload.date=prev.date;
   var r=await api("saveOrder",payload);
   if(!r.ok){ toast(r.message||"ذخیره ناموفق",true); return; }
   var on=r.orderNo;
   localUpsert(DB.orders,function(x){return x.clientCode===_cp.client&&pad2(x.orderNo)===pad2(on);},
-    {clientCode:_cp.client,orderNo:on,title:title,
+    {clientCode:_cp.client,orderNo:on,title:title,titleEn:titleEn,
      date:(prev&&prev.date)||todayISO(), createdBy:(prev&&prev.createdBy)||ME.username});
   _cp.editingOrder=""; _cp.order=pad2(on);
   closeModal(); localRefresh(); toast("سفارش "+on+" ذخیره شد");
@@ -398,6 +401,7 @@ async function cpSaveProject(){
   var orderNo=pad2(parts[0]);
   if(!orderNo){ toast("سفارش نامشخص است.",true); return; }
   var desc=val("cpPrDesc").trim(), descEn=val("cpPrEn").trim();
+  if(!desc||!descEn){ toast("نام فارسی و نام انگلیسی پروژه هر دو لازم است.",true); return; }   // هیچ پروژه‌ای بی‌نام ثبت نشود (CAD Studio نام انگلیسی را نشان می‌دهد)
   var payload={clientCode:_cp.client, orderNo:orderNo, nameFa:desc, nameEn:descEn};
   if(editing) payload.projectNo=parts[1];
   var r=await api("saveProject",payload);
@@ -482,7 +486,7 @@ async function cpSaveClientModal(code){
   var codeVal=(editing?code:val("clmCode")).trim().toUpperCase();
   var name=val("clmName").trim();
   var nameEn=val("clmNameEn").trim();
-  if(!codeVal||!name){ toast("کد و نام مشتری لازم است.",true); return; }
+  if(!codeVal||!name||!nameEn){ toast("کد، نام و نام لاتین مشتری لازم است.",true); return; }
   var payload={code:codeVal,name:name,nameEn:nameEn};
   if(_cp.logoData!==undefined) payload.logo=_cp.logoData; // "" پاک می‌کند، dataURL تنظیم می‌کند
   var r=await api("saveClient",payload);
@@ -1622,6 +1626,7 @@ function psedResetOrder(){
 async function saveProjectSpecs(){
   if(!PSED) return;
   var c=PSED.c,o=PSED.o,pr=PSED.pr, p=findProject(c,o,pr); if(!p) return;
+  if(!String(PSED.name||"").trim()||!String(PSED.nameEn||"").trim()){ toast("نام فارسی و نام انگلیسی پروژه هر دو لازم است.",true); return; }
   var root=specsRoot(p);
   root.tpl=root.tpl||{}; root.tpl.category=String(PSED.category||"").trim();
   root.projDocTypes=PSED.projDocs.filter(function(x){ return x.on; }).map(function(x){ return x.code; });
