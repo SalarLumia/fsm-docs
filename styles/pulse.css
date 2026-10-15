@@ -1,0 +1,13 @@
+/* ═══ پالس واحد سامانه ═══
+   هر نقطهٔ پالس‌دار (کارت‌های شاخص داشبورد، فعالیت اخیر، نقطهٔ قطعه در پنل پروژه، بنر رد، مرحلهٔ فعلی گردش کار
+   و CAD Studio) فقط کلاس fsm-ping می‌گیرد؛ زمان، شتاب، اندازهٔ نهایی و کم‌رنگ‌شدن از همین یک‌جا می‌آید.
+   حلقه به لبه‌های خود نقطه چسبیده (inset منفی) و دور مرکز خودش بزرگ می‌شود؛ هیچ «۵۰٪» در کار نیست.
+   ⚠ روش قبلی (left/top:50% + translate(-50%,-50%)) برای نقطهٔ با اندازهٔ فرد (۷px) مرکز را ۳٫۵px می‌گرفت و
+   مرورگر آن نیم‌پیکسل را گرد می‌کرد: حلقه دقیقاً ۰٫۵px کج بود (اندازه‌گیری‌شده در مقیاس ۱، ۱٫۲۵ و ۱٫۵ صفحه).
+   رنگ حلقه = color خود نقطه (currentColor). حلقه پیش‌فرض ۲px از هر طرف بیرون‌تر از نقطه است؛
+   نقطه‌ای که لازم دارد با --ping-pad عوضش می‌کند. */
+.fsm-ping{position:relative}
+.fsm-ping::after{content:"";position:absolute;inset:calc(-1 * var(--ping-pad,2px));border-radius:50%;border:2px solid currentColor;
+  opacity:.7;transform:scale(.4);pointer-events:none;animation:fsmPing 1.7s cubic-bezier(0,0,.2,1) infinite}
+@keyframes fsmPing{0%{transform:scale(.4);opacity:.7}58%{opacity:0}100%{transform:scale(2.6);opacity:0}}
+@media(prefers-reduced-motion:reduce){.fsm-ping::after{animation:none;opacity:0}}

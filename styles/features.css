@@ -199,14 +199,8 @@
 .dm-reject{background:var(--err-bg);border:1px solid var(--err-line);border-radius:9px;
   padding:10px 12px 11px;margin-bottom:14px}
 .dm-reject-t{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--err)}
-.dm-reject-dot{position:relative;width:7px;height:7px;border-radius:50%;background:var(--err);flex-shrink:0}
-.dm-reject-dot::after{content:"";position:absolute;left:50%;top:50%;width:7px;height:7px;border-radius:50%;
-  border:2px solid var(--err);transform:translate(-50%,-50%) scale(.4);opacity:.6;
-  pointer-events:none;animation:dmRejectPing 1.7s cubic-bezier(0,0,.2,1) infinite}
-@keyframes dmRejectPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}
-  58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
+.dm-reject-dot{position:relative;width:7px;height:7px;border-radius:50%;background:var(--err);color:var(--err);flex-shrink:0}
 .dm-reject-note{margin-top:5px;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.7}
-@media(prefers-reduced-motion:reduce){.dm-reject-dot::after{animation:none;opacity:0}}
 /* بنر «ویرایش جدیدتر تأیید شده» — هم‌ساختار بنر رد، ولی زرد/هشدار نه قرمز/خطا:
    وضعیت سند غلط نیست، فقط نسخهٔ تازه‌تری هست. */
 .dm-newer{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:9px;
@@ -386,11 +380,8 @@
   box-sizing:border-box;flex-shrink:0;margin-top:5px;z-index:1}
 .wf-step.done .wf-ring{background:var(--wf,var(--brand));border-color:var(--wf,var(--brand))}
 /* مرحلهٔ فعلی: حلقهٔ شعاعی متحرک، دقیقاً مثل نقطهٔ فعالیت اخیر داشبورد (.tl-dot) */
-.wf-step.active .wf-ring::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;
-  border:2px solid var(--wf,var(--brand));transform:translate(-50%,-50%) scale(.4);opacity:.6;pointer-events:none;
-  animation:wfPing 1.7s cubic-bezier(0,0,.2,1) infinite}
-@keyframes wfPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
-@media(prefers-reduced-motion:reduce){.wf-step.active .wf-ring::after{animation:none;opacity:0}}
+.wf-step.active .wf-ring{color:var(--wf,var(--brand))}
+.wf-step:not(.active) .wf-ring::after{content:none}   /* پالس (styles/pulse.css) فقط روی مرحلهٔ فعلی */
 /* ⚠ فاصلهٔ خط تا نقطهٔ بالا و پایین برابر (۵px): بالا = margin-top همین خط؛ پایین = margin-top 
    نقطهٔ مرحلهٔ بعد (.wf-ring). پس margin-bottom صفر است — قبلاً ۱۶px بود و پایین خط ۲۱px از نقطهٔ بعدی فاصله داشت. */
 .wf-line{flex:1;width:2px;background:var(--line);min-height:10px;margin:5px 0 0;border-radius:1px}

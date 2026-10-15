@@ -38,19 +38,10 @@
 /* نقطهٔ هر کارت با انیمیشن پالس (هم‌الگوی نقطهٔ فعالیت اخیر داشبورد)، رنگش بسته به کارت شخصی‌سازی می‌شود:
    پروژه‌های فعال=نارنجی، اسناد ثبت‌شده=خاکستری، اسناد تأییدشده=سبز، در انتظار بازبینی=زرد */
 .kpi-dot{position:relative;width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--muted)}
-.kpi-dot::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:11px;border-radius:50%;
-  /* ⚠ box-sizing:border-box لازم است تا حاشیه به اندازه اضافه نشود؛
-     وگرنه translate(-50%) روی عرض واقعی حساب نمی‌شود و پالس از مرکز خارج می‌زند.
-     عرض هم 11px می‌ماند (نه 7) تا ضخامت دیده‌شدهٔ حلقه مثل قبل پررنگ باشد. */
-  box-sizing:border-box;
-  border:2px solid currentColor;opacity:.7;transform:translate(-50%,-50%) scale(.4);
-  pointer-events:none;animation:kpiPing 1.7s cubic-bezier(0,0,.2,1) infinite}
-@keyframes kpiPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.7}58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
 .kf-brand .kpi-dot{background:var(--brand);color:var(--brand)}
 .kf-gray  .kpi-dot{background:var(--charcoal);color:var(--charcoal)}
 .kf-ok    .kpi-dot{background:var(--ok);color:var(--ok)}
 .kf-warn  .kpi-dot{background:#eab308;color:#eab308}   /* زرد — نه کهربایی، تا با نارنجی برند اشتباه نشود */
-@media(prefers-reduced-motion:reduce){.kpi-dot::after{animation:none;opacity:0}}
 
 /* ===== ورود آبشاری عمومی صفحات ===== */
 /* کد JS (playTabReveal) هنگام ورود به هر تب، به بلوک‌های سطح‌بالای آن کلاس rv-in و
@@ -278,13 +269,8 @@
 .tl-item{display:flex;align-items:stretch;gap:8px;padding:9px 0;direction:rtl}   /* stretch تا خط تا ته متن (دو خط) کشیده شود */
 .tl-marker{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px;padding-top:3px}
 .tl-dot{position:relative;width:12px;height:12px;border-radius:50%;background:var(--brand);border:2px solid #fff;flex-shrink:0}
-/* حلقهٔ نارنجی کم‌رنگ که مثل رادار/آلارم از مرکز نقطه بیرون می‌زند و تکرار می‌شود */
-.tl-dot::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;border-radius:50%;
-  border:2px solid rgba(247,148,31,.55);transform:translate(-50%,-50%) scale(.4);opacity:.6;
-  pointer-events:none;animation:tlPing 1.7s cubic-bezier(0,0,.2,1) infinite}
-@keyframes tlPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.6}
-  58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2);opacity:0}}
-@media(prefers-reduced-motion:reduce){.tl-dot::after{animation:none;opacity:0}}
+/* پالس: styles/pulse.css (fsm-ping)؛ حلقه هم‌اندازهٔ داخل نقطه (۱۲px)، نه بزرگ‌تر */
+.tl-dot{color:var(--brand);--ping-pad:0px}
 .tl-line{flex:1;width:2px;background:var(--line);border-radius:2px;min-height:18px;margin-top:4px;
   transform:scaleY(.75) translateY(8px);transform-origin:top}   /* هم‌اندازهٔ خط مودال: ۲۵٪ از پایین کوتاه‌تر، بالا ثابت؛ +۶px از پایین (translateY درون فضای مقیاس‌شده اجرا می‌شود، پس مقدار را بر ۰٫۷۵ تقسیم کردم تا اثر بصری واقعی ۶px شود) */
 .tl-body{flex:1;min-width:0}

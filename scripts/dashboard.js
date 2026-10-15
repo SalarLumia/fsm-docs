@@ -315,14 +315,14 @@ function activityItemHTML(ev, isLast, asCard){
   if(asCard){
     // نسخهٔ کارت (مودال «همهٔ فعالیت‌ها») — هم‌شکل کارتابل بازبینی؛ تاریخ بالا کنار شمارهٔ سند (سمت چپ)
     return '<div class="rq-item">'+
-      '<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>'+
+      '<div class="rq-marker"><div class="tl-dot fsm-ping"></div><div class="rq-line"></div></div>'+
       '<div class="rq-main">'+
         '<div class="rq-head-row"><div class="rq-num mono" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+dateHTML+'</div>'+
         body+
       '</div></div>';
   }
   return '<div class="tl-item">'+
-    '<div class="tl-marker"><div class="tl-dot"></div><div class="tl-line"></div></div>'+
+    '<div class="tl-marker"><div class="tl-dot fsm-ping"></div><div class="tl-line"></div></div>'+
     '<div class="tl-body">'+
       '<div class="rq-head-row"><div class="tl-num" onclick="openDocDetail(\''+esc(ev.drawingNumber)+'\')">'+esc(ev.drawingNumber)+'</div>'+dateHTML+'</div>'+
       body+

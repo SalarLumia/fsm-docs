@@ -158,16 +158,6 @@
 /* نقطهٔ نارنجی پالس‌دار پیش نام قطعه — همان الگوی نقطهٔ کارت‌های شاخص داشبورد */
 .spec-dot{position:relative;width:7px;height:7px;border-radius:50%;flex-shrink:0;
   background:var(--brand);color:var(--brand)}
-.spec-dot::after{content:"";position:absolute;left:50%;top:50%;width:11px;height:11px;border-radius:50%;
-  /* ⚠ box-sizing:border-box لازم است تا حاشیه به اندازه اضافه نشود؛
-     وگرنه translate(-50%) روی عرض واقعی حساب نمی‌شود و پالس از مرکز خارج می‌زند.
-     عرض هم 11px می‌ماند (نه 7) تا ضخامت دیده‌شدهٔ حلقه مثل قبل پررنگ باشد. */
-  box-sizing:border-box;
-  border:2px solid currentColor;opacity:.7;transform:translate(-50%,-50%) scale(.4);
-  pointer-events:none;animation:specPing 1.7s cubic-bezier(0,0,.2,1) infinite}
-@keyframes specPing{0%{transform:translate(-50%,-50%) scale(.4);opacity:.7}
-  58%{opacity:0}100%{transform:translate(-50%,-50%) scale(2.6);opacity:0}}
-@media(prefers-reduced-motion:reduce){.spec-dot::after{animation:none;opacity:0}}
 /* دکمهٔ ویرایش همین قطعه — جای نام انگلیسی پیشین */
 .spec-edit{flex-shrink:0;margin-inline-start:auto}
 .spec-body{flex:1;border-top:1px solid var(--line);background:#fff;padding:2px var(--sp-3) var(--sp-3)}

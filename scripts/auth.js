@@ -416,16 +416,6 @@ async function startApp(){
   // سند QR ممکن است تازه باشد و در دادهٔ ذخیره‌شده نباشد؛ پس با دادهٔ تازه باز می‌شود
   if(typeof consumePendingRoute==="function") consumePendingRoute();
 }
-/* دادهٔ بوت‌استرپ (یا نسخهٔ ذخیره‌شده‌اش) → DB */
-function applyBootData(r){
-  DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
-  DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
-  DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
-  DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسناد حذف‌شده، برای معنا‌دار ماندن رویدادهای گذشته
-  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[]; DB.positions=r.positions||[];
-  DB.instanceCounts=r.instanceCounts||{};
-  DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردن همان بخش گرفته می‌شوند
-}
 /* امضای کامل دادهٔ بوت‌استرپ — dataSig به‌علاوهٔ بخش‌هایی که فقط هنگام شروع می‌آیند */
 function bootSig(x){
   return dataSig(x)+JSON.stringify([x.users||[],x.instanceCounts||{},x.suppliers||[],x.rawTypes||[],x.heatTreats||[],x.processes||[],x.positions||[]]);

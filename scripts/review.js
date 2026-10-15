@@ -51,7 +51,7 @@ async function confirmReject(num){
 /* یک ردیف کارتابل بازبینی (مشترک بین داشبورد و پنجرهٔ «مشاهدهٔ همه») */
 function reviewItemHTML(d, canAct, withDot){
   return '<div class="rq-item">'+
-    (withDot?'<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>':'')+   // دایرهٔ متحرک + خط، فقط در مودال بازشده
+    (withDot?'<div class="rq-marker"><div class="tl-dot fsm-ping"></div><div class="rq-line"></div></div>':'')+   // دایرهٔ متحرک + خط، فقط در مودال بازشده
     '<div class="rq-main"><div class="rq-num mono" onclick="openDocDetail(\''+esc(d.drawingNumber)+'\')">'+esc(d.drawingNumber)+'</div>'+
     '<div class="rq-meta">'+esc(docPhrase(d))+'</div></div>'+
     '<div class="rq-actions">'+
@@ -142,7 +142,7 @@ function openSingleReviewTray(num){
       rejectIconBtn("srtReject('"+esc(num)+"')")
     : viewIconBtn("openDocDetail('"+esc(num)+"')");
   var row='<div class="rq-item">'+
-    '<div class="rq-marker"><div class="tl-dot"></div><div class="rq-line"></div></div>'+
+    '<div class="rq-marker"><div class="tl-dot fsm-ping"></div><div class="rq-line"></div></div>'+
     '<div class="rq-main"><div class="rq-num mono">'+esc(num)+'</div>'+
     '<div class="rq-meta">'+esc(docPhrase(d))+'</div></div>'+
     '<div class="rq-actions">'+actsHTML+'</div></div>';

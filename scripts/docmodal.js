@@ -206,7 +206,7 @@ function dmMetaHTML(d){
 function dmRejectHTML(d){
   return (String(d.status||"").toLowerCase()==="rejected")
     ? '<div class="dm-reject">'+
-        '<div class="dm-reject-t"><span class="dm-reject-dot"></span>این سند نیاز به اعمال تغییرات دارد.</div>'+
+        '<div class="dm-reject-t"><span class="dm-reject-dot fsm-ping"></span>این سند نیاز به اعمال تغییرات دارد.</div>'+
         '<div class="dm-reject-note">'+(d.reviewNote?esc(d.reviewNote):'دلیلی ثبت نشده است.')+'</div>'+
       '</div>'
     : '';
@@ -523,7 +523,7 @@ function workflowStepsHTML(num){
   return '<div class="wf-timeline">'+steps.map(function(s,i){
     var last=(i===steps.length-1);
     return '<div class="wf-step '+(s.done?"done":"todo")+(s.active?" active":"")+'">'+
-      '<div class="wf-rail"><span class="wf-ring"'+((s.done&&s.color)?(' style="--wf:'+s.color+'"'):'')+'></span>'+(last?'':'<span class="wf-line"></span>')+'</div>'+
+      '<div class="wf-rail"><span class="wf-ring fsm-ping"'+((s.done&&s.color)?(' style="--wf:'+s.color+'"'):'')+'></span>'+(last?'':'<span class="wf-line"></span>')+'</div>'+
       /* ساختار دو‌خطی «فعالیت‌های اخیر»: توضیح و نام در یک ظرف واحد می‌آیند و
          wfFixLines پس از رندر تصمیم می‌گیرد نام به خط دوم مستقل برود (توضیح
          یک‌خطی) یا در ادامهٔ خط دوم پشت جداکننده بنشیند (توضیح دو‌خطی). */

@@ -121,6 +121,54 @@ function clientsSorted(){ return DB.clients.slice().sort(function(a,b){
    ردیف‌شان در برگه می‌ماند تا فایل‌های سه‌بعدی قدیمیِ هنوز منتقل‌نشده نامشان را داشته باشند. */
 function isRetiredType(code){ return String(code||"").toUpperCase().indexOf("3D")===0; }
 function docTypesSorted(){ return DB.docTypes.filter(function(t){ return !isRetiredType(t.code); }).sort(byCode); }
+/* ترتیب ثابت اسناد سطح پروژه؛ انواع ناشناخته پس از این ترتیب می‌آیند (به ترتیب تنظیمات) */
+var PROJ_DOC_ORDER=["AS","PS","QP","MTC"];
+/* ═══ ترتیب پیش‌فرض انواع سند (از «تنظیمات ◂ انواع اسناد» با کشیدن) ═══
+   مبنا ستون order است. تا وقتی مدیر هنوز ترتیبی نچیده (order خالی)، ترتیب قدیمی حفظ می‌شود:
+   سطح پروژه → PROJ_DOC_ORDER؛ سطح قطعه → «نقشهٔ رفرنس» اول؛ سپس کد. */
+function docTypeOrderVal(t){ var v=t&&t.order; return (v===""||v==null||isNaN(Number(v)))?null:Number(v); }
+function docTypesDefault(scope){
+  var types=docTypesSorted().filter(function(t){ return (t.scope==="project")===(scope==="project"); });
+  var rank=function(t){ var cd=String(t.code).toUpperCase();
+    if(scope==="project"){ var i=PROJ_DOC_ORDER.indexOf(cd); return i<0?PROJ_DOC_ORDER.length:i; }
+    return cd===RD_CODE?0:1; };
+  return types.map(function(t,i){ return {t:t,i:i,o:docTypeOrderVal(t),r:rank(t)}; })
+    .sort(function(a,b){
+      if(a.o!==null&&b.o!==null&&a.o!==b.o) return a.o-b.o;
+      if((a.o===null)!==(b.o===null)) return a.o===null?1:-1;   // دارای order پیش از بی‌order
+      return a.r!==b.r ? a.r-b.r : a.i-b.i; })
+    .map(function(x){ return x.t; });
+}
+function orderedProjectTypes(){ return docTypesDefault("project"); }
+/* دادهٔ بوت‌استرپ (یا نسخهٔ ذخیره‌شده‌اش) → DB */
+function applyBootData(r){
+  DB.clients=r.clients||[]; DB.orders=r.orders||[]; DB.projects=r.projects||[];
+  DB.parts=r.parts||[]; DB.docTypes=r.docTypes||[]; DB.documents=r.documents||[]; DB.users=r.users||[];
+  DB.templates=r.templates||[]; DB.workflow=r.workflow||[]; DB.partMods=r.partMods||[];
+  DB.trashedDocs=r.trashedDocs||[];   // شناسنامهٔ اسناد حذف‌شده، برای معنا‌دار ماندن رویدادهای گذشته
+  DB.suppliers=r.suppliers||[]; DB.rawTypes=r.rawTypes||[]; DB.materials=r.materials||[]; DB.heatTreats=r.heatTreats||[]; DB.processes=r.processes||[]; DB.positions=r.positions||[];
+  DB.instanceCounts=r.instanceCounts||{};
+  DB.instances=[]; DB.instancesLoaded=false;   // رکوردهای ردیابی با بازکردن همان بخش گرفته می‌شوند
+}
+/* آیکن‌های سربرگ کارت‌ها (خطی، هم‌زبان نظام طراحی) — در هسته، تا CAD Studio هم همین‌ها را بخواند */
+var SEC_IC_DOC='<svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>';
+var SEC_IC_PART='<svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>';
+var SEC_IC_SPEC='<svg viewBox="0 0 24 24"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="14" y2="18"/></svg>';
+var SEC_IC_INFO='<svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>';
+/* آیکون سفارش عمداً «سبد خرید» شد تا با آیکون سند (SEC_IC_DOC) یکسان به‌نظر نرسد */
+var SEC_IC_ORDERS='<svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>';
+var SEC_IC_PROJ='<svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>';
+/* آیکون مشتری (ساختمان) — تک‌منبع؛ در ریل مشتریان و در ویزارد ثبت سند استفاده می‌شود */
+var SEC_IC_CLIENT='<svg viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16"/><path d="M15 21v-7h4v7"/><line x1="8" y1="7" x2="10" y2="7"/><line x1="8" y1="11" x2="10" y2="11"/><line x1="8" y1="15" x2="10" y2="15"/></svg>';
+/* نام انگلیسی قطعه — برای رابط انگلیسی (CAD Studio). قطعهٔ ۰۰ قطعه نیست و همتای «سند پروژه» را می‌گیرد؛
+   ستون name برگهٔ Parts خودش انگلیسی است. */
+function partNameEn(no){ if(pad2(no)==="00")return"Project level"; var p=partRec(no); return p?(p.name||pad2(no)):pad2(no); }
+/* نام هر گروه مدل سه‌بعدی (منوی قطعات ویوئر پروژه و CAD Studio): مدل سطح پروژه (قطعهٔ ۰۰) کل مجموعه است، پس Assembly؛
+   بقیه نام قطعه. عمداً کوتاه و هم‌وزن نام قطعه‌ها (Shaft، Drive Pinion)، نه نام کامل نوع سند. */
+function modelPartName(no){ return pad2(no)==="00" ? "Assembly" : partNameEn(no); }
+/* نام انگلیسی سمت کاربر از فهرست سمت‌ها (Positions.nameEn)؛ اگر ثبت نشده، خالی */
+function positionNameEn(fa){ var k=String(fa||"").trim(); if(!k) return "";
+  var p=(DB.positions||[]).find(function(x){ return String(x.nameFa||"").trim()===k; }); return p?String(p.nameEn||"").trim():""; }
 /* فهرست اصلی ماژول‌های اطلاعات قطعه (سراسری)، مرتب بر اساس order سپس نام */
 function partModsSorted(){ return (DB.partMods||[]).filter(function(m){ return String(m.active).toLowerCase()!=="false" && String(m.nameFa||"").trim()!==""; })
   .slice().sort(function(a,b){ var d=(Number(a.order)||0)-(Number(b.order)||0); return d!==0?d:String(a.nameFa).localeCompare(String(b.nameFa),"fa"); }); }
