@@ -569,7 +569,9 @@ function renderOptList(k){
   var L=OPT_LISTS[k], host=document.getElementById(L.body); if(!host) return;
   host.innerHTML=optSorted(k).map(function(m){
     var n=String(m.name), u=optUseCount(k,n);
-    return "<tr "+mgRowAttrs(n,"")+"><td><div class='pm-cell'><span class='el-badge'>"+OPT_EL_SVG[k]+"</span><span class='mat-grade'>"+esc(n)+"</span></div></td>"+
+    var cast=k==="proc" && procIsCasting(m);
+    return "<tr "+mgRowAttrs(n,"")+"><td><div class='pm-cell'><span class='el-badge'>"+OPT_EL_SVG[k]+"</span><span class='mat-grade'>"+esc(n)+"</span>"+
+      (cast?"<span class='tag opt-cast'>ریخته‌گری</span>":"")+"</div></td>"+
       "<td class='c-mid'>"+(u?faN(u)+" قطعه":"—")+"</td>"+
       "<td class='col-act'><div class='row-actions'>"+editIconBtn("openOptModal('"+k+"','"+esc(n)+"')")+
         delIconBtn("del('"+L.del+"',{name:'"+esc(n)+"'})")+mgGripHTML()+"</div></td></tr>";
@@ -583,6 +585,10 @@ function openOptModal(k, name){
     '<div class="um-row"><div class="um-field"><label class="fld">'+esc(L.field)+'</label>'+
       '<input id="optName" style="direction:ltr;text-align:left" placeholder="'+esc(L.ph)+'" value="'+esc(m?m.name:"")+'" '+
       'onkeydown="if(event.key===\'Enter\')saveOptItem()"></div></div>'+
+    /* فقط فرآیند تولید: آیا این فرآیند قطعه را ریختگی می‌کند (برای بخش‌های ریخته‌گری CAD Studio) */
+    (k==="proc" ? '<div class="ed-doc-row opt-cast-row'+(procIsCasting(m)?'':' off')+'" onclick="optCastToggle()">'+
+      '<button type="button" id="optCast" class="ed-check'+(procIsCasting(m)?' on':'')+'" role="checkbox" aria-checked="'+(procIsCasting(m)?'true':'false')+'" aria-label="ریخته‌گری"></button>'+
+      '<span class="ed-name"><span>ریخته‌گری</span></span><span class="opt-cast-hint">قطعه‌ای با این فرآیند ریختگی حساب می‌شود</span></div>' : '')+
     '<div class="um-actions">'+
       '<button class="btn" onclick="closeModal()">انصراف</button>'+
       '<button class="btn primary" onclick="saveOptItem()">'+(m?"ذخیرهٔ تغییرات":"افزودن")+'</button>'+
@@ -597,6 +603,8 @@ async function saveOptItem(){
   var old=_optEdit.old, arr=DB[L.arr]=DB[L.arr]||[];
   if(arr.some(function(x){ return optKey(x.name)===optKey(name) && String(x.name)!==old; })){ toast("این مورد قبلاً ثبت شده است.",true); return; }
   var payload={name:name}; if(old) payload.oldName=old;
+  var cb=document.getElementById("optCast"), cast=cb?cb.classList.contains("on"):undefined;
+  if(cast!==undefined) payload.casting=cast;
   var r=await api(L.save,payload);
   if(!r||!r.ok){ toast((r&&r.message)||"ذخیره ناموفق بود",true); return; }
   /* تغییر نام: پیش از عوض‌کردن فهرست، قطعه‌هایی که نام قدیمی را دارند پیدا می‌شوند (با فهرست قدیمی) */
@@ -610,11 +618,16 @@ async function saveOptItem(){
   arr.forEach(function(x,i){ if(String(x.name)===(old||name)){ ord=Number(x.order)||0; idx=i; } });
   if(old && idx>=0) arr.splice(idx,1);
   else if(!old){ var mx=0; arr.forEach(function(x){ var n=Number(x.order)||0; if(n>mx)mx=n; }); ord=mx+1; }
-  localUpsert(arr,function(x){ return String(x.name)===name; },{name:name,active:true,order:ord});
+  var row={name:name,active:true,order:ord}; if(cast!==undefined) row.casting=cast;
+  localUpsert(arr,function(x){ return String(x.name)===name; },row);
   if(renames.length) await migrateOptRename(k, renames, old, name);
   closeModal(); localRefresh(); toast(L.title+" "+(old?"به‌روزرسانی شد":"افزوده شد"));
 }
 /* نام تازه در مقدار قطعه‌هایی که نام قدیمی را داشتند، هر پروژه یک ذخیره */
+function optCastToggle(){
+  var b=document.getElementById("optCast"); if(!b) return; var on=!b.classList.contains("on");
+  b.classList.toggle("on",on); b.setAttribute("aria-checked",on); b.closest(".ed-doc-row").classList.toggle("off",!on);
+}
 async function migrateOptRename(k, list, oldName, newName){
   var label=OPT_LISTS[k].label, byProj=[];
   list.forEach(function(x){ var names=x.hp.names.map(function(n){ return n===oldName?newName:n; });

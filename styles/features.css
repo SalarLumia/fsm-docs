@@ -901,6 +901,10 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* سلول نام پارامتر = المان مرجع + نام، عیناً مثل سلول کاربر (.u-cell): بج ۳۰px روی [۱۴،۴۴]، گپ ۱۱، نام روی ۵۵px */
 .pm-cell{display:flex;align-items:center;gap:11px}
 .pm-cell .el-badge{flex-shrink:0}
+/* v45: فرآیند تولیدی که قطعه را ریختگی می‌کند — تگ خنثی (نارنجی فقط برند و تعامل است) + ردیف کلید در پنجرهٔ ویرایش */
+.pm-cell .tag.opt-cast{background:#f3f2f0;border-color:var(--line);color:var(--muted);flex-shrink:0}
+.opt-cast-row{cursor:pointer;margin-top:var(--sp-3);border-bottom:none}
+.opt-cast-row .opt-cast-hint{margin-inline-start:auto;font-size:11.5px;font-weight:500;color:var(--muted)}
 /* آیکون برچسب پارامتر کمی کوچک‌تر از آیکون اسناد (کادر همان ۳۰px می‌ماند تا هم‌ترازی نخورد) */
 .pm-cell .el-badge svg{width:17px;height:17px}
 /* ستون دوم از راست (دادهٔ لاتین: نام انگلیسی قطعه/سند/پارامتر + نام کاربری) در هر چهار جدول:

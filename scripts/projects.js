@@ -1273,40 +1273,7 @@ async function removeProjectPart(c,o,pr,pn){
 /* تابع goNewDocForProject (ثبت سند با پیش‌تنظیم پروژه/نوع/قطعه) اکنون در documents.js
    (ویزارد ریل شماره) تعریف شده است. */
 
-/* ============ مشخصات پروژه و قطعات — همه در p.specs (JSON) ذخیره می‌شوند ============
-   ساختار: { project:[{label,value,on}], partMods:[{label,unit,on}],
-             partVals:{"03":{"وزن":"96",...}}, partDocTypes:["MC","AC",...] }
-   سازگاری عقب‌رو: اگر p.specs یک آرایهٔ ساده بود، همان = ماژول‌های سطح پروژه. بدون تغییر بک‌اند. */
-function specsRoot(p){
-  var raw=p&&p.specs, root={project:[],partMods:null,partVals:{},partDocTypes:null,projDocTypes:null,projDocOrder:null,tpl:null,partModsByPart:null,partDocsByPart:null,
-    ordProjDocs:null,ordPartDocs:null,ordPartMods:null};
-  if(raw){ try{ var j=(typeof raw==="string")?JSON.parse(raw):raw;
-    if(Array.isArray(j)){ root.project=j; }
-    else if(j&&typeof j==="object"){
-      if(Array.isArray(j.project)) root.project=j.project;
-      if(Array.isArray(j.partMods)) root.partMods=j.partMods;
-      if(j.partVals&&typeof j.partVals==="object") root.partVals=j.partVals;
-      if(Array.isArray(j.partDocTypes)) root.partDocTypes=j.partDocTypes;
-      if(Array.isArray(j.projDocTypes)) root.projDocTypes=j.projDocTypes;
-      if(Array.isArray(j.projDocOrder)) root.projDocOrder=j.projDocOrder;   // ترتیب دلخواه نمایش اسناد سطح پروژه (شامل خاموش‌ها)
-      if(j.tpl&&typeof j.tpl==="object") root.tpl=j.tpl;
-      if(j.partModsByPart&&typeof j.partModsByPart==="object") root.partModsByPart=j.partModsByPart;   // پارامترهای per-part: {"03":["وزن",...]}
-      if(j.partDocsByPart&&typeof j.partDocsByPart==="object") root.partDocsByPart=j.partDocsByPart;   // انواع سند per-part: {"03":["MC",...]}
-      /* ترتیب اختصاصی همین پروژه — فقط وقتی کاربر در پنل پروژه واقعاً ردیفی را جابه‌جا کرده.
-         نبودنش یعنی «ترتیب پیش‌فرض تنظیمات». (projDocOrder و ترتیب درون partDocsByPart/partModsByPart
-         از نسخه‌های قبل‌اند و دیگر برای ترتیب خوانده نمی‌شوند: همهٔ پروژه‌های قبلی پیش‌فرض می‌گیرند.) */
-      if(Array.isArray(j.ordProjDocs)) root.ordProjDocs=j.ordProjDocs;
-      if(j.ordPartDocs&&typeof j.ordPartDocs==="object") root.ordPartDocs=j.ordPartDocs;
-      if(j.ordPartMods&&typeof j.ordPartMods==="object") root.ordPartMods=j.ordPartMods;
-    }
-  }catch(e){} }
-  /* انواع بازنشسته (3D/3DA) از فهرست اسناد الزامی پروژه بیرون می‌روند؛ با اولین ذخیرهٔ پروژه از داده هم پاک می‌شوند */
-  var live=function(a){ return Array.isArray(a) ? a.filter(function(x){ return !isRetiredType(x); }) : a; };
-  ["partDocTypes","projDocTypes","projDocOrder","ordProjDocs"].forEach(function(k){ root[k]=live(root[k]); });
-  ["partDocsByPart","ordPartDocs"].forEach(function(k){ var o=root[k]; if(!o) return;
-    var n={}; Object.keys(o).forEach(function(pn){ n[pn]=live(o[pn]); }); root[k]=n; });
-  return root;
-}
+/* specsRoot و partValsOf (خواندن p.specs) در state.js‌اند تا CAD Studio هم همان را بخواند */
 /* ماژول‌های سطح پروژه (دسته‌بندی پروژه و…) */
 function projectSpecs(p){
   return specsRoot(p).project.map(function(m){ return {label:String(m.label||m.key||""),value:String(m.value==null?"":m.value),on:m.on!==false}; });
@@ -1324,7 +1291,6 @@ function partModsOf(p){
   Object.keys(overlay).forEach(function(l){ if(!seen[l]){ seen[l]=1; out.push({label:l, on:overlay[l], legacy:true}); } });
   return out.length?out:partModsSeed();
 }
-function partValsOf(p,part){ var v=specsRoot(p).partVals[pad2(part)]; return (v&&typeof v==="object")?v:{}; }
 /* انواع سند سطح قطعه که این پروژه فعال کرده؛ اگر تعریف نشده، از enabledSlots قدیمی مهاجرت می‌شود */
 function partDocTypesOf(p){
   var r=specsRoot(p);
