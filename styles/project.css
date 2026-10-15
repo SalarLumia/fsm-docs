@@ -46,7 +46,7 @@
   border:1px solid var(--line);border-radius:var(--radius);overflow:visible}
 @media(max-width:1150px){.mband{grid-template-columns:1fr 1fr 1fr}}
 @media(max-width:660px){.mband{grid-template-columns:1fr 1fr}}
-.mcell{position:relative;padding:var(--sp-3) var(--sp-5);border-left:1px solid var(--line);
+.mcell{position:relative;padding:var(--sp-3) var(--sp-4);border-left:1px solid var(--line);
   display:flex;flex-direction:column;justify-content:center;gap:var(--sp-1);min-width:0}
 .mcell:last-child{border-left:none}
 @media(max-width:1150px){.mcell:nth-child(3n){border-left:none}}
@@ -68,12 +68,12 @@
 .mleg.ok i{background:var(--ok)}
 
 /* دونات درصد (چپ سلول، متن راست آن) */
-.mdonut{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-direction:row-reverse}
-.mtext{min-width:0;display:flex;flex-direction:column;gap:var(--sp-1)}
-.dwrap{position:relative;width:84px;height:84px;flex-shrink:0}
+.mdonut{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-direction:row-reverse}
+.mtext{flex:1;min-width:0;display:flex;flex-direction:column;gap:var(--sp-1)}
+.dwrap{position:relative;width:68px;height:68px;flex-shrink:0}
 /* ⚠ بدون transform: جهت و نقطهٔ شروع در خود مسیر قوس (دستور A) تعیین می‌شوند.
    چرخاندن ظرف با rotate/scaleX دوباره همان وابستگی قبلی را برمی‌گرداند. */
-.dwrap svg{width:84px;height:84px}
+.dwrap svg{width:68px;height:68px}
 .dwrap circle,.dwrap path{fill:none;stroke-width:4.5;stroke-linecap:round}
 .d-bg{stroke:#f0efeb}
 /* پرشدن نرم حلقه: مسیر همیشه کامل است و فقط dasharray عوض می‌شود — این
@@ -81,7 +81,7 @@
 .d-fg{transition:stroke-dasharray .8s cubic-bezier(.4,0,.2,1),stroke .5s,stroke-opacity .5s}
 @media(prefers-reduced-motion:reduce){.d-fg{transition:stroke .3s}}
 .dtxt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  font-size:19px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;pointer-events:none}
+  font-size:16px;font-weight:700;color:var(--txt);font-variant-numeric:tabular-nums;pointer-events:none}
 
 /* ===== تولتیپ گراف‌های نوار شاخص — عیناً جعبهٔ .sgt نوار پیشرفت داشبورد (dashboard.css) =====
    ظاهر جعبه از همان کلاس‌ها می‌آید؛ این‌جا فقط جای‌گیری و منطق نمایش تعریف می‌شود. */
