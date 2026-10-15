@@ -21,6 +21,9 @@ CLAUDE.md
 PROJECT-OVERVIEW.md
 CODE-AUDIT.md
 AGENT-WORKFLOW.md
+# قواعد کار با آنتی‌گرویتی (برگه‌های کار و دانسته‌ها در _dev/agents)
+AGENTS.md
+.agents/
 # خلاصهٔ اسنادِ محرمانهٔ یک شرکتِ ثالث و قیمت‌ها را دارد — مخزن عمومی است
 drawing-review-module-brief.md
 

@@ -369,7 +369,7 @@ async function startApp(){
   var snap=(typeof snapLoad==="function")?snapLoad():null;
   /* دادهٔ ذخیره‌شدهٔ خالی (بی مشتری، بی پروژه، بی سند) بازشدن فوری ندارد: اگر سرور هم جواب ندهد،
      داشبورد با «پروژه‌ای ثبت نشده» رسم می‌شد و به نظر می‌رسید پایگاه داده پاک شده.
-     پس مثل نبودِ داده رفتار می‌شود تا در قطعی، صفحهٔ «داده نرسیده» بیاید. */
+     پس مثل نبود داده رفتار می‌شود تا در قطعی، صفحهٔ «داده نرسیده» بیاید. */
   if(snap && !((snap.clients||[]).length || (snap.projects||[]).length || (snap.documents||[]).length)) snap=null;
   if(snap){ applyBootData(snap); showAppShell(true); }
   else lgStage2();   // متن دکمه: ورود موفق بود، حالا داده می‌آید

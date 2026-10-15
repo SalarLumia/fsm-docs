@@ -118,7 +118,7 @@ function clientOrderVal(c){ return (c.order===undefined||c.order===null||c.order
 function clientsSorted(){ return DB.clients.slice().sort(function(a,b){
   var d=clientOrderVal(a)-clientOrderVal(b); return d!==0?d:byCode(a,b); }); }
 /* انواع بازنشسته: مدل سه‌بعدی حالا جزو خود نقشه است (MC/AS)، پس 3D و 3DA دیگر نوع سند جدا نیستند.
-   ردیف‌شان در برگه می‌ماند تا فایل‌های سه‌بعدی قدیمیِ هنوز منتقل‌نشده نامشان را داشته باشند. */
+   ردیف‌شان در برگه می‌ماند تا فایل‌های سه‌بعدی قدیمی هنوز منتقل‌نشده نامشان را داشته باشند. */
 function isRetiredType(code){ return String(code||"").toUpperCase().indexOf("3D")===0; }
 function docTypesSorted(){ return DB.docTypes.filter(function(t){ return !isRetiredType(t.code); }).sort(byCode); }
 /* ترتیب ثابت اسناد سطح پروژه؛ انواع ناشناخته پس از این ترتیب می‌آیند (به ترتیب تنظیمات) */

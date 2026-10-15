@@ -1010,7 +1010,7 @@ function partMaterialEdit(el,c,o,pr,pn){
   _matDD={el:el,c:c,o:o,pr:pr,pn:pn,orig:raw,menu:menu};
   matDDListen();
 }
-/* جای منوی سفارشی: به body منتقل و fixed می‌شود تا لبهٔ کارت قطعه آن را نبُرد (و transform کارت جایش را به‌هم نزند)؛
+/* جای منوی سفارشی: به body منتقل و fixed می‌شود تا لبهٔ کارت قطعه آن را نبرد (و transform کارت جایش را به‌هم نزند)؛
    اگر پایین جا نبود، بالای دکمه باز می‌شود. مشترک میان منوی جنس و عملیات حرارتی. */
 function matDDPlace(el, dd){
   var trig=dd.querySelector(".mat-trig"), menu=dd.querySelector(".ed-part-menu");
