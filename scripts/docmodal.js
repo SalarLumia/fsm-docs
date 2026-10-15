@@ -674,7 +674,7 @@ async function dmSelectVersion(num, _retried){
   }
 }
 /* منوی نما «نقشه / مدل سه‌بعدی» گوشهٔ بالا-چپ پیش‌نمایش — عیناً منوی انتخاب قطعهٔ ویوئر پروژه (mv-picker)،
-   همیشه باز تا نام‌ها پنهان نشوند: ردیف نقشه (نام نوع سند) و ردیف مدل (نام قطعه)؛ ردیف فعلی روشن است.
+   همیشه باز تا نام‌ها پنهان نشوند: ردیف نقشه («Assembly Drawing») و ردیف مدل («Roller 3D»، قطعهٔ ۰۰ = Assembly)؛ ردیف فعلی روشن است.
    اگر مدل از ریویژن قبلی به اشتراک آمده، در حالت مدل زیر منو گفته می‌شود. */
 function dmRenderViewSwitch(d, canModel){
   var slot=document.getElementById("dmViewSw"); if(!slot) return;
@@ -683,7 +683,7 @@ function dmRenderViewSwitch(d, canModel){
   var row=function(v,ic,lab){ return '<button type="button" class="mv-pick'+((v==="model")===m?' on':'')+'" onclick="dmSetView(\''+v+'\')">'+
     ic+'<span class="mv-pick-lab">'+esc(lab)+'</span></button>'; };
   slot.innerHTML='<div class="dm-vsw"><div class="mv-picker expanded">'+
-    row("doc", SEC_IC_DOC, typeNameEn(d.typeCode)||"Drawing")+row("model", MV_LAYERS_IC, partName(d.partNo)||"3D Model")+'</div>'+
+    row("doc", SEC_IC_DOC, typeNameEn(d.typeCode)+" Drawing")+row("model", MV_LAYERS_IC, modelPartName(d.partNo)+" 3D")+'</div>'+
     (m && from ? '<span class="dm-vsw-from">مدل ریویژن '+Number(from).toLocaleString("fa-IR",{minimumIntegerDigits:2})+'</span>' : '')+
   '</div>';
 }
