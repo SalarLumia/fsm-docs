@@ -628,7 +628,7 @@ async function dmSelectVersion(num, _retried){
         host.innerHTML='<div class="mv-toolwrap">'+
           '<model-viewer id="dmMv" src="'+url+'" camera-controls touch-action="pan-y" shadow-intensity="1" exposure="0.95" '+
             'ar ar-modes="webxr scene-viewer quick-look" ar-scale="auto" alt="مدل سه‌بعدی" style="background:#f4f4f2"><button slot="ar-button" class="mv-ar"></button></model-viewer>'+
-          mvPartBadgeHTML(partName(d.partNo))+                                    // برچسب نام انگلیسی قطعه + آیکون سه‌بعدی
+          (canModel?'':mvPartBadgeHTML(partName(d.partNo)))+                      // برچسب نام قطعه؛ نقشهٔ دارای مدل آن را در کلید نما دارد
           (typeof mvToolbarHTML==="function"?mvToolbarHTML():'')+
         '</div>';
       } else {
@@ -673,16 +673,16 @@ async function dmSelectVersion(num, _retried){
     if(host) host.innerHTML=dmFailHTML(online?FAIL_RENDER:FAIL_ASSET, num);
   }
 }
-/* سوییچ «نقشه / مدل سه‌بعدی» گوشهٔ پیش‌نمایش. اگر مدل از ریویژن قبلی به اشتراک آمده، در حالت مدل گفته می‌شود. */
+/* کلید نما «نقشه ⇄ مدل سه‌بعدی» گوشهٔ بالا-چپ پیش‌نمایش: همان برچسب نام قطعه، که در هر دو حالت دیده می‌شود.
+   آیکون حالت فعلی را نشان می‌دهد و کلیک نما را عوض می‌کند. اگر مدل از ریویژن قبلی به اشتراک آمده، در حالت مدل گفته می‌شود. */
+var DM_SWAP_IC='<svg class="dm-vt-sw" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
 function dmRenderViewSwitch(d, canModel){
   var slot=document.getElementById("dmViewSw"); if(!slot) return;
   if(!canModel){ slot.innerHTML=""; return; }
   var from=docModelFromRev(d), m=_dm.view==="model";
   slot.innerHTML='<div class="dm-vsw">'+
-    '<div class="seg">'+
-      '<button type="button" class="seg-btn'+(m?'':' on')+'" onclick="dmSetView(\'doc\')">نقشه</button>'+
-      '<button type="button" class="seg-btn'+(m?' on':'')+'" onclick="dmSetView(\'model\')">مدل سه‌بعدی</button>'+
-    '</div>'+
+    '<button type="button" class="mv-partbadge dm-vtoggle" onclick="dmSetView(\''+(m?'doc':'model')+'\')" title="'+(m?'نمایش نقشه':'نمایش مدل سه‌بعدی')+'">'+
+      (m?MV_LAYERS_IC:SEC_IC_DOC)+'<span class="mv-pb-t">'+esc(partName(d.partNo))+'</span>'+DM_SWAP_IC+'</button>'+
     (m && from ? '<span class="dm-vsw-from">مدل ریویژن '+Number(from).toLocaleString("fa-IR",{minimumIntegerDigits:2})+'</span>' : '')+
   '</div>';
 }

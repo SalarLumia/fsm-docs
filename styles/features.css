@@ -1521,8 +1521,11 @@ body.boot-failed .app-main .tabpane{display:none!important}
 @keyframes bootSpin{to{transform:rotate(360deg)}}
 
 /* سوییچ «نقشه / مدل سه‌بعدی» بالای پیش‌نمایش سند — فقط برای نقشه‌ای که مدل دارد */
-.dm-vsw{position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:8px;pointer-events:none}
+.dm-vsw{position:absolute;top:12px;left:12px;z-index:6;direction:ltr;display:flex;align-items:center;gap:8px;pointer-events:none}
 .dm-vsw>*{pointer-events:auto}
-.dm-vsw .seg{box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.dm-vsw .seg-btn{padding:6px 14px}
+.dm-vtoggle{position:static;font:inherit;cursor:pointer;transition:.15s}
+.dm-vtoggle:hover{border-color:var(--brand);background:#fff8f0}
+.dm-vtoggle:hover svg,.dm-vtoggle:hover .mv-pb-t{stroke:var(--brand);color:var(--brand)}
+.dm-vtoggle:active{transform:translateY(1px)}
+.dm-vtoggle .dm-vt-sw{width:13px;height:13px;stroke:var(--muted);margin-left:2px}
 .dm-vsw-from{font-size:11px;font-weight:500;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
