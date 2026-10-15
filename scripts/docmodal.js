@@ -673,16 +673,17 @@ async function dmSelectVersion(num, _retried){
     if(host) host.innerHTML=dmFailHTML(online?FAIL_RENDER:FAIL_ASSET, num);
   }
 }
-/* کلید نما «نقشه ⇄ مدل سه‌بعدی» گوشهٔ بالا-چپ پیش‌نمایش: همان برچسب نام قطعه، که در هر دو حالت دیده می‌شود.
-   آیکون حالت فعلی را نشان می‌دهد و کلیک نما را عوض می‌کند. اگر مدل از ریویژن قبلی به اشتراک آمده، در حالت مدل گفته می‌شود. */
-var DM_SWAP_IC='<svg class="dm-vt-sw" viewBox="0 0 24 24"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>';
+/* منوی نما «نقشه / مدل سه‌بعدی» گوشهٔ بالا-چپ پیش‌نمایش — عیناً منوی انتخاب قطعهٔ ویوئر پروژه (mv-picker)،
+   همیشه باز تا نام‌ها پنهان نشوند: ردیف نقشه (نام نوع سند) و ردیف مدل (نام قطعه)؛ ردیف فعلی روشن است.
+   اگر مدل از ریویژن قبلی به اشتراک آمده، در حالت مدل زیر منو گفته می‌شود. */
 function dmRenderViewSwitch(d, canModel){
   var slot=document.getElementById("dmViewSw"); if(!slot) return;
   if(!canModel){ slot.innerHTML=""; return; }
   var from=docModelFromRev(d), m=_dm.view==="model";
-  slot.innerHTML='<div class="dm-vsw">'+
-    '<button type="button" class="mv-partbadge dm-vtoggle" onclick="dmSetView(\''+(m?'doc':'model')+'\')" title="'+(m?'نمایش نقشه':'نمایش مدل سه‌بعدی')+'">'+
-      (m?MV_LAYERS_IC:SEC_IC_DOC)+'<span class="mv-pb-t">'+esc(partName(d.partNo))+'</span>'+DM_SWAP_IC+'</button>'+
+  var row=function(v,ic,lab){ return '<button type="button" class="mv-pick'+((v==="model")===m?' on':'')+'" onclick="dmSetView(\''+v+'\')">'+
+    ic+'<span class="mv-pick-lab">'+esc(lab)+'</span></button>'; };
+  slot.innerHTML='<div class="dm-vsw"><div class="mv-picker expanded">'+
+    row("doc", SEC_IC_DOC, typeNameEn(d.typeCode)||"Drawing")+row("model", MV_LAYERS_IC, partName(d.partNo)||"3D Model")+'</div>'+
     (m && from ? '<span class="dm-vsw-from">مدل ریویژن '+Number(from).toLocaleString("fa-IR",{minimumIntegerDigits:2})+'</span>' : '')+
   '</div>';
 }
