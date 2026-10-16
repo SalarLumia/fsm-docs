@@ -181,16 +181,9 @@
     .settings-subitem{display:flex;align-items:center;gap:8px;min-height:34px;padding:5px 9px;color:var(--muted);font-size:11px;line-height:1.5}
     .settings-subitem-icon{width:15px;height:15px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-content{min-width:0}
-    .settings-group-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:0 1px 4px #00000008}
-    .settings-group-title{display:flex;align-items:center;gap:11px;min-width:0}
-    .settings-group-icon{display:grid;place-items:center;width:34px;height:34px;flex:none;border:1px solid var(--line);border-radius:9px;color:var(--brand)}
-    .settings-group-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .settings-group-title h2{margin:0;font-size:15px;line-height:1.5}
-    .settings-group-title p{margin:2px 0 0;color:var(--muted);font-size:11px}
-    .settings-group-count{flex:none;padding:4px 10px;border:1px solid var(--line);border-radius:20px;color:var(--muted);font-size:10.5px}
     .settings-cards{display:grid;gap:14px}
     .settings-content .spec-sec-t{height:54px;box-sizing:border-box;margin:calc(-1 * var(--sp-6)) calc(-1 * var(--sp-6)) 14px;padding:0 14px}
-    .settings-content.is-changing>.settings-group-head,.settings-content.is-changing .settings-cards>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
+    .settings-content.is-changing .settings-cards>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
     .settings-switch{min-height:42px;cursor:default}
     .settings-switch[hidden]{display:none!important}
     .settings-switch span{font-size:13px}
@@ -201,7 +194,7 @@
     @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}}
     @media(prefers-reduced-motion:reduce){
       .settings-nav-row::before{transition:none}
-      .settings-content.is-changing>.settings-group-head,.settings-content.is-changing .settings-cards>.card{animation:none}
+      .settings-content.is-changing .settings-cards>.card{animation:none}
     }
   </style>
 </head>
@@ -733,8 +726,7 @@
         '<tbody>'+settingsRows(setting)+'</tbody></table></div></section>';
     }
     function settingsGroupView(group){
-      return '<div class="settings-group-head"><div class="settings-group-title"><span class="settings-group-icon">'+settingsIcon(group.icon)+'</span><div><h2>'+settingsEscape(group.name)+'</h2><p>همهٔ فهرست‌های این گروه در یک صفحه</p></div></div><span class="settings-group-count">'+settingsFaNumber(group.settings.length)+' فهرست</span></div>'+
-        '<div class="settings-cards">'+group.settings.map(settingsCard).join("")+'</div>';
+      return '<div class="settings-cards">'+group.settings.map(settingsCard).join("")+'</div>';
     }
     function settingsOne(){
       var selectedGroup=settingsGroups.filter(function(group){return group.id===selectedSettingsGroup;})[0]||settingsGroups[0];
