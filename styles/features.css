@@ -996,7 +996,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 #tab-archive .arch-table thead th{position:static}
 /* همهٔ ستون‌ها وسط‌چین (تیتر + داده)؛ فونت یک‌دست ۱۲px برای همهٔ سلول‌های داده */
 .arch-table th,.arch-table td{text-align:center;vertical-align:middle}
-.arch-table tbody td{font-size:12px}
+.arch-table tbody td{font-size:var(--fs-body)}
 /* تیتر چسبان همیشه بالاتر از محتوای بدنه (آیکون z-3، خط نارنجی z-4، بج/متن‌های z-5)
    تا هنگام اسکرول، بج سفید بدنه از زیرش رد نشود و پس‌زمینهٔ طوسی تیتر بریده/سفید نشود */
 .arch-table thead th{z-index:6}
