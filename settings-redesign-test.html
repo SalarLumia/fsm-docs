@@ -161,7 +161,7 @@
     .settings-main{min-width:0}
     .settings-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
     .settings-index{position:sticky;top:76px;padding:0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008;overflow:hidden}
-    .settings-index-title{display:flex;align-items:center;gap:8px;height:54px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);color:var(--txt);font-size:14px;font-weight:700;line-height:1.7}
+    .settings-index-title{display:flex;align-items:center;gap:8px;height:54px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);line-height:1.7}
     .settings-index-title svg{width:16px;height:16px;flex:none;color:var(--brand);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     .settings-nav-list{padding:8px 10px}
     .settings-nav-group{margin-bottom:3px}
@@ -171,17 +171,17 @@
     .settings-nav-row::before{content:"";position:absolute;top:50%;inset-inline-start:0;width:3px;height:18px;border-radius:3px;background:var(--brand);transform:translateY(-50%) scaleY(0);transition:transform .22s}
     .settings-nav-row.active::before{transform:translateY(-50%) scaleY(1)}
     .settings-nav-row.active .settings-category{color:var(--brand)}
-    .settings-category{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);font:700 13px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:color .15s}
+    .settings-category{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);text-align:start;cursor:pointer;transition:color .15s}
     .settings-category:hover{color:var(--brand)}
     .settings-category:focus-visible,.settings-subitem:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
     .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
     .settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-category-label{flex:1}
     .settings-subnav{display:grid;gap:1px;margin:3px 0 7px;margin-inline-start:20px;border-inline-start:1.5px solid var(--line);padding-inline-start:3px}
-    .settings-subitem{position:relative;display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:400 11.5px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:background .15s,color .15s}
+    .settings-subitem{position:relative;display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--muted);text-align:start;cursor:pointer;transition:background .15s,color .15s}
     .settings-subitem-icon{width:16px;height:16px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:color .15s}
     .settings-subitem:hover{background:var(--panel);color:var(--txt)}
-    .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
+    .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:var(--fw-sub)}
     .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
     .settings-content{min-width:0}
     .settings-content .spec-sec-t{height:54px;box-sizing:border-box;margin:calc(-1 * var(--sp-6)) calc(-1 * var(--sp-6)) 14px;padding:0 14px}
@@ -734,13 +734,13 @@
       selectedSettingsGroup=selectedGroup.id;
       selectedSetting=selected.id;
       return '<div class="settings-layout"><nav class="settings-index" aria-label="دسته‌ها و تنظیمات">'+
-        '<h2 class="settings-index-title">'+settingsIcon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')+'<span>انواع تنظیمات</span></h2><div class="settings-nav-list">'+settingsGroups.map(function(group){
+        '<h2 class="settings-index-title t-section">'+settingsIcon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')+'<span>انواع تنظیمات</span></h2><div class="settings-nav-list">'+settingsGroups.map(function(group){
           var categoryIcon=group.icon;
           var active=group.id===selectedGroup.id;
-          return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category" type="button" data-settings-group="'+group.id+'" aria-current="'+(active?'true':'false')+'">'+
+          return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category t-sub" type="button" data-settings-group="'+group.id+'" aria-current="'+(active?'true':'false')+'">'+
             '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button></div>'+
             '<div class="settings-subnav">'+group.settings.map(function(setting){
-              return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(settingsItemIcon(setting),'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
+              return '<button class="settings-subitem t-body" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(settingsItemIcon(setting),'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
             }).join("")+'</div></div>';
         }).join("")+'</div></nav><section class="settings-content" aria-live="polite">'+
         settingsCard(selected)+'</section></div>';
