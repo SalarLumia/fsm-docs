@@ -175,7 +175,6 @@
     .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
     .settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-category-label{flex:1}
-    .settings-category-count{color:var(--muted);font-size:10px}
     .settings-toggle{width:34px;flex:none;display:grid;place-items:center;border:0;border-radius:0 8px 8px 0;background:transparent;color:var(--muted);cursor:pointer;transition:color .15s}
     .settings-toggle:hover{color:var(--brand)}
     .settings-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
@@ -675,8 +674,7 @@
           var active=group.id===selectedGroup.id;
           var subnavId="settings-nav-"+group.id;
           return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category" type="button" data-settings-group="'+group.id+'" aria-current="'+(active?'true':'false')+'">'+
-            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span>'+
-            '<span class="settings-category-count">'+settingsFaNumber(group.settings.length)+'</span></button>'+
+            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button>'+
             '<button class="settings-toggle" type="button" data-settings-toggle="'+group.id+'" aria-label="'+(expanded?'بستن':'بازکردن')+' '+settingsEscape(group.name)+'" aria-controls="'+subnavId+'" aria-expanded="'+expanded+'">'+settingsIcon('<polyline points="6 9 12 15 18 9"/>')+'</button></div>'+
             '<div class="settings-collapse'+(expanded?' open':'')+'" id="'+subnavId+'"><div class="settings-collapse-inner"><div class="settings-subnav">'+group.settings.map(function(setting){
               return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsEscape(setting.name)+'</button>';
