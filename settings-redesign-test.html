@@ -164,17 +164,12 @@
     .settings-index{position:sticky;top:76px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008}
     .settings-index-title{margin:0 0 8px;padding:0 8px;color:var(--muted);font-size:11.5px;font-weight:700}
     .settings-nav-group{margin-bottom:3px}
-    .settings-category{display:flex;align-items:center;gap:9px;width:100%;min-height:42px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);font:500 12px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:.15s}
-    .settings-category:hover{background:var(--panel)}
-    .settings-category[aria-expanded="true"]{background:#fff8f0;color:var(--brand);font-weight:700}
+    .settings-category{display:flex;align-items:center;gap:9px;width:100%;min-height:42px;padding:8px 9px;border-radius:8px;color:var(--txt);font:700 12px IRANSans,system-ui,sans-serif}
     .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
     .settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-category-label{flex:1}
     .settings-category-count{color:var(--muted);font-size:10px}
-    .settings-category-chevron{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;transition:transform .18s}
-    .settings-category[aria-expanded="true"] .settings-category-chevron{transform:rotate(180deg)}
     .settings-subnav{display:grid;gap:2px;margin:3px 0 7px;padding-inline-start:15px}
-    .settings-subnav[hidden]{display:none}
     .settings-subitem{display:flex;align-items:center;gap:9px;width:100%;min-height:38px;padding:7px 9px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:400 11.5px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:.15s}
     .settings-subitem::before{content:"";width:5px;height:5px;flex:none;border:1.5px solid var(--line);border-radius:50%}
     .settings-subitem:hover{background:var(--panel);color:var(--txt)}
@@ -663,12 +658,11 @@
       selectedSetting=selected.id;
       return '<div class="settings-layout"><nav class="settings-index" aria-label="دسته‌ها و تنظیمات">'+
         '<h2 class="settings-index-title">انواع تنظیمات</h2>'+settingsGroups.map(function(group){
-          var expanded=group.id===selectedGroup.id;
           var categoryIcon=group.settings[0].icon;
-          return '<div class="settings-nav-group"><button class="settings-category" type="button" data-settings-group="'+group.id+'" aria-expanded="'+expanded+'">'+
+          return '<div class="settings-nav-group"><div class="settings-category">'+
             '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span>'+
-            '<span class="settings-category-count">'+settingsFaNumber(group.settings.length)+'</span>'+settingsIcon('<path d="m6 9 6 6 6-6"/>','settings-category-chevron')+
-            '</button><div class="settings-subnav"'+(expanded?'':' hidden')+'>'+group.settings.map(function(setting){
+            '<span class="settings-category-count">'+settingsFaNumber(group.settings.length)+'</span>'+
+            '</div><div class="settings-subnav">'+group.settings.map(function(setting){
               return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsEscape(setting.name)+'</button>';
             }).join("")+'</div></div>';
         }).join("")+'</nav><section class="settings-content" aria-live="polite">'+
@@ -706,22 +700,7 @@
       document.getElementById("appView").scrollTop=0;
     });
     settingsHost.addEventListener("click",function(event){
-      var category=event.target.closest("[data-settings-group]");
       var setting=event.target.closest("[data-setting]");
-      if(category){
-        var group=settingsGroups.filter(function(item){return item.id===category.getAttribute("data-settings-group");})[0];
-        if(!group)return;
-        if(selectedSettingsGroup===group.id){
-          var open=category.getAttribute("aria-expanded")==="true";
-          category.setAttribute("aria-expanded",String(!open));
-          category.nextElementSibling.hidden=open;
-          return;
-        }
-        selectedSettingsGroup=group.id;
-        selectedSetting=group.settings[0].id;
-        renderSettings("one");
-        return;
-      }
       if(setting){
         selectedSetting=setting.getAttribute("data-setting");
         var owner=settingsGroups.filter(function(group){
