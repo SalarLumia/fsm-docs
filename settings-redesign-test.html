@@ -160,12 +160,30 @@
     #appView{height:100%;overflow:auto}
     .settings-main{min-width:0}
     .settings-page-header{align-items:center}
-    .settings-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;align-items:start}
+    .settings-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
     .settings-index{position:sticky;top:76px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008}
     .settings-index-title{margin:0 0 8px;padding:0 8px;color:var(--muted);font-size:11.5px;font-weight:700}
-    .settings-index a{display:block;padding:8px 10px;border-radius:8px;color:var(--muted);font-size:11.5px;text-decoration:none;transition:.15s}
-    .settings-index a:hover,.settings-index a:focus-visible,.settings-index a[aria-current="location"]{background:#fff8f0;color:var(--txt)}
-    .settings-groups{min-width:0}
+    .settings-nav-group{margin-bottom:3px}
+    .settings-category{display:flex;align-items:center;gap:9px;width:100%;min-height:42px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);font:500 12px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:.15s}
+    .settings-category:hover{background:var(--panel)}
+    .settings-category[aria-expanded="true"]{background:#fff8f0;color:var(--brand);font-weight:700}
+    .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
+    .settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .settings-category-label{flex:1}
+    .settings-category-count{color:var(--muted);font-size:10px}
+    .settings-category-chevron{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;transition:transform .18s}
+    .settings-category[aria-expanded="true"] .settings-category-chevron{transform:rotate(180deg)}
+    .settings-subnav{display:grid;gap:2px;margin:3px 0 7px;padding-inline-start:15px}
+    .settings-subnav[hidden]{display:none}
+    .settings-subitem{display:flex;align-items:center;gap:9px;width:100%;min-height:38px;padding:7px 9px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:400 11.5px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:.15s}
+    .settings-subitem::before{content:"";width:5px;height:5px;flex:none;border:1.5px solid var(--line);border-radius:50%}
+    .settings-subitem:hover{background:var(--panel);color:var(--txt)}
+    .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
+    .settings-subitem[aria-current="page"]::before{border-color:var(--brand);background:var(--brand)}
+    .settings-content{min-width:0}
+    .settings-breadcrumb{display:flex;align-items:center;gap:9px;margin:0 0 14px;padding:0 2px;color:var(--muted);font-size:12px}
+    .settings-breadcrumb svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;stroke-width:2}
+    .settings-breadcrumb strong{color:var(--txt);font-size:13px;font-weight:700}
     .settings-group{scroll-margin-top:76px}
     .settings-group-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
     .settings-group-title::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--brand)}
@@ -188,8 +206,8 @@
     .settings-add{cursor:default}
     .settings-static-action{cursor:default}
     .settings-empty{text-align:center!important;color:var(--muted);font-size:11.5px}
-    @media(max-width:900px){.settings-layout{grid-template-columns:180px minmax(0,1fr);gap:12px}}
-    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.settings-index-title{grid-column:1/-1}.settings-tabs{top:0}}
+    @media(max-width:900px){.settings-layout{grid-template-columns:205px minmax(0,1fr);gap:12px}}
+    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{padding-inline-start:24px}.settings-tabs{top:0}}
     @media(prefers-reduced-motion:reduce){.settings-accordion summary,.settings-accordion summary::after{transition:none}}
   </style>
 </head>
@@ -570,6 +588,8 @@
     ];
     var settingsHost=document.getElementById("tab-data");
     var settingsSidebar=document.querySelector(".sb-bottom");
+    var selectedSettingsGroup="technical";
+    var selectedSetting="parts";
 
     function settingsEscape(value){
       return String(value).replace(/[&<>"']/g,function(char){
@@ -642,12 +662,26 @@
         group.settings.map(settingsCard).join("")+'</section>';
     }
     function settingsOne(){
-      return '<div class="settings-layout"><nav class="settings-index" aria-label="گروه‌های تنظیمات">'+
-        '<h2 class="settings-index-title">تنظیمات</h2>'+settingsGroups.map(function(group,index){
-          return '<a href="#group-'+group.id+'"'+(index===0?' aria-current="location"':'')+'>'+settingsEscape(group.name)+'</a>';
-        }).join("")+'</nav><div class="settings-groups">'+settingsGroups.map(function(group){
-          return settingsGroupMarkup(group,true);
-        }).join("")+'</div></div>';
+      var selectedGroup=settingsGroups.filter(function(group){return group.id===selectedSettingsGroup;})[0]||settingsGroups[0];
+      var selected=selectedGroup.settings.filter(function(setting){return setting.id===selectedSetting;})[0]||selectedGroup.settings[0];
+      selectedSettingsGroup=selectedGroup.id;
+      selectedSetting=selected.id;
+      return '<div class="settings-layout"><nav class="settings-index" aria-label="دسته‌ها و تنظیمات">'+
+        '<h2 class="settings-index-title">انواع تنظیمات</h2>'+settingsGroups.map(function(group){
+          var expanded=group.id===selectedGroup.id;
+          var categoryIcon=group.settings[0].icon;
+          return '<div class="settings-nav-group"><button class="settings-category" type="button" data-settings-group="'+group.id+'" aria-expanded="'+expanded+'">'+
+            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span>'+
+            '<span class="settings-category-count">'+settingsFaNumber(group.settings.length)+'</span>'+settingsIcon('<path d="m6 9 6 6 6-6"/>','settings-category-chevron')+
+            '</button><div class="settings-subnav"'+(expanded?'':' hidden')+'>'+group.settings.map(function(setting){
+              return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsEscape(setting.name)+'</button>';
+            }).join("")+'</div></div>';
+        }).join("")+'</nav><section class="settings-content" aria-live="polite">'+
+        '<div class="settings-breadcrumb"><span>'+settingsEscape(selectedGroup.name)+'</span>'+settingsIcon('<path d="m9 18 6-6-6-6"/>')+'<strong>'+settingsEscape(selected.name)+'</strong></div>'+
+        settingsCard(selected)+'</section></div>';
+    }
+    function settingsFaNumber(value){
+      return String(value).replace(/\d/g,function(digit){return "۰۱۲۳۴۵۶۷۸۹"[Number(digit)];});
     }
     function settingsTwo(){
       return '<div class="settings-accordion">'+settingsGroups.map(function(group){
@@ -678,12 +712,31 @@
       document.getElementById("appView").scrollTop=0;
     });
     settingsHost.addEventListener("click",function(event){
-      var link=event.target.closest(".settings-index a,.settings-tabs a");
-      if(!link)return;
-      settingsHost.querySelectorAll(".settings-index a,.settings-tabs a").forEach(function(item){
-        item.removeAttribute("aria-current");
-      });
-      link.setAttribute("aria-current","location");
+      var category=event.target.closest("[data-settings-group]");
+      var setting=event.target.closest("[data-setting]");
+      if(category){
+        var group=settingsGroups.filter(function(item){return item.id===category.getAttribute("data-settings-group");})[0];
+        if(!group)return;
+        if(selectedSettingsGroup===group.id){
+          var open=category.getAttribute("aria-expanded")==="true";
+          category.setAttribute("aria-expanded",String(!open));
+          category.nextElementSibling.hidden=open;
+          return;
+        }
+        selectedSettingsGroup=group.id;
+        selectedSetting=group.settings[0].id;
+        renderSettings("one");
+        return;
+      }
+      if(setting){
+        selectedSetting=setting.getAttribute("data-setting");
+        var owner=settingsGroups.filter(function(group){
+          return group.settings.some(function(item){return item.id===selectedSetting;});
+        })[0];
+        if(!owner)return;
+        selectedSettingsGroup=owner.id;
+        renderSettings("one");
+      }
     });
     renderSettings("one");
   </script>
