@@ -177,6 +177,9 @@
     .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
     .settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-category-label{flex:1}
+    .settings-subnav{display:grid;gap:1px;margin:2px 0 8px;margin-inline-start:20px;border-inline-start:1.5px solid var(--line);padding:2px 0;padding-inline-start:3px}
+    .settings-subitem{display:flex;align-items:center;gap:8px;min-height:34px;padding:5px 9px;color:var(--muted);font-size:11px;line-height:1.5}
+    .settings-subitem-icon{width:15px;height:15px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-content{min-width:0}
     .settings-group-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:0 1px 4px #00000008}
     .settings-group-title{display:flex;align-items:center;gap:11px;min-width:0}
@@ -741,7 +744,10 @@
           var categoryIcon=group.icon;
           var active=group.id===selectedGroup.id;
           return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category t-sub" type="button" data-settings-group="'+group.id+'" aria-pressed="'+active+'">'+
-            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button></div></div>';
+            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button></div>'+
+            '<div class="settings-subnav" role="list" aria-label="فهرست‌های '+settingsEscape(group.name)+'">'+group.settings.map(function(setting){
+              return '<div class="settings-subitem" role="listitem">'+settingsIcon(settingsItemIcon(setting),'settings-subitem-icon')+'<span>'+settingsEscape(setting.name)+'</span></div>';
+            }).join("")+'</div></div>';
         }).join("")+'</div></nav><section class="settings-content" aria-live="polite">'+
         settingsGroupView(selectedGroup)+'</section></div>';
     }
