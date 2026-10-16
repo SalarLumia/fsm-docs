@@ -76,7 +76,7 @@
 .hp-cat-ic{width:32px;height:32px;flex-shrink:0;border-radius:9px;display:grid;place-items:center;
   background:#fff3e6;color:var(--brand)}
 .hp-cat-ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9}
-.hp-cat-t{font-size:13px;font-weight:700;color:var(--txt);line-height:1.6}
+.hp-cat-t{font-size:var(--fs-sub);font-weight:var(--fw-sub);color:var(--txt);line-height:1.6}
 .hp-cat-d{font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);line-height:1.75;margin-top:2px}
 .hp-cat-l{display:flex;flex-direction:column;gap:1px}
 .hp-catlink{display:flex;align-items:center;gap:6px;width:100%;text-align:right;

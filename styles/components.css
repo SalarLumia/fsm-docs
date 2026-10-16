@@ -78,7 +78,7 @@ input::placeholder{color:#b0afa9}
 .dz-body{display:flex;flex-direction:column;align-items:center;gap:5px;pointer-events:none}
 .dz-ico{color:var(--brand);opacity:.85}
 .dz-ico svg{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.dz-main{font-size:13px;font-weight:700;color:var(--txt)}
+.dz-main{font-size:var(--fs-sub);font-weight:var(--fw-sub);color:var(--txt)}
 .dz-sub{font-size:11.5px;color:var(--muted)}
 .dz-file{font-size:12px;font-weight:700;color:var(--ok);margin-top:6px;direction:ltr;word-break:break-all}
 .dropzone.has-file{border-style:solid;border-color:var(--ok);background:var(--ok-bg)}
@@ -369,7 +369,7 @@ html:has(.modal:not(.hidden)){overflow:hidden}
 /* ===== چک‌لیست پروژه ===== */
 .checkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
 .part-block{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#ffffff;box-shadow:0 1px 4px #0000000a}
-.part-block h4{margin:0 0 10px;font-size:13px;font-weight:700;display:flex;justify-content:space-between;color:var(--txt)}
+.part-block h4{margin:0 0 10px;font-size:var(--fs-sub);font-weight:var(--fw-sub);display:flex;justify-content:space-between;color:var(--txt)}
 /* نکته: استایل .doc-row در project.css است (خط توپر). قانون قدیمی اینجا (border-top: dashed)
    حذف شد چون با ردیف‌های سند صفحهٔ جزئیات پروژه تداخل و خط نقطه‌چین ایجاد می‌کرد. */
 .dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-left:6px;flex-shrink:0}
