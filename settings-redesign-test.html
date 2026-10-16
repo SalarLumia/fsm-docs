@@ -181,9 +181,6 @@
     .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
     .settings-subitem[aria-current="page"]::before{border-color:var(--brand);background:var(--brand)}
     .settings-content{min-width:0}
-    .settings-breadcrumb{display:flex;align-items:center;gap:9px;margin:0 0 14px;padding:0 2px;color:var(--muted);font-size:12px}
-    .settings-breadcrumb svg{width:13px;height:13px;flex:none;fill:none;stroke:currentColor;stroke-width:2}
-    .settings-breadcrumb strong{color:var(--txt);font-size:13px;font-weight:700}
     .settings-group{scroll-margin-top:76px}
     .settings-group-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
     .settings-group-title::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--brand)}
@@ -675,7 +672,6 @@
               return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsEscape(setting.name)+'</button>';
             }).join("")+'</div></div>';
         }).join("")+'</nav><section class="settings-content" aria-live="polite">'+
-        '<div class="settings-breadcrumb"><span>'+settingsEscape(selectedGroup.name)+'</span>'+settingsIcon('<path d="m9 18 6-6-6-6"/>')+'<strong>'+settingsEscape(selected.name)+'</strong></div>'+
         settingsCard(selected)+'</section></div>';
     }
     function settingsFaNumber(value){
