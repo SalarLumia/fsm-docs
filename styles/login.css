@@ -295,7 +295,7 @@
 .lg-field:has(input:disabled) .lg-ic,
 .lg-field:has(input:disabled) .lg-eye{opacity:.5}
 .lg-note{display:flex;align-items:flex-start;gap:7px;margin:22px 0 0;padding-right:6px;
-  font-size:11.5px;font-weight:500;color:#b0b0ae;line-height:1.9;text-align:right}
+  font-size:var(--fs-body);font-weight:var(--fw-body);color:#b0b0ae;line-height:1.9;text-align:right}
 .lg-note svg{width:14px;height:14px;flex-shrink:0;margin-top:4px;
   stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 /* حالت خطا: همین خط جای متن راهنما پیام خطا را با آیکون اخطار نشان می‌دهد،

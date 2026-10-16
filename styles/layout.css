@@ -58,7 +58,7 @@
 @media(prefers-reduced-motion:reduce){.nav-item.active,.nav-item.leaving{transition:none}}
 .nav-item.nav-logout{color:#ef4444}
 .nav-item.nav-logout:hover{background:rgba(239,68,68,0.16);color:#ff5c5c}
-.role-chip{font-size:11px;padding:3px 12px;border-radius:20px;background:#fff3e6;border:1px solid #f7941f44;color:var(--brand);font-weight:500;white-space:nowrap}
+.role-chip{font-size:var(--fs-label);padding:3px 12px;border-radius:20px;background:#fff3e6;border:1px solid #f7941f44;color:var(--brand);font-weight:var(--fw-label);white-space:nowrap}
 
 /* ===== درخت «مشتریان و پروژه‌ها» — سلول یکپارچه، اکسپندشونده، روی سایدبار تیره ===== */
 .nav-tree{display:flex;flex-direction:column}

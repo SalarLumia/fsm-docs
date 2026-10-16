@@ -25,7 +25,7 @@
   padding-bottom:var(--sp-3);border-bottom:1px solid var(--line)}
 .pp-head-main{display:flex;align-items:center;gap:var(--sp-3);min-width:0}
 /* خط عمودی نارنجی پیش عنوان با ::before (نه border) تا گوشه‌هایش گرد شوند، هم‌سبک کارت پروژهٔ داشبورد */
-.pp-head h1{position:relative;margin:0;font-size:19px;font-weight:700;color:var(--txt);min-width:0;
+.pp-head h1{position:relative;margin:0;font-size:var(--fs-title);font-weight:var(--fw-title);color:var(--txt);min-width:0;
   padding-right:13px;line-height:1.2;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pp-head h1::before{content:"";position:absolute;right:0;top:50%;transform:translateY(-50%);
@@ -33,7 +33,7 @@
 .pp-head-actions{display:flex;align-items:center;gap:var(--sp-2);flex-shrink:0}
 
 /* تگ وضعیت پروژه — متریک .tag سایت */
-.mstate{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;
+.mstate{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-label);font-weight:var(--fw-label);padding:3px 10px;border-radius:20px;
   line-height:1.4;white-space:nowrap;flex-shrink:0}
 .mstate svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .s-run{background:#fff3e6;color:var(--brand);border:1px solid #f7941f33}
@@ -51,17 +51,17 @@
 .mcell:last-child{border-left:none}
 @media(max-width:1150px){.mcell:nth-child(3n){border-left:none}}
 @media(max-width:660px){.mcell{border-left:none}}
-.mlabel{font-size:14px;line-height:1.3;color:var(--txt);font-weight:700;margin-bottom:var(--sp-2);
+.mlabel{font-size:var(--fs-section);line-height:1.3;color:var(--txt);font-weight:var(--fw-section);margin-bottom:var(--sp-2);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* سلول سرتیتر: درصد بزرگ + نوار دولایه + دو راهنما */
 .mhero-vis{flex:1;min-width:0;max-width:180px;display:flex;flex-direction:column;gap:var(--sp-2)}
-.mhero-pct{font-size:28px;font-weight:800;color:var(--txt);font-variant-numeric:tabular-nums;
+.mhero-pct{font-size:var(--fs-metric);font-weight:var(--fw-metric);color:var(--txt);font-variant-numeric:tabular-nums;
   line-height:1;flex-shrink:0;text-align:left}
 .bar{position:relative;height:8px;background:#f0efeb;border-radius:4px;overflow:hidden;direction:ltr}
 .bar>i{position:absolute;inset-block:0;left:0;border-radius:4px;transition:.6s}
 .bar>i.faint{opacity:.3}
-.mleg{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:var(--muted);
+.mleg{display:flex;align-items:center;gap:6px;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mleg i{width:8px;height:8px;border-radius:50%;background:var(--brand);flex-shrink:0}
 .mleg.faint i{opacity:.3}
@@ -127,7 +127,7 @@
 @media(max-width:1100px){.spec-main{max-height:none;overflow:visible}}
 
 /* تیتر بخش (مشخصات / قطعات) — عیناً .panel-hd داشبورد */
-.spec-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
+.spec-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt);
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .spec-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .spec-sec-t .sec-act{margin-inline-start:auto;display:flex;gap:6px}
@@ -170,12 +170,12 @@
 .spec-row{display:flex;align-items:center;gap:var(--val-gap);padding:var(--sp-2) 0;border-bottom:1px solid #f2f1ee}
 .spec-row:last-child{border-bottom:none}
 /* عرض به‌اندازهٔ inset بزرگ‌تر شده تا با وجود padding، جای متن پارامتر همان --label-w بماند */
-.spec-label{font-size:11.5px;color:var(--muted);font-weight:500;flex-shrink:0;
+.spec-label{font-size:var(--fs-body);color:var(--muted);font-weight:var(--fw-body);flex-shrink:0;
   width:calc(var(--label-w) + var(--val-inset));padding-inline-start:var(--val-inset);
   display:flex;align-items:center;gap:6px;overflow:hidden}
 .spec-label .lbl-t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* پیش‌فرض فارسی/راست‌به‌چپ؛ فقط جواب لاتین کلاس .ltr می‌گیرد و از چپ نوشته می‌شود */
-.spec-val{font-size:11.5px;color:var(--txt);font-weight:500;flex:1;min-width:0}
+.spec-val{font-size:var(--fs-body);color:var(--txt);font-weight:var(--fw-body);flex:1;min-width:0}
 .spec-val.ltr{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.5px;
   padding-inline-start:var(--val-inset)}
 .spec-val.empty{color:#b9b7b2}
@@ -204,14 +204,14 @@ button.doc-ic:active{transform:translateY(1px)}
 button.doc-ic:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 button.doc-ic:disabled{cursor:default}
 /* نام سند در ستون راست (جایگاه پارامتر) است، پس عیناً کلاس فارسی استاندارد این بخش (.spec-label) — خاکستری کم‌رنگ */
-.doc-name{font-size:11.5px;color:var(--txt);font-weight:500;min-width:0;
+.doc-name{font-size:var(--fs-body);color:var(--txt);font-weight:var(--fw-body);min-width:0;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* فقط ردیف بدون سند کم‌رنگ است — هم‌منطق .spec-val.empty بالای همین کارت.
    پیش از این هر دو حالت خاکستری بودند و ردیف دارای سند از خالی تشخیص داده نمی‌شد. */
 .doc-row.empty .doc-name{color:var(--muted)}
 .doc-acts{flex:1;min-width:0;display:flex;align-items:center;gap:var(--sp-2)}
 /* جواب ردیف سند (شمارهٔ سند) عیناً .spec-val.ltr است تا لبهٔ چپش با بقیهٔ جواب‌ها یکی باشد */
-.doc-num,.doc-none{font-size:11.5px;font-weight:500;flex:1;min-width:0;
+.doc-num,.doc-none{font-size:var(--fs-body);font-weight:var(--fw-body);flex:1;min-width:0;
   direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.5px;
   padding-inline-start:var(--val-inset);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .doc-num{color:var(--txt);cursor:pointer}
@@ -225,7 +225,7 @@ button.doc-ic:disabled{cursor:default}
 .doc-add-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
 .doc-add-lbl{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;color:var(--muted)}
 .doc-add-lbl .ic,.doc-add-lbl svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
-.doc-add-pill{font-size:11.5px;font-weight:500;color:var(--muted);background:#fff;border:1px dashed var(--line);
+.doc-add-pill{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);background:#fff;border:1px dashed var(--line);
   border-radius:20px;padding:4px 12px;cursor:pointer;transition:.12s;font-family:inherit}
 .doc-add-pill:hover{border-style:solid;border-color:var(--brand);color:var(--brand);background:#fff8f0}
 /* دکمهٔ حذف کوچک کنار سربرگ قطعه (حذف قطعه از پروژه) */
@@ -344,10 +344,10 @@ button.doc-ic:disabled{cursor:default}
 .mv-pick svg{width:16px;height:16px;flex-shrink:0;margin:0 8.5px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 /* خانهٔ ثابت شمارهٔ قطعه (هم‌عرض خانهٔ آیکن تولباکس = ۳۳px) */
 /* شمارهٔ قطعه — عیناً فونت «پاسخ پارامترها» در مشخصات پروژه (.spec-val.ltr) */
-.mv-pk-no{min-width:33px;text-align:center;flex-shrink:0;font-size:11.5px;font-weight:500;color:inherit;
+.mv-pk-no{min-width:33px;text-align:center;flex-shrink:0;font-size:var(--fs-body);font-weight:var(--fw-body);color:inherit;
   direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.5px}
 /* نام قطعه — عیناً فونت «پاسخ پارامترها» (.spec-val.ltr): ۱۱٫۵px، وزن ۵۰۰، tabular-nums، فاصله‌حروف ۰٫۵ */
-.mv-pick-lab{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-size:11.5px;font-weight:500;color:inherit;
+.mv-pick-lab{max-width:0;opacity:0;overflow:hidden;white-space:nowrap;font-size:var(--fs-body);font-weight:var(--fw-body);color:inherit;
   font-variant-numeric:tabular-nums;letter-spacing:.5px;
   transition:max-width .18s,opacity .18s,padding .18s}
 .mv-picker.expanded .mv-pick-lab{max-width:160px;opacity:1;padding-right:8px}
@@ -362,7 +362,7 @@ button.doc-ic:disabled{cursor:default}
   padding:6px 11px 6px 9px;background:#ffffffe8;backdrop-filter:blur(6px);border:1px solid var(--line);
   border-radius:11px;box-shadow:0 3px 14px #0000001f}
 .mv-partbadge svg{width:16px;height:16px;stroke:var(--txt);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;margin:0 1px}
-.mv-pb-t{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.5px;white-space:nowrap}
+.mv-pb-t{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt);direction:ltr;font-variant-numeric:tabular-nums;letter-spacing:.5px;white-space:nowrap}
 .mv-retry{margin-top:14px}   /* دکمهٔ «تلاش مجدد» بارگذاری مدل روی خطا */
 /* دکمهٔ پیش‌فرض AR سرکوب می‌شود؛ فعال‌سازی از طریق دکمهٔ «واقعیت افزوده» در تولباکس انجام می‌شود */
 .mv-ar{display:none}
@@ -411,7 +411,7 @@ button.doc-ic:disabled{cursor:default}
 .sp-row.dragging{opacity:.4}
 .sp-row.drop-to{background:#fff6ec;border-radius:8px}
 .sp-name{min-width:0}
-.sp-row input{font-size:11.5px;font-weight:500;padding:7px 10px;border:1px solid #d4d3ce;border-radius:7px;
+.sp-row input{font-size:var(--fs-body);font-weight:var(--fw-body);padding:7px 10px;border:1px solid #d4d3ce;border-radius:7px;
   background:#fff;font-family:inherit;color:var(--txt);width:100%}
 .sp-row .sp-name input{direction:rtl;text-align:right}
 .sp-row>input{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.3px}
@@ -441,7 +441,7 @@ button.doc-ic:disabled{cursor:default}
 .unit{color:var(--muted);margin-inline-start:3px;font-size:11px}
 .spec-val.editable{cursor:pointer}
 .spec-val.editable:hover{color:var(--brand)}
-.spec-inline{width:100%;max-width:220px;font-size:11.5px;font-weight:500;padding:4px 8px;border:1px solid var(--brand);
+.spec-inline{width:100%;max-width:220px;font-size:var(--fs-body);font-weight:var(--fw-body);padding:4px 8px;border:1px solid var(--brand);
   border-radius:6px;background:#fff;font-family:inherit;color:var(--txt);direction:ltr;text-align:left;font-variant-numeric:tabular-nums}
 .spec-inline:focus{outline:none;box-shadow:0 0 0 3px #f7941f1a}
 .mat-sel{max-width:300px;cursor:pointer}
@@ -453,10 +453,10 @@ button.doc-ic:disabled{cursor:default}
 /* ============ پنل ویرایش قطعات (چک‌لیست استاندارد سایت) ============ */
 .ed-body{padding:20px 22px;display:flex;flex-direction:column;gap:var(--sp-5)}
 .ed-card{background:#fcfcfb;border:1px solid var(--line);border-radius:10px;padding:16px 18px}
-.ed-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
+.ed-sec-t{margin:0 0 14px;padding-bottom:12px;font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt);
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .ed-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
-.ed-count{margin-inline-start:auto;font-size:11.5px;font-weight:500;color:var(--muted)}
+.ed-count{margin-inline-start:auto;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted)}
 /* «ترتیب پیش‌فرض» — دکمهٔ آیکونی هم‌اندازهٔ .icon-btn.sm در انتهای عنوان کارت.
    خاکستری کم‌رنگ = ترتیب همان پیش‌فرض است (بی‌اثر)؛ .is-on = ترتیب اختصاصی دارد و قابل کلیک است. */
 .ed-reset{display:inline-grid;place-items:center;width:26px;height:26px;padding:0;margin-inline-start:auto;flex-shrink:0;
@@ -470,7 +470,7 @@ button.doc-ic:disabled{cursor:default}
 /* ردیف چک‌لیست: دایرهٔ روشن/خاموش + نام فارسی + کد لاتین (+ حذف در ماژول‌ها) */
 .ed-doc-row{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) 0;border-bottom:1px solid #f2f1ee}
 .ed-doc-row:last-child{border-bottom:none}
-.ed-name{font-size:11.5px;color:var(--txt);font-weight:500;flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
+.ed-name{font-size:var(--fs-body);color:var(--txt);font-weight:var(--fw-body);flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden}
 .ed-name span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ed-doc-code{font-size:11.5px;font-weight:600;color:var(--muted);direction:ltr;text-align:left;letter-spacing:.02em;flex-shrink:0}
 .ed-doc-row.off .ed-name,.ed-doc-row.off .ed-doc-code{opacity:.45}
@@ -499,7 +499,7 @@ button.doc-ic:disabled{cursor:default}
 .ed-del:hover{border-color:var(--err);color:var(--err);background:var(--err-bg)}
 .ed-del svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2}
 /* شرط حداقل — پیام محو با آیکن */
-.ed-req-note{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:11.5px;font-weight:500;line-height:1.6;color:var(--muted)}
+.ed-req-note{display:flex;align-items:center;gap:7px;margin-top:12px;font-size:var(--fs-body);font-weight:var(--fw-body);line-height:1.6;color:var(--muted)}
 .ed-req-note svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 /* ردیف افزودن ماژول جدید */
 .ed-doc-add{display:flex;align-items:center;gap:var(--sp-3);padding-top:var(--sp-3);margin-top:4px}
@@ -610,4 +610,4 @@ button.doc-ic:disabled{cursor:default}
 .wt-val{cursor:default}
 .wt-empty{color:var(--muted);font-weight:500}
 .wt-line{display:flex;gap:8px;align-items:baseline;justify-content:flex-start}
-.wt-k{font-size:11px;font-weight:500;color:var(--muted)}
+.wt-k{font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted)}

@@ -18,7 +18,7 @@
 /* بخش کناری کارت فعالیت (مودال): فقط تاریخ (تگ وضعیت به ردیف «کاربر» درون rq-meta منتقل شد) */
 .rq-aside{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
 /* هم‌کلاس متنی act-who (نام کاربر): ۱۱٫۵px، وزن ۵۰۰، رنگ muted */
-.rq-date{font-size:11.5px;font-weight:500;color:var(--muted);white-space:nowrap}
+.rq-date{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);white-space:nowrap}
 /* کارت‌های مودال («همهٔ فعالیت‌ها» و «کارتابل بازبینی»): مارکر دایره+خط کنار متن.
    .seeall-body مخصوص مودال‌هاست، پس مینی‌پنل‌های داشبورد دست‌نخورده می‌مانند.
    ارتفاع کارت با کش‌آمدن (stretch) کامل می‌شود تا خط از زیر دایره تا ته متن (دو خط بعدی) برسد؛
@@ -35,7 +35,7 @@
   transition:.15s;box-shadow:0 1px 3px #00000006}
 .pl-card:hover{border-color:var(--brand);box-shadow:0 4px 14px #0000000f;transform:translateY(-1px)}
 .pl-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
-.pl-name{font-size:14px;font-weight:700;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pl-name{font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pl-meta{font-size:11.5px;color:var(--muted);margin-bottom:12px}
 
 /* ===== جزئیات پروژه ===== */
@@ -200,14 +200,14 @@
   padding:10px 12px 11px;margin-bottom:14px}
 .dm-reject-t{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--err)}
 .dm-reject-dot{position:relative;width:7px;height:7px;border-radius:50%;background:var(--err);color:var(--err);flex-shrink:0}
-.dm-reject-note{margin-top:5px;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.7}
+.dm-reject-note{margin-top:5px;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);line-height:1.7}
 /* بنر «ویرایش جدیدتر تأیید شده» — هم‌ساختار بنر رد، ولی زرد/هشدار نه قرمز/خطا:
    وضعیت سند غلط نیست، فقط نسخهٔ تازه‌تری هست. */
 .dm-newer{background:var(--warn-bg);border:1px solid var(--warn-line);border-radius:9px;
   padding:10px 12px 11px;margin-bottom:14px}
 .dm-newer-t{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:var(--warn)}
 .dm-newer-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);flex-shrink:0}
-.dm-newer-note{margin:5px 0 9px;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.7}
+.dm-newer-note{margin:5px 0 9px;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);line-height:1.7}
 /* جای بنر: روی پیش‌نمایش، چسبیده به پایین کادر — یک ردیف فشرده (متن | دکمه | بستن) با سایه تا از نقشه جدا دیده شود */
 .dp-stage{flex:1;min-height:0;position:relative;display:flex;flex-direction:column}
 .dp-newer{position:absolute;left:14px;right:14px;bottom:14px;z-index:6;margin:0;
@@ -230,7 +230,7 @@
   border:1px solid var(--line);border-radius:9px}
 .dm-qr-img svg{display:block;width:100%;height:100%}
 .dm-qr-side{min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:9px}
-.dm-qr-note{margin:0;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.8}
+.dm-qr-note{margin:0;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);line-height:1.8}
 .rej-box{padding:18px 20px;max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
 .rej-lead{margin:0 0 2px;font-size:13.5px;color:var(--txt)}
 .rej-ta{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;
@@ -240,7 +240,7 @@
 /* هر بخش (مشخصات/تاریخچه) در باکس کارتی خودش، هم‌سبک بقیهٔ سکشن‌های سایت */
 .dm-sec{margin-bottom:16px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:15px 16px 13px;box-shadow:0 1px 3px #00000008}
 .dm-sec:last-child{margin-bottom:0}
-.dm-sec-t{margin:0 0 12px;padding-bottom:12px;font-size:14px;font-weight:700;color:var(--txt);
+.dm-sec-t{margin:0 0 12px;padding-bottom:12px;font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt);
   display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line)}
 .dm-sec-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 /* فاصله‌گذاری/فونت/جداکننده دقیقاً مثل ردیف مشخصات پروژه‌ها (.spec-row): پدینگ ۸px، گپ ۳۲px، خط محو #f2f1ee، فونت ۱۱٫۵px وزن ۵۰۰ */
@@ -323,7 +323,7 @@
 /* ⚠ فقط یک خط: با دو خط، بیشتر توضیح‌ها کامل دیده می‌شدند و اکسپند بی‌فایده
    می‌شد. حالا متن بلند با «…» بریده می‌شود و متن کامل زیر مرحلهٔ «ایجاد سند»
    در گردش‌کار اکسپندشده است. */
-.ver-desc{flex:1;min-width:0;padding-inline-start:8px;font-size:11.5px;font-weight:500;
+.ver-desc{flex:1;min-width:0;padding-inline-start:8px;font-size:var(--fs-body);font-weight:var(--fw-body);
   color:var(--muted);line-height:1.8;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:opacity .28s,visibility .28s}
 /* توضیح یک‌خطی فقط پیش‌نمایش حالت بسته است: با اکسپند محو می‌شود چون متن کاملش
@@ -407,9 +407,9 @@
 /* متن توضیحات دوسرچین می‌شود تا لبهٔ پایانی همهٔ خط‌ها روی یک خط بیفتد.
    text-align-last دست‌نخورده می‌ماند (auto)، پس خط آخر کشیده نمی‌شود و
    طبیعی در جهت متن می‌نشیند. */
-.wf-lines{margin-top:3px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.6;word-break:break-word;
+.wf-lines{margin-top:3px;font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);line-height:1.6;word-break:break-word;
   text-align:justify}
-.wf-note{font-size:11px;font-weight:500;color:var(--muted)}
+.wf-note{font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted)}
 .wf-lines.one .wf-note{display:block}
 .wf-lines.one .wf-sep{display:none}
 /* اگر توضیحی نبود، نام از همان خط اول شروع می‌شود */
@@ -573,12 +573,12 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .nd-opt-ic .cp-logo{border-radius:8px}
 .nd-opt-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .nd-opt-lab{font-size:13px;font-weight:600;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nd-opt-sub{font-size:11px;font-weight:500;color:var(--muted);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nd-opt-sub{font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nd-opt-ck{flex-shrink:0;display:inline-flex;color:var(--brand)}
 .nd-opt-ck svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.4}
 .nd-opt.special .nd-opt-lab{color:var(--brand)}
 .nd-menu-empty{padding:14px 12px;font-size:12px;color:var(--muted);text-align:center}
-.nd-step-hint{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.6}
+.nd-step-hint{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);line-height:1.6}
 .nd-step-hint svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 /* مسیر قفل (ثبت سند از ماژول سند پروژه): ریل و سکشن‌ها فقط نمایشی‌اند، نه کلیک‌پذیر */
 .nd-locked .nd-chip,.nd-locked .nd-sec-hd,.nd-locked .nd-opt{cursor:default}
@@ -595,14 +595,14 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .nd-final-inner{padding:12px 14px 14px}
 /* پیام ریویژن: یک خط زیر جداکننده با نقطهٔ نارنجی، هم‌فونت بقیهٔ سایت (نه کادر جدا) */
 /* هم‌فونت کپشن کارت‌های داشبورد (.kpi-foot): ۱۱px، وزن ۵۰۰، رنگ --muted */
-.nd-revnote{display:flex;align-items:flex-start;gap:7px;margin-bottom:13px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.9}
+.nd-revnote{display:flex;align-items:flex-start;gap:7px;margin-bottom:13px;font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);line-height:1.9}
 .nd-revnote::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--brand);flex-shrink:0;margin-top:6px}
 .nd-revnote b{font-weight:700;color:var(--brand);unicode-bidi:isolate}
 .nd-revnote.warn{color:var(--err)}
 .nd-revnote.warn::before{background:var(--err)}
 .nd-revnote.warn b{color:var(--err)}
 /* توضیح کوچک زیر دراپ‌زون‌های سه‌بعدی (بارگذاری نسخهٔ جدید): آیکون ریز + متن کم‌رنگ، هم‌سبک .nd-revnote */
-.rv-3d-hint{display:flex;align-items:flex-start;gap:7px;margin-top:10px;font-size:11px;font-weight:500;color:var(--muted);line-height:1.8}
+.rv-3d-hint{display:flex;align-items:flex-start;gap:7px;margin-top:10px;font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);line-height:1.8}
 .rv-3d-hint svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;flex-shrink:0;margin-top:2px}
 /* ⚠ لازم است: قاعدهٔ نویسنده با display:flex بر [hidden] استایل پیش‌فرض مرورگر
    غلبه می‌کند، پس عنصر با وجود صفت hidden دیده می‌شود. همان تمهیدی که برای
@@ -669,7 +669,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .cp-rail{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008;
   overflow:hidden;position:sticky;top:76px}
 .cp-rail-hd{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--line);
-  font-size:14px;font-weight:700;color:var(--txt)}
+  font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt)}
 .cp-rail-hd>span{display:flex;align-items:center;gap:8px}
 .cp-rail-hd>span svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 .cp-client-list{display:flex;flex-direction:column;max-height:70vh;overflow:auto;position:relative;z-index:0}
@@ -722,7 +722,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .cp-identity{display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--line);
   border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 4px #00000008}
 .cp-id-body{flex:1;min-width:0}
-.cp-id-name{margin:0;font-size:19px;font-weight:700;color:var(--txt)}
+.cp-id-name{margin:0;font-size:var(--fs-title);font-weight:var(--fw-title);color:var(--txt)}
 .cp-id-meta{font-size:12px;color:var(--muted);margin-top:4px}
 .cp-id-acts{display:flex;gap:8px;flex-shrink:0}
 
@@ -779,7 +779,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* کد پروژه: هم‌فونت مقدار «کد پروژه» در مشخصات (.spec-val.ltr) — 11.5/500/تیره؛ چپ‌نویس.
    margin-inline:auto فضای آزاد بین نام و درصد را دوطرفه می‌بلعد، پس کد وسط‌چین آن فضاست
    (نه چسبیده به نام، نه به درصد) و چون نام ثابت است، همهٔ کدها دقیقاً زیر هم می‌نشینند */
-.cpr-code{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;text-align:left;flex-shrink:0;margin-inline:auto}
+.cpr-code{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt);direction:ltr;text-align:left;flex-shrink:0;margin-inline:auto}
 /* نام عرض ثابت ۳۲٪ می‌گیرد و رشد نمی‌کند؛ چون ثابت است ستون کد همیشه در یک x ثابت می‌نشیند (کدها زیر هم). نام خیلی‌بلند … می‌شود */
 .cpr-name{font-size:13px;font-weight:500;color:var(--txt);flex:0 1 32%;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* درصد (راست) + نوار (چپ)؛ عرض ثابت باعث می‌شود نوار همهٔ ردیف‌ها هم‌اندازه بماند */
@@ -904,7 +904,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* v45: فرآیند تولیدی که قطعه را ریختگی می‌کند — تگ خنثی (نارنجی فقط برند و تعامل است) + ردیف کلید در پنجرهٔ ویرایش */
 .pm-cell .tag.opt-cast{background:#f3f2f0;border-color:var(--line);color:var(--muted);flex-shrink:0}
 .opt-cast-row{cursor:pointer;margin-top:var(--sp-3);border-bottom:none}
-.opt-cast-row .opt-cast-hint{margin-inline-start:auto;font-size:11.5px;font-weight:500;color:var(--muted)}
+.opt-cast-row .opt-cast-hint{margin-inline-start:auto;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted)}
 /* آیکون برچسب پارامتر کمی کوچک‌تر از آیکون اسناد (کادر همان ۳۰px می‌ماند تا هم‌ترازی نخورد) */
 .pm-cell .el-badge svg{width:17px;height:17px}
 /* ستون دوم از راست (دادهٔ لاتین: نام انگلیسی قطعه/سند/پارامتر + نام کاربری) در هر چهار جدول:
@@ -1049,18 +1049,18 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .arch-hide{visibility:hidden}   /* ستون تاریخ ادغام‌شده: فقط عرض را نگه می‌دارد تا بقیهٔ ستون‌ها جابه‌جا نشوند */
 .arch-stat{display:inline-block;position:relative}
 /* مقادیر سطر اول (مشتری/قطعه/سفارش/پروژه) — مطابق رفرنس مشکی و پررنگ: رنگ --txt، وزن ۶۰۰ */
-.arch-client{display:inline-block;font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;
+.arch-client{display:inline-block;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt);direction:ltr;
   letter-spacing:.02em;cursor:pointer;transition:color .12s,transform .28s var(--exp-ease,cubic-bezier(.2,0,0,1))}
 .arch-row.open .arch-client:hover{color:var(--brand)}   /* هاور نارنجی فقط در حالت اکسپند */
 .arch-row.open .arch-client.arch-anim{transform:scale(1.1)}
 /* سفارش/پروژه راست‌به‌چپ تا «سفارش ۰۱» درست نمایش داده شود (کلمه راست، عدد چپ) */
-.arch-code{font-size:11.5px;font-weight:500;color:var(--txt);direction:rtl;letter-spacing:.02em}
-.arch-cell{font-size:11.5px;font-weight:500;color:var(--txt);direction:ltr;letter-spacing:.02em}
+.arch-code{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt);direction:rtl;letter-spacing:.02em}
+.arch-cell{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt);direction:ltr;letter-spacing:.02em}
 /* سلول پروژه/قطعه هم مثل مشتری/شماره کلیک‌پذیر (فقط در حالت اکسپند ناوبری می‌کند) */
 .arch-lnk{transition:color .12s,transform .28s var(--exp-ease,cubic-bezier(.2,0,0,1))}
 .arch-row.open .arch-lnk:hover{color:var(--brand)}   /* هاور نارنجی فقط در حالت اکسپند */
 /* تاریخ — عیناً برچسب‌های خاکستری پنل اکسپند (.adg-k): ۱۱٫۵px، وزن ۵۰۰، رنگ --muted */
-.arch-date{font-size:11.5px;font-weight:500;color:var(--muted)}
+.arch-date{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted)}
 /* فلش اکسپند ردیف — بالای نوار کنترل چپ؛ هم‌سبک فلش جمع/باز جدول‌ها */
 .arch-exp{display:inline-grid;place-items:center;width:30px;height:30px;border:none;background:none;
   cursor:pointer;color:var(--muted);border-radius:7px;transition:color .14s,transform .28s var(--exp-ease,cubic-bezier(.2,0,0,1));padding:0}
@@ -1250,8 +1250,8 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* دکمهٔ خروجی = همان .btn.sm استاندارد سایت (مثل دکمه‌های متن‌دار ویرایش/حذف) */
 /* گروه صفحه‌بندی */
 .arch-pager{display:flex;align-items:center;justify-content:center;gap:var(--sp-3);flex-wrap:wrap}
-.pg-lbl{font-size:11.5px;color:var(--muted);font-weight:500}
-.pg-range{font-size:11.5px;color:var(--txt);font-weight:500;font-variant-numeric:tabular-nums;min-width:0}
+.pg-lbl{font-size:var(--fs-body);color:var(--muted);font-weight:var(--fw-body)}
+.pg-range{font-size:var(--fs-body);color:var(--txt);font-weight:var(--fw-body);font-variant-numeric:tabular-nums;min-width:0}
 /* دراپ‌داون سفارشی «تعداد سطر» — هم‌سبک منوی سه‌نقطه‌ای، با گوشهٔ گرد و انیمیشن باز/بست */
 .pg-drop{position:relative;display:inline-block}
 .pg-drop-btn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px;border:1px solid var(--line);
@@ -1309,7 +1309,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 /* چیپ فیلتر فعال — هم‌رنگ و هم‌اندازهٔ .tag (کوچک‌ترین کلاس متنی استاندارد سایت: ۱۱px) */
 .filt-chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 5px 0 11px;box-sizing:border-box;
   border:1px solid #f7941f33;border-radius:9px;background:#fff3e6;
-  font-size:11px;font-weight:500;line-height:1;color:var(--brand)}
+  font-size:var(--fs-label);font-weight:var(--fw-label);line-height:1;color:var(--brand)}
 .filt-chip .fc-v{color:var(--brand);font-weight:600}
 .filt-chip .fc-x{display:inline-grid;place-items:center;width:20px;height:20px;border:none;background:none;
   color:var(--brand);cursor:pointer;transition:color .12s}
@@ -1528,4 +1528,4 @@ body.boot-failed .app-main .tabpane{display:none!important}
 .dm-vsw{position:absolute;top:12px;left:12px;z-index:6;direction:ltr;display:flex;flex-direction:column;align-items:flex-start;gap:8px;pointer-events:none}
 .dm-vsw .mv-picker{position:static}
 .dm-vsw>*{pointer-events:auto}
-.dm-vsw-from{font-size:11px;font-weight:500;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+.dm-vsw-from{font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}

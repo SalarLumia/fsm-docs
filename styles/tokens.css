@@ -24,6 +24,14 @@
   --err:#dc2626;    --err-bg:#fee2e2;  --err-line:#fecaca;  --err2:#b91c1c;   /* err2 = حالت hover دکمه‌های قرمز، هم‌نقش brand2 */
   --gray:#6b7280;   --gray-bg:#f3f4f6; --gray-line:#e5e7eb;
 
+  /* تایپوگرافی: شش نقش متن (مرجع: _dev/design-system.html). هر قاعده‌ای که اندازه و وزنش با یک نقش یکی است، از این متغیرها می‌خواند */
+  --fs-title:19px;   --fw-title:700;    /* تیتر صفحه */
+  --fs-section:14px; --fw-section:700;  /* تیتر بخش و کارت */
+  --fs-body:11.5px;  --fw-body:500;     /* متن بدنه، پارامتر و جواب */
+  --fs-label:11px;   --fw-label:500;    /* برچسب و تگ */
+  --fs-metric:28px;  --fw-metric:800;   /* عدد شاخص */
+  --fs-code:11.5px;  --fw-code:500;     /* شماره سند و کد */
+
   /* شعاع گوشه */
   --radius:12px; --radius-sm:9px; --radius-lg:16px;
 

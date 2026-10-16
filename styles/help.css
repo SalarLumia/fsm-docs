@@ -8,7 +8,7 @@
 
 /* ─── سر راهنما: عنوان + جست‌وجو ─── */
 .help-hd{padding:var(--sp-5) var(--sp-6);border-bottom:1px solid var(--line);background:var(--panel)}
-.help-hd-t{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--txt);margin-bottom:14px}
+.help-hd-t{display:flex;align-items:center;gap:8px;font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt);margin-bottom:14px}
 .help-hd-t svg{width:16px;height:16px;stroke:var(--brand);fill:none;stroke-width:2;flex-shrink:0}
 
 /* جست‌وجو در مرکز صفحه است نه در گوشه: راهنمای دسته‌بندی‌محور از راهنمای
@@ -77,11 +77,11 @@
   background:#fff3e6;color:var(--brand)}
 .hp-cat-ic svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.9}
 .hp-cat-t{font-size:13px;font-weight:700;color:var(--txt);line-height:1.6}
-.hp-cat-d{font-size:11px;font-weight:500;color:var(--muted);line-height:1.75;margin-top:2px}
+.hp-cat-d{font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);line-height:1.75;margin-top:2px}
 .hp-cat-l{display:flex;flex-direction:column;gap:1px}
 .hp-catlink{display:flex;align-items:center;gap:6px;width:100%;text-align:right;
   padding:6px 8px;border:0;background:none;border-radius:7px;
-  font-family:inherit;font-size:11.5px;font-weight:500;color:var(--txt);line-height:1.75;cursor:pointer;
+  font-family:inherit;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt);line-height:1.75;cursor:pointer;
   transition:background .15s,color .15s}
 .hp-catlink svg{width:11px;height:11px;flex-shrink:0;stroke:var(--muted);fill:none;stroke-width:2.2;
   transition:stroke .15s,transform .2s}
@@ -90,9 +90,9 @@
 
 /* ─── مقاله ─── */
 .hp-crumb{display:flex;align-items:center;gap:5px;margin-bottom:12px;
-  font-size:11px;font-weight:500;color:var(--muted)}
+  font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted)}
 .hp-crumb svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:2.4;flex-shrink:0}
-.hp-crumb-b{border:0;background:none;padding:0;font-family:inherit;font-size:11px;font-weight:500;
+.hp-crumb-b{border:0;background:none;padding:0;font-family:inherit;font-size:var(--fs-label);font-weight:var(--fw-label);
   color:var(--muted);cursor:pointer;transition:color .15s}
 .hp-crumb-b:hover{color:var(--brand)}
 .hp-t{margin:0 0 5px;font-size:17px;font-weight:700;color:var(--txt);line-height:1.6}
@@ -160,13 +160,13 @@
   font-family:inherit;cursor:pointer;transition:border-color .15s,background .15s}
 .hp-rescard:hover{border-color:var(--brand);background:#fff8f0}
 .hp-res-t{font-size:12.5px;font-weight:700;color:var(--txt);line-height:1.7}
-.hp-res-d{font-size:11.5px;font-weight:500;color:var(--muted);line-height:1.8;margin-top:2px}
+.hp-res-d{font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);line-height:1.8;margin-top:2px}
 .hp-res-c{display:inline-block;margin-top:7px;padding:1px 9px;border-radius:20px;
   background:var(--panel2);font-size:10px;font-weight:600;color:var(--muted)}
 
 .hp-nores{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;padding:56px 24px}
 .hp-nores svg{width:34px;height:34px;stroke:#c9c7c2;fill:none;stroke-width:1.6;margin-bottom:4px}
-.hp-nores-t{font-size:14px;font-weight:700;color:var(--txt)}
+.hp-nores-t{font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt)}
 .hp-nores-d{font-size:12px;font-weight:500;color:var(--muted);line-height:1.9;max-width:38ch}
 
 /* ─── صفحهٔ باریک: ریل به بالای محتوا می‌رود ─── */
