@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>پیش‌نمایش بازطراحی تنظیمات</title>
+  <link rel="stylesheet" href="styles/tokens.css">
+  <style>
+    @font-face{font-family:IRANSans;src:url("fonts/IRANSans.woff2") format("woff2"),url("fonts/IRANSans.ttf") format("truetype");font-weight:400;font-display:swap}
+    @font-face{font-family:IRANSans;src:url("fonts/IRANSans_Medium.woff2") format("woff2"),url("fonts/IRANSans_Medium.ttf") format("truetype");font-weight:500;font-display:swap}
+    @font-face{font-family:IRANSans;src:url("fonts/IRANSans_Bold.woff2") format("woff2"),url("fonts/IRANSans_Bold.ttf") format("truetype");font-weight:700;font-display:swap}
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.8 IRANSans,system-ui,"Segoe UI",Tahoma,sans-serif}
+    button,input{font:inherit}
+    button{color:inherit}
+    button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+    .topbar{height:62px;background:var(--charcoal);color:#fff;display:flex;align-items:center;padding:0 28px;gap:12px}
+    .brand-mark{width:30px;height:30px;border:1px solid var(--gold1);border-radius:8px;display:grid;place-items:center;color:var(--gold1);flex:none}
+    .brand-mark svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .brand-name{font-size:13px;font-weight:500}
+    .bar-caption{margin-inline-start:auto;font-size:11px;color:var(--gold1)}
+    .page{max-width:1260px;margin:0 auto;padding:30px 28px 48px}
+    .intro{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
+    .intro h1{font-size:19px;line-height:1.3;margin:0 0 6px;padding-inline-end:10px;border-inline-end:3px solid var(--brand);font-weight:700}
+    .intro p{margin:0;color:var(--muted);font-size:12px}
+    .demo-tag{white-space:nowrap;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:5px 11px;color:var(--muted);font-size:11px}
+    .note{display:flex;align-items:flex-start;gap:10px;padding:12px 15px;margin-bottom:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--muted);font-size:11.5px}
+    .note svg{width:17px;height:17px;flex:none;margin-top:2px;color:var(--brand);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
+    .option{position:relative;min-height:174px;text-align:start;padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
+    .option:hover{border-color:var(--brand);background:#fff8f0}
+    .option[aria-pressed="true"]{border-color:var(--brand);background:#fff8f0;box-shadow:0 0 0 1px var(--brand)}
+    .option-top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+    .option-icon{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;display:grid;place-items:center;color:var(--brand);flex:none}
+    .option-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .option-title{font-size:13px;line-height:1.5;font-weight:700}
+    .option p{margin:0 0 8px;color:var(--muted);font-size:11.5px;line-height:1.8}
+    .option-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+    .chip{display:inline-flex;align-items:center;border-radius:20px;padding:2px 8px;background:var(--panel);color:var(--muted);font-size:10px}
+    .chip.recommended{background:#fff2e2;color:var(--txt);font-weight:700}
+    .preview{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:0 1px 4px #00000008;overflow:hidden}
+    .preview-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line)}
+    .preview-title h2{margin:0 0 2px;font-size:14px}
+    .preview-title p{margin:0;color:var(--muted);font-size:11px}
+    .search-wrap{position:relative;width:min(310px,42%)}
+    .search-label{display:block;margin-bottom:3px;color:var(--muted);font-size:10px}
+    .search-wrap svg{position:absolute;inset-inline-start:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+    .search-wrap input{width:100%;min-height:44px;padding:7px 12px 7px 34px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--txt);font-size:11.5px}
+    .search-wrap input::placeholder{color:var(--muted)}
+    .preview-body{padding:18px}
+    .layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:16px;align-items:start}
+    .nav-panel,.content-panel,.group-box,.detail-card{border:1px solid var(--line);border-radius:10px;background:var(--card)}
+    .nav-panel{padding:12px}
+    .panel-label{margin:0 0 8px;padding:0 4px;color:var(--muted);font-size:10px;font-weight:700}
+    .nav-group{margin-bottom:10px}
+    .nav-group:last-child{margin-bottom:0}
+    .nav-heading{display:flex;align-items:center;gap:7px;padding:6px 5px;color:var(--txt);font-size:11.5px;font-weight:700}
+    .nav-heading svg,.group-title svg{width:15px;height:15px;color:var(--brand);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+    .nav-list{display:grid;gap:2px;padding-inline-start:9px}
+    .nav-item,.group-tab{width:100%;border:0;background:transparent;text-align:start;cursor:pointer}
+    .nav-item{display:flex;align-items:center;gap:8px;min-height:44px;padding:6px 9px;border-radius:7px;color:var(--muted);font-size:11px}
+    .nav-item::before{content:"";width:5px;height:5px;border:1.5px solid var(--line);border-radius:50%;flex:none}
+    .nav-item:hover,.nav-item[aria-pressed="true"]{background:#fff8f0;color:var(--txt)}
+    .nav-item[aria-pressed="true"]::before{border-color:var(--brand);background:var(--brand)}
+    .content-panel{min-width:0;padding:16px}
+    .content-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .content-heading h3{margin:0;font-size:14px}
+    .content-heading p{margin:2px 0 0;color:var(--muted);font-size:11px}
+    .add-hint{border:1px solid var(--line);border-radius:7px;padding:4px 9px;color:var(--muted);font-size:10.5px;white-space:nowrap}
+    .sample-note{margin:0 0 10px;color:var(--muted);font-size:10px}
+    .sample-table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;font-size:11px}
+    .sample-table th,.sample-table td{padding:9px 11px;text-align:start;border-bottom:1px solid var(--line)}
+    .sample-table th{background:var(--panel);color:var(--muted);font-weight:500}
+    .sample-table tr:last-child td{border-bottom:0}
+    .sample-table td:last-child{color:var(--muted)}
+    .sample-table bdi{direction:ltr;unicode-bidi:isolate}
+    .empty{padding:20px;text-align:center;color:var(--muted);font-size:11px}
+    .accordion-list{display:grid;gap:10px}
+    .accordion-detail{margin-top:14px}
+    .group-box{overflow:hidden}
+    .group-summary{display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:48px;padding:10px 15px;cursor:pointer;list-style:none}
+    .group-summary::-webkit-details-marker{display:none}
+    .group-title{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:700}
+    .group-meta{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:10.5px}
+    .group-meta svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform .15s}
+    details[open] .group-meta svg{transform:rotate(180deg)}
+    .group-content{padding:0 14px 13px;border-top:1px solid var(--line)}
+    .list-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 2px;border-bottom:1px solid var(--line)}
+    .list-row:last-child{border-bottom:0}
+    .list-row strong{font-size:11.5px;font-weight:500}
+    .list-row span{color:var(--muted);font-size:10.5px}
+    .list-row button{min-height:44px;border:1px solid var(--line);border-radius:6px;background:var(--card);padding:5px 9px;color:var(--txt);font-size:10px;cursor:pointer}
+    .list-row button:hover{border-color:var(--brand);background:#fff8f0}
+    .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid var(--line);padding-bottom:10px}
+    .group-tab{width:auto;min-height:44px;padding:7px 13px;border:1px solid transparent;border-radius:8px;color:var(--muted);font-size:11.5px}
+    .group-tab:hover,.group-tab[aria-pressed="true"]{border-color:var(--brand);background:#fff8f0;color:var(--txt)}
+    .tile-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+    .list-tile{min-height:88px;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--card);text-align:start;cursor:pointer;transition:border-color .15s,background .15s}
+    .list-tile:hover,.list-tile[aria-pressed="true"]{border-color:var(--brand);background:#fff8f0}
+    .list-tile strong{display:block;margin-bottom:3px;font-size:11.5px;font-weight:700}
+    .list-tile span{display:block;color:var(--muted);font-size:10px;line-height:1.7}
+    .detail-card{padding:15px}
+    .decision{margin:16px 2px 0;color:var(--muted);font-size:11px}
+    .decision strong{color:var(--txt)}
+    @media(max-width:900px){
+      .page{padding-inline:18px}
+      .options{grid-template-columns:1fr}
+      .option{min-height:0}
+      .tile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    }
+    @media(max-width:680px){
+      .topbar{height:54px;padding-inline:16px}
+      .bar-caption{font-size:10px}
+      .page{padding:22px 14px 32px}
+      .intro{display:block}
+      .demo-tag{display:inline-flex;margin-top:12px}
+      .preview-head{align-items:flex-start;flex-direction:column}
+      .search-wrap{width:100%}
+      .preview-body{padding:12px}
+      .layout{grid-template-columns:1fr}
+      .nav-panel{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:9px}
+      .panel-label{grid-column:1/-1}
+      .nav-group{margin:0;min-width:0}
+      .nav-heading{font-size:10.5px;line-height:1.5}
+      .nav-list{padding-inline-start:0}
+      .nav-item{font-size:10px;padding-inline:6px}
+      .content-panel{padding:12px}
+      .tile-grid{grid-template-columns:1fr}
+      .group-summary{align-items:flex-start}
+      .group-meta{white-space:nowrap}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V6l8 7 8-7v12"/></svg></span>
+    <span class="brand-name">فولاد شرق ماهان</span>
+    <span class="bar-caption">پیش‌نمایش بازطراحی تنظیمات</span>
+  </header>
+
+  <main class="page">
+    <section class="intro">
+      <div>
+        <h1>بازطراحی صفحهٔ تنظیمات</h1>
+        <p>سه الگوی دسته‌بندی برای دسترسی ساده‌تر به فهرست‌های سامانه</p>
+      </div>
+      <span class="demo-tag">پیش‌نمایش آزمایشی، بدون ذخیره‌سازی</span>
+    </section>
+
+    <div class="note">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
+      <span>این صفحه فقط برای مقایسهٔ چیدمان‌هاست. نام فهرست‌ها از تنظیمات فعلی گرفته شده و ردیف‌های جدول ساختگی هستند؛ هیچ تغییری در اطلاعات ذخیره نمی‌شود.</span>
+    </div>
+
+    <section class="options" aria-label="گزینه‌های بازطراحی">
+      <button class="option" type="button" data-option="sidebar" aria-pressed="true" aria-controls="demoPreview">
+        <span class="option-top">
+          <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M13 8h4m-4 4h4m-4 4h3"/></svg></span>
+          <span class="option-title">۱. دسته‌بندی با منوی کناری</span>
+        </span>
+        <p>یک گروه و فهرست را انتخاب کنید؛ فقط همان بخش در فضای اصلی نمایش داده می‌شود.</p>
+        <span class="option-foot"><span class="chip recommended">پیشنهاد اصلی</span><span class="chip">مناسب برای رشد فهرست‌ها</span></span>
+      </button>
+      <button class="option" type="button" data-option="accordion" aria-pressed="false" aria-controls="demoPreview">
+        <span class="option-top">
+          <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><path d="m17 9 3 3-3 3"/></svg></span>
+          <span class="option-title">۲. گروه‌های بازشونده</span>
+        </span>
+        <p>گروه‌ها در یک صفحه می‌مانند و هر بخش هنگام نیاز باز می‌شود.</p>
+        <span class="option-foot"><span class="chip">مرور یک‌جای گروه‌ها</span><span class="chip">نیازمند اسکرول بیشتر</span></span>
+      </button>
+      <button class="option" type="button" data-option="tabs" aria-pressed="false" aria-controls="demoPreview">
+        <span class="option-top">
+          <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v2"/></svg></span>
+          <span class="option-title">۳. تب‌های موضوعی و کارت‌ها</span>
+        </span>
+        <p>ابتدا موضوع را انتخاب کنید، سپس فهرست موردنظر را از کارت‌ها باز کنید.</p>
+        <span class="option-foot"><span class="chip">نمای دیداری‌تر</span><span class="chip">یک گام انتخاب بیشتر</span></span>
+      </button>
+    </section>
+
+    <section class="preview" id="demoPreview" aria-label="پیش‌نمایش تعاملی">
+      <header class="preview-head">
+        <div class="preview-title">
+          <h2 id="previewHeading">الگوی دسته‌بندی با منوی کناری</h2>
+          <p id="previewDescription">گروه‌ها و فهرست‌ها همیشه در دسترس‌اند؛ محتوای اصلی روی یک فهرست متمرکز می‌ماند.</p>
+        </div>
+        <label class="search-wrap">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+          <span class="search-label">جست‌وجو میان فهرست‌ها</span>
+          <input id="settingsSearch" type="search" placeholder="نام گروه یا فهرست را بنویسید" aria-label="جست‌وجو میان فهرست‌ها">
+        </label>
+      </header>
+      <div class="preview-body" id="previewBody"></div>
+    </section>
+
+    <p class="decision"><strong>برای انتخاب:</strong> می‌توانیم الگوی پیشنهادی را پایه بگیریم و جست‌وجو، شمار فهرست‌ها و نمایش موبایل را در پیاده‌سازی نهایی دقیق‌تر کنیم.</p>
+  </main>
+
+  <script>
+    var groupData=[
+      {id:"technical",name:"اطلاعات فنی",icon:'<path d="M4 5h16v14H4z"/><path d="M8 9h8m-8 4h8m-8 3h4"/>',lists:[
+        {id:"parts",name:"انواع قطعات",description:"نام و شناسهٔ قطعه",rows:[["۰۱","مونتاژ","ASSEMBLE"],["۰۲","غلتک","ROLLER"]]},
+        {id:"doctypes",name:"انواع اسناد",description:"نام، کد و سطح سند",rows:[["MC","نقشهٔ ماشین‌کاری","Machining"],["QP","پلن کنترل کیفی","QC Plan"]]},
+        {id:"partmods",name:"پارامترهای قطعات",description:"مشخصات قابل ثبت برای قطعه",rows:[["نمونه","پارامتر نمونه","مقدار نمونه"],["نمونه","پارامتر دوم","مقدار نمونه"]]}
+      ]},
+      {id:"production",name:"مواد و تولید",icon:'<path d="m12 3 9 5v8l-9 5-9-5V8z"/><path d="m3 8 9 5 9-5m-9 5v8"/>',lists:[
+        {id:"materials",name:"کتابخانهٔ مواد",description:"گرید، استاندارد و وزن مخصوص",rows:[["نمونه","مادهٔ نمونه","مقدار نمونه"],["نمونه","مادهٔ دوم","مقدار نمونه"]]},
+        {id:"heat",name:"عملیات حرارتی",description:"فهرست عملیات حرارتی",rows:[["نمونه","عملیات نمونه","مقدار نمونه"],["نمونه","عملیات دوم","مقدار نمونه"]]},
+        {id:"process",name:"فرآیند تولید",description:"مراحل قابل انتخاب برای قطعه",rows:[["نمونه","فرآیند نمونه","مقدار نمونه"],["نمونه","فرآیند دوم","مقدار نمونه"]]},
+        {id:"suppliers",name:"تأمین‌کنندگان مواد خام",description:"اطلاعات تأمین‌کننده‌ها",rows:[["نمونه","تأمین‌کنندهٔ نمونه","مقدار نمونه"],["نمونه","تأمین‌کنندهٔ دوم","مقدار نمونه"]]},
+        {id:"rawtypes",name:"انواع مادهٔ خام",description:"نام فارسی و انگلیسی ماده",rows:[["نمونه","مادهٔ خام نمونه","مقدار نمونه"],["نمونه","مادهٔ خام دوم","مقدار نمونه"]]}
+      ]},
+      {id:"access",name:"کاربران و سمت‌ها",icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1m2-9a3 3 0 1 0 0-6m1 9a5 5 0 0 1 3 4v1"/>',lists:[
+        {id:"positions",name:"سمت‌ها",description:"عنوان‌های شغلی کاربران",rows:[["نمونه","سمت نمونه","مقدار نمونه"],["نمونه","سمت دوم","مقدار نمونه"]]},
+        {id:"users",name:"کاربران سامانه",description:"کاربر، سمت و نقش",rows:[["نمونه","کاربر نمونه","بیننده"],["نمونه","کاربر دوم","بازبین"]]}
+      ]}
+    ];
+    var optionInfo={
+      sidebar:{title:"الگوی دسته‌بندی با منوی کناری",description:"گروه‌ها و فهرست‌ها همیشه در دسترس‌اند؛ محتوای اصلی روی یک فهرست متمرکز می‌ماند."},
+      accordion:{title:"الگوی گروه‌های بازشونده",description:"گروه‌ها در یک صفحه می‌مانند و فقط بخش موردنیاز باز می‌شود."},
+      tabs:{title:"الگوی تب‌های موضوعی و کارت‌ها",description:"انتخاب موضوع، سپس انتخاب فهرست از کارت‌های قابل‌اسکن."}
+    };
+    var activeOption="sidebar",activeGroup="technical",activeList="parts",searchText="";
+    var previewBody=document.getElementById("previewBody");
+
+    function escText(value){
+      return String(value).replace(/[&<>"']/g,function(char){
+        return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char];
+      });
+    }
+    function getAllLists(){
+      return groupData.reduce(function(all,group){return all.concat(group.lists);},[]);
+    }
+    function findList(id){
+      return getAllLists().filter(function(list){return list.id===id;})[0]||getAllLists()[0];
+    }
+    function matchesSearch(value){
+      return !searchText||value.toLocaleLowerCase("fa").indexOf(searchText.toLocaleLowerCase("fa"))!==-1;
+    }
+    function faNumber(value){
+      return String(value).replace(/\d/g,function(digit){return "۰۱۲۳۴۵۶۷۸۹"[Number(digit)];});
+    }
+    function filteredGroups(){
+      return groupData.map(function(group){
+        return {id:group.id,name:group.name,icon:group.icon,lists:group.lists.filter(function(list){
+          return matchesSearch(group.name+" "+list.name+" "+list.description);
+        })};
+      }).filter(function(group){return group.lists.length;});
+    }
+    function detailMarkup(list){
+      if(!list)return '<div class="empty">فهرستی با این جست‌وجو پیدا نشد.</div>';
+      return '<section class="detail-card"><div class="content-heading"><div><h3>'+escText(list.name)+'</h3><p>'+escText(list.description)+'</p></div><span class="add-hint">نمونهٔ چیدمان</span></div>'+
+        '<p class="sample-note">ردیف‌های زیر ساختگی هستند و فقط ساختار جدول را نشان می‌دهند.</p>'+
+        '<table class="sample-table"><thead><tr><th>شناسه</th><th>نام فارسی</th><th>نام یا مقدار نمونه</th></tr></thead><tbody>'+
+        list.rows.map(function(row){return '<tr><td><bdi>'+escText(row[0])+'</bdi></td><td>'+escText(row[1])+'</td><td><bdi>'+escText(row[2])+'</bdi></td></tr>';}).join("")+
+        '</tbody></table></section>';
+    }
+    function sidebarMarkup(groups){
+      if(!groups.length)return '<div class="empty">فهرستی با این جست‌وجو پیدا نشد.</div>';
+      var chosen=groups.some(function(group){return group.lists.some(function(list){return list.id===activeList;});});
+      if(!chosen&&groups[0]){activeGroup=groups[0].id;activeList=groups[0].lists[0].id;}
+      return '<div class="layout"><nav class="nav-panel" aria-label="گروه‌ها و فهرست‌ها"><p class="panel-label">دسته‌بندی تنظیمات</p>'+
+        groups.map(function(group){
+          return '<div class="nav-group"><div class="nav-heading"><svg viewBox="0 0 24 24" aria-hidden="true">'+group.icon+'</svg>'+escText(group.name)+'</div><div class="nav-list">'+
+            group.lists.map(function(list){return '<button type="button" class="nav-item" data-list="'+list.id+'" aria-pressed="'+(list.id===activeList)+'">'+escText(list.name)+'</button>';}).join("")+
+            '</div></div>';
+        }).join("")+'</nav><section class="content-panel">'+detailMarkup(findList(activeList))+'</section></div>';
+    }
+    function accordionMarkup(groups){
+      if(!groups.length)return '<div class="empty">فهرستی با این جست‌وجو پیدا نشد.</div>';
+      if(!groups.some(function(group){return group.lists.some(function(list){return list.id===activeList;});}))activeList=groups[0].lists[0].id;
+      var first=groups[0]&&groups[0].id;
+      return '<div class="accordion-list">'+groups.map(function(group){
+        return '<details class="group-box" '+(group.id===first?"open":"")+'><summary class="group-summary"><span class="group-title"><svg viewBox="0 0 24 24" aria-hidden="true">'+group.icon+'</svg>'+escText(group.name)+'</span><span class="group-meta">'+faNumber(group.lists.length)+' فهرست<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></span></summary><div class="group-content">'+
+          group.lists.map(function(list){return '<div class="list-row"><strong>'+escText(list.name)+'</strong><span>'+escText(list.description)+'</span><button type="button" data-list="'+list.id+'">نمایش نمونه</button></div>';}).join("")+
+          '</div></details>';
+      }).join("")+'</div><div class="accordion-detail">'+detailMarkup(findList(activeList))+'</div>';
+    }
+    function tabsMarkup(groups){
+      var group=groups.filter(function(item){return item.id===activeGroup;})[0]||groups[0];
+      if(!group){return '<div class="empty">فهرستی با این جست‌وجو پیدا نشد.</div>';}
+      if(!group.lists.some(function(list){return list.id===activeList;})){activeList=group.lists[0].id;}
+      return '<div class="tabs" role="group" aria-label="گروه تنظیمات">'+groups.map(function(item){
+        return '<button type="button" class="group-tab" data-group="'+item.id+'" aria-pressed="'+(item.id===group.id)+'">'+escText(item.name)+'</button>';
+      }).join("")+'</div><div class="tile-grid">'+group.lists.map(function(list){
+        return '<button type="button" class="list-tile" data-list="'+list.id+'" aria-pressed="'+(list.id===activeList)+'"><strong>'+escText(list.name)+'</strong><span>'+escText(list.description)+'</span></button>';
+      }).join("")+'</div>'+detailMarkup(findList(activeList));
+    }
+    function renderPreview(){
+      var groups=filteredGroups();
+      var info=optionInfo[activeOption];
+      document.getElementById("previewHeading").textContent=info.title;
+      document.getElementById("previewDescription").textContent=info.description;
+      previewBody.innerHTML=activeOption==="sidebar"?sidebarMarkup(groups):activeOption==="accordion"?accordionMarkup(groups):tabsMarkup(groups);
+      document.querySelectorAll(".option").forEach(function(button){
+        button.setAttribute("aria-pressed",String(button.getAttribute("data-option")===activeOption));
+      });
+    }
+    document.querySelector(".options").addEventListener("click",function(event){
+      var button=event.target.closest("[data-option]");
+      if(!button)return;
+      activeOption=button.getAttribute("data-option");
+      renderPreview();
+    });
+    previewBody.addEventListener("click",function(event){
+      var listButton=event.target.closest("[data-list]");
+      var groupButton=event.target.closest("[data-group]");
+      if(listButton)activeList=listButton.getAttribute("data-list");
+      if(groupButton)activeGroup=groupButton.getAttribute("data-group");
+      if(listButton||groupButton)renderPreview();
+    });
+    document.getElementById("settingsSearch").addEventListener("input",function(event){
+      searchText=event.target.value.trim();
+      renderPreview();
+    });
+    renderPreview();
+  </script>
+</body>
+</html>
