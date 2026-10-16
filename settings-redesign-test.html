@@ -159,31 +159,38 @@
   <style>
     #appView{height:100%;overflow:auto}
     .settings-main{min-width:0}
+    .settings-page-header{align-items:center}
     .settings-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;align-items:start}
-    .settings-index{position:sticky;top:16px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+    .settings-index{position:sticky;top:76px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008}
     .settings-index-title{margin:0 0 8px;padding:0 8px;color:var(--muted);font-size:11.5px;font-weight:700}
     .settings-index a{display:block;padding:8px 10px;border-radius:8px;color:var(--muted);font-size:11.5px;text-decoration:none;transition:.15s}
-    .settings-index a:hover,.settings-index a:focus-visible{background:#fff8f0;color:var(--txt)}
+    .settings-index a:hover,.settings-index a:focus-visible,.settings-index a[aria-current="location"]{background:#fff8f0;color:var(--txt)}
     .settings-groups{min-width:0}
-    .settings-group{scroll-margin-top:16px}
-    .settings-group-title{margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
-    .settings-group .card{scroll-margin-top:16px}
+    .settings-group{scroll-margin-top:76px}
+    .settings-group-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
+    .settings-group-title::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--brand)}
+    .settings-group .card{scroll-margin-top:76px}
+    .settings-group:last-child .card:last-child{margin-bottom:0}
+    .settings-switch{min-height:42px}
+    .settings-switch span{font-size:13px}
     .settings-accordion{display:grid;gap:12px}
     .settings-accordion details{overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008}
-    .settings-accordion summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;padding:12px 16px;cursor:pointer;list-style:none;color:var(--txt);font-size:14px;font-weight:700}
+    .settings-accordion summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;padding:12px 16px;cursor:pointer;list-style:none;color:var(--txt);font-size:14px;font-weight:700;transition:background .15s}
+    .settings-accordion summary:hover{background:var(--panel)}
     .settings-accordion summary::-webkit-details-marker{display:none}
     .settings-accordion summary::after{content:"";width:8px;height:8px;border-inline-end:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);transition:transform .15s;flex:none}
     .settings-accordion details[open] summary::after{transform:rotate(225deg)}
     .settings-accordion .settings-group{padding:14px 16px 2px;border-top:1px solid var(--line)}
     .settings-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:0 0 10px;border-bottom:1px solid var(--line)}
-    .settings-tabs a{display:inline-flex;align-items:center;min-height:40px;padding:6px 13px;border:1px solid transparent;border-radius:8px;color:var(--muted);font-size:12px;text-decoration:none;transition:.15s}
-    .settings-tabs a:hover,.settings-tabs a:focus-visible{border-color:var(--brand);background:#fff8f0;color:var(--txt)}
+    .settings-tabs a{display:inline-flex;align-items:center;min-height:40px;padding:6px 13px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--muted);font-size:12px;text-decoration:none;transition:.15s}
+    .settings-tabs a:hover,.settings-tabs a:focus-visible,.settings-tabs a[aria-current="location"]{border-color:var(--brand);background:#fff8f0;color:var(--txt)}
+    .settings-tabs{position:sticky;top:60px;z-index:10;background:var(--bg);padding-top:8px}
     .settings-add{cursor:default}
     .settings-static-action{cursor:default}
     .settings-empty{text-align:center!important;color:var(--muted);font-size:11.5px}
     @media(max-width:900px){.settings-layout{grid-template-columns:180px minmax(0,1fr);gap:12px}}
-    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.settings-index-title{grid-column:1/-1}}
-    @media(prefers-reduced-motion:reduce){.settings-accordion summary::after{transition:none}}
+    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.settings-index-title{grid-column:1/-1}.settings-tabs{top:0}}
+    @media(prefers-reduced-motion:reduce){.settings-accordion summary,.settings-accordion summary::after{transition:none}}
   </style>
 </head>
 <body>
@@ -260,6 +267,10 @@
         </div>
       </header>
       <main class="app-main">
+        <section class="page-header settings-page-header">
+          <div class="ph-titles"><h2>تنظیمات سامانه</h2></div>
+          <a class="btn sm" href="index.html">بازگشت به سامانه</a>
+        </section>
         <section id="tab-data" class="settings-main" aria-label="تنظیمات سامانه"></section>
       </main>
       <footer class="app-footer"><span>ارائه‌دهندهٔ راهکارهای خلاق دیجیتال برای کسب‌وکارها</span></footer>
@@ -626,27 +637,27 @@
         '<tbody>'+settingsRows(setting)+'</tbody></table></div></section>';
     }
     function settingsGroupMarkup(group,includeTitle){
-      return '<section class="settings-group" id="group-'+group.id+'">'+
-        (includeTitle?'<h2 class="settings-group-title">'+settingsEscape(group.name)+'</h2>':'')+
+      return '<section class="settings-group" id="'+(includeTitle?"group-":"group-content-")+group.id+'">'+
+        (includeTitle?'<h2 class="settings-group-title" id="heading-'+group.id+'">'+settingsEscape(group.name)+'</h2>':'')+
         group.settings.map(settingsCard).join("")+'</section>';
     }
     function settingsOne(){
       return '<div class="settings-layout"><nav class="settings-index" aria-label="گروه‌های تنظیمات">'+
-        '<h2 class="settings-index-title">تنظیمات</h2>'+settingsGroups.map(function(group){
-          return '<a href="#group-'+group.id+'">'+settingsEscape(group.name)+'</a>';
+        '<h2 class="settings-index-title">تنظیمات</h2>'+settingsGroups.map(function(group,index){
+          return '<a href="#group-'+group.id+'"'+(index===0?' aria-current="location"':'')+'>'+settingsEscape(group.name)+'</a>';
         }).join("")+'</nav><div class="settings-groups">'+settingsGroups.map(function(group){
           return settingsGroupMarkup(group,true);
         }).join("")+'</div></div>';
     }
     function settingsTwo(){
       return '<div class="settings-accordion">'+settingsGroups.map(function(group){
-        return '<details open><summary>'+settingsEscape(group.name)+'</summary>'+
+        return '<details open id="group-'+group.id+'"><summary>'+settingsEscape(group.name)+'</summary>'+
           settingsGroupMarkup(group,false)+'</details>';
       }).join("")+'</div>';
     }
     function settingsThree(){
-      return '<nav class="settings-tabs" aria-label="گروه‌های تنظیمات">'+settingsGroups.map(function(group){
-        return '<a href="#group-'+group.id+'">'+settingsEscape(group.name)+'</a>';
+      return '<nav class="settings-tabs" aria-label="گروه‌های تنظیمات">'+settingsGroups.map(function(group,index){
+        return '<a href="#group-'+group.id+'"'+(index===0?' aria-current="location"':'')+'>'+settingsEscape(group.name)+'</a>';
       }).join("")+'</nav><div class="settings-groups">'+settingsGroups.map(function(group){
         return settingsGroupMarkup(group,true);
       }).join("")+'</div>';
@@ -665,6 +676,14 @@
       if(!button)return;
       renderSettings(button.getAttribute("data-layout"));
       document.getElementById("appView").scrollTop=0;
+    });
+    settingsHost.addEventListener("click",function(event){
+      var link=event.target.closest(".settings-index a,.settings-tabs a");
+      if(!link)return;
+      settingsHost.querySelectorAll(".settings-index a,.settings-tabs a").forEach(function(item){
+        item.removeAttribute("aria-current");
+      });
+      link.setAttribute("aria-current","location");
     });
     renderSettings("one");
   </script>
