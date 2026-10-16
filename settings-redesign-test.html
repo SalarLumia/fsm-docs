@@ -547,7 +547,7 @@
   </template>
   <script>
     var settingsGroups=[
-      {id:"technical",name:"اطلاعات فنی",settings:[
+      {id:"technical",name:"اطلاعات فنی",icon:'<path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h5M8 16h3"/><path d="M17 12v4m-2-2h4"/>',settings:[
         {id:"parts",name:"انواع قطعات",table:"parts-tbl",columns:["نام فارسی قطعه","نام انگلیسی قطعه","عملیات"],rows:[
           {code:"01",fa:"مونتاژ",en:"ASSEMBLE"},{code:"02",fa:"غلتک",en:"ROLLER"},{code:"03",fa:"محور",en:"SHAFT"},
           {code:"04",fa:"تایر",en:"TIRE (RING)"},{code:"05",fa:"غلتک رانشی",en:"THRUST ROLLER"},{code:"06",fa:"پینیون",en:"PINION"},
@@ -565,7 +565,7 @@
         {id:"partmods",name:"انواع پارامتر های قطعات",table:"partmods-tbl",columns:["نام فارسی پارامتر","نام انگلیسی پارامتر","واحد","عملیات"],rows:[],icon:'<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
          badge:'<circle cx="12" cy="12" r="8"/><path d="M12 8v8m-4-4h8"/>'}
       ]},
-      {id:"production",name:"مواد و تولید",settings:[
+      {id:"production",name:"مواد و تولید",icon:'<path d="M3 19h18"/><path d="M5 19V9l7-5 7 5v10"/><path d="M9 19v-5h6v5"/><path d="M7.5 10.5h.01M16.5 10.5h.01"/>',settings:[
         {id:"materials",name:"کتابخانهٔ مواد",table:"mats-tbl",columns:["گرید ماده","شمارهٔ ماده","استاندارد","وزن مخصوص","عملیات"],rows:[],icon:'<path d="M3 18h18l-3-7H6z"/><path d="M8.5 11l1.5-5h4l1.5 5"/>',
          badge:'<path d="M3 18h18l-3-7H6z"/><path d="M8.5 11l1.5-5h4l1.5 5"/>'},
         {id:"heat",name:"عملیات حرارتی",table:"opt-tbl",columns:["نام عملیات","استفاده در قطعات","عملیات"],rows:[],icon:'<path d="M12 2c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.8 1.5-3.8.3 1.3 1 2.1 2 2.3C11 7 11.2 4.5 12 2z"/><path d="M5 21h14"/><path d="M7 17.5h10"/>',
@@ -577,7 +577,7 @@
         {id:"rawtypes",name:"انواع مادهٔ خام",table:"rawtypes-tbl",columns:["نام فارسی","نام انگلیسی","عملیات"],rows:[],icon:'<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/>',
          badge:'<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/>'}
       ]},
-      {id:"access",name:"کاربران و سمت‌ها",settings:[
+      {id:"access",name:"کاربران و سمت‌ها",icon:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1"/><circle cx="18" cy="9" r="2"/><path d="M18 14a4 4 0 0 1 3 4v2"/>',settings:[
         {id:"positions",name:"سمت‌ها",table:"positions-tbl",columns:["نام فارسی","نام انگلیسی","عملیات"],rows:[],icon:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
          badge:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>'},
         {id:"users",name:"کاربران سامانه",table:"users-table",columns:["نام و نام خانوادگی کاربر","نام کاربری","سمت","نقش","عملیات"],rows:[
@@ -669,7 +669,7 @@
       selectedSetting=selected.id;
       return '<div class="settings-layout"><nav class="settings-index" aria-label="دسته‌ها و تنظیمات">'+
         '<h2 class="settings-index-title">انواع تنظیمات</h2>'+settingsGroups.map(function(group){
-          var categoryIcon=group.settings[0].icon;
+          var categoryIcon=group.icon;
           var expanded=!!expandedSettingsGroups[group.id];
           var active=group.id===selectedGroup.id;
           var subnavId="settings-nav-"+group.id;
