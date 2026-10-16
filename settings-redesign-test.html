@@ -161,7 +161,7 @@
     .settings-main{min-width:0}
     .settings-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
     .settings-index{position:sticky;top:76px;padding:0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008;overflow:hidden}
-    .settings-index-title{display:flex;align-items:center;gap:8px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);color:var(--txt);font-size:14px;font-weight:700}
+    .settings-index-title{display:flex;align-items:center;gap:8px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);color:var(--txt);font-size:14px;font-weight:700;line-height:1.7}
     .settings-index-title svg{width:16px;height:16px;flex:none;color:var(--brand);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
     .settings-nav-list{padding:8px 10px}
     .settings-nav-group{margin-bottom:3px}
@@ -185,32 +185,15 @@
     .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
     .settings-content{min-width:0}
     .settings-content.is-changing>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
-    .settings-group{scroll-margin-top:76px}
-    .settings-group-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
-    .settings-group-title::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--brand)}
-    .settings-group .card{scroll-margin-top:76px}
-    .settings-group:last-child .card:last-child{margin-bottom:0}
-    .settings-switch{min-height:42px}
+    .settings-switch{min-height:42px;cursor:default}
     .settings-switch span{font-size:13px}
-    .settings-accordion{display:grid;gap:12px}
-    .settings-accordion details{overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008}
-    .settings-accordion summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;padding:12px 16px;cursor:pointer;list-style:none;color:var(--txt);font-size:14px;font-weight:700;transition:background .15s}
-    .settings-accordion summary:hover{background:var(--panel)}
-    .settings-accordion summary::-webkit-details-marker{display:none}
-    .settings-accordion summary::after{content:"";width:8px;height:8px;border-inline-end:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);transition:transform .15s;flex:none}
-    .settings-accordion details[open] summary::after{transform:rotate(225deg)}
-    .settings-accordion .settings-group{padding:14px 16px 2px;border-top:1px solid var(--line)}
-    .settings-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:0 0 10px;border-bottom:1px solid var(--line)}
-    .settings-tabs a{display:inline-flex;align-items:center;min-height:40px;padding:6px 13px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--muted);font-size:12px;text-decoration:none;transition:.15s}
-    .settings-tabs a:hover,.settings-tabs a:focus-visible,.settings-tabs a[aria-current="location"]{border-color:var(--brand);background:#fff8f0;color:var(--txt)}
-    .settings-tabs{position:sticky;top:60px;z-index:10;background:var(--bg);padding-top:8px}
     .settings-add{cursor:default}
     .settings-static-action{cursor:default}
     .settings-empty{text-align:center!important;color:var(--muted);font-size:11.5px}
     @media(max-width:900px){.settings-layout{grid-template-columns:205px minmax(0,1fr);gap:12px}}
-    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{margin-inline-start:22px}.settings-tabs{top:0}}
+    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{margin-inline-start:22px}}
     @media(prefers-reduced-motion:reduce){
-      .settings-accordion summary,.settings-accordion summary::after,.settings-nav-row::before{transition:none}
+      .settings-nav-row::before{transition:none}
       .settings-content.is-changing>.card{animation:none}
     }
   </style>
@@ -261,15 +244,15 @@
         </a>
       </nav>
       <div class="sb-bottom">
-        <button class="nav-item settings-switch active" type="button" data-layout="one" aria-pressed="true">
+        <div class="nav-item settings-switch active" aria-current="page">
           <svg class="ni ni-gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>تنظیمات ۱</span>
-        </button>
-        <button class="nav-item settings-switch" type="button" data-layout="two" aria-pressed="false">
+        </div>
+        <button class="nav-item settings-switch" type="button" data-layout="two" aria-pressed="false" hidden>
           <svg class="ni ni-gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>تنظیمات ۲</span>
         </button>
-        <button class="nav-item settings-switch" type="button" data-layout="three" aria-pressed="false">
+        <button class="nav-item settings-switch" type="button" data-layout="three" aria-pressed="false" hidden>
           <svg class="ni ni-gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
           <span>تنظیمات ۳</span>
         </button>
@@ -598,7 +581,6 @@
       ]}
     ];
     var settingsHost=document.getElementById("tab-data");
-    var settingsSidebar=document.querySelector(".sb-bottom");
     var selectedSettingsGroup="technical";
     var selectedSetting="parts";
     var previewClients=[
@@ -736,11 +718,6 @@
         '<div class="tablewrap"><table class="'+tableClass+'">'+settingsTableHead(setting)+
         '<tbody>'+settingsRows(setting)+'</tbody></table></div></section>';
     }
-    function settingsGroupMarkup(group,includeTitle){
-      return '<section class="settings-group" id="'+(includeTitle?"group-":"group-content-")+group.id+'">'+
-        (includeTitle?'<h2 class="settings-group-title" id="heading-'+group.id+'">'+settingsEscape(group.name)+'</h2>':'')+
-        group.settings.map(settingsCard).join("")+'</section>';
-    }
     function settingsOne(){
       var selectedGroup=settingsGroups.filter(function(group){return group.id===selectedSettingsGroup;})[0]||settingsGroups[0];
       var selected=selectedGroup.settings.filter(function(setting){return setting.id===selectedSetting;})[0]||selectedGroup.settings[0];
@@ -761,29 +738,10 @@
     function settingsFaNumber(value){
       return String(value).replace(/\d/g,function(digit){return "۰۱۲۳۴۵۶۷۸۹"[Number(digit)];});
     }
-    function settingsTwo(){
-      return '<div class="settings-accordion">'+settingsGroups.map(function(group){
-        return '<details open id="group-'+group.id+'"><summary>'+settingsEscape(group.name)+'</summary>'+
-          settingsGroupMarkup(group,false)+'</details>';
-      }).join("")+'</div>';
-    }
-    function settingsThree(){
-      return '<nav class="settings-tabs" aria-label="گروه‌های تنظیمات">'+settingsGroups.map(function(group,index){
-        return '<a href="#group-'+group.id+'"'+(index===0?' aria-current="location"':'')+'>'+settingsEscape(group.name)+'</a>';
-      }).join("")+'</nav><div class="settings-groups">'+settingsGroups.map(function(group){
-        return settingsGroupMarkup(group,true);
-      }).join("")+'</div>';
-    }
-    function renderSettings(layout){
-      var selected=layout||"one";
-      settingsHost.innerHTML=selected==="two"?settingsTwo():selected==="three"?settingsThree():settingsOne();
+    function renderSettings(){
+      settingsHost.innerHTML=settingsOne();
       var content=settingsHost.querySelector(".settings-content");
       if(content)content.classList.add("is-changing");
-      settingsSidebar.querySelectorAll("[data-layout]").forEach(function(button){
-        var active=button.getAttribute("data-layout")===selected;
-        button.classList.toggle("active",active);
-        button.setAttribute("aria-pressed",String(active));
-      });
     }
     function updateSettingsSelection(){
       var selectedGroup=settingsGroups.filter(function(group){return group.id===selectedSettingsGroup;})[0];
@@ -805,12 +763,6 @@
       content.innerHTML=settingsCard(selected);
       content.classList.add("is-changing");
     }
-    settingsSidebar.addEventListener("click",function(event){
-      var button=event.target.closest("[data-layout]");
-      if(!button)return;
-      renderSettings(button.getAttribute("data-layout"));
-      document.getElementById("appView").scrollTop=0;
-    });
     settingsHost.addEventListener("click",function(event){
       var category=event.target.closest("[data-settings-group]");
       var setting=event.target.closest("[data-setting]");
@@ -833,7 +785,7 @@
         updateSettingsSelection();
       }
     });
-    renderSettings("one");
+    renderSettings();
   </script>
 </body>
 </html>
