@@ -184,6 +184,7 @@
     .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
     .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
     .settings-content{min-width:0}
+    .settings-content .spec-sec-t{height:54px;box-sizing:border-box;margin:calc(-1 * var(--sp-6)) calc(-1 * var(--sp-6)) 14px;padding:0 14px}
     .settings-content.is-changing>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
     .settings-switch{min-height:42px;cursor:default}
     .settings-switch[hidden]{display:none!important}
@@ -665,6 +666,9 @@
     function settingsIcon(paths,className){
       return '<svg'+(className?' class="'+className+'"':'')+' viewBox="0 0 24 24" aria-hidden="true">'+paths+'</svg>';
     }
+    function settingsItemIcon(setting){
+      return setting.id==="process"?'<circle cx="4" cy="12" r="2.5"/><circle cx="12" cy="12" r="2.5"/><circle cx="20" cy="12" r="2.5"/><path d="M6.5 12h3m-2-2 2 2-2 2M14.5 12h3m-2-2 2 2-2 2"/>':setting.icon;
+    }
     function settingsActions(){
       return '<span class="icon-btn settings-static-action" title="ویرایش" aria-hidden="true">'+settingsIcon('<path d="m16 4 4 4L8 20H4v-4z"/><path d="m14 6 4 4"/>','ic')+'</span>'+
         '<span class="icon-btn settings-static-action" title="حذف" aria-hidden="true">'+settingsIcon('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 11v5m4-5v5"/>','ic')+'</span>';
@@ -673,7 +677,7 @@
       return '<span class="icon-btn settings-add" title="افزودن" aria-hidden="true">'+settingsIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>','ic')+'</span>';
     }
     function settingsHeader(setting){
-      return '<h3 class="spec-sec-t">'+settingsIcon(setting.icon)+'<span>'+settingsEscape(setting.name)+'</span><span class="sec-act">'+settingsActionHeader()+'</span></h3>';
+      return '<h3 class="spec-sec-t">'+settingsIcon(settingsItemIcon(setting))+'<span>'+settingsEscape(setting.name)+'</span><span class="sec-act">'+settingsActionHeader()+'</span></h3>';
     }
     function settingsEmptyRow(count){
       return '<tr><td colspan="'+count+'" class="muted settings-empty" style="text-align:center;padding:14px">موردی نیست.</td></tr>';
@@ -734,7 +738,7 @@
           return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category" type="button" data-settings-group="'+group.id+'" aria-current="'+(active?'true':'false')+'">'+
             '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button></div>'+
             '<div class="settings-subnav">'+group.settings.map(function(setting){
-              return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(setting.icon,'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
+              return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(settingsItemIcon(setting),'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
             }).join("")+'</div></div>';
         }).join("")+'</div></nav><section class="settings-content" aria-live="polite">'+
         settingsCard(selected)+'</section></div>';
