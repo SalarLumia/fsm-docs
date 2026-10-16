@@ -190,7 +190,6 @@
     .settings-subitem:hover{background:var(--panel);color:var(--txt)}
     .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
     .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
-    .settings-subitem[aria-current="page"]::after{content:"";position:absolute;inset-inline-start:0;top:50%;width:2px;height:60%;min-height:12px;border-radius:2px;background:var(--brand);transform:translateY(-50%) scaleY(0);transform-origin:center;animation:hpSelIn .22s cubic-bezier(.2,0,0,1) forwards}
     .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem{animation:navRise .34s cubic-bezier(0,0,.2,1) both}
     .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(1){animation-delay:.02s}
     .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(2){animation-delay:.06s}
@@ -200,7 +199,7 @@
     .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(6){animation-delay:.22s}
     .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(n+7){animation-delay:.22s}
     .settings-content{min-width:0}
-    .settings-content>.card{animation:fsmRise .5s cubic-bezier(0,0,.2,1) both}
+    .settings-content.is-changing>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
     .settings-group{scroll-margin-top:76px}
     .settings-group-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
     .settings-group-title::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--brand)}
@@ -227,8 +226,7 @@
     @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{margin-inline-start:22px}.settings-tabs{top:0}}
     @media(prefers-reduced-motion:reduce){
       .settings-accordion summary,.settings-accordion summary::after,.settings-nav-row::before,.settings-toggle svg,.settings-collapse{transition:none}
-      .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem,.settings-content>.card{animation:none}
-      .settings-subitem[aria-current="page"]::after{animation:none;transform:translateY(-50%) scaleY(1)}
+      .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem,.settings-content.is-changing>.card{animation:none}
     }
   </style>
 </head>
@@ -798,11 +796,33 @@
     function renderSettings(layout){
       var selected=layout||"one";
       settingsHost.innerHTML=selected==="two"?settingsTwo():selected==="three"?settingsThree():settingsOne();
+      var content=settingsHost.querySelector(".settings-content");
+      if(content)content.classList.add("is-changing");
       settingsSidebar.querySelectorAll("[data-layout]").forEach(function(button){
         var active=button.getAttribute("data-layout")===selected;
         button.classList.toggle("active",active);
         button.setAttribute("aria-pressed",String(active));
       });
+    }
+    function updateSettingsSelection(){
+      var selectedGroup=settingsGroups.filter(function(group){return group.id===selectedSettingsGroup;})[0];
+      if(!selectedGroup)return;
+      var selected=selectedGroup.settings.filter(function(item){return item.id===selectedSetting;})[0];
+      if(!selected)return;
+      settingsHost.querySelectorAll("[data-settings-group]").forEach(function(button){
+        var active=button.getAttribute("data-settings-group")===selectedGroup.id;
+        button.closest(".settings-nav-row").classList.toggle("active",active);
+        button.setAttribute("aria-current",String(active));
+      });
+      settingsHost.querySelectorAll("[data-setting]").forEach(function(button){
+        button.setAttribute("aria-current",button.getAttribute("data-setting")===selected.id?"page":"false");
+      });
+      var content=settingsHost.querySelector(".settings-content");
+      if(!content)return;
+      content.classList.remove("is-changing");
+      void content.offsetWidth;
+      content.innerHTML=settingsCard(selected);
+      content.classList.add("is-changing");
     }
     function playSettingsSubnav(collapse){
       if(!collapse)return;
@@ -850,21 +870,30 @@
         if(!selectedGroup)return;
         selectedSettingsGroup=selectedGroup.id;
         selectedSetting=selectedGroup.settings[0].id;
+        var wasExpanded=!!expandedSettingsGroups[selectedGroup.id];
         expandedSettingsGroups[selectedGroup.id]=true;
-        renderSettings("one");
-        playSettingsSubnav(document.getElementById("settings-nav-"+selectedGroup.id));
+        updateSettingsSelection();
+        if(!wasExpanded){
+          var collapse=document.getElementById("settings-nav-"+selectedGroup.id);
+          var groupToggle=settingsHost.querySelector('[data-settings-toggle="'+selectedGroup.id+'"]');
+          if(groupToggle){
+            groupToggle.setAttribute("aria-expanded","true");
+            groupToggle.setAttribute("aria-label","بستن "+selectedGroup.name);
+          }
+          collapse.classList.add("open");
+          playSettingsSubnav(collapse);
+        }
         return;
       }
       if(setting){
-        selectedSetting=setting.getAttribute("data-setting");
+        var settingId=setting.getAttribute("data-setting");
         var owner=settingsGroups.filter(function(group){
-          return group.settings.some(function(item){return item.id===selectedSetting;});
+          return group.settings.some(function(item){return item.id===settingId;});
         })[0];
         if(!owner)return;
+        selectedSetting=settingId;
         selectedSettingsGroup=owner.id;
-        expandedSettingsGroups[owner.id]=true;
-        renderSettings("one");
-        playSettingsSubnav(document.getElementById("settings-nav-"+owner.id));
+        updateSettingsSelection();
       }
     });
     renderSettings("one");
