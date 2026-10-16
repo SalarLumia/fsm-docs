@@ -244,10 +244,22 @@
           <svg class="ni ni-dash" viewBox="0 0 24 24" aria-hidden="true"><rect class="q q1" x="3" y="3" width="7" height="7" rx="1.5"/><rect class="q q2" x="14" y="3" width="7" height="7" rx="1.5"/><rect class="q q3" x="3" y="14" width="7" height="7" rx="1.5"/><rect class="q q4" x="14" y="14" width="7" height="7" rx="1.5"/></svg>
           <span>داشبورد</span>
         </a>
-        <a class="nav-item" href="index.html">
-          <svg class="ni ni-clients" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21V11.8l6 3.4V11.8l6 3.4V6.4l6 3.4V21z"/><line x1="1.5" y1="21" x2="22.5" y2="21"/></svg>
-          <span>مشتریان و پروژه‌ها</span>
-        </a>
+        <div class="nav-tree">
+          <div class="nav-trow">
+            <button class="nav-item nav-tmain" type="button" data-preview-nav-select aria-current="false">
+              <svg class="ni ni-clients" viewBox="0 0 24 24" aria-hidden="true"><path class="cl-body" d="M2 21V11.8l6 3.4V11.8l6 3.4V6.4l6 3.4V21z"/><line class="cl-ground" x1="1.5" y1="21" x2="22.5" y2="21"/><circle class="cl-w1" cx="5" cy="18.2" r="1.05" fill="currentColor" stroke="none"/><circle class="cl-w2" cx="11" cy="18.2" r="1.05" fill="currentColor" stroke="none"/><circle class="cl-w3" cx="17" cy="18.2" r="1.05" fill="currentColor" stroke="none"/><path class="cl-smoke" d="M13.2 4.7c0-1.15 1.7-1.15 1.7-2.3"/></svg>
+              مشتریان و پروژه‌ها
+            </button>
+            <button class="nav-exp" type="button" data-preview-nav-toggle aria-label="نمایش یا پنهان‌سازی مشتریان" aria-controls="previewNavTreeChildren" aria-expanded="false">
+              <svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+          <div class="nav-collapse" id="previewNavTreeChildren">
+            <div class="nav-collapse-inner">
+              <div class="nav-children" id="previewNavClients"></div>
+            </div>
+          </div>
+        </div>
         <a class="nav-item" href="index.html">
           <svg class="ni ni-folder" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
           <span>آرشیو اسناد</span>
@@ -607,12 +619,81 @@
     var selectedSettingsGroup="technical";
     var selectedSetting="parts";
     var expandedSettingsGroups={technical:true,production:true,access:true};
+    var previewClients=[
+      {code:"SAV",name:"Saveh Cement Co.",projects:["پروژهٔ ۰۱","پروژهٔ ۰۲"]},
+      {code:"ISR",name:"Isfahan Rolling Mill",projects:["پروژهٔ ۰۱"]},
+      {code:"KSH",name:"Khash Cement Co.",projects:["پروژهٔ ۰۱","پروژهٔ ۰۲"]},
+      {code:"INT",name:"Internal Project",projects:["پروژهٔ ۰۱"]},
+      {code:"LAB",name:"Lab / R&D",projects:["پروژهٔ ۰۱"]},
+      {code:"MNK",name:"Iranian Refractories",projects:["پروژهٔ ۰۱","پروژهٔ ۰۲"]}
+    ];
+    var previewNavOpen=false;
+    var previewClientOpen={};
 
     function settingsEscape(value){
       return String(value).replace(/[&<>"']/g,function(char){
         return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char];
       });
     }
+    function previewNavMarkup(){
+      return previewClients.map(function(client){
+        var projectsOpen=!!previewClientOpen[client.code];
+        return '<div class="nav-cnode"><div class="nav-trow" data-preview-client="'+client.code+'">'+
+          '<button class="nav-leaf nav-cleaf" type="button" data-preview-client-select="'+client.code+'"><span class="nav-ci-ph">'+client.code.slice(0,2)+'</span><span class="nav-lb">'+settingsEscape(client.name)+'</span></button>'+
+          '<button class="nav-exp'+(projectsOpen?' open':'')+'" type="button" data-preview-client-toggle="'+client.code+'" aria-label="پروژه‌های '+settingsEscape(client.name)+'" aria-controls="previewNavProjects-'+client.code+'" aria-expanded="'+projectsOpen+'"><svg class="chev" viewBox="0 0 24 24" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></button>'+
+          '</div><div class="nav-collapse nav-projcollapse'+(projectsOpen?' open':'')+'" id="previewNavProjects-'+client.code+'"><div class="nav-collapse-inner"><div class="nav-projwrap">'+
+          client.projects.map(function(project,index){
+            return '<button class="nav-leaf nav-pleaf" type="button" data-preview-project="'+client.code+'-'+index+'"><span class="nav-dot"></span><span class="nav-lb">'+settingsEscape(project)+'</span></button>';
+          }).join("")+
+          '</div></div></div></div>';
+      }).join("");
+    }
+    function previewNavAnimOpen(element,open){
+      if(!element)return;
+      element.classList.toggle("open",open);
+      if(open){
+        element.classList.add("nav-anim");
+        setTimeout(function(){element.classList.remove("nav-anim");},480);
+      }
+    }
+    function previewNavSelect(){
+      document.querySelector(".nav-tmain[data-preview-nav-select]").classList.add("active");
+      document.querySelector(".nav-tmain[data-preview-nav-select]").setAttribute("aria-current","page");
+    }
+    document.getElementById("previewNavClients").innerHTML=previewNavMarkup();
+    document.querySelector("[data-preview-nav-select]").addEventListener("click",previewNavSelect);
+    document.querySelector("[data-preview-nav-toggle]").addEventListener("click",function(){
+      previewNavOpen=!previewNavOpen;
+      this.classList.toggle("open",previewNavOpen);
+      this.setAttribute("aria-expanded",String(previewNavOpen));
+      document.body.classList.toggle("sb-wide",previewNavOpen);
+      previewNavAnimOpen(document.getElementById("previewNavTreeChildren"),previewNavOpen);
+    });
+    document.getElementById("previewNavClients").addEventListener("click",function(event){
+      var toggle=event.target.closest("[data-preview-client-toggle]");
+      if(toggle){
+        var code=toggle.getAttribute("data-preview-client-toggle");
+        previewClientOpen[code]=!previewClientOpen[code];
+        var expanded=previewClientOpen[code];
+        toggle.classList.toggle("open",expanded);
+        toggle.setAttribute("aria-expanded",String(expanded));
+        previewNavAnimOpen(document.getElementById("previewNavProjects-"+code),expanded);
+        return;
+      }
+      var client=event.target.closest("[data-preview-client-select]");
+      if(client){
+        previewNavSelect();
+        document.querySelectorAll("[data-preview-client]").forEach(function(row){row.classList.toggle("cur",row.getAttribute("data-preview-client")===client.getAttribute("data-preview-client-select"));});
+        document.querySelectorAll("[data-preview-project]").forEach(function(project){project.classList.remove("cur");});
+        return;
+      }
+      var project=event.target.closest("[data-preview-project]");
+      if(project){
+        previewNavSelect();
+        document.querySelectorAll("[data-preview-client]").forEach(function(row){row.classList.remove("cur");});
+        document.querySelectorAll("[data-preview-project]").forEach(function(item){item.classList.toggle("cur",item===project);});
+      }
+    });
     function settingsIcon(paths,className){
       return '<svg'+(className?' class="'+className+'"':'')+' viewBox="0 0 24 24" aria-hidden="true">'+paths+'</svg>';
     }
