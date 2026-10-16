@@ -191,7 +191,7 @@
     .settings-switch span{font-size:13px}
     .settings-add{cursor:default}
     .settings-static-action{cursor:default}
-    .settings-empty{text-align:center!important;color:var(--muted);font-size:11.5px}
+    .settings-empty{text-align:center!important;color:var(--muted)}
     @media(max-width:900px){.settings-layout{grid-template-columns:205px minmax(0,1fr);gap:12px}}
     @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{margin-inline-start:22px}}
     @media(prefers-reduced-motion:reduce){
@@ -682,7 +682,7 @@
       return '<h3 class="spec-sec-t">'+settingsIcon(settingsItemIcon(setting))+'<span>'+settingsEscape(setting.name)+'</span><span class="sec-act">'+settingsActionHeader()+'</span></h3>';
     }
     function settingsEmptyRow(count){
-      return '<tr><td colspan="'+count+'" class="muted settings-empty" style="text-align:center;padding:14px">موردی نیست.</td></tr>';
+      return '<tr><td colspan="'+count+'" class="muted settings-empty t-body" style="text-align:center;padding:14px">موردی نیست.</td></tr>';
     }
     function settingsTableHead(setting){
       return '<thead><tr>'+setting.columns.map(function(column,index){
@@ -692,25 +692,25 @@
       }).join("")+'</tr></thead>';
     }
     function settingsBadge(setting,code){
-      return '<span class="el-badge">'+settingsIcon(setting.badge).replace("</svg>",'<text class="el-code" x="12" y="16" text-anchor="middle">'+settingsEscape(code)+'</text></svg>')+'</span>';
+      return '<span class="el-badge">'+settingsIcon(setting.badge).replace("</svg>",'<text class="t-code" x="12" y="16" text-anchor="middle">'+settingsEscape(code)+'</text></svg>')+'</span>';
     }
     function settingsPartRow(setting,row){
-      return '<tr><td><div class="pm-cell">'+settingsBadge(setting,row.code)+'<span class="nm-fa">'+settingsEscape(row.fa)+'</span></div></td>'+
-        '<td class="spec-en c-mid"><span class="en-shift"><bdi>'+settingsEscape(row.en)+'</bdi></span></td>'+
+      return '<tr><td><div class="pm-cell">'+settingsBadge(setting,row.code)+'<span class="t-body">'+settingsEscape(row.fa)+'</span></div></td>'+
+        '<td class="c-mid"><span class="en-shift t-body"><bdi>'+settingsEscape(row.en)+'</bdi></span></td>'+
         '<td class="col-act"><div class="row-actions">'+settingsActions()+'</div></td></tr>';
     }
     function settingsDocTypeRow(setting,row){
       var project=row.scope==="project";
       var scope=project?'<span class="tag proj">پروژه</span>':'<span class="tag">قطعه</span>';
-      return '<tr><td><div class="pm-cell">'+settingsBadge(setting,row.code)+'<span class="nm-fa">'+settingsEscape(row.fa)+'</span></div></td>'+
-        '<td class="spec-en c-mid"><span class="en-shift"><bdi>'+settingsEscape(row.en)+'</bdi></span></td>'+
-        '<td class="spec-en c-mid"><span class="unit-shift"><bdi>'+settingsEscape(row.code)+'</bdi></span></td>'+
+      return '<tr><td><div class="pm-cell">'+settingsBadge(setting,row.code)+'<span class="t-body">'+settingsEscape(row.fa)+'</span></div></td>'+
+        '<td class="c-mid"><span class="en-shift t-body"><bdi>'+settingsEscape(row.en)+'</bdi></span></td>'+
+        '<td class="c-mid"><span class="unit-shift t-code"><bdi>'+settingsEscape(row.code)+'</bdi></span></td>'+
         '<td class="c-mid">'+scope+'</td><td class="col-act"><div class="row-actions">'+settingsActions()+'</div></td></tr>';
     }
     function settingsUserRow(row){
       return '<tr><td><div class="u-cell"><span class="u-av lg">ع</span><span class="u-name">آقای '+settingsEscape(row.name)+'</span></div></td>'+
-        '<td class="spec-en c-mid"><span class="en-shift"><bdi>'+settingsEscape(row.username)+'</bdi></span></td>'+
-        '<td class="meta-txt">'+settingsEscape(row.position)+'</td><td><span class="tag role-admin">مدیر</span></td>'+
+        '<td class="c-mid"><span class="en-shift t-code"><bdi>'+settingsEscape(row.username)+'</bdi></span></td>'+
+        '<td class="t-body">'+settingsEscape(row.position)+'</td><td><span class="tag role-admin">مدیر</span></td>'+
         '<td><div class="row-actions">'+settingsActions()+'</div></td></tr>';
     }
     function settingsRows(setting){
