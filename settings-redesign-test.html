@@ -184,10 +184,10 @@
     .settings-collapse-inner{overflow:hidden;min-height:0}
     .settings-subnav{display:grid;gap:1px;margin:3px 0 7px;margin-inline-start:20px;border-inline-start:1.5px solid var(--line);padding-inline-start:3px}
     .settings-subitem{display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:400 11.5px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:background .15s,color .15s}
-    .settings-subitem::before{content:"";width:5px;height:5px;flex:none;border:1.5px solid var(--line);border-radius:50%}
+    .settings-subitem-icon{width:16px;height:16px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:color .15s}
     .settings-subitem:hover{background:var(--panel);color:var(--txt)}
     .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
-    .settings-subitem[aria-current="page"]::before{border-color:var(--brand);background:var(--brand)}
+    .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
     .settings-content{min-width:0}
     .settings-group{scroll-margin-top:76px}
     .settings-group-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
@@ -677,7 +677,7 @@
             '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button>'+
             '<button class="settings-toggle" type="button" data-settings-toggle="'+group.id+'" aria-label="'+(expanded?'بستن':'بازکردن')+' '+settingsEscape(group.name)+'" aria-controls="'+subnavId+'" aria-expanded="'+expanded+'">'+settingsIcon('<polyline points="6 9 12 15 18 9"/>')+'</button></div>'+
             '<div class="settings-collapse'+(expanded?' open':'')+'" id="'+subnavId+'"><div class="settings-collapse-inner"><div class="settings-subnav">'+group.settings.map(function(setting){
-              return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsEscape(setting.name)+'</button>';
+              return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(setting.icon,'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
             }).join("")+'</div></div></div></div>';
         }).join("")+'</nav><section class="settings-content" aria-live="polite">'+
         settingsCard(selected)+'</section></div>';
