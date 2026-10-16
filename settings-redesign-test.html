@@ -173,19 +173,21 @@
     .settings-nav-row.active .settings-category{color:var(--brand)}
     .settings-category{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);text-align:start;cursor:pointer;transition:color .15s}
     .settings-category:hover{color:var(--brand)}
-    .settings-category:focus-visible,.settings-subitem:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+    .settings-category:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
     .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
     .settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-category-label{flex:1}
-    .settings-subnav{display:grid;gap:1px;margin:3px 0 7px;margin-inline-start:20px;border-inline-start:1.5px solid var(--line);padding-inline-start:3px}
-    .settings-subitem{position:relative;display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--muted);text-align:start;cursor:pointer;transition:background .15s,color .15s}
-    .settings-subitem-icon{width:16px;height:16px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:color .15s}
-    .settings-subitem:hover{background:var(--panel);color:var(--txt)}
-    .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:var(--fw-sub)}
-    .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
     .settings-content{min-width:0}
+    .settings-group-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:14px;padding:14px 16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:0 1px 4px #00000008}
+    .settings-group-title{display:flex;align-items:center;gap:11px;min-width:0}
+    .settings-group-icon{display:grid;place-items:center;width:34px;height:34px;flex:none;border:1px solid var(--line);border-radius:9px;color:var(--brand)}
+    .settings-group-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .settings-group-title h2{margin:0;font-size:15px;line-height:1.5}
+    .settings-group-title p{margin:2px 0 0;color:var(--muted);font-size:11px}
+    .settings-group-count{flex:none;padding:4px 10px;border:1px solid var(--line);border-radius:20px;color:var(--muted);font-size:10.5px}
+    .settings-cards{display:grid;gap:14px}
     .settings-content .spec-sec-t{height:54px;box-sizing:border-box;margin:calc(-1 * var(--sp-6)) calc(-1 * var(--sp-6)) 14px;padding:0 14px}
-    .settings-content.is-changing>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
+    .settings-content.is-changing>.settings-group-head,.settings-content.is-changing .settings-cards>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
     .settings-switch{min-height:42px;cursor:default}
     .settings-switch[hidden]{display:none!important}
     .settings-switch span{font-size:13px}
@@ -193,10 +195,10 @@
     .settings-static-action{cursor:default}
     .settings-empty{text-align:center!important;color:var(--muted)}
     @media(max-width:900px){.settings-layout{grid-template-columns:205px minmax(0,1fr);gap:12px}}
-    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{margin-inline-start:22px}}
+    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}}
     @media(prefers-reduced-motion:reduce){
       .settings-nav-row::before{transition:none}
-      .settings-content.is-changing>.card{animation:none}
+      .settings-content.is-changing>.settings-group-head,.settings-content.is-changing .settings-cards>.card{animation:none}
     }
   </style>
 </head>
@@ -587,7 +589,6 @@
     ];
     var settingsHost=document.getElementById("tab-data");
     var selectedSettingsGroup="technical";
-    var selectedSetting="parts";
     var previewClients=[
       {code:"SAV",name:"Saveh Cement Co.",projects:["پروژهٔ ۰۱","پروژهٔ ۰۲"]},
       {code:"ISR",name:"Isfahan Rolling Mill",projects:["پروژهٔ ۰۱"]},
@@ -728,22 +729,21 @@
         '<div class="tablewrap"><table class="'+tableClass+'">'+settingsTableHead(setting)+
         '<tbody>'+settingsRows(setting)+'</tbody></table></div></section>';
     }
+    function settingsGroupView(group){
+      return '<div class="settings-group-head"><div class="settings-group-title"><span class="settings-group-icon">'+settingsIcon(group.icon)+'</span><div><h2>'+settingsEscape(group.name)+'</h2><p>همهٔ فهرست‌های این گروه در یک صفحه</p></div></div><span class="settings-group-count">'+settingsFaNumber(group.settings.length)+' فهرست</span></div>'+
+        '<div class="settings-cards">'+group.settings.map(settingsCard).join("")+'</div>';
+    }
     function settingsOne(){
       var selectedGroup=settingsGroups.filter(function(group){return group.id===selectedSettingsGroup;})[0]||settingsGroups[0];
-      var selected=selectedGroup.settings.filter(function(setting){return setting.id===selectedSetting;})[0]||selectedGroup.settings[0];
       selectedSettingsGroup=selectedGroup.id;
-      selectedSetting=selected.id;
-      return '<div class="settings-layout"><nav class="settings-index" aria-label="دسته‌ها و تنظیمات">'+
+      return '<div class="settings-layout"><nav class="settings-index" aria-label="گروه‌های تنظیمات">'+
         '<h2 class="settings-index-title t-section">'+settingsIcon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')+'<span>انواع تنظیمات</span></h2><div class="settings-nav-list">'+settingsGroups.map(function(group){
           var categoryIcon=group.icon;
           var active=group.id===selectedGroup.id;
-          return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category t-sub" type="button" data-settings-group="'+group.id+'" aria-current="'+(active?'true':'false')+'">'+
-            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button></div>'+
-            '<div class="settings-subnav">'+group.settings.map(function(setting){
-              return '<button class="settings-subitem t-body" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(settingsItemIcon(setting),'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
-            }).join("")+'</div></div>';
+          return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category t-sub" type="button" data-settings-group="'+group.id+'" aria-pressed="'+active+'">'+
+            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button></div></div>';
         }).join("")+'</div></nav><section class="settings-content" aria-live="polite">'+
-        settingsCard(selected)+'</section></div>';
+        settingsGroupView(selectedGroup)+'</section></div>';
     }
     function settingsFaNumber(value){
       return String(value).replace(/\d/g,function(digit){return "۰۱۲۳۴۵۶۷۸۹"[Number(digit)];});
@@ -756,42 +756,24 @@
     function updateSettingsSelection(){
       var selectedGroup=settingsGroups.filter(function(group){return group.id===selectedSettingsGroup;})[0];
       if(!selectedGroup)return;
-      var selected=selectedGroup.settings.filter(function(item){return item.id===selectedSetting;})[0];
-      if(!selected)return;
       settingsHost.querySelectorAll("[data-settings-group]").forEach(function(button){
         var active=button.getAttribute("data-settings-group")===selectedGroup.id;
         button.closest(".settings-nav-row").classList.toggle("active",active);
-        button.setAttribute("aria-current",String(active));
-      });
-      settingsHost.querySelectorAll("[data-setting]").forEach(function(button){
-        button.setAttribute("aria-current",button.getAttribute("data-setting")===selected.id?"page":"false");
+        button.setAttribute("aria-pressed",String(active));
       });
       var content=settingsHost.querySelector(".settings-content");
       if(!content)return;
       content.classList.remove("is-changing");
       void content.offsetWidth;
-      content.innerHTML=settingsCard(selected);
+      content.innerHTML=settingsGroupView(selectedGroup);
       content.classList.add("is-changing");
     }
     settingsHost.addEventListener("click",function(event){
       var category=event.target.closest("[data-settings-group]");
-      var setting=event.target.closest("[data-setting]");
       if(category){
         var selectedGroup=settingsGroups.filter(function(group){return group.id===category.getAttribute("data-settings-group");})[0];
         if(!selectedGroup)return;
         selectedSettingsGroup=selectedGroup.id;
-        selectedSetting=selectedGroup.settings[0].id;
-        updateSettingsSelection();
-        return;
-      }
-      if(setting){
-        var settingId=setting.getAttribute("data-setting");
-        var owner=settingsGroups.filter(function(group){
-          return group.settings.some(function(item){return item.id===settingId;});
-        })[0];
-        if(!owner)return;
-        selectedSetting=settingId;
-        selectedSettingsGroup=owner.id;
         updateSettingsSelection();
       }
     });
