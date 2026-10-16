@@ -132,7 +132,7 @@ body.modal-open{overflow:hidden}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th,td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--line)}
 /* تایپوگرافی «عنوان ستون» — مشترک همهٔ تیترهای جدول‌ها؛ کلاس .col-title همین را روی هر عنصری می‌دهد */
-th,.col-title{color:var(--txt);font-weight:700;font-size:12.5px}
+th,.col-title{color:var(--txt);font-weight:var(--fw-sub);font-size:var(--fs-sub)}
 th{position:sticky;top:0;background:#f4f4f2}
 /* متن فرعی جمع‌وجور — خاکستری ۱۱٫۵px، وزن ۵۵۰ (کمی سبک‌تر از لاتین کنارش برای توازن بصری)؛
    کلاس مرجع استاندارد برای «مقدار/زیرنویس» ثانویه (مثل ستون سمت) */
@@ -457,6 +457,7 @@ html:has(.modal:not(.hidden)){overflow:hidden}
 .t-title  {font-size:var(--fs-title);font-weight:var(--fw-title);color:var(--txt);line-height:1.2}
 .t-title.tbar{padding-right:10px;border-right:3px solid var(--brand)}
 .t-section{font-size:var(--fs-section);font-weight:var(--fw-section);color:var(--txt)}
+.t-sub    {font-size:var(--fs-sub);font-weight:var(--fw-sub);color:var(--txt)}
 .t-body   {font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt)}
 .t-label  {font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted)}
 .t-metric {font-size:var(--fs-metric);font-weight:var(--fw-metric);color:var(--txt);font-variant-numeric:tabular-nums;line-height:1}
