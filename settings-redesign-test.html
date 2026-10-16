@@ -4,7 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>پیش‌نمایش بازطراحی تنظیمات</title>
-  <link rel="stylesheet" href="styles/tokens.css">
+  <link rel="stylesheet" href="styles/tokens.css?v=20261015.2">
+  <link rel="stylesheet" href="styles/base.css?v=20261015.2">
+  <link rel="stylesheet" href="styles/components.css?v=20261015.2">
+  <link rel="stylesheet" href="styles/layout.css?v=20261015.2">
   <style>
     @font-face{font-family:IRANSans;src:url("fonts/IRANSans.woff2") format("woff2"),url("fonts/IRANSans.ttf") format("truetype");font-weight:400;font-display:swap}
     @font-face{font-family:IRANSans;src:url("fonts/IRANSans_Medium.woff2") format("woff2"),url("fonts/IRANSans_Medium.ttf") format("truetype");font-weight:500;font-display:swap}
@@ -14,38 +17,40 @@
     button,input{font:inherit}
     button{color:inherit}
     button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
-    .topbar{height:62px;background:var(--charcoal);color:#fff;display:flex;align-items:center;padding:0 28px;gap:12px}
-    .brand-mark{width:30px;height:30px;border:1px solid var(--gold1);border-radius:8px;display:grid;place-items:center;color:var(--gold1);flex:none}
-    .brand-mark svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .brand-name{font-size:13px;font-weight:500}
-    .bar-caption{margin-inline-start:auto;font-size:11px;color:var(--gold1)}
+    #appView{height:100%;overflow:auto}
+    .prototype-app .top-bar{grid-template-columns:1fr 1fr}
+    .prototype-app .user-meta{gap:8px}
+    .prototype-app .user-name{font-size:14px}
+    .prototype-app .user-role{font-size:11px;color:var(--muted);white-space:nowrap}
+    .prototype-app .user-position{font-size:11px;padding-right:10px}
+    .prototype-app .top-bar-left{font-size:11px}
+    .prototype-app .app-main>.page{width:100%;max-width:1260px;padding:0}
+    .prototype-app .app-footer{margin-right:0}
     .page{max-width:1260px;margin:0 auto;padding:30px 28px 48px}
-    .intro{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px}
-    .intro h1{font-size:19px;line-height:1.3;margin:0 0 6px;padding-inline-end:10px;border-inline-end:3px solid var(--brand);font-weight:700}
-    .intro p{margin:0;color:var(--muted);font-size:12px}
-    .demo-tag{white-space:nowrap;border:1px solid var(--line);background:var(--card);border-radius:20px;padding:5px 11px;color:var(--muted);font-size:11px}
     .note{display:flex;align-items:flex-start;gap:10px;padding:12px 15px;margin-bottom:20px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);color:var(--muted);font-size:11.5px}
     .note svg{width:17px;height:17px;flex:none;margin-top:2px;color:var(--brand);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
-    .option{position:relative;min-height:174px;text-align:start;padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:var(--card);cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
+    .switcher{margin-bottom:18px;padding:14px 16px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+    .switcher-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:11px}
+    .switcher-head h2{margin:0;font-size:13px}
+    .switcher-head span{font-size:10.5px;color:var(--muted)}
+    .options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .option{display:flex;align-items:flex-start;gap:10px;min-height:68px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--card);text-align:start;cursor:pointer;transition:border-color .15s,background .15s,box-shadow .15s}
     .option:hover{border-color:var(--brand);background:#fff8f0}
-    .option[aria-pressed="true"]{border-color:var(--brand);background:#fff8f0;box-shadow:0 0 0 1px var(--brand)}
-    .option-top{display:flex;align-items:center;gap:10px;margin-bottom:9px}
-    .option-icon{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;display:grid;place-items:center;color:var(--brand);flex:none}
-    .option-icon svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-    .option-title{font-size:13px;line-height:1.5;font-weight:700}
-    .option p{margin:0 0 8px;color:var(--muted);font-size:11.5px;line-height:1.8}
-    .option-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-    .chip{display:inline-flex;align-items:center;border-radius:20px;padding:2px 8px;background:var(--panel);color:var(--muted);font-size:10px}
-    .chip.recommended{background:#fff2e2;color:var(--txt);font-weight:700}
+    .option[aria-pressed="true"]{border-color:var(--brand);background:#fff8f0;box-shadow:inset -3px 0 var(--brand)}
+    .option-icon{width:28px;height:28px;border:1px solid var(--line);border-radius:8px;display:grid;place-items:center;color:var(--brand);flex:none}
+    .option-icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+    .option-copy{min-width:0}
+    .option-title{display:block;font-size:11.5px;line-height:1.6;font-weight:700}
+    .option-desc{display:block;margin-top:2px;color:var(--muted);font-size:10px;line-height:1.65}
+    .switcher-help{margin:8px 2px 0;color:var(--muted);font-size:10px}
     .preview{border:1px solid var(--line);border-radius:var(--radius);background:var(--card);box-shadow:0 1px 4px #00000008;overflow:hidden}
     .preview-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 18px;border-bottom:1px solid var(--line)}
     .preview-title h2{margin:0 0 2px;font-size:14px}
     .preview-title p{margin:0;color:var(--muted);font-size:11px}
     .search-wrap{position:relative;width:min(310px,42%)}
     .search-label{display:block;margin-bottom:3px;color:var(--muted);font-size:10px}
-    .search-wrap svg{position:absolute;inset-inline-start:11px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
-    .search-wrap input{width:100%;min-height:44px;padding:7px 12px 7px 34px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--txt);font-size:11.5px}
+    .search-wrap svg{position:absolute;inset-inline-start:11px;inset-block-end:14px;width:16px;height:16px;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round}
+    .search-wrap input{width:100%;min-height:44px;padding:7px 34px 7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--txt);font-size:11.5px}
     .search-wrap input::placeholder{color:var(--muted)}
     .preview-body{padding:18px}
     .layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:16px;align-items:start}
@@ -105,15 +110,28 @@
     @media(max-width:900px){
       .page{padding-inline:18px}
       .options{grid-template-columns:1fr}
-      .option{min-height:0}
+      .option{min-height:58px}
       .tile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
     }
     @media(max-width:680px){
-      .topbar{height:54px;padding-inline:16px}
-      .bar-caption{font-size:10px}
       .page{padding:22px 14px 32px}
-      .intro{display:block}
-      .demo-tag{display:inline-flex;margin-top:12px}
+      .prototype-app .sidebar{width:64px}
+      .prototype-app .app-body{margin-right:64px}
+      .prototype-app .sb-brand{padding:12px 7px}
+      .prototype-app .sb-logo{padding:5px}
+      .prototype-app .sb-caption,.prototype-app .nav-item span,.prototype-app .sb-dev,.prototype-app .nav-label{display:none}
+      .prototype-app .sb-nav{padding:10px 5px}
+      .prototype-app .nav-item{justify-content:center;padding:12px 8px}
+      .prototype-app .nav-item svg{width:19px;height:19px}
+      .prototype-app .sb-bottom{padding:8px 5px}
+      .prototype-app .top-bar{grid-template-columns:1fr;gap:7px;padding:8px 12px}
+      .prototype-app .user-meta{gap:5px;flex-wrap:wrap}
+      .prototype-app .user-position{display:none}
+      .prototype-app .top-bar-left{justify-content:flex-start;padding-inline-start:48px}
+      .prototype-app .app-main{padding:14px 12px 22px}
+      .prototype-app .app-footer{padding:6px}
+      .switcher{padding:12px}
+      .switcher-head{align-items:flex-start;flex-direction:column;gap:2px}
       .preview-head{align-items:flex-start;flex-direction:column}
       .search-wrap{width:100%}
       .preview-body{padding:12px}
@@ -129,74 +147,140 @@
       .group-summary{align-items:flex-start}
       .group-meta{white-space:nowrap}
     }
+    @media(max-width:420px){.prototype-app .user-role{display:none}.prototype-app .user-name{font-size:12px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 18V6l8 7 8-7v12"/></svg></span>
-    <span class="brand-name">فولاد شرق ماهان</span>
-    <span class="bar-caption">پیش‌نمایش بازطراحی تنظیمات</span>
-  </header>
-
-  <main class="page">
-    <section class="intro">
-      <div>
-        <h1>بازطراحی صفحهٔ تنظیمات</h1>
-        <p>سه الگوی دسته‌بندی برای دسترسی ساده‌تر به فهرست‌های سامانه</p>
+  <div id="appView" class="prototype-app">
+    <aside class="sidebar" aria-label="پیش‌نمایش نوار کناری سامانه">
+      <div class="sb-brand">
+        <img class="sb-logo" src="fsm-logotype.svg" alt="فولاد شرق ماهان">
+        <div class="sb-caption">سامانهٔ مدیریت اسناد و پروژه‌ها</div>
       </div>
-      <span class="demo-tag">پیش‌نمایش آزمایشی، بدون ذخیره‌سازی</span>
-    </section>
-
-    <div class="note">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
-      <span>این صفحه فقط برای مقایسهٔ چیدمان‌هاست. نام فهرست‌ها از تنظیمات فعلی گرفته شده و ردیف‌های جدول ساختگی هستند؛ هیچ تغییری در اطلاعات ذخیره نمی‌شود.</span>
-    </div>
-
-    <section class="options" aria-label="گزینه‌های بازطراحی">
-      <button class="option" type="button" data-option="sidebar" aria-pressed="true" aria-controls="demoPreview">
-        <span class="option-top">
-          <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M13 8h4m-4 4h4m-4 4h3"/></svg></span>
-          <span class="option-title">۱. دسته‌بندی با منوی کناری</span>
+      <nav class="sb-nav">
+        <a class="nav-item" href="index.html" title="بازگشت به سامانه">
+          <svg class="ni ni-dash" viewBox="0 0 24 24" aria-hidden="true"><rect class="q q1" x="3" y="3" width="7" height="7" rx="1.5"/><rect class="q q2" x="14" y="3" width="7" height="7" rx="1.5"/><rect class="q q3" x="3" y="14" width="7" height="7" rx="1.5"/><rect class="q q4" x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>داشبورد</span>
+        </a>
+        <span class="nav-item" aria-hidden="true">
+          <svg class="ni ni-clients" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21V11.8l6 3.4V11.8l6 3.4V6.4l6 3.4V21z"/><line x1="1.5" y1="21" x2="22.5" y2="21"/></svg>
+          <span>مشتریان و پروژه‌ها</span>
         </span>
-        <p>یک گروه و فهرست را انتخاب کنید؛ فقط همان بخش در فضای اصلی نمایش داده می‌شود.</p>
-        <span class="option-foot"><span class="chip recommended">پیشنهاد اصلی</span><span class="chip">مناسب برای رشد فهرست‌ها</span></span>
-      </button>
-      <button class="option" type="button" data-option="accordion" aria-pressed="false" aria-controls="demoPreview">
-        <span class="option-top">
-          <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><path d="m17 9 3 3-3 3"/></svg></span>
-          <span class="option-title">۲. گروه‌های بازشونده</span>
+        <span class="nav-item" aria-hidden="true">
+          <svg class="ni ni-folder" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>آرشیو اسناد</span>
         </span>
-        <p>گروه‌ها در یک صفحه می‌مانند و هر بخش هنگام نیاز باز می‌شود.</p>
-        <span class="option-foot"><span class="chip">مرور یک‌جای گروه‌ها</span><span class="chip">نیازمند اسکرول بیشتر</span></span>
-      </button>
-      <button class="option" type="button" data-option="tabs" aria-pressed="false" aria-controls="demoPreview">
-        <span class="option-top">
-          <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v2"/></svg></span>
-          <span class="option-title">۳. تب‌های موضوعی و کارت‌ها</span>
+        <span class="nav-item" aria-hidden="true">
+          <svg class="ni ni-search" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>ردیابی قطعات تولیدی</span>
         </span>
-        <p>ابتدا موضوع را انتخاب کنید، سپس فهرست موردنظر را از کارت‌ها باز کنید.</p>
-        <span class="option-foot"><span class="chip">نمای دیداری‌تر</span><span class="chip">یک گام انتخاب بیشتر</span></span>
-      </button>
-    </section>
+        <span class="nav-item" aria-hidden="true">
+          <svg class="ni ni-cad" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V4.6A1.6 1.6 0 0 1 4.6 3H8m8 0h3.4A1.6 1.6 0 0 1 21 4.6V8m0 8v3.4a1.6 1.6 0 0 1-1.6 1.6H16m-8 0H4.6A1.6 1.6 0 0 1 3 19.4V16"/><path d="m12 6.4 5 2.9v5.8l-5 2.9-5-2.9V9.3z"/></svg>
+          <span>CAD Studio</span>
+        </span>
+        <span class="nav-item" aria-hidden="true">
+          <svg class="ni ni-trash" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m-2 0h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>سطل زباله</span>
+        </span>
+      </nav>
+      <div class="sb-dev">
+        <span class="sb-dev-name">پیش‌نمایش آزمایشی</span>
+        <span class="sb-dev-mail">بدون اتصال به اطلاعات اصلی</span>
+      </div>
+      <div class="sb-bottom">
+        <span class="nav-item active" aria-current="page">
+          <svg class="ni ni-gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>تنظیمات</span>
+        </span>
+        <span class="nav-item" aria-hidden="true">
+          <svg class="ni ni-help" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8.9 9.3a3.2 3.2 0 1 1 4.5 2.95c-.85.42-1.4 1.05-1.4 1.95v.55"/><circle cx="12" cy="17.4" r="1"/></svg>
+          <span>راهنما</span>
+        </span>
+        <span class="nav-item nav-logout" aria-hidden="true">
+          <svg class="ni ni-out" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5m5 5H9"/></svg>
+          <span>خروج</span>
+        </span>
+      </div>
+    </aside>
 
-    <section class="preview" id="demoPreview" aria-label="پیش‌نمایش تعاملی">
-      <header class="preview-head">
-        <div class="preview-title">
-          <h2 id="previewHeading">الگوی دسته‌بندی با منوی کناری</h2>
-          <p id="previewDescription">گروه‌ها و فهرست‌ها همیشه در دسترس‌اند؛ محتوای اصلی روی یک فهرست متمرکز می‌ماند.</p>
+    <div class="app-body">
+      <header class="top-bar">
+        <div class="top-bar-right">
+          <div class="user-badge">
+            <div class="user-avatar" aria-hidden="true">ع</div>
+            <div class="user-meta">
+              <span class="user-name">آقای علی شفیعی</span>
+              <span class="user-role">مدیر سامانه</span>
+              <span class="user-position">واحد تحقیق و توسعه</span>
+            </div>
+          </div>
         </div>
-        <label class="search-wrap">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-          <span class="search-label">جست‌وجو میان فهرست‌ها</span>
-          <input id="settingsSearch" type="search" placeholder="نام گروه یا فهرست را بنویسید" aria-label="جست‌وجو میان فهرست‌ها">
-        </label>
+        <div class="top-bar-left">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="top-clock">جمعه ۲۴ مهر ۱۴۰۵</span>
+          <span class="tb-sep" aria-hidden="true"></span>
+          <span>محیط آزمایشی</span>
+        </div>
       </header>
-      <div class="preview-body" id="previewBody"></div>
-    </section>
 
-    <p class="decision"><strong>برای انتخاب:</strong> می‌توانیم الگوی پیشنهادی را پایه بگیریم و جست‌وجو، شمار فهرست‌ها و نمایش موبایل را در پیاده‌سازی نهایی دقیق‌تر کنیم.</p>
-  </main>
+      <main class="app-main">
+        <div class="page">
+          <section class="page-header">
+            <div class="ph-titles">
+              <h2>تنظیمات سامانه</h2>
+              <p>پیش‌نمایش سه الگوی پیشنهادی در پوستهٔ واقعی سایت</p>
+            </div>
+            <a class="btn sm" href="index.html">بازگشت به سامانه</a>
+          </section>
+
+          <div class="note">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/></svg>
+            <span>پوستهٔ هدر و نوار کناری از طراحی خود سایت پیروی می‌کند. این نمونه به اطلاعات واقعی وصل نیست و ردیف‌های جدول ساختگی هستند.</span>
+          </div>
+
+          <section class="switcher" aria-label="انتخاب الگوی نمایش تنظیمات">
+            <div class="switcher-head">
+              <h2>الگوی نمایش فهرست‌ها را عوض کنید</h2>
+              <span>برای مقایسه، یکی از گزینه‌ها را انتخاب کنید</span>
+            </div>
+            <div class="options" role="group" aria-label="الگوهای بازطراحی">
+              <button class="option" type="button" data-option="sidebar" aria-pressed="true" aria-controls="demoPreview">
+                <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16M13 8h4m-4 4h4m-4 4h3"/></svg></span>
+                <span class="option-copy"><span class="option-title">۱. منوی دسته‌بندی کناری</span><span class="option-desc">فهرست‌ها همیشه در دسترس‌اند</span></span>
+              </button>
+              <button class="option" type="button" data-option="accordion" aria-pressed="false" aria-controls="demoPreview">
+                <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/><path d="m17 9 3 3-3 3"/></svg></span>
+                <span class="option-copy"><span class="option-title">۲. گروه‌های بازشونده</span><span class="option-desc">گروه‌ها در یک صفحه جمع می‌شوند</span></span>
+              </button>
+              <button class="option" type="button" data-option="tabs" aria-pressed="false" aria-controls="demoPreview">
+                <span class="option-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h7l2 2h9v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 7V5a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v2"/></svg></span>
+                <span class="option-copy"><span class="option-title">۳. تب‌های موضوعی</span><span class="option-desc">فهرست‌ها با کارت انتخاب می‌شوند</span></span>
+              </button>
+            </div>
+            <p class="switcher-help">این دکمه‌ها فقط چیدمان پیش‌نمایش را عوض می‌کنند و چیزی ذخیره نمی‌کنند.</p>
+          </section>
+
+          <section class="preview" id="demoPreview" aria-label="پیش‌نمایش تعاملی تنظیمات">
+            <header class="preview-head">
+              <div class="preview-title">
+                <h2 id="previewHeading">الگوی دسته‌بندی با منوی کناری</h2>
+                <p id="previewDescription">گروه‌ها و فهرست‌ها همیشه در دسترس‌اند؛ محتوای اصلی روی یک فهرست متمرکز می‌ماند.</p>
+              </div>
+              <label class="search-wrap">
+                <span class="search-label">جست‌وجو میان فهرست‌ها</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
+                <input id="settingsSearch" type="search" placeholder="نام گروه یا فهرست را بنویسید" aria-label="جست‌وجو میان فهرست‌ها">
+              </label>
+            </header>
+            <div class="preview-body" id="previewBody"></div>
+          </section>
+          <p class="decision"><strong>برای انتخاب:</strong> پس از بررسی الگوها، گزینهٔ دلخواه را انتخاب می‌کنیم و همان را در صفحهٔ اصلی پیاده‌سازی می‌کنیم.</p>
+        </div>
+      </main>
+      <footer class="app-footer">پیش‌نمایش آزمایشی بازطراحی تنظیمات</footer>
+    </div>
+  </div>
 
   <script>
     var groupData=[
