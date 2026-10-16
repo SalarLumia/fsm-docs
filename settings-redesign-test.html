@@ -160,8 +160,10 @@
     #appView{height:100%;overflow:auto}
     .settings-main{min-width:0}
     .settings-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
-    .settings-index{position:sticky;top:76px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008}
-    .settings-index-title{margin:0 0 8px;padding:0 8px;color:var(--muted);font-size:11.5px;font-weight:700}
+    .settings-index{position:sticky;top:76px;padding:0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008;overflow:hidden}
+    .settings-index-title{display:flex;align-items:center;gap:8px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);color:var(--txt);font-size:14px;font-weight:700}
+    .settings-index-title svg{width:16px;height:16px;flex:none;color:var(--brand);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .settings-nav-list{padding:8px 10px}
     .settings-nav-group{margin-bottom:3px}
     .settings-nav-row{display:flex;align-items:stretch;position:relative;border-radius:8px;transition:background .15s}
     .settings-nav-row:hover{background:var(--panel)}
@@ -169,7 +171,7 @@
     .settings-nav-row::before{content:"";position:absolute;top:50%;inset-inline-start:0;width:3px;height:18px;border-radius:3px;background:var(--brand);transform:translateY(-50%) scaleY(0);transition:transform .22s}
     .settings-nav-row.active::before{transform:translateY(-50%) scaleY(1)}
     .settings-nav-row.active .settings-category,.settings-nav-row.active .settings-toggle{color:var(--brand)}
-    .settings-category{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);font:700 12px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer}
+    .settings-category{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);font:700 12px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:color .15s}
     .settings-category:hover{color:var(--brand)}
     .settings-category:focus-visible,.settings-toggle:focus-visible,.settings-subitem:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
     .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
@@ -183,12 +185,22 @@
     .settings-collapse.open{grid-template-rows:1fr;opacity:1}
     .settings-collapse-inner{overflow:hidden;min-height:0}
     .settings-subnav{display:grid;gap:1px;margin:3px 0 7px;margin-inline-start:20px;border-inline-start:1.5px solid var(--line);padding-inline-start:3px}
-    .settings-subitem{display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:400 11.5px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:background .15s,color .15s}
+    .settings-subitem{position:relative;display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:400 11.5px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:background .15s,color .15s}
     .settings-subitem-icon{width:16px;height:16px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:color .15s}
     .settings-subitem:hover{background:var(--panel);color:var(--txt)}
     .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
     .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
+    .settings-subitem[aria-current="page"]::after{content:"";position:absolute;inset-inline-start:0;top:50%;width:2px;height:60%;min-height:12px;border-radius:2px;background:var(--brand);transform:translateY(-50%) scaleY(0);transform-origin:center;animation:hpSelIn .22s cubic-bezier(.2,0,0,1) forwards}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem{animation:navRise .34s cubic-bezier(0,0,.2,1) both}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(1){animation-delay:.02s}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(2){animation-delay:.06s}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(3){animation-delay:.1s}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(4){animation-delay:.14s}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(5){animation-delay:.18s}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(6){animation-delay:.22s}
+    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(n+7){animation-delay:.22s}
     .settings-content{min-width:0}
+    .settings-content>.card{animation:fsmRise .5s cubic-bezier(0,0,.2,1) both}
     .settings-group{scroll-margin-top:76px}
     .settings-group-title{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
     .settings-group-title::before{content:"";width:3px;height:16px;border-radius:2px;background:var(--brand)}
@@ -213,7 +225,11 @@
     .settings-empty{text-align:center!important;color:var(--muted);font-size:11.5px}
     @media(max-width:900px){.settings-layout{grid-template-columns:205px minmax(0,1fr);gap:12px}}
     @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{margin-inline-start:22px}.settings-tabs{top:0}}
-    @media(prefers-reduced-motion:reduce){.settings-accordion summary,.settings-accordion summary::after,.settings-nav-row::before,.settings-toggle svg,.settings-collapse{transition:none}}
+    @media(prefers-reduced-motion:reduce){
+      .settings-accordion summary,.settings-accordion summary::after,.settings-nav-row::before,.settings-toggle svg,.settings-collapse{transition:none}
+      .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem,.settings-content>.card{animation:none}
+      .settings-subitem[aria-current="page"]::after{animation:none;transform:translateY(-50%) scaleY(1)}
+    }
   </style>
 </head>
 <body>
@@ -668,7 +684,7 @@
       selectedSettingsGroup=selectedGroup.id;
       selectedSetting=selected.id;
       return '<div class="settings-layout"><nav class="settings-index" aria-label="دسته‌ها و تنظیمات">'+
-        '<h2 class="settings-index-title">انواع تنظیمات</h2>'+settingsGroups.map(function(group){
+        '<h2 class="settings-index-title">'+settingsIcon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')+'<span>انواع تنظیمات</span></h2><div class="settings-nav-list">'+settingsGroups.map(function(group){
           var categoryIcon=group.icon;
           var expanded=!!expandedSettingsGroups[group.id];
           var active=group.id===selectedGroup.id;
@@ -679,7 +695,7 @@
             '<div class="settings-collapse'+(expanded?' open':'')+'" id="'+subnavId+'"><div class="settings-collapse-inner"><div class="settings-subnav">'+group.settings.map(function(setting){
               return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(setting.icon,'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
             }).join("")+'</div></div></div></div>';
-        }).join("")+'</nav><section class="settings-content" aria-live="polite">'+
+        }).join("")+'</div></nav><section class="settings-content" aria-live="polite">'+
         settingsCard(selected)+'</section></div>';
     }
     function settingsFaNumber(value){
@@ -707,6 +723,23 @@
         button.setAttribute("aria-pressed",String(active));
       });
     }
+    function playSettingsSubnav(collapse){
+      if(!collapse)return;
+      if(collapse._settingsAnimT)clearTimeout(collapse._settingsAnimT);
+      collapse.classList.remove("settings-anim");
+      void collapse.offsetWidth;
+      collapse.classList.add("settings-anim");
+      collapse._settingsAnimT=setTimeout(function(){
+        collapse.classList.remove("settings-anim");
+        collapse._settingsAnimT=null;
+      },600);
+    }
+    function stopSettingsSubnav(collapse){
+      if(!collapse)return;
+      if(collapse._settingsAnimT)clearTimeout(collapse._settingsAnimT);
+      collapse.classList.remove("settings-anim");
+      collapse._settingsAnimT=null;
+    }
     settingsSidebar.addEventListener("click",function(event){
       var button=event.target.closest("[data-layout]");
       if(!button)return;
@@ -723,7 +756,10 @@
         var expanded=expandedSettingsGroups[groupId];
         toggle.setAttribute("aria-expanded",String(expanded));
         toggle.setAttribute("aria-label",(expanded?'بستن':'بازکردن')+' '+toggleGroup.name);
-        document.getElementById("settings-nav-"+groupId).classList.toggle("open",expanded);
+        var collapse=document.getElementById("settings-nav-"+groupId);
+        collapse.classList.toggle("open",expanded);
+        if(expanded)playSettingsSubnav(collapse);
+        else stopSettingsSubnav(collapse);
         return;
       }
       var category=event.target.closest("[data-settings-group]");
@@ -735,6 +771,7 @@
         selectedSetting=selectedGroup.settings[0].id;
         expandedSettingsGroups[selectedGroup.id]=true;
         renderSettings("one");
+        playSettingsSubnav(document.getElementById("settings-nav-"+selectedGroup.id));
         return;
       }
       if(setting){
@@ -746,6 +783,7 @@
         selectedSettingsGroup=owner.id;
         expandedSettingsGroups[owner.id]=true;
         renderSettings("one");
+        playSettingsSubnav(document.getElementById("settings-nav-"+owner.id));
       }
     });
     renderSettings("one");
