@@ -3,12 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>پیش‌نمایش بازطراحی تنظیمات</title>
+  <title>تنظیمات سامانه</title>
+  <link rel="icon" type="image/svg+xml" href="fsm-favicon.svg">
   <link rel="stylesheet" href="styles/tokens.css?v=20261015.2">
   <link rel="stylesheet" href="styles/base.css?v=20261015.2">
+  <link rel="stylesheet" href="styles/pulse.css?v=20261015.2">
   <link rel="stylesheet" href="styles/components.css?v=20261015.2">
   <link rel="stylesheet" href="styles/layout.css?v=20261015.2">
-  <style>
+  <link rel="stylesheet" href="styles/dashboard.css?v=20261015.2">
+  <link rel="stylesheet" href="styles/features.css?v=20261015.2">
+  <link rel="stylesheet" href="styles/project.css?v=20261015.2">
+  <link rel="stylesheet" href="styles/help.css?v=20261015.2">
+  <template><style>
     @font-face{font-family:IRANSans;src:url("fonts/IRANSans.woff2") format("woff2"),url("fonts/IRANSans.ttf") format("truetype");font-weight:400;font-display:swap}
     @font-face{font-family:IRANSans;src:url("fonts/IRANSans_Medium.woff2") format("woff2"),url("fonts/IRANSans_Medium.ttf") format("truetype");font-weight:500;font-display:swap}
     @font-face{font-family:IRANSans;src:url("fonts/IRANSans_Bold.woff2") format("woff2"),url("fonts/IRANSans_Bold.ttf") format("truetype");font-weight:700;font-display:swap}
@@ -149,9 +155,117 @@
     }
     @media(max-width:420px){.prototype-app .user-role{display:none}.prototype-app .user-name{font-size:12px}}
     @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+  </style></template>
+  <style>
+    #appView{height:100%;overflow:auto}
+    .settings-main{min-width:0}
+    .settings-layout{display:grid;grid-template-columns:210px minmax(0,1fr);gap:16px;align-items:start}
+    .settings-index{position:sticky;top:16px;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+    .settings-index-title{margin:0 0 8px;padding:0 8px;color:var(--muted);font-size:11.5px;font-weight:700}
+    .settings-index a{display:block;padding:8px 10px;border-radius:8px;color:var(--muted);font-size:11.5px;text-decoration:none;transition:.15s}
+    .settings-index a:hover,.settings-index a:focus-visible{background:#fff8f0;color:var(--txt)}
+    .settings-groups{min-width:0}
+    .settings-group{scroll-margin-top:16px}
+    .settings-group-title{margin:0 0 14px;padding:0 10px;color:var(--muted);font-size:12px;font-weight:700}
+    .settings-group .card{scroll-margin-top:16px}
+    .settings-accordion{display:grid;gap:12px}
+    .settings-accordion details{overflow:hidden;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008}
+    .settings-accordion summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:50px;padding:12px 16px;cursor:pointer;list-style:none;color:var(--txt);font-size:14px;font-weight:700}
+    .settings-accordion summary::-webkit-details-marker{display:none}
+    .settings-accordion summary::after{content:"";width:8px;height:8px;border-inline-end:1.5px solid var(--muted);border-bottom:1.5px solid var(--muted);transform:rotate(45deg);transition:transform .15s;flex:none}
+    .settings-accordion details[open] summary::after{transform:rotate(225deg)}
+    .settings-accordion .settings-group{padding:14px 16px 2px;border-top:1px solid var(--line)}
+    .settings-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:0 0 10px;border-bottom:1px solid var(--line)}
+    .settings-tabs a{display:inline-flex;align-items:center;min-height:40px;padding:6px 13px;border:1px solid transparent;border-radius:8px;color:var(--muted);font-size:12px;text-decoration:none;transition:.15s}
+    .settings-tabs a:hover,.settings-tabs a:focus-visible{border-color:var(--brand);background:#fff8f0;color:var(--txt)}
+    .settings-add{cursor:default}
+    .settings-static-action{cursor:default}
+    .settings-empty{text-align:center!important;color:var(--muted);font-size:11.5px}
+    @media(max-width:900px){.settings-layout{grid-template-columns:180px minmax(0,1fr);gap:12px}}
+    @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px}.settings-index-title{grid-column:1/-1}}
+    @media(prefers-reduced-motion:reduce){.settings-accordion summary::after{transition:none}}
   </style>
 </head>
 <body>
+  <div id="appView">
+    <aside class="sidebar" aria-label="نوار کناری سامانه">
+      <div class="sb-brand">
+        <img class="sb-logo" src="fsm-logotype.svg" alt="فولاد شرق ماهان">
+        <div class="sb-caption">سامانهٔ مدیریت اسناد و پروژه‌ها</div>
+      </div>
+      <nav class="sb-nav" aria-label="بخش‌های سامانه">
+        <a class="nav-item" href="index.html">
+          <svg class="ni ni-dash" viewBox="0 0 24 24" aria-hidden="true"><rect class="q q1" x="3" y="3" width="7" height="7" rx="1.5"/><rect class="q q2" x="14" y="3" width="7" height="7" rx="1.5"/><rect class="q q3" x="3" y="14" width="7" height="7" rx="1.5"/><rect class="q q4" x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span>داشبورد</span>
+        </a>
+        <a class="nav-item" href="index.html">
+          <svg class="ni ni-clients" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 21V11.8l6 3.4V11.8l6 3.4V6.4l6 3.4V21z"/><line x1="1.5" y1="21" x2="22.5" y2="21"/></svg>
+          <span>مشتریان و پروژه‌ها</span>
+        </a>
+        <a class="nav-item" href="index.html">
+          <svg class="ni ni-folder" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          <span>آرشیو اسناد</span>
+        </a>
+        <a class="nav-item" href="index.html">
+          <svg class="ni ni-search" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>ردیابی قطعات تولیدی</span>
+        </a>
+        <a class="nav-item" href="index.html">
+          <svg class="ni ni-cad" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8V4.6A1.6 1.6 0 0 1 4.6 3H8m8 0h3.4A1.6 1.6 0 0 1 21 4.6V8m0 8v3.4a1.6 1.6 0 0 1-1.6 1.6H16m-8 0H4.6A1.6 1.6 0 0 1 3 19.4V16"/><path d="m12 6.4 5 2.9v5.8l-5 2.9-5-2.9V9.3z"/></svg>
+          <span>CAD Studio</span>
+        </a>
+        <a class="nav-item" href="index.html">
+          <svg class="ni ni-trash" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m-2 0h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>سطل زباله</span>
+        </a>
+      </nav>
+      <div class="sb-bottom">
+        <button class="nav-item settings-switch active" type="button" data-layout="one" aria-pressed="true">
+          <svg class="ni ni-gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>تنظیمات ۱</span>
+        </button>
+        <button class="nav-item settings-switch" type="button" data-layout="two" aria-pressed="false">
+          <svg class="ni ni-gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>تنظیمات ۲</span>
+        </button>
+        <button class="nav-item settings-switch" type="button" data-layout="three" aria-pressed="false">
+          <svg class="ni ni-gear" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>تنظیمات ۳</span>
+        </button>
+        <div class="sb-divider"></div>
+        <a class="nav-item" href="index.html">
+          <svg class="ni ni-help" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M8.9 9.3a3.2 3.2 0 1 1 4.5 2.95c-.85.42-1.4 1.05-1.4 1.95v.55"/><circle cx="12" cy="17.4" r="1"/></svg>
+          <span>راهنما</span>
+        </a>
+        <a class="nav-item nav-logout" href="index.html">
+          <svg class="ni ni-out" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5m5 5H9"/></svg>
+          <span>خروج</span>
+        </a>
+      </div>
+    </aside>
+    <div class="app-body">
+      <header class="top-bar">
+        <div class="top-bar-right">
+          <div class="user-badge">
+            <div class="user-avatar" aria-hidden="true">ع</div>
+            <div class="user-meta">
+              <span class="user-name">آقای علی شفیعی</span>
+              <span class="user-position">واحد تحقیق و توسعه</span>
+            </div>
+          </div>
+        </div>
+        <div class="top-bar-left">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span class="top-clock">جمعه ۲۴ مهر ۱۴۰۵</span>
+        </div>
+      </header>
+      <main class="app-main">
+        <section id="tab-data" class="settings-main" aria-label="تنظیمات سامانه"></section>
+      </main>
+      <footer class="app-footer"><span>ارائه‌دهندهٔ راهکارهای خلاق دیجیتال برای کسب‌وکارها</span></footer>
+    </div>
+  </div>
+  <template>
   <div id="appView" class="prototype-app">
     <aside class="sidebar" aria-label="پیش‌نمایش نوار کناری سامانه">
       <div class="sb-brand">
@@ -400,6 +514,159 @@
       renderPreview();
     });
     renderPreview();
+  </script>
+  </template>
+  <script>
+    var settingsGroups=[
+      {id:"technical",name:"اطلاعات فنی",settings:[
+        {id:"parts",name:"انواع قطعات",table:"parts-tbl",columns:["نام فارسی قطعه","نام انگلیسی قطعه","عملیات"],rows:[
+          {code:"01",fa:"مونتاژ",en:"ASSEMBLE"},{code:"02",fa:"غلتک",en:"ROLLER"},{code:"03",fa:"محور",en:"SHAFT"},
+          {code:"04",fa:"تایر",en:"TIRE (RING)"},{code:"05",fa:"غلتک رانشی",en:"THRUST ROLLER"},{code:"06",fa:"پینیون",en:"PINION"},
+          {code:"07",fa:"چرخ‌دنده بزرگ",en:"LARGE GEAR"}
+        ],icon:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+         badge:'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>'},
+        {id:"doctypes",name:"انواع اسناد",table:"doctypes-tbl",columns:["نام فارسی سند","نام انگلیسی سند","کد سند","سطح","عملیات"],rows:[
+          {code:"QP",fa:"پلن کنترل کیفی",en:"QC Plan",scope:"project"},{code:"PS",fa:"برنامه زمانبندی پروژه",en:"Project Schedule",scope:"project"},
+          {code:"MC",fa:"نقشه ماشینکاری",en:"Machining",scope:"part"},{code:"AS",fa:"نقشه مونتاژی",en:"Assembly",scope:"part"},
+          {code:"AC",fa:"نقشه قطعه ریخته‌گری‌شده",en:"As-Cast",scope:"part"},{code:"TC",fa:"نقشه تکنولوژی ریخته‌گری",en:"Technology",scope:"part"},
+          {code:"PT",fa:"نقشه مدل",en:"Pattern",scope:"part"},{code:"CB",fa:"نقشه جعبه ماهیچه",en:"Core Box",scope:"part"},
+          {code:"MTC",fa:"گواهی نهایی محصول",en:"Material Test Certificate",scope:"part"}
+        ],icon:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/>',
+         badge:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/>'},
+        {id:"partmods",name:"انواع پارامتر های قطعات",table:"partmods-tbl",columns:["نام فارسی پارامتر","نام انگلیسی پارامتر","واحد","عملیات"],rows:[],icon:'<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>',
+         badge:'<circle cx="12" cy="12" r="8"/><path d="M12 8v8m-4-4h8"/>'}
+      ]},
+      {id:"production",name:"مواد و تولید",settings:[
+        {id:"materials",name:"کتابخانهٔ مواد",table:"mats-tbl",columns:["گرید ماده","شمارهٔ ماده","استاندارد","وزن مخصوص","عملیات"],rows:[],icon:'<path d="M3 18h18l-3-7H6z"/><path d="M8.5 11l1.5-5h4l1.5 5"/>',
+         badge:'<path d="M3 18h18l-3-7H6z"/><path d="M8.5 11l1.5-5h4l1.5 5"/>'},
+        {id:"heat",name:"عملیات حرارتی",table:"opt-tbl",columns:["نام عملیات","استفاده در قطعات","عملیات"],rows:[],icon:'<path d="M12 2c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.8 1.5-3.8.3 1.3 1 2.1 2 2.3C11 7 11.2 4.5 12 2z"/><path d="M5 21h14"/><path d="M7 17.5h10"/>',
+         badge:'<path d="M12 2c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.8 1.5-3.8.3 1.3 1 2.1 2 2.3C11 7 11.2 4.5 12 2z"/>'},
+        {id:"process",name:"فرآیند تولید",table:"opt-tbl",columns:["نام فرآیند","استفاده در قطعات","عملیات"],rows:[],icon:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+         badge:'<circle cx="12" cy="12" r="3"/><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>'},
+        {id:"suppliers",name:"تأمین‌کنندگان مواد خام",table:"suppliers-tbl",columns:["نام فارسی","نام انگلیسی","عملیات"],rows:[],icon:'<path d="M16 3h1.5a2 2 0 0 1 1.7.95L22 8v8a1 1 0 0 1-1 1h-1"/><path d="M16 17H9"/><rect x="1" y="3" width="15" height="14" rx="2"/><circle cx="6.5" cy="19.5" r="2"/><circle cx="18.5" cy="19.5" r="2"/>',
+         badge:'<path d="M3 6h18l-2 12H5z"/><path d="M8 6V4h8v2"/>'},
+        {id:"rawtypes",name:"انواع مادهٔ خام",table:"rawtypes-tbl",columns:["نام فارسی","نام انگلیسی","عملیات"],rows:[],icon:'<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/>',
+         badge:'<path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/>'}
+      ]},
+      {id:"access",name:"کاربران و سمت‌ها",settings:[
+        {id:"positions",name:"سمت‌ها",table:"positions-tbl",columns:["نام فارسی","نام انگلیسی","عملیات"],rows:[],icon:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>',
+         badge:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>'},
+        {id:"users",name:"کاربران سامانه",table:"users-table",columns:["نام و نام خانوادگی کاربر","نام کاربری","سمت","نقش","عملیات"],rows:[
+          {name:"علی شفیعی",username:"admin",position:"واحد تحقیق و توسعه",role:"admin"}
+        ],icon:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+         badge:'<circle cx="9" cy="8" r="3"/><path d="M3 20v-1a6 6 0 0 1 12 0v1m2-9a3 3 0 1 0 0-6m1 9a5 5 0 0 1 3 4v1"/>'}
+      ]}
+    ];
+    var settingsHost=document.getElementById("tab-data");
+    var settingsSidebar=document.querySelector(".sb-bottom");
+
+    function settingsEscape(value){
+      return String(value).replace(/[&<>"']/g,function(char){
+        return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char];
+      });
+    }
+    function settingsIcon(paths,className){
+      return '<svg'+(className?' class="'+className+'"':'')+' viewBox="0 0 24 24" aria-hidden="true">'+paths+'</svg>';
+    }
+    function settingsActions(){
+      return '<span class="icon-btn settings-static-action" title="ویرایش" aria-hidden="true">'+settingsIcon('<path d="m16 4 4 4L8 20H4v-4z"/><path d="m14 6 4 4"/>','ic')+'</span>'+
+        '<span class="icon-btn settings-static-action" title="حذف" aria-hidden="true">'+settingsIcon('<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="m19 6-1 14H6L5 6"/><path d="M10 11v5m4-5v5"/>','ic')+'</span>';
+    }
+    function settingsActionHeader(){
+      return '<span class="icon-btn settings-add" title="افزودن" aria-hidden="true">'+settingsIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>','ic')+'</span>';
+    }
+    function settingsHeader(setting){
+      return '<h3 class="spec-sec-t">'+settingsIcon(setting.icon)+'<span>'+settingsEscape(setting.name)+'</span><span class="sec-act">'+settingsActionHeader()+'</span></h3>';
+    }
+    function settingsEmptyRow(count){
+      return '<tr><td colspan="'+count+'" class="muted settings-empty" style="text-align:center;padding:14px">موردی نیست.</td></tr>';
+    }
+    function settingsTableHead(setting){
+      return '<thead><tr>'+setting.columns.map(function(column,index){
+        var title=index===0?'<span class="th-exp"><span class="tbl-exp settings-static-action" aria-hidden="true">'+settingsIcon('<polyline points="6 9 12 15 18 9"/>','chev')+'</span>'+settingsEscape(column)+'</span>':
+          '<span'+(index===1?' class="en-shift"':'')+'>'+settingsEscape(column)+'</span>';
+        return '<th>'+title+'</th>';
+      }).join("")+'</tr></thead>';
+    }
+    function settingsBadge(setting,code){
+      return '<span class="el-badge">'+settingsIcon(setting.badge).replace("</svg>",'<text class="el-code" x="12" y="16" text-anchor="middle">'+settingsEscape(code)+'</text></svg>')+'</span>';
+    }
+    function settingsPartRow(setting,row){
+      return '<tr><td><div class="pm-cell">'+settingsBadge(setting,row.code)+'<span class="nm-fa">'+settingsEscape(row.fa)+'</span></div></td>'+
+        '<td class="spec-en c-mid"><span class="en-shift"><bdi>'+settingsEscape(row.en)+'</bdi></span></td>'+
+        '<td class="col-act"><div class="row-actions">'+settingsActions()+'</div></td></tr>';
+    }
+    function settingsDocTypeRow(setting,row){
+      var project=row.scope==="project";
+      var scope=project?'<span class="tag proj">پروژه</span>':'<span class="tag">قطعه</span>';
+      return '<tr><td><div class="pm-cell">'+settingsBadge(setting,row.code)+'<span class="nm-fa">'+settingsEscape(row.fa)+'</span></div></td>'+
+        '<td class="spec-en c-mid"><span class="en-shift"><bdi>'+settingsEscape(row.en)+'</bdi></span></td>'+
+        '<td class="spec-en c-mid"><span class="unit-shift"><bdi>'+settingsEscape(row.code)+'</bdi></span></td>'+
+        '<td class="c-mid">'+scope+'</td><td class="col-act"><div class="row-actions">'+settingsActions()+'</div></td></tr>';
+    }
+    function settingsUserRow(row){
+      return '<tr><td><div class="u-cell"><span class="u-av lg">ع</span><span class="u-name">آقای '+settingsEscape(row.name)+'</span></div></td>'+
+        '<td class="spec-en c-mid"><span class="en-shift"><bdi>'+settingsEscape(row.username)+'</bdi></span></td>'+
+        '<td class="meta-txt">'+settingsEscape(row.position)+'</td><td><span class="tag role-admin">مدیر</span></td>'+
+        '<td><div class="row-actions">'+settingsActions()+'</div></td></tr>';
+    }
+    function settingsRows(setting){
+      if(!setting.rows.length)return settingsEmptyRow(setting.columns.length);
+      return setting.rows.map(function(row){
+        if(setting.id==="parts")return settingsPartRow(setting,row);
+        if(setting.id==="doctypes")return settingsDocTypeRow(setting,row);
+        if(setting.id==="users")return settingsUserRow(row);
+        return "";
+      }).join("");
+    }
+    function settingsCard(setting){
+      var tableClass=setting.id==="users"?"users-table":"mgmt-table "+setting.table;
+      return '<section class="card" id="setting-'+setting.id+'">'+settingsHeader(setting)+
+        '<div class="tablewrap"><table class="'+tableClass+'">'+settingsTableHead(setting)+
+        '<tbody>'+settingsRows(setting)+'</tbody></table></div></section>';
+    }
+    function settingsGroupMarkup(group,includeTitle){
+      return '<section class="settings-group" id="group-'+group.id+'">'+
+        (includeTitle?'<h2 class="settings-group-title">'+settingsEscape(group.name)+'</h2>':'')+
+        group.settings.map(settingsCard).join("")+'</section>';
+    }
+    function settingsOne(){
+      return '<div class="settings-layout"><nav class="settings-index" aria-label="گروه‌های تنظیمات">'+
+        '<h2 class="settings-index-title">تنظیمات</h2>'+settingsGroups.map(function(group){
+          return '<a href="#group-'+group.id+'">'+settingsEscape(group.name)+'</a>';
+        }).join("")+'</nav><div class="settings-groups">'+settingsGroups.map(function(group){
+          return settingsGroupMarkup(group,true);
+        }).join("")+'</div></div>';
+    }
+    function settingsTwo(){
+      return '<div class="settings-accordion">'+settingsGroups.map(function(group){
+        return '<details open><summary>'+settingsEscape(group.name)+'</summary>'+
+          settingsGroupMarkup(group,false)+'</details>';
+      }).join("")+'</div>';
+    }
+    function settingsThree(){
+      return '<nav class="settings-tabs" aria-label="گروه‌های تنظیمات">'+settingsGroups.map(function(group){
+        return '<a href="#group-'+group.id+'">'+settingsEscape(group.name)+'</a>';
+      }).join("")+'</nav><div class="settings-groups">'+settingsGroups.map(function(group){
+        return settingsGroupMarkup(group,true);
+      }).join("")+'</div>';
+    }
+    function renderSettings(layout){
+      var selected=layout||"one";
+      settingsHost.innerHTML=selected==="two"?settingsTwo():selected==="three"?settingsThree():settingsOne();
+      settingsSidebar.querySelectorAll("[data-layout]").forEach(function(button){
+        var active=button.getAttribute("data-layout")===selected;
+        button.classList.toggle("active",active);
+        button.setAttribute("aria-pressed",String(active));
+      });
+    }
+    settingsSidebar.addEventListener("click",function(event){
+      var button=event.target.closest("[data-layout]");
+      if(!button)return;
+      renderSettings(button.getAttribute("data-layout"));
+      document.getElementById("appView").scrollTop=0;
+    });
+    renderSettings("one");
   </script>
 </body>
 </html>
