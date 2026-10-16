@@ -799,3 +799,40 @@ async function saveUser(){
     closeModal(); localRefresh(); toast("کاربر "+(wasEdit?"به‌روزرسانی شد":"افزوده شد"));
   } else toast(r.message,true);
 }
+
+/* ═══ دسته‌بندی‌های صفحهٔ تنظیمات (چیدمان دوستونی بازطراحی) ═══
+   فقط سه دستهٔ فهرست کنار انتخاب می‌شوند: انتخاب دسته، همهٔ کارت‌های همان دسته را نشان می‌دهد.
+   کارت‌های همهٔ دسته‌ها همیشه در DOM می‌مانند (tbody ها و جدول‌های ترتیب‌کشیدنی دست‌نخورده می‌مانند)
+   و با data-settings-cards پنهان/نمایان می‌شوند. دستهٔ آخر در حافظهٔ مرورگر می‌ماند (try/catch). */
+var MG_CATS=["technical","production","access"], MG_CAT_DEFAULT="technical", MG_CAT_KEY="fsm_settings_cat";
+var _mgCatCur="";
+function mgCatSave(id){ try{ localStorage.setItem(MG_CAT_KEY,id); }catch(e){} }
+function mgCatLoad(){ try{ return String(localStorage.getItem(MG_CAT_KEY)||""); }catch(e){ return ""; } }
+function mgCatShow(id){
+  if(MG_CATS.indexOf(id)<0) id=MG_CAT_DEFAULT;   /* دستهٔ ذخیره‌شده نامعتبر: دستهٔ اول */
+  _mgCatCur=id;
+  var pane=document.getElementById("tab-data"); if(!pane) return;
+  pane.querySelectorAll(".settings-nav-row").forEach(function(row){
+    var btn=row.querySelector("[data-settings-group]");
+    var on=!!btn && btn.getAttribute("data-settings-group")===id;
+    row.classList.toggle("active",on);
+    if(btn) btn.setAttribute("aria-pressed",on?"true":"false");
+  });
+  var content=pane.querySelector(".settings-content"); if(!content) return;
+  content.classList.remove("is-changing");
+  void content.offsetWidth;                      /* پخش دوبارهٔ انیمیشن ورود کارت‌ها، هم‌الگوی دموی بازطراحی */
+  pane.querySelectorAll("[data-settings-cards]").forEach(function(card){
+    card.hidden=card.getAttribute("data-settings-cards")!==id;
+  });
+  content.classList.add("is-changing");
+}
+mgCatShow(mgCatLoad());
+/* انتخاب دسته: چون فقط دکمه‌های سه دسته data-settings-group دارند، یک شنوندهٔ عمومی روی document کافی است */
+document.addEventListener("click",function(event){
+  var t=event.target;
+  var category=t&&t.closest?t.closest("[data-settings-group]"):null;
+  if(!category) return;
+  var id=category.getAttribute("data-settings-group");
+  if(!id || id===_mgCatCur) return;
+  mgCatShow(id); mgCatSave(id);
+});

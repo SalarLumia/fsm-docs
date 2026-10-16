@@ -1529,3 +1529,56 @@ body.boot-failed .app-main .tabpane{display:none!important}
 .dm-vsw .mv-picker{position:static}
 .dm-vsw>*{pointer-events:auto}
 .dm-vsw-from{font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;white-space:nowrap}
+
+/* ═══ صفحهٔ تنظیمات: چیدمان دوستونی بازطراحی‌شده (فهرست دسته‌بندی + کارت‌های فهرست‌ها) ═══
+   پورت آزمایشی تأییدشده (settings-redesign-test.html): فهرست کنار «دسته‌بندی» فقط سه دستهٔ
+   قابل‌انتخاب دارد؛ نام/آیکون زیرمجموعه‌ها فقط برچسب‌اند. کارت‌های همهٔ دسته‌ها همیشه در DOM
+   می‌مانند (تا tbody ها و جدول‌های ترتیب‌کشیدنی دست‌نخورده بمانند) و با data-settings-cards پنهان/نمایان می‌شوند. */
+.settings-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:16px;align-items:start}
+.settings-index{position:sticky;top:76px;padding:0;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 4px #00000008;overflow:hidden}
+.settings-index-title{display:flex;align-items:center;gap:8px;height:54px;margin:0;padding:12px 14px;border-bottom:1px solid var(--line);line-height:1.7}
+.settings-index-title svg{width:16px;height:16px;flex:none;color:var(--brand);fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.settings-nav-list{padding:8px 10px}
+.settings-nav-group{margin-bottom:3px}
+.settings-nav-group:last-child{margin-bottom:0}
+.settings-nav-row{display:flex;align-items:stretch;position:relative;border-radius:8px;transition:background .15s}
+.settings-nav-row:hover{background:var(--panel)}
+.settings-nav-row.active{background:#fff8f0}
+.settings-nav-row::before{content:"";position:absolute;top:50%;inset-inline-start:0;width:3px;height:18px;border-radius:3px;background:var(--brand);transform:translateY(-50%) scaleY(0);transition:transform .22s}
+.settings-nav-row.active::before{transform:translateY(-50%) scaleY(1)}
+.settings-nav-row.active .settings-category{color:var(--brand)}
+.settings-category{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);text-align:start;cursor:pointer;transition:color .15s}
+.settings-category:hover{color:var(--brand)}
+.settings-category:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+.settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
+.settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.settings-category-label{flex:1}
+.settings-subnav{display:grid;gap:1px;margin:2px 0 8px;margin-inline-start:20px;border-inline-start:1.5px solid var(--line);padding:2px 0;padding-inline-start:3px}
+.settings-subitem{display:flex;align-items:center;gap:8px;min-height:34px;padding:5px 9px;color:var(--muted);font-size:11px;line-height:1.5}
+.settings-subitem-icon{width:15px;height:15px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.settings-content{min-width:0}
+.settings-cards{display:grid;gap:14px}
+.settings-cards .card[hidden]{display:none}   /* تکیه‌گاه صریح display، هم‌الگوی .rv-3d-hint[hidden] */
+/* تیتر کارت مثل دمو تمام‌عرض نوار بالای کارت می‌شود (خط زیر تیتر از لبه تا لبه) */
+.settings-content .spec-sec-t{height:54px;box-sizing:border-box;margin:calc(-1 * var(--sp-6)) calc(-1 * var(--sp-6)) 14px;padding:0 14px}
+/* قاب تودرتو: کادر کارت کافی است — کادر داخلی .tablewrap حذف می‌شود (گوشه‌گرد و برش سرریز می‌ماند) */
+.settings-cards .tablewrap{border:none}
+.settings-content.is-changing .settings-cards>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
+/* زیر ~۹۰۰px فهرست، ردیف افقی سه دسته بالای کارت‌ها می‌شود (بدون برچسب زیرمجموعه‌ها) */
+@media(max-width:900px){
+  .settings-layout{grid-template-columns:1fr;gap:12px}
+  .settings-index{position:static}
+  .settings-index-title{height:48px}
+  .settings-nav-list{display:flex;gap:6px;padding:8px}
+  .settings-nav-group{margin:0;flex:1;min-width:0}
+  .settings-subnav{display:none}
+  .settings-nav-row{border:1px solid var(--line);background:var(--panel)}
+  .settings-nav-row::before{display:none}
+  .settings-category{justify-content:center;text-align:center;min-height:42px;padding:8px 4px}
+  .settings-category-label{flex:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .settings-nav-row.active{border-color:var(--brand);background:#fff8f0}
+}
+@media(prefers-reduced-motion:reduce){
+  .settings-nav-row::before{transition:none}
+  .settings-content.is-changing .settings-cards>.card{animation:none}
+}

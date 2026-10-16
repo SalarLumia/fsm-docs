@@ -401,54 +401,105 @@
 
     <!-- ---------- تنظیمات سامانه ---------- -->
     <section id="tab-data" class="tabpane hidden">
-      <div class="card">
+      <div class="settings-layout">
+        <nav class="settings-index" aria-label="دسته‌بندی تنظیمات">
+          <h2 class="settings-index-title t-section"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>دسته‌بندی</span></h2>
+          <div class="settings-nav-list">
+            <div class="settings-nav-group">
+              <div class="settings-nav-row active">
+                <button class="settings-category t-sub" type="button" data-settings-group="technical" aria-pressed="true">
+                  <span class="settings-category-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 8h8M8 12h5M8 16h3"/><path d="M17 12v4m-2-2h4"/></svg></span>
+                  <span class="settings-category-label">اطلاعات فنی</span>
+                </button>
+              </div>
+              <div class="settings-subnav" role="list" aria-label="فهرست‌های اطلاعات فنی">
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg><span>انواع قطعات</span></div>
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg><span>انواع اسناد</span></div>
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg><span>انواع پارامتر های قطعات</span></div>
+              </div>
+            </div>
+            <div class="settings-nav-group">
+              <div class="settings-nav-row">
+                <button class="settings-category t-sub" type="button" data-settings-group="production" aria-pressed="false">
+                  <span class="settings-category-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19h18"/><path d="M5 19V9l7-5 7 5v10"/><path d="M9 19v-5h6v5"/><path d="M7.5 10.5h.01M16.5 10.5h.01"/></svg></span>
+                  <span class="settings-category-label">مواد و تولید</span>
+                </button>
+              </div>
+              <div class="settings-subnav" role="list" aria-label="فهرست‌های مواد و تولید">
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M9 4v16"/></svg><span>کتابخانهٔ مواد</span></div>
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.8 1.5-3.8.3 1.3 1 2.1 2 2.3C11 7 11.2 4.5 12 2z"/><path d="M5 21h14"/><path d="M7 17.5h10"/></svg><span>عملیات حرارتی</span></div>
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="8" width="4.5" height="8" rx="1"/><rect x="9.75" y="4" width="4.5" height="8" rx="1"/><rect x="17" y="8" width="4.5" height="8" rx="1"/><path d="M7 12h2.75m-1.5-1.5L9.75 12l-1.5 1.5M14.25 8h2.75m-1.5-1.5L17 8l-1.5 1.5"/></svg><span>فرآیند تولید</span></div>
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3h1.5a2 2 0 0 1 1.7.95L22 8v8a1 1 0 0 1-1 1h-1"/><path d="M16 17H9"/><rect x="1" y="3" width="15" height="14" rx="2"/><circle cx="6.5" cy="19.5" r="2"/><circle cx="18.5" cy="19.5" r="2"/></svg><span>تأمین‌کنندگان مواد خام</span></div>
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h16l2 10H2L4 8z"/><path d="m4 8 3-4h10l3 4"/><path d="M8 12h8"/></svg><span>انواع مادهٔ خام</span></div>
+              </div>
+            </div>
+            <div class="settings-nav-group">
+              <div class="settings-nav-row">
+                <button class="settings-category t-sub" type="button" data-settings-group="access" aria-pressed="false">
+                  <span class="settings-category-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="5" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="8.5" y="16" width="7" height="5" rx="1"/><path d="M6.5 8v4h11V8m-5.5 4v4"/></svg></span>
+                  <span class="settings-category-label">کاربران و سمت‌ها</span>
+                </button>
+              </div>
+              <div class="settings-subnav" role="list" aria-label="فهرست‌های کاربران و سمت‌ها">
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg><span>سمت‌ها</span></div>
+                <div class="settings-subitem" role="listitem"><svg class="settings-subitem-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>کاربران سامانه</span></div>
+              </div>
+            </div>
+          </div>
+        </nav>
+        <section class="settings-content" aria-live="polite">
+        <div class="settings-cards">
+        <div class="card" id="setting-parts" data-settings-cards="technical">
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>انواع قطعات<span class="sec-act"><button class="icon-btn" title="قطعه جدید" aria-label="قطعه جدید" onclick="openPartModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table parts-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی قطعه</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی قطعه</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partsBody"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-doctypes" data-settings-cards="technical" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="14" y2="17"/></svg>انواع اسناد<span class="sec-act"><button class="icon-btn" title="سند جدید" aria-label="سند جدید" onclick="openDocTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table doctypes-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی سند</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی سند</span></th><th class="c-mid"><span class="unit-shift">کد سند</span></th><th class="c-mid">سطح</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="doctypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-partmods" data-settings-cards="technical" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>انواع پارامتر های قطعات<span class="sec-act"><button class="icon-btn" title="پارامتر جدید" aria-label="پارامتر جدید" onclick="openPartModModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table partmods-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی پارامتر</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی پارامتر</span></th><th class="c-mid"><span class="unit-shift">واحد</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="partmodsBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-materials" data-settings-cards="production" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M3 18h18l-3-7H6z"/><path d="M8.5 11l1.5-5h4l1.5 5"/></svg>کتابخانهٔ مواد<span class="sec-act"><button class="icon-btn" title="مادهٔ جدید" aria-label="مادهٔ جدید" onclick="openMaterialModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table mats-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>گرید ماده</span></th><th class="c-mid"><span class="en-shift">شمارهٔ ماده</span></th><th class="c-mid">استاندارد</th><th class="c-mid">وزن مخصوص</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="materialsBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-heat" data-settings-cards="production" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M12 2c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.8 1.5-3.8.3 1.3 1 2.1 2 2.3C11 7 11.2 4.5 12 2z"/><path d="M5 21h14"/><path d="M7 17.5h10"/></svg>عملیات حرارتی<span class="sec-act"><button class="icon-btn" title="عملیات جدید" aria-label="عملیات جدید" onclick="openOptModal('heat')"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table opt-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام عملیات</span></th><th class="c-mid">استفاده در قطعات</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="heattreatsBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-process" data-settings-cards="production" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>فرآیند تولید<span class="sec-act"><button class="icon-btn" title="فرآیند جدید" aria-label="فرآیند جدید" onclick="openOptModal('proc')"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table opt-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فرآیند</span></th><th class="c-mid">استفاده در قطعات</th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="processesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-suppliers" data-settings-cards="production" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M16 3h1.5a2 2 0 0 1 1.7.95L22 8v8a1 1 0 0 1-1 1h-1"/><path d="M16 17H9"/><rect x="1" y="3" width="15" height="14" rx="2"/><circle cx="6.5" cy="19.5" r="2"/><circle cx="18.5" cy="19.5" r="2"/></svg>تأمین‌کنندگان مواد خام<span class="sec-act"><button class="icon-btn" title="تأمین‌کننده جدید" aria-label="تأمین‌کننده جدید" onclick="openSupplierModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table suppliers-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="suppliersBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-rawtypes" data-settings-cards="production" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5"/><line x1="12" y1="12" x2="12" y2="22"/></svg>انواع مادهٔ خام<span class="sec-act"><button class="icon-btn" title="نوع مادهٔ خام جدید" aria-label="نوع مادهٔ خام جدید" onclick="openRawTypeModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table rawtypes-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="rawtypesBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-positions" data-settings-cards="access" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><path d="M2 13h20"/></svg>سمت‌ها<span class="sec-act"><button class="icon-btn" title="سمت جدید" aria-label="سمت جدید" onclick="openPositionModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="mgmt-table positions-tbl"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام فارسی</span></th><th class="c-mid"><span class="en-shift">نام انگلیسی</span></th><th class="col-act"><span class="act-h">عملیات</span></th></tr></thead><tbody id="positionsBody" ondragover="mgRowDragOver(event)" ondrop="event.preventDefault()"></tbody></table></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="setting-users" data-settings-cards="access" hidden>
         <h3 class="spec-sec-t"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>کاربران سامانه<span class="sec-act"><button class="icon-btn" title="کاربر جدید" aria-label="کاربر جدید" onclick="openUserModal()"><svg viewBox="0 0 24 24" class="ic"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button></span></h3>
         <div class="tablewrap"><table class="users-table"><thead><tr><th><span class="th-exp"><button type="button" class="tbl-exp" aria-expanded="false" aria-label="جمع‌کردن یا بازکردن جدول" title="جمع‌کردن یا بازکردن جدول" onclick="toggleMgmtTable(this)"><svg class="chev" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></button>نام و نام خانوادگی کاربر</span></th><th class="c-mid"><span class="en-shift">نام کاربری</span></th><th>سمت</th><th>نقش</th><th><span class="act-h">عملیات</span></th></tr></thead><tbody id="usersBody"></tbody></table></div>
+      </div>
+        </div>
+        </section>
       </div>
     </section>
     </main>
