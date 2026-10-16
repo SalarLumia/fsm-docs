@@ -1270,7 +1270,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
   transition:opacity .18s ease,transform .2s cubic-bezier(.2,0,0,1)}
 .pg-drop.open .pg-drop-menu{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
 .pg-drop-opt{display:flex;align-items:center;justify-content:center;height:30px;padding:0 6px;
-  border:none;background:none;border-radius:7px;font:inherit;font-size:12px;font-weight:500;color:var(--txt);
+  border:none;background:none;border-radius:7px;font:inherit;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--txt);
   cursor:pointer;font-variant-numeric:tabular-nums;transition:background .12s,color .12s}
 .pg-drop-opt:hover{background:var(--panel)}
 .pg-drop-opt.selected{background:#fff3e6;color:var(--brand);font-weight:600}
@@ -1330,7 +1330,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .filt-fields{min-width:150px}
 .filt-panel{width:320px;box-sizing:border-box;max-height:300px;overflow:auto;overscroll-behavior:contain}   /* عرض ثابت برای همهٔ پارامترها */
 .filt-item{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;box-sizing:border-box;height:34px;flex:0 0 34px;
-  padding:0 10px;border:none;background:none;border-radius:8px;font:inherit;font-size:12.5px;font-weight:500;
+  padding:0 10px;border:none;background:none;border-radius:8px;font:inherit;font-size:var(--fs-body);font-weight:var(--fw-body);
   color:var(--txt);cursor:pointer;text-align:start;transition:background .12s,color .12s}
 .filt-item:hover,.filt-item.active{background:var(--panel);color:var(--brand)}
 .filt-item .ic{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;color:var(--muted);flex-shrink:0}
@@ -1435,7 +1435,7 @@ button.nd-chip:hover{border-color:var(--charcoal)}
 .fld-hint{font-weight:400;color:var(--muted);font-size:11px}
 /* کنترل سگمنتی (جنسیت/نقش) */
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--radius-sm);overflow:hidden;background:#fff;width:fit-content;max-width:100%}
-.seg-btn{flex:1;white-space:nowrap;font-family:inherit;font-size:12.5px;font-weight:500;color:var(--muted);
+.seg-btn{flex:1;white-space:nowrap;font-family:inherit;font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--muted);
   background:#fff;border:none;border-inline-start:1px solid var(--line);padding:8px 15px;cursor:pointer;transition:.15s}
 .seg-btn:first-child{border-inline-start:none}
 .seg-btn:hover{background:#f6f5f3;color:var(--txt)}

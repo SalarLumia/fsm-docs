@@ -11,7 +11,7 @@
   display:flex;flex-direction:column;align-items:center;gap:10px}
 .sb-logo{width:100%;max-width:176px;height:auto;object-fit:contain;display:block;
   background:#faf9f7;border-radius:12px;padding:12px 16px;box-sizing:border-box}
-.sb-caption{font-size:12px;font-weight:500;letter-spacing:.3px;color:#ffffff;text-align:center}
+.sb-caption{font-size:var(--fs-body);font-weight:var(--fw-body);letter-spacing:.3px;color:#ffffff;text-align:center}
 .sb-nav{flex:1;padding:18px 10px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto;
   /* تورفتگی باکس نارنجی حالت فعال و جای نوار لبه — تا با خط راهنمای
      عمودی درخت (که روی مرکز آیکون است) تداخل نکند. */
@@ -197,7 +197,7 @@ body.sb-wide .app-body{margin-right:308px}
 /* خط جداکنندهٔ بین تاریخ و دکمهٔ انتقال — هم‌سبک جداکنندهٔ نقش/سمت کاربر (۱px + ۱۶px فاصله) */
 .tb-sep{align-self:center;width:1px;height:18px;background:var(--line);margin-inline:9px;flex-shrink:0}
 /* برچسب «نسخهٔ محلی» (scripts/local.js) — فقط وقتی سایت از سرور محلی باز شده */
-.lc-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn);border-radius:999px;font-size:12px;font-weight:500;white-space:nowrap;max-width:46vw;overflow:hidden}
+.lc-chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border:1px solid var(--warn-line);background:var(--warn-bg);color:var(--warn);border-radius:999px;font-size:var(--fs-body);font-weight:var(--fw-body);white-space:nowrap;max-width:46vw;overflow:hidden}
 .lc-dot{width:7px;height:7px;border-radius:50%;background:var(--warn);flex-shrink:0}
 .lc-chip.busy .lc-dot{animation:lcPulse 1s ease-in-out infinite}
 .lc-meta{color:var(--muted);overflow:hidden;text-overflow:ellipsis}

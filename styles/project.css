@@ -372,7 +372,7 @@ button.doc-ic:disabled{cursor:default}
 .ar-warn{display:flex;align-items:flex-start;gap:8px;text-align:right;
   margin:0 0 16px;padding:10px 12px;border-radius:var(--radius-sm);
   background:var(--err-bg);border:1px solid var(--err-line);
-  font-size:12px;font-weight:500;color:var(--err);line-height:1.8}
+  font-size:var(--fs-body);font-weight:var(--fw-body);color:var(--err);line-height:1.8}
 .ar-warn svg{width:15px;height:15px;flex-shrink:0;margin-top:3px;
   stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .qr-body .ar-warn:only-child{margin-bottom:0}
@@ -520,7 +520,7 @@ button.doc-ic:disabled{cursor:default}
 .ed-scroll::-webkit-scrollbar-track{background:transparent}
 /* منوی انتخاب قطعه (سفارشی) در هدر کارت‌های per-part — تریگر و گزینه‌ها دقیقاً هم‌رنگ/هم‌فونت/هم‌اندازه، بدون نارنجی */
 .ed-part-dd{position:relative;margin-inline-start:auto;direction:rtl}
-.ed-part-trig{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-family:inherit;font-size:12.5px;font-weight:500;
+.ed-part-trig{display:inline-flex;align-items:center;gap:7px;cursor:pointer;font-family:inherit;font-size:var(--fs-body);font-weight:var(--fw-body);
   color:var(--txt);background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 12px;white-space:nowrap;transition:.15s}
 .ed-part-trig:hover,.ed-part-dd.open .ed-part-trig{border-color:var(--charcoal);background:#f6f5f3}
 .ed-part-trig .ed-chev{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;transition:transform .22s,color .15s}
@@ -529,7 +529,7 @@ button.doc-ic:disabled{cursor:default}
   background:#fff;border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px #00000022;padding:4px;max-height:220px;overflow-y:auto;
   opacity:0;transform:translateY(-6px) scale(.95);transform-origin:top center;pointer-events:none;transition:opacity .18s ease,transform .2s cubic-bezier(.2,0,0,1)}
 .ed-part-dd.open .ed-part-menu{opacity:1;transform:translateY(0) scale(1);pointer-events:auto}
-.ed-part-opt{display:block;width:100%;text-align:right;font-family:inherit;font-size:12.5px;font-weight:500;
+.ed-part-opt{display:block;width:100%;text-align:right;font-family:inherit;font-size:var(--fs-body);font-weight:var(--fw-body);
   color:var(--txt);background:none;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;white-space:nowrap;transition:.12s}
 .ed-part-opt:hover{background:#f2f1ee}
 .ed-part-opt.on{background:var(--charcoal);color:#fff}
@@ -595,7 +595,7 @@ button.doc-ic:disabled{cursor:default}
 /* ردیف قالب ثابت مشخصات پروژه: برچسب (راست) + مقدار/ورودی (چپ) */
 .ed-fld-row{display:flex;align-items:center;gap:var(--sp-4);padding:9px 0;border-bottom:1px solid #f2f1ee}
 .ed-fld-row:last-child{border-bottom:none}
-.ed-fld-lab{font-size:12px;color:var(--muted);font-weight:500;width:140px;flex-shrink:0}
+.ed-fld-lab{font-size:var(--fs-body);color:var(--muted);font-weight:var(--fw-body);width:140px;flex-shrink:0}
 .ed-fld-val{flex:1;min-width:0;font-size:12.5px;color:var(--txt);font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ed-fld-val.ltr{direction:ltr;text-align:left;font-variant-numeric:tabular-nums;letter-spacing:.3px}
 .ed-fld-val.auto{color:var(--muted);font-weight:500}
