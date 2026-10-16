@@ -170,34 +170,19 @@
     .settings-nav-row.active{background:#fff8f0}
     .settings-nav-row::before{content:"";position:absolute;top:50%;inset-inline-start:0;width:3px;height:18px;border-radius:3px;background:var(--brand);transform:translateY(-50%) scaleY(0);transition:transform .22s}
     .settings-nav-row.active::before{transform:translateY(-50%) scaleY(1)}
-    .settings-nav-row.active .settings-category,.settings-nav-row.active .settings-toggle{color:var(--brand)}
+    .settings-nav-row.active .settings-category{color:var(--brand)}
     .settings-category{flex:1;min-width:0;display:flex;align-items:center;gap:9px;min-height:44px;padding:8px 9px;border:0;border-radius:8px;background:transparent;color:var(--txt);font:700 12px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:color .15s}
     .settings-category:hover{color:var(--brand)}
-    .settings-category:focus-visible,.settings-toggle:focus-visible,.settings-subitem:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+    .settings-category:focus-visible,.settings-subitem:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
     .settings-category-icon{display:grid;place-items:center;width:24px;height:24px;flex:none}
     .settings-category-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
     .settings-category-label{flex:1}
-    .settings-toggle{width:34px;flex:none;display:grid;place-items:center;border:0;border-radius:0 8px 8px 0;background:transparent;color:var(--muted);cursor:pointer;transition:color .15s}
-    .settings-toggle:hover{color:var(--brand)}
-    .settings-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;transition:transform .22s}
-    .settings-toggle[aria-expanded="true"] svg{transform:rotate(180deg)}
-    .settings-collapse{display:grid;grid-template-rows:0fr;opacity:0;transition:grid-template-rows .3s cubic-bezier(0,0,.2,1),opacity .28s cubic-bezier(0,0,.2,1)}
-    .settings-collapse.open{grid-template-rows:1fr;opacity:1}
-    .settings-collapse-inner{overflow:hidden;min-height:0}
     .settings-subnav{display:grid;gap:1px;margin:3px 0 7px;margin-inline-start:20px;border-inline-start:1.5px solid var(--line);padding-inline-start:3px}
     .settings-subitem{position:relative;display:flex;align-items:center;gap:9px;width:100%;min-height:44px;padding:7px 10px;border:0;border-radius:7px;background:transparent;color:var(--muted);font:400 11.5px IRANSans,system-ui,sans-serif;text-align:start;cursor:pointer;transition:background .15s,color .15s}
     .settings-subitem-icon{width:16px;height:16px;flex:none;color:var(--muted);fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:color .15s}
     .settings-subitem:hover{background:var(--panel);color:var(--txt)}
     .settings-subitem[aria-current="page"]{background:#fff8f0;color:var(--txt);font-weight:700}
     .settings-subitem[aria-current="page"] .settings-subitem-icon{color:var(--brand)}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem{animation:navRise .34s cubic-bezier(0,0,.2,1) both}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(1){animation-delay:.02s}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(2){animation-delay:.06s}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(3){animation-delay:.1s}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(4){animation-delay:.14s}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(5){animation-delay:.18s}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(6){animation-delay:.22s}
-    .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem:nth-child(n+7){animation-delay:.22s}
     .settings-content{min-width:0}
     .settings-content.is-changing>.card{animation:fsmRise .28s cubic-bezier(0,0,.2,1) both}
     .settings-group{scroll-margin-top:76px}
@@ -225,8 +210,8 @@
     @media(max-width:900px){.settings-layout{grid-template-columns:205px minmax(0,1fr);gap:12px}}
     @media(max-width:700px){.settings-layout{grid-template-columns:1fr}.settings-index{position:static}.settings-subnav{margin-inline-start:22px}.settings-tabs{top:0}}
     @media(prefers-reduced-motion:reduce){
-      .settings-accordion summary,.settings-accordion summary::after,.settings-nav-row::before,.settings-toggle svg,.settings-collapse{transition:none}
-      .settings-collapse.settings-anim.open>.settings-collapse-inner>.settings-subnav>.settings-subitem,.settings-content.is-changing>.card{animation:none}
+      .settings-accordion summary,.settings-accordion summary::after,.settings-nav-row::before{transition:none}
+      .settings-content.is-changing>.card{animation:none}
     }
   </style>
 </head>
@@ -616,7 +601,6 @@
     var settingsSidebar=document.querySelector(".sb-bottom");
     var selectedSettingsGroup="technical";
     var selectedSetting="parts";
-    var expandedSettingsGroups={technical:true,production:true,access:true};
     var previewClients=[
       {code:"SAV",name:"Saveh Cement Co.",projects:["پروژهٔ ۰۱","پروژهٔ ۰۲"]},
       {code:"ISR",name:"Isfahan Rolling Mill",projects:["پروژهٔ ۰۱"]},
@@ -765,15 +749,12 @@
       return '<div class="settings-layout"><nav class="settings-index" aria-label="دسته‌ها و تنظیمات">'+
         '<h2 class="settings-index-title">'+settingsIcon('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>')+'<span>انواع تنظیمات</span></h2><div class="settings-nav-list">'+settingsGroups.map(function(group){
           var categoryIcon=group.icon;
-          var expanded=!!expandedSettingsGroups[group.id];
           var active=group.id===selectedGroup.id;
-          var subnavId="settings-nav-"+group.id;
           return '<div class="settings-nav-group"><div class="settings-nav-row'+(active?' active':'')+'"><button class="settings-category" type="button" data-settings-group="'+group.id+'" aria-current="'+(active?'true':'false')+'">'+
-            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button>'+
-            '<button class="settings-toggle" type="button" data-settings-toggle="'+group.id+'" aria-label="'+(expanded?'بستن':'بازکردن')+' '+settingsEscape(group.name)+'" aria-controls="'+subnavId+'" aria-expanded="'+expanded+'">'+settingsIcon('<polyline points="6 9 12 15 18 9"/>')+'</button></div>'+
-            '<div class="settings-collapse'+(expanded?' open':'')+'" id="'+subnavId+'"><div class="settings-collapse-inner"><div class="settings-subnav">'+group.settings.map(function(setting){
+            '<span class="settings-category-icon">'+settingsIcon(categoryIcon)+'</span><span class="settings-category-label">'+settingsEscape(group.name)+'</span></button></div>'+
+            '<div class="settings-subnav">'+group.settings.map(function(setting){
               return '<button class="settings-subitem" type="button" data-setting="'+setting.id+'" aria-current="'+(setting.id===selected.id?'page':'false')+'">'+settingsIcon(setting.icon,'settings-subitem-icon')+settingsEscape(setting.name)+'</button>';
-            }).join("")+'</div></div></div></div>';
+            }).join("")+'</div></div>';
         }).join("")+'</div></nav><section class="settings-content" aria-live="polite">'+
         settingsCard(selected)+'</section></div>';
     }
@@ -824,23 +805,6 @@
       content.innerHTML=settingsCard(selected);
       content.classList.add("is-changing");
     }
-    function playSettingsSubnav(collapse){
-      if(!collapse)return;
-      if(collapse._settingsAnimT)clearTimeout(collapse._settingsAnimT);
-      collapse.classList.remove("settings-anim");
-      void collapse.offsetWidth;
-      collapse.classList.add("settings-anim");
-      collapse._settingsAnimT=setTimeout(function(){
-        collapse.classList.remove("settings-anim");
-        collapse._settingsAnimT=null;
-      },600);
-    }
-    function stopSettingsSubnav(collapse){
-      if(!collapse)return;
-      if(collapse._settingsAnimT)clearTimeout(collapse._settingsAnimT);
-      collapse.classList.remove("settings-anim");
-      collapse._settingsAnimT=null;
-    }
     settingsSidebar.addEventListener("click",function(event){
       var button=event.target.closest("[data-layout]");
       if(!button)return;
@@ -848,21 +812,6 @@
       document.getElementById("appView").scrollTop=0;
     });
     settingsHost.addEventListener("click",function(event){
-      var toggle=event.target.closest("[data-settings-toggle]");
-      if(toggle){
-        var groupId=toggle.getAttribute("data-settings-toggle");
-        var toggleGroup=settingsGroups.filter(function(group){return group.id===groupId;})[0];
-        if(!toggleGroup)return;
-        expandedSettingsGroups[groupId]=!expandedSettingsGroups[groupId];
-        var expanded=expandedSettingsGroups[groupId];
-        toggle.setAttribute("aria-expanded",String(expanded));
-        toggle.setAttribute("aria-label",(expanded?'بستن':'بازکردن')+' '+toggleGroup.name);
-        var collapse=document.getElementById("settings-nav-"+groupId);
-        collapse.classList.toggle("open",expanded);
-        if(expanded)playSettingsSubnav(collapse);
-        else stopSettingsSubnav(collapse);
-        return;
-      }
       var category=event.target.closest("[data-settings-group]");
       var setting=event.target.closest("[data-setting]");
       if(category){
@@ -870,19 +819,7 @@
         if(!selectedGroup)return;
         selectedSettingsGroup=selectedGroup.id;
         selectedSetting=selectedGroup.settings[0].id;
-        var wasExpanded=!!expandedSettingsGroups[selectedGroup.id];
-        expandedSettingsGroups[selectedGroup.id]=true;
         updateSettingsSelection();
-        if(!wasExpanded){
-          var collapse=document.getElementById("settings-nav-"+selectedGroup.id);
-          var groupToggle=settingsHost.querySelector('[data-settings-toggle="'+selectedGroup.id+'"]');
-          if(groupToggle){
-            groupToggle.setAttribute("aria-expanded","true");
-            groupToggle.setAttribute("aria-label","بستن "+selectedGroup.name);
-          }
-          collapse.classList.add("open");
-          playSettingsSubnav(collapse);
-        }
         return;
       }
       if(setting){
